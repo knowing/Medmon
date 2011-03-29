@@ -6,9 +6,9 @@
 *.out
 
 #IDE files to ignore (Netbeans, Eclipse)
-.classpath
-.project
-.settings
+#.classpath
+#.project
+#.settings
 
 #ignore generated .class files
 *.class
