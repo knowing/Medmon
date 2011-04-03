@@ -1,8 +1,9 @@
 package de.sendsor.accelerationSensor.model;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.annotations.SensorData;
-import de.lmu.ifi.dbs.medmon.datamining.core.annotations.SensorDataClass;
-import de.lmu.ifi.dbs.medmon.datamining.core.annotations.SensorDataTimestamp;
+import de.lmu.ifi.dbs.medmon.sensor.core.annotations.SensorData;
+import de.lmu.ifi.dbs.medmon.sensor.core.annotations.SensorDataClass;
+import de.lmu.ifi.dbs.medmon.sensor.core.annotations.SensorDataTimestamp;
+
 
 @SensorDataClass(dimension = 3)
 public class Data {

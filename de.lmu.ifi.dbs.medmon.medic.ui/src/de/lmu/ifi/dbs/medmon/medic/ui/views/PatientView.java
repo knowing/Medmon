@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ArchivLabelProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
-import de.lmu.ifi.dbs.medmon.medic.ui.util.MedicUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TrainClusterWizard;
 
 public class PatientView extends ViewPart implements PropertyChangeListener {
@@ -344,7 +343,9 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		archivViewer.setInput(archives);
 		
 		//Update Cluster
-		clusterViewer.setInput(MedicUtil.loadClusterUnits(patient));
+		//clusterViewer.setInput(MedicUtil.loadClusterUnits(patient));
+		//TODO clusterViewer.setInput(Clusters)
+		System.err.println("TODO: clusterViewer.setInput(Clusters)");
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public class SelectDataSourcePage extends WizardPage {
 	
 	public Object getConfiguration() {
 		if(currentKey.equals(CSV))
-			return csvSource.getDescriptor();
+			return null; //return csvSource.getDescriptor();
 		else if(currentKey.equals(SENSOR))
 			return sensorSource;
 		else

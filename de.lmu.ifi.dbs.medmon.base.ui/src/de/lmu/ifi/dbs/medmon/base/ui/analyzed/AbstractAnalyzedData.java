@@ -7,8 +7,6 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.data.general.Dataset;
 import org.jfree.experimental.chart.swt.ChartComposite;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
-
 public abstract class AbstractAnalyzedData implements IAnalyzedData {
 
 	protected ChartComposite chartComposite;

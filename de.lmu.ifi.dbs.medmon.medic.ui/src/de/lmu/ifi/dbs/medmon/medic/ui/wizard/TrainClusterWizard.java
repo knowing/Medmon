@@ -1,20 +1,8 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
@@ -22,29 +10,12 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterContainer;
-import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterFile;
-import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterTableItem;
-import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
-import de.lmu.ifi.dbs.medmon.base.ui.widgets.SensorSourceWidget;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.ClusterWizardPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataSourcePage;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.cluster.ClusterUnit;
-import de.lmu.ifi.dbs.medmon.datamining.core.container.RawData;
-import de.lmu.ifi.dbs.medmon.datamining.core.csv.io.CSVDescriptor;
-import de.lmu.ifi.dbs.medmon.datamining.core.csv.io.CSVFileReader;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.IClusterData;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.internal.DataConverter;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.internal.Processor;
-import de.lmu.ifi.dbs.medmon.datamining.core.util.ClusterUtils;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDPUPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
 public class TrainClusterWizard extends Wizard implements IWorkbenchWizard, IExecutableExtension {
 
@@ -77,7 +48,7 @@ public class TrainClusterWizard extends Wizard implements IWorkbenchWizard, IExe
 		}
 
 		DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
-		Processor processor = Processor.getInstance();
+/*		Processor processor = Processor.getInstance();
 		ClusterUnit cu = null;
 		if (dataSourcePage.getCurrentKey().equals(SelectDataSourcePage.CSV)) {
 			CSVDescriptor descriptor = (CSVDescriptor) dataSourcePage.getConfiguration();
@@ -96,11 +67,13 @@ public class TrainClusterWizard extends Wizard implements IWorkbenchWizard, IExe
 				container[index++] = (ClusterContainer) item;
 			cu = clusterSensor(dpu, processor, widget.getSensor().getSensorExtension(), container);
 		}	
-		saveClusterUnit(cu);
+		saveClusterUnit(cu);*/
+		//TODO generate Cluster in TrainClusterWizard
+		System.err.println("TODO: generate Cluster in TrainClusterWizard");
 		return true;
 	}
 
-	private ClusterUnit clusterCSV(DataProcessingUnit dpu, Processor processor, CSVDescriptor descriptor,
+/*	private ClusterUnit clusterCSV(DataProcessingUnit dpu, Processor processor, CSVDescriptor descriptor,
 			ClusterFile[] files) {
 		Map<String, IAnalyzedData> acc = null;
 		for (ClusterFile file : files) {
@@ -182,22 +155,8 @@ public class TrainClusterWizard extends Wizard implements IWorkbenchWizard, IExe
 			e.printStackTrace();
 		}
 
-	}
+	}*/
 
-	/*
-	 * private String schedule(String familyToJoin, ISensorDataContainer c,
-	 * IConverter converter, DataProcessingUnit dpu, Processor p, RawData data,
-	 * Map<String, IAnalyzedData> acc) { String family = data.getLabel();
-	 * ConvertJob convertJob = new ConvertJob("Import", c, converter, family);
-	 * DataProcessJob processJob = new DataProcessJob("Process", dpu, p, data,
-	 * acc, family); IJobManager jm = Job.getJobManager(); IProgressMonitor pm =
-	 * jm.createProgressGroup(); try { pm.beginTask("Building", 10);
-	 * convertJob.setProgressGroup(pm, 5); convertJob.schedule();
-	 * processJob.setProgressGroup(pm, 5); processJob.schedule();
-	 * convertJob.join(); processJob.join(); jm.join(familyToJoin, pm); } catch
-	 * (InterruptedException e) { e.printStackTrace(); } finally { pm.done(); }
-	 * return family; }
-	 */
 
 	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)

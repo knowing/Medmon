@@ -13,13 +13,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.parameter.ClusterParameter;
-import de.lmu.ifi.dbs.medmon.datamining.core.parameter.IProcessorParameter;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.XMLDataProcessor;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.internal.Processor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
@@ -79,36 +74,23 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			return false;
 		
 		Patient patient = sourcePage.getPatient();
-		setClusterParameter(dpu, patient);
-		
-		Processor processor = Processor.getInstance();
-		Map<String, IAnalyzedData> acc = null;
-		ISensor sensor = sourcePage.getSensor().getSensorExtension();
-		ISensorDataContainer[] selection = dataPage.getSelection();
-		for (ISensorDataContainer c : selection) {
-			// new ImportJob(c.getBlock(), sensor.getConverter()).schedule();
-			try {
-				Object[] input = sensor.getConverter().readData(c);
-				acc = processor.run(dpu, input, acc);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		//TODO QuickAnalyseWizard -> performFinish()
+		System.err.println("NOT IMPLEMENTED YET");
+//		Processor processor = Processor.getInstance();
+//		Map<String, IAnalyzedData> acc = null;
+//		ISensor sensor = sourcePage.getSensor().getSensorExtension();
+//		ISensorDataContainer[] selection = dataPage.getSelection();
+//		for (ISensorDataContainer c : selection) {
+//			// new ImportJob(c.getBlock(), sensor.getConverter()).schedule();
+//			try {
+//				Object[] input = sensor.getConverter().readData(c);
+//				acc = processor.run(dpu, input, acc);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 		return true;
-	}
-
-	private void setClusterParameter(DataProcessingUnit dpu, Patient patient) {
-		List<XMLDataProcessor> processors = dpu.getProcessors();
-		XMLDataProcessor processor = processors.get(processors.size() - 1);
-		Map<String, IProcessorParameter> parameters = processor.getParameters();
-		for (IProcessorParameter parameter : parameters.values()) {
-			if(parameter instanceof ClusterParameter) {
-				ClusterParameter p = (ClusterParameter) parameter;
-				//p.setValue(MedicUtil.loadClusterUnit(patient, patient.getCluster()));
-				p.setValueAsString(ApplicationConfigurationUtil.getClusterUnitFolder(patient) + patient.getCluster() + ".xml");
-			}
-		}
 	}
 
 	@Override

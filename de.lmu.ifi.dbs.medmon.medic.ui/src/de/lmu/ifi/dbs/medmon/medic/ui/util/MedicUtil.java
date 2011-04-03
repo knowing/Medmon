@@ -1,25 +1,9 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.util;
 
-import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil.getClusterUnitFolder;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import de.lmu.ifi.dbs.medmon.base.ui.adapter.PatientClusterAdapter;
-import de.lmu.ifi.dbs.medmon.base.ui.filter.XMLFileFilter;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.cluster.ClusterUnit;
 
 public class MedicUtil {
-
+	//TODO Move medic.ui MedicUtil to medic.core
+/*
 	public static List<PatientClusterAdapter> loadClusterUnits(Patient patient) {
 		List<ClusterUnit> units = loadClusterUnits(getClusterUnitFolder(patient));
 
@@ -78,5 +62,5 @@ public class MedicUtil {
 		}
 
 		return null;
-	}
+	}*/
 }

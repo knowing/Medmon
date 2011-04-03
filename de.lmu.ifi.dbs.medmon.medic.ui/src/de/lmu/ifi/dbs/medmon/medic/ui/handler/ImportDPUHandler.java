@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DPUValidator;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.graph.GraphValidator;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
 public class ImportDPUHandler extends AbstractHandler implements IHandler {
@@ -40,10 +40,9 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 			JAXBContext context = JAXBContext.newInstance(DataProcessingUnit.class);
 			Unmarshaller um = context.createUnmarshaller();
 			DataProcessingUnit dpu = (DataProcessingUnit) um.unmarshal(new File(dpufile));
-			
+			GraphValidator validator = new GraphValidator(dpu);
 			//Validation
-			DPUValidator dpuValidator = new DPUValidator(dpu);
-			if(dpuValidator.validate()) {
+			if(validator.validate()) {
 				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.getName());
 				if(file.exists()) {
 					if(!MessageDialog.openConfirm(shell, "Ueberschreiben?", "Verfahren existiert bereits! Wollen Sie es ueberschreiben?"))
@@ -55,7 +54,7 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.getName() + " wurde nach importiert");
 				}
 			} else {
-				Map<String, String> errors = dpuValidator.getErrors();
+				Map<String, String> errors = validator.getErrors();
 				Status status = new Status(IStatus.ERROR, "Medic Plugin", createErrorList(errors));
 				ErrorDialog errorDialog = new ErrorDialog(shell, "Fehler beim Import", "Die Datei ist nicht korrekt", status, IStatus.ERROR);
 				errorDialog.open();

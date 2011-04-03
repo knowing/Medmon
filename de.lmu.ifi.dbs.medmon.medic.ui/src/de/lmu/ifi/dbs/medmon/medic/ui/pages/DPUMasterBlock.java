@@ -34,9 +34,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import de.lmu.ifi.dbs.medmon.base.ui.filter.ClusterDPUFilter;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportDPUHandler;
@@ -48,7 +47,7 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 	private Text tSearch;
 
 	private TreeViewer dpuViewer;
-	private ClusterDPUFilter clusterFilter;
+//	private ClusterDPUFilter clusterFilter;
 	private DPUFilter dpuFilter;
 	private DPUDetailsPage dpuDetailsPage;
 
@@ -84,7 +83,7 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 		bCluster.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				clusterFilter.setCluster(bCluster.getSelection());
+//				clusterFilter.setCluster(bCluster.getSelection());
 				dpuViewer.refresh();
 			}
 		});
@@ -101,9 +100,9 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 				managedForm.fireSelectionChanged(part, event.getSelection());
 			}
 		});
-		clusterFilter = new ClusterDPUFilter();
+//		clusterFilter = new ClusterDPUFilter();
 		dpuFilter = new DPUFilter();
-		dpuViewer.addFilter(clusterFilter);
+//		dpuViewer.addFilter(clusterFilter);
 		dpuViewer.addFilter(dpuFilter);
 		Tree tree = dpuViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
@@ -170,7 +169,6 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 			
 			for (int i = 0; i < returns.length; i++) {
 				DataProcessingUnit dpu = (DataProcessingUnit) um.unmarshal(new File(path + files[i]));
-				dpu.setFile(path + files[i]);
 				returns[i] = dpu;
 			}
 				
@@ -185,7 +183,5 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		dpuViewer.addSelectionChangedListener(listener);
 	}
-	
-	
 
 }

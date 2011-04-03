@@ -1,9 +1,13 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.provider;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.PersistentNode;
+
 
 /**
  * This provider structures the DPU in categories and gives access to the
@@ -22,7 +26,11 @@ public class DPUContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		return null;
+		if(!(parentElement instanceof DataProcessingUnit))
+			return new Object[0];
+		DataProcessingUnit dpu = (DataProcessingUnit) parentElement;
+		List<PersistentNode> nodes = dpu.getNodes();
+		return (PersistentNode[]) nodes.toArray(new PersistentNode[nodes.size()]);
 	}
 
 	@Override
@@ -32,6 +40,8 @@ public class DPUContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
+		if(element instanceof DataProcessingUnit)
+			return !((DataProcessingUnit)element).getNodes().isEmpty();
 		return false;
 	}
 	

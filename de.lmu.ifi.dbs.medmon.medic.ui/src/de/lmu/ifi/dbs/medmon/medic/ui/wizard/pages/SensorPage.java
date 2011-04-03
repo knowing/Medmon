@@ -1,13 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -36,12 +30,10 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.core.job.LoadPatientJob;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.PatientProposalProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.TextContentAdapter2;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.RootSensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
 
 public class SensorPage extends WizardPage {
@@ -189,23 +181,13 @@ public class SensorPage extends WizardPage {
 			ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new LabelProvider());
 			dialog.setBlockOnOpen(true);
 			dialog.setTitle("Patient auswaehlen");
-			dialog.setElements(loadPatients());
+			dialog.setElements(LoadPatientJob.getPatients());
 			if (dialog.open() == Window.OK) {
 				// Assuming that there's only one Patient Selection
 				Patient patient = (Patient) dialog.getResult()[0];
 				tPatient.setText(PatientProposalProvider.parseString(patient));
 				done();
 			}
-		}
-
-		private Patient[] loadPatients() {
-			EntityManager em = JPAUtil.createEntityManager();
-			em.getTransaction().begin();
-			Query allPatients = em.createNamedQuery("Patient.findAll");
-			List<Patient> patients = allPatients.getResultList();
-			em.getTransaction().commit();
-			em.close();
-			return patients.toArray(new Patient[patients.size()]);
 		}
 
 	}

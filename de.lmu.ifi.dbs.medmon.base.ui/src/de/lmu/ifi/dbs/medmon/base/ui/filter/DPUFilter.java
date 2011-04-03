@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.medmon.base.ui.filter;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+
 
 public class DPUFilter extends ViewerFilter {
 

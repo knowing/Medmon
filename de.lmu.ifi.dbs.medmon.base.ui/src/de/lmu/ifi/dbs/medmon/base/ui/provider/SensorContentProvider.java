@@ -3,8 +3,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.provider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import de.lmu.ifi.dbs.medmon.datamining.core.util.FrameworkUtil;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
 
 
 /**
@@ -26,6 +25,6 @@ public class SensorContentProvider implements IStructuredContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		return FrameworkUtil.<ISensor>evaluateExtensions(ISensor.SENSOR_ID);
+		return SensorUtil.evaluateSensors();
 	}	
 }

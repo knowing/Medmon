@@ -6,10 +6,11 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.core.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0",
+ de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0";visibility:=reexport,
  de.lmu.ifi.dbs.medmon.datamining.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.derby;bundle-version="1.0.0",
- javax.persistence;bundle-version="2.0.1"
+ de.lmu.ifi.dbs.medmon.derby;bundle-version="1.0.0";visibility:=reexport,
+ javax.persistence;bundle-version="2.0.3",
+ de.lmu.ifi.dbs.knowing.core;bundle-version="1.0.0";visibility:=reexport
 Service-Component: OSGI-INF/component.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -28,7 +28,6 @@ import de.sendsor.accelerationSensor.model.Data;
  * Class for converting SDR Files to {@link ISensorDataContainers}
  * 
  * @author Alexander Stautner, Nepomuk Seiler
- * @param <E>
  */
 public class SDRConverter extends AbstractConverter<Data> {
 

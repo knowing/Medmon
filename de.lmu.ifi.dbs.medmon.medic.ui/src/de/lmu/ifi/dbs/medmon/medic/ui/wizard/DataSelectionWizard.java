@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.datamining.core.util.FrameworkUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
@@ -23,6 +22,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.RootSensorDataContainer;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
 
 public class DataSelectionWizard extends Wizard {
 
@@ -52,10 +52,10 @@ public class DataSelectionWizard extends Wizard {
 		}
 
 		Sensor dbsensor = results.get(0).getSensor();
-		List<ISensor<?>> sensors = FrameworkUtil.<ISensor<?>>evaluateExtensionsAsList(ISensor.SENSOR_ID);
-		ISensor<?> sensor = null;
+		List<ISensor> sensors = SensorUtil.evaluateExtensionsAsList();
+		ISensor sensor = null;
 		for (Object o : sensors) {
-			ISensor<?> s = (ISensor<?>) o;
+			ISensor s = (ISensor) o;
 			String id = Sensor.parseId(s.getName(), s.getVersion());
 			if (id.equals(dbsensor.getId())) {
 				sensor = s;

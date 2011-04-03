@@ -8,7 +8,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Table;
 
-import de.lmu.ifi.dbs.medmon.base.ui.adapter.PatientClusterAdapter;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 
@@ -30,22 +29,24 @@ public class DefaultClusterEditingSupport extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		PatientClusterAdapter adapter = (PatientClusterAdapter) element;
-		return adapter.isDefault();
+//		PatientClusterAdapter adapter = (PatientClusterAdapter) element;
+//		return adapter.isDefault();
+		return Boolean.TRUE;
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		PatientClusterAdapter adapter = (PatientClusterAdapter) element;
-		EntityManager em = JPAUtil.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = adapter.getPatient();
-		em.merge(patient);
-		patient.setCluster(adapter.getCluster().getName());
-		em.getTransaction().commit();
-		em.close();
-		validate(patient, adapter.getCluster().getName());
-		getViewer().refresh();
+//		PatientClusterAdapter adapter = (PatientClusterAdapter) element;
+//		EntityManager em = JPAUtil.createEntityManager();
+//		em.getTransaction().begin();
+//		Patient patient = adapter.getPatient();
+//		em.merge(patient);
+//		patient.setCluster(adapter.getCluster().getName());
+//		em.getTransaction().commit();
+//		em.close();
+//		validate(patient, adapter.getCluster().getName());
+//		getViewer().refresh();
+		System.err.println("setValue -> NOT IMPLEMENTED YET");
 	}
 	
 	private void validate(Patient patient, String cluster) {
