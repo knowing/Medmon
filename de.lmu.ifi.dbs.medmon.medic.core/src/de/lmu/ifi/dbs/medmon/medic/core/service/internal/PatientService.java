@@ -14,9 +14,9 @@ import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
 
 /**
  * PatientService declarative Service.

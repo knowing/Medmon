@@ -1,14 +1,13 @@
 package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.cluster.ClusterUnit;
 
 public class PatientClusterAdapter {
 
 	private final Patient patient;
-	private final ClusterUnit unit;
+	private final Object unit;
 	
-	public PatientClusterAdapter(Patient patient, ClusterUnit unit) {
+	public PatientClusterAdapter(Patient patient, Object unit) {
 		this.patient = patient;
 		this.unit = unit;
 	}
@@ -18,22 +17,20 @@ public class PatientClusterAdapter {
 		return patient;
 	}
 	
-	public ClusterUnit getCluster() {
+	public Object getCluster() {
 		return unit;
 	}
 
 	public String getName() {
-		return unit.getName();
+		return "NOT IMPLEMENTED";
 	}
 
 	public String getDescription() {
-		return unit.getDescription();
+		return "NOT IMPLEMENTED";
 	}
 	
 	public boolean isDefault() {
-		if(patient.getCluster() == null)
-			return false;
-		return unit.getName().equals(patient.getCluster());
+		return false;
 	}
 	
 }

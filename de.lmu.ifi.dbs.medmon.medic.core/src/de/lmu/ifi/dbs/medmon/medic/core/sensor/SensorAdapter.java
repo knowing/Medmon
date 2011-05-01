@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.sensor.core.util;
+package de.lmu.ifi.dbs.medmon.medic.core.sensor;
 
 import java.io.IOException;
 

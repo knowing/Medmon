@@ -51,7 +51,6 @@ public class Activator extends AbstractUIPlugin {
 		emfbTracker = new ServiceTracker(context, EntityManagerFactoryBuilder.class.getName(),
 				JPAUtil.getServiceTrackerCustomizer("medmon", database.getProperties()));
 		emfbTracker.open();
-		startingDBBundles(context);
 	}
 
 	/*
@@ -95,32 +94,6 @@ public class Activator extends AbstractUIPlugin {
 
 	public static ServiceTracker getEmfTracker() {
 		return emfTracker;
-	}
-
-	private void startingDBBundles(BundleContext context) {
-		Bundle[] bundles = context.getBundles();
-		final String jpa = "org.eclipse.gemini.jpa";
-		for (final Bundle bundle : bundles) {
-			if (jpa.equals(bundle.getSymbolicName())) {
-				Runnable startJPA = new Runnable() {
-
-					@Override
-					public void run() {
-						try {
-							System.out.println("##### Trying to start " + jpa);
-							bundle.start();
-							System.out.println("##### Started!");
-						} catch (BundleException e) {
-							e.printStackTrace();
-						}
-					}
-				};
-				Thread thread = new Thread(startJPA);
-				thread.start();
-				
-			}
-		}
-
 	}
 
 }

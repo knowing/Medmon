@@ -7,6 +7,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -34,6 +35,7 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		
 		createApplicationFolders();
+		SensorDaemon.start();
 	}
 
 	/*
@@ -42,7 +44,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-
+		SensorDaemon.stop();
 		super.stop(context);
 	}
 

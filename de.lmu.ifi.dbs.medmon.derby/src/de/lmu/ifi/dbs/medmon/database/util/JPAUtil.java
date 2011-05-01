@@ -76,9 +76,13 @@ public class JPAUtil implements ServiceTrackerCustomizer {
 	public static boolean isAvailable() {
 		if (utils == null)
 			return false;
-		if (utils.isEmpty())
+		if (utils.isEmpty()) 
 			return false;
-		return true;
+		for(JPAUtil util : utils.values()) {
+			if(util != null && util.emfBuilder != null ) 
+				return true;
+		}
+		return false;
 	}
 	
 	public static boolean isAvailable(String punit) {
