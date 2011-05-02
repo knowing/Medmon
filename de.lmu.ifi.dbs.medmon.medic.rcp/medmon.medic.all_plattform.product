@@ -13,6 +13,9 @@
    </launcherArgs>
 
    <plugins>
+      <plugin id="ch.qos.logback.classic"/>
+      <plugin id="ch.qos.logback.core"/>
+      <plugin id="com.google.inject"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="de.lmu.ifi.dbs.elki.libs"/>
       <plugin id="de.lmu.ifi.dbs.medmon.base.ui"/>
@@ -107,19 +110,21 @@
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.sat4j.core"/>
       <plugin id="org.sat4j.pb"/>
+      <plugin id="org.scala-ide.scala.library"/>
       <plugin id="osgi.enterprise"/>
+      <plugin id="se.scalablesolutions.akka.osgi.dependencies.bundle"/>
+      <plugin id="slf4j.api"/>
    </plugins>
 
    <configurations>
-      <plugin id="de.lmu.ifi.dbs.medmon.derby" autoStart="true" startLevel="0" />
-      <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="true" startLevel="0" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="true" startLevel="0" />
       <plugin id="javax.persistence" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
    </configurations>
 

@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Table;
 
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.editing.SensorPathEditingSupport;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorDaemon;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
 
 public class SensorTableViewer extends TableViewer implements PropertyChangeListener {
 
@@ -70,7 +70,7 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 	}
 
 	private void initInput() {
-		SensorDaemon daemon = SensorDaemon.getInstance();
+		SensorDaemon daemon = SensorDaemon.getDaemon();
 		if (daemon == null) {
 			new Thread(new WaitingForInput(this)).start();
 		} else {
@@ -103,10 +103,10 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 
 		@Override
 		public void run() {
-			SensorDaemon daemon = SensorDaemon.getInstance();
+			SensorDaemon daemon = SensorDaemon.getDaemon();
 			//Try getting the Daemon
 			while (daemon == null) {
-				daemon = SensorDaemon.getInstance();
+				daemon = SensorDaemon.getDaemon();
 				try {
 					Thread.sleep(500L);
 				} catch (InterruptedException e) {

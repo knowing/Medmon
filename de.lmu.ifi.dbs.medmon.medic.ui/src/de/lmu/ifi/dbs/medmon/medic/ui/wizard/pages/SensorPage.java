@@ -1,16 +1,10 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -31,10 +25,9 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.job.LoadPatientJob;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.PatientProposalProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.TextContentAdapter2;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
 
 public class SensorPage extends WizardPage {
 
@@ -44,8 +37,6 @@ public class SensorPage extends WizardPage {
 
 	private IStructuredSelection initialSelection;
 	private String initialPatient;
-
-	private ISensorDataContainer data;
 
 	private boolean flip = false;
 
@@ -122,7 +113,7 @@ public class SensorPage extends WizardPage {
 		}
 	}
 
-	public ISensorDataContainer importData() {
+	/*public ISensorDataContainer importData() {
 		// Use Sample begin and end
 		try {
 			getContainer().run(false, false, new IRunnableWithProgress() {
@@ -145,7 +136,7 @@ public class SensorPage extends WizardPage {
 			e.printStackTrace();
 		}
 		return data;
-	}
+	}*/
 
 	private void done() {
 		flip = (getPatient() != null) && (getSensor() != null);

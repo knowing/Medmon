@@ -154,7 +154,7 @@ public class SensorDaemon implements Runnable {
 		List<ISensor> sensors = getSensorExtensions();
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
-		for (ISensor<?> sensor : sensors) {
+		for (ISensor sensor : sensors) {
 			String id = sensor.getName() + ":" + sensor.getVersion();
 			Sensor dbsensor = em.find(Sensor.class, id);
 			if (dbsensor == null) {

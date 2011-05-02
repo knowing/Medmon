@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 public class SensorAdapterFactory implements IAdapterFactory {
 

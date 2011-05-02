@@ -4,35 +4,21 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.RootSensorDataContainer;
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
-import de.sendsor.accelerationSensor.converter.SDRConverter;
-import de.sendsor.accelerationSensor.model.Data;
+import de.lmu.ifi.dbs.medmon.sensor.core.sensor.Sensor;
+import de.sendsor.accelerationSensor.converter.SDRLoader;
 
-public class Sensor3D implements ISensor<Data> {
+public class Sensor3D extends Sensor {
 
-	private static final SDRConverter converter = new SDRConverter();
+	private static final SDRLoader converter = new SDRLoader();
 	
-	@Override
-	public String getVersion() {
-		return "1.0";
+	public Sensor3D() {
+		super("3D Master Sensor", "1.0");
 	}
 
 	@Override
-	public String getName() {
-		return "3D Master Sensor";
-	}
-
-	@Override
-	public int getType() {
-		return ISensor.MASTER;
-	}
-
-	@Override
-	public ISensorDataContainer<Data> getData(String path) throws IOException {
+	public Instances getData(String path) throws IOException {
 		//Sensor exists
 		File sensorpath = new File(path);
 		if(!sensorpath.exists() || !sensorpath.isDirectory())
@@ -50,13 +36,9 @@ public class Sensor3D implements ISensor<Data> {
 		if(sdrFiles.length < 1)
 			throw new IOException("Sensor contains no data");
 		
-		//Convert it
-		ISensorDataContainer<Data> root = new RootSensorDataContainer<Data>();
-		for (File each : sdrFiles) {
-			root.addChild(converter.convertToContainer(each.getAbsolutePath(), ContainerType.WEEK, ContainerType.HOUR, null));
-		}
+		converter.setFile(sdrFiles[0]);
 		
-		return root;
+		return converter.getDataSet();
 	}
 	
 	@Override
@@ -72,7 +54,7 @@ public class Sensor3D implements ISensor<Data> {
 	}
 	
 	@Override
-	public IConverter<Data> getConverter() {
+	public IConverter getConverter() {
 		return converter;
 	}
 

@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 public class SensorPathEditingSupport extends EditingSupport {
 

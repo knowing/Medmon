@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.sensor.core.sensor;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 /**
@@ -12,11 +12,13 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
  * @author Nepomuk Seiler
  * @version 0.9
  */
-public interface ISensor<E> {
+public interface ISensor {
 
 	public static final String SENSOR_ID = "de.lmu.ifi.dbs.medmon.sensor";
 	public static final int MASTER = 1;
 	public static final int SLAVE = 2;
+	
+	public String getId();
 	
 	public String getVersion();
 	
@@ -33,9 +35,9 @@ public interface ISensor<E> {
 	 * @return ISensorDataContainer
 	 * @throws IOException
 	 */
-	public ISensorDataContainer<E> getData(String path) throws IOException;
+	public Instances getData(String path) throws IOException;
 	
-	public IConverter<E> getConverter();
+	public IConverter getConverter();
 	
 	/**
 	 * 

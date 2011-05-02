@@ -124,11 +124,11 @@ public class DPUDetailsPage implements IDetailsPage {
 
 
 	private void update() {
-		tName.setText(dpu.getName());
-		if(dpu.getDescription() != null)
-			tDescription.setText(dpu.getDescription());
-		if(dpu.getTags() != null)
-			tTags.setText(dpu.getTags());
+		tName.setText(dpu.name());
+		if(dpu.description() != null)
+			tDescription.setText(dpu.description());
+		if(dpu.tags() != null)
+			tTags.setText(dpu.tags());
 	}
 
 

@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 public class SensorSourceWidget extends Composite {
 	

@@ -11,18 +11,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 public class ImportJob extends Job {
 
 	private Object[] data;
-	private final IConverter<?> converter;
-	private final Block block;
+	private final IConverter converter;
 
-	public ImportJob(Block block, IConverter<?> converter) {
-		super("Importiere " + block);
-		this.block = block;
+	public ImportJob( IConverter converter) {
+		super("Importiere ");
 		this.converter = converter;
 		setUser(true);
 //		setProperty(IProgressConstants.ICON_PROPERTY,
@@ -33,7 +31,10 @@ public class ImportJob extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 
 		try {
-			data = converter.readData(block);
+//			data = converter.readData(block);
+			System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
+			Instances dataSet = converter.getDataSet();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

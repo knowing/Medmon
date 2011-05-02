@@ -16,7 +16,6 @@ import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
 
 /**
  * PatientService declarative Service.
@@ -56,23 +55,16 @@ public class PatientService implements IPatientService {
 		if(first instanceof Patient) {
 			Object oldPatient = selections.put(PATIENT, (Patient)first);
 			Object oldAnalyzed = selections.put(ANALYZED_DATA, null);
-			Object oldContainer = selections.put(SENSOR_CONTAINER, null);
 			Object oldSensor = selections.put(SENSOR, null);
 			support.firePropertyChange(PATIENT, oldPatient, first);
 			support.firePropertyChange(ANALYZED_DATA, oldAnalyzed, null);
-			support.firePropertyChange(SENSOR_CONTAINER, oldContainer, null);
 			support.firePropertyChange(SENSOR, oldSensor, null);
 		} else if(first instanceof Map) {
 			Object old = selections.put(ANALYZED_DATA, (Map<String, IAnalyzedData>)first);
 			support.firePropertyChange(ANALYZED_DATA, old, first);
-		} else if(first instanceof ISensorDataContainer) {
-			Object old = selections.put(SENSOR_CONTAINER, (ISensorDataContainer)first);
-			support.firePropertyChange(SENSOR_CONTAINER, old, first);
 		} else if(first instanceof SensorAdapter) {
 			Object oldSensor = selections.put(SENSOR, (SensorAdapter)first);
-			Object oldContainer = selections.put(SENSOR_CONTAINER, null);
 			support.firePropertyChange(SENSOR, oldSensor, first);
-			support.firePropertyChange(SENSOR_CONTAINER, oldContainer, null);
 		} else if(first instanceof DataProcessingUnit) {
 			Object old = selections.put(DPU, (DataProcessingUnit)first);
 			support.firePropertyChange(DPU, old, first);
@@ -99,8 +91,7 @@ public class PatientService implements IPatientService {
 	public void addPropertyChangeListener(String property,PropertyChangeListener listener) {
 		if(property.equals(ANALYZED_DATA) ||
 				property.equals(PATIENT) ||
-				property.equals(SENSOR) ||
-				property.equals(SENSOR_CONTAINER))
+				property.equals(SENSOR))
 		support.addPropertyChangeListener(property, listener);
 		else
 			throw new IllegalArgumentException("Value " + property + " is invalid. Choose from IPatientService");

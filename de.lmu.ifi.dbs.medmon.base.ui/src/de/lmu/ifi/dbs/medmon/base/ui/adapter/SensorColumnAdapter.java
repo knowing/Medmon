@@ -4,7 +4,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 public class SensorColumnAdapter implements IWorkbenchColumnAdapter {
 

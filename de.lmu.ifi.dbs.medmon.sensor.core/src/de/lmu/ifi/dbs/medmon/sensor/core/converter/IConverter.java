@@ -1,36 +1,23 @@
 package de.lmu.ifi.dbs.medmon.sensor.core.converter;
 
 import java.io.IOException;
-import java.util.List;
+import java.io.OutputStream;
+import java.util.Date;
 
-import org.eclipse.swt.widgets.Shell;
+import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
+import weka.core.converters.BatchConverter;
+import weka.core.converters.Loader;
 
 /**
- * 
- * 
  * @author Nepomuk Seiler
  *
- * @param <E> - data entity
  * @version 0.9
  */
-public interface IConverter<E> {
+public interface IConverter extends Loader, BatchConverter {
 	
-	public E[] readData(ISensorDataContainer<E> root) throws IOException;
+	void copy(OutputStream out, Date from, Date to) throws IOException;
 	
-	public E[] readData(Block block) throws IOException;
+	IBlock convert() throws IOException;
 	
-	public ISensorDataContainer<E> convertToContainer(String file, ContainerType root, ContainerType leaf, List<ISensorDataContainer<E>> acc) throws IOException;
-	
-	public Block[] convertToBlock(String file, ContainerType type) throws IOException;
-	
-	/**
-	 * 
-	 * @param shell
-	 * @return Path to the location
-	 */
-	public String openChooseInputDialog(Shell shell);
 }

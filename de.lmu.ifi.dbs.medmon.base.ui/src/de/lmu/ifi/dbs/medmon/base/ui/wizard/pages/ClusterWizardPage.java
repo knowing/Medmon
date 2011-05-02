@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,16 +23,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterContainer;
 import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterFile;
 import de.lmu.ifi.dbs.medmon.base.ui.cluster.ClusterTableItem;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.ClusterTableItemContentProvider;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.ClusterTableItemEditingSupport;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.ClusterTableItemLabelProvider;
-import de.lmu.ifi.dbs.medmon.base.ui.provider.SensorContainerContentProvider;
 import de.lmu.ifi.dbs.medmon.base.ui.widgets.SensorSourceWidget;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
 
 public class ClusterWizardPage extends WizardPage {
 
@@ -145,22 +140,23 @@ public class ClusterWizardPage extends WizardPage {
 					}
 
 				} else if (prevPage.getCurrentKey().equals(SelectDataSourcePage.SENSOR)) {
-					ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
+		/*			ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
 							new WorkbenchLabelProvider(), new SensorContainerContentProvider());
 					SensorSourceWidget source = (SensorSourceWidget) prevPage.getConfiguration();
 					try {
-						ISensorDataContainer<?> input = source.getSensor().getData();
+						ISensorDataContainer input = source.getSensor().getData();
 						dialog.setInput(input);
 						dialog.open();
 						Object[] result = dialog.getResult();
 						for (Object element : result) {
-							ISensorDataContainer<?> c = (ISensorDataContainer<?>) element;
+							ISensorDataContainer c = (ISensorDataContainer) element;
 							clusterfiles.add(new ClusterContainer(c.getName(), c));
 						}
 						
 					} catch (IOException e1) {
 						e1.printStackTrace();
-					}
+					}*/
+					System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
 				}
 
 			} else if (e.widget == remove) {

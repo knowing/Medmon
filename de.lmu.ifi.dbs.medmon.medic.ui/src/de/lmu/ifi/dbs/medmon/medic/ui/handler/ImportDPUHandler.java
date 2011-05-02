@@ -43,19 +43,18 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 			GraphValidator validator = new GraphValidator(dpu);
 			//Validation
 			if(validator.validate()) {
-				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.getName());
+				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.name());
 				if(file.exists()) {
 					if(!MessageDialog.openConfirm(shell, "Ueberschreiben?", "Verfahren existiert bereits! Wollen Sie es ueberschreiben?"))
 						return null;
 					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.getName() + " wurde nach importiert");
+					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde nach importiert");
 				} else {
 					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.getName() + " wurde nach importiert");
+					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde nach importiert");
 				}
 			} else {
-				Map<String, String> errors = validator.getErrors();
-				Status status = new Status(IStatus.ERROR, "Medic Plugin", createErrorList(errors));
+				Status status = new Status(IStatus.ERROR, "Medic Plugin", createErrorList(validator.getErrors()));
 				ErrorDialog errorDialog = new ErrorDialog(shell, "Fehler beim Import", "Die Datei ist nicht korrekt", status, IStatus.ERROR);
 				errorDialog.open();
 				return null;
@@ -75,12 +74,10 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 		marshaller.marshal(dpu, file);
 	}
 		
-	private String createErrorList(Map<String, String> errors) {
+	private String createErrorList(String[] errors) {
 		StringBuilder sb = new StringBuilder();
-		for (String key : errors.keySet()) {
-			sb.append(key);
-			sb.append(": ");
-			sb.append(errors.get(key));
+		for (String error : errors) {
+			sb.append(error);
 			sb.append("\n");
 		}
 		return sb.toString();

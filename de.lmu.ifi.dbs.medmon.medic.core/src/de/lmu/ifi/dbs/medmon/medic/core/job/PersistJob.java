@@ -1,19 +1,11 @@
 package de.lmu.ifi.dbs.medmon.medic.core.job;
 
-import javax.persistence.EntityManager;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.BlockDescriptor;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
 public class PersistJob extends Job {
@@ -21,14 +13,12 @@ public class PersistJob extends Job {
 	private static final PersistRule rule = new PersistRule();
 	
 	private final Patient patient;
-	private ISensorDataContainer root;
 	private final ISensor sensor;
 	private final String filepath;
 
 
-	public PersistJob(String name, String filepath, ISensorDataContainer root, ISensor sensor, Patient patient) {
+	public PersistJob(String name, String filepath, ISensor sensor, Patient patient) {
 		super(name);
-		this.root = root;
 		this.sensor = sensor;
 		this.patient = patient;
 		this.filepath = filepath;
@@ -36,11 +26,9 @@ public class PersistJob extends Job {
 		setUser(true);
 	}
 	
-	protected IStatus persist(ISensorDataContainer root, ISensor sensor, IProgressMonitor monitor) {
+	protected IStatus persist( ISensor sensor, IProgressMonitor monitor) {
 		monitor.beginTask("persist", IProgressMonitor.UNKNOWN);
-		Block block = root.getBlock();
-		BlockDescriptor descriptor = block.getDescriptor();
-		EntityManager entityManager = JPAUtil.createEntityManager();
+/*		EntityManager entityManager = JPAUtil.createEntityManager();
 		
 		entityManager.getTransaction().begin();
 		Data entity = new Data();
@@ -53,7 +41,7 @@ public class PersistJob extends Job {
 			return new Status(IStatus.ERROR, "de.lmu.ifi.dbs.medmon.jobs.persistence", "Sensor not in DB");
 		entity.setSensor(dbSensor);
 		
-		String file = (String) descriptor.getAttribute(BlockDescriptor.FILE);
+		String file = (String) descriptor.getAttribute(BlockDescriptorOld.FILE);
 		String name = file.substring(file.lastIndexOf(System.getProperty("file.separator")) + 1);
 		entity.setOriginalFile(name);
 		
@@ -62,7 +50,7 @@ public class PersistJob extends Job {
 		
 		entityManager.persist(entity);
 		entityManager.getTransaction().commit();
-		entityManager.close();
+		entityManager.close();*/
 		monitor.done();
 		return Status.OK_STATUS;
 	}
@@ -70,7 +58,7 @@ public class PersistJob extends Job {
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		return persist(root, sensor, monitor);
+		return persist(sensor, monitor);
 	}
 
 }

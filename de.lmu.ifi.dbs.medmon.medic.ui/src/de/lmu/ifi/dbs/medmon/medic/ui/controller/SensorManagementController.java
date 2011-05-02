@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.controller;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -11,10 +10,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.RootSensorDataContainer;
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
@@ -54,12 +50,14 @@ public class SensorManagementController extends HyperlinkAdapter implements List
 
 	public void importData() {
 		IStructuredSelection selection = (IStructuredSelection) sensorViewer.getSelection();
-		ISensor<?> sensor = (ISensor<?>) selection.getFirstElement();
-		IConverter<?> converter = sensor.getConverter();
-		String file = converter.openChooseInputDialog(sensorViewer.getControl().getShell());
+		ISensor sensor = (ISensor) selection.getFirstElement();
+		IConverter converter = sensor.getConverter();
+//		String file = converter.openChooseInputDialog(sensorViewer.getControl().getShell());
 		try {
-			ISensorDataContainer root = converter.convertToContainer(file, ContainerType.WEEK, ContainerType.HOUR, null);
-			dataViewer.setInput(root);
+//			ISensorDataContainer root = converter.convertToContainer(file, ContainerType.WEEK, ContainerType.HOUR, null);
+//			dataViewer.setInput(root);
+			System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
+			Instances dataSet = converter.getDataSet();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

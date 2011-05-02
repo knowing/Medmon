@@ -1,29 +1,21 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorAdapter;
 
 public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutableExtension {
 
@@ -41,11 +33,6 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 		if (patient != null && sensor != null)
 			sourcePage = new SensorPage(patient, sensor);
 
-		/* Can skip dataPage */
-		ISensorDataContainer c = (ISensorDataContainer) service.getSelection(IPatientService.SENSOR_CONTAINER);
-		if (c != null)
-			dataPage = new SelectDataPage(new ISensorDataContainer[] { c });
-
 	}
 
 	@Override
@@ -55,16 +42,6 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 		addPage(sourcePage);
 		addPage(dataPage);
 		addPage(mpuPage = new SelectDPUPage());
-	}
-
-	@Override
-	public IWizardPage getNextPage(IWizardPage page) {
-		if (page == dataPage) {
-			if (firstcall)
-				dataPage.setViewerInput(sourcePage.importData());
-			firstcall = !firstcall;
-		}
-		return super.getNextPage(page);
 	}
 
 	@Override

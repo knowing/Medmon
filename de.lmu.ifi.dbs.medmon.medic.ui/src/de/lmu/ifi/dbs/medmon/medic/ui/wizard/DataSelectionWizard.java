@@ -10,16 +10,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.wizard.Wizard;
 
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ISensorDataContainer;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.RootSensorDataContainer;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
@@ -68,14 +65,15 @@ public class DataSelectionWizard extends Wizard {
 		}
 
 		// The new input for the Viewer
-		RootSensorDataContainer<Object> root = new RootSensorDataContainer<Object>(patient.toString());
 		IConverter converter = sensor.getConverter();
 		for (Data data : results) {
 			try {
-				ISensorDataContainer c = converter.convertToContainer(data.getFile(), ContainerType.WEEK, ContainerType.HOUR, null);
-				if(c instanceof RootSensorDataContainer) 
-					((RootSensorDataContainer)c).setName(data.getFile());
-				root.addChild(c);
+//				ISensorDataContainer c = converter.convertToContainer(data.getFile(), ContainerType.WEEK, ContainerType.HOUR, null);
+//				if(c instanceof RootSensorDataContainer) 
+//					((RootSensorDataContainer)c).setName(data.getFile());
+//				root.addChild(c);
+				System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
+				Instances dataSet = converter.getDataSet();
 			} catch (IOException e) {
 				e.printStackTrace();
 				Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
@@ -87,7 +85,7 @@ public class DataSelectionWizard extends Wizard {
 			}
 		}
 
-		Activator.getPatientService().setSelection(root, IPatientService.SENSOR_CONTAINER);
+//		Activator.getPatientService().setSelection(root, IPatientService.SENSOR_CONTAINER);
 		return true;
 	}
 
