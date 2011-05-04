@@ -3,17 +3,15 @@ package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.osgi.service.component.ComponentContext;
 
+import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.DataProcessingUnit;
-import de.lmu.ifi.dbs.medmon.datamining.core.processing.IAnalyzedData;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
@@ -59,9 +57,6 @@ public class PatientService implements IPatientService {
 			support.firePropertyChange(PATIENT, oldPatient, first);
 			support.firePropertyChange(ANALYZED_DATA, oldAnalyzed, null);
 			support.firePropertyChange(SENSOR, oldSensor, null);
-		} else if(first instanceof Map) {
-			Object old = selections.put(ANALYZED_DATA, (Map<String, IAnalyzedData>)first);
-			support.firePropertyChange(ANALYZED_DATA, old, first);
 		} else if(first instanceof SensorAdapter) {
 			Object oldSensor = selections.put(SENSOR, (SensorAdapter)first);
 			support.firePropertyChange(SENSOR, oldSensor, first);

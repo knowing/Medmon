@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.medmon.medic.core.util;
 
-import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil.getPatientFolder;
-import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil.getPreferenceStore;
-
 import java.io.File;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.datamining.core.cluster.ClusterUnit;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 
@@ -57,12 +53,12 @@ public class ApplicationConfigurationUtil {
 		
 	}
 	
-	public static String createClusterUnitFile(ClusterUnit cu, Patient patient) {
+	public static String createClusterUnitFile(Object cu, Patient patient) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getPatientFolder(patient));
 		sb.append("cluster");
 		sb.append(getPreferenceStore().getString(IMedicPreferences.DIR_SEPERATOR_ID));
-		sb.append(cu.getName());	
+//		sb.append(cu.getName());	
 		sb.append(".xml");
 		return sb.toString();
 	}

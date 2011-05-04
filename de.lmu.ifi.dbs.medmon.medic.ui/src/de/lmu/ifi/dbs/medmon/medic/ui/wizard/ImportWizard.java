@@ -4,35 +4,36 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
 public class ImportWizard extends Wizard {
 
-	private static final String String = null;
 	private SensorPage sourcePage;
 	private SelectDataPage dataPage;
 
-	private ISensor sensor;
+	private SensorAdapter sensor;
 	private Patient patient;
 
 	public ImportWizard() {
 		setWindowTitle("Datenimport");
 	}
 
-	public ImportWizard(ISensor sensor, Patient patient) {
+	public ImportWizard(SensorAdapter sensor, Patient patient) {
 		this();
 		this.sensor = sensor;
 		this.patient = patient;
@@ -48,14 +49,32 @@ public class ImportWizard extends Wizard {
 		dataPage = new SelectDataPage();
 		addPage(dataPage);
 	}
+	
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if(page == sourcePage)
+			dataPage.setSensor(sourcePage.getSensor());
+		return super.getNextPage(page);
+	}
 
 	@Override
 	public boolean performFinish() {
 		if (sensor == null)
-			sensor = sourcePage.getSensor().getSensorExtension();
+			sensor = sourcePage.getSensor();
 		if (patient == null)
 			patient = sourcePage.getPatient();
-		IConverter converter = sensor.getConverter();
+		if(dataPage.isImportLatest()) {
+			try {
+				Date from = dataPage.getFrom();
+				Date to = dataPage.getTo();
+				String extension = sensor.getSensorExtension().getConverter().getFileExtension();
+				sensor.copy(createOutputFile(from, to, extension));
+				
+			} catch (IOException e) {
+				MessageDialog.openError(getShell(), "Failed to import data", e.getMessage());
+				e.printStackTrace();
+			}
+		}
 		// Set the global selection
 //		Activator.getPatientService().setSelection(root, IPatientService.SENSOR_CONTAINER);
 		// Persist
@@ -72,6 +91,21 @@ public class ImportWizard extends Wizard {
 		}*/
 
 		return true;
+	}
+	
+	private OutputStream createOutputFile(Date from, Date to, String extension) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		String sep = System.getProperty("file.separator");
+		
+		sb.append(ApplicationConfigurationUtil.getPatientFolder(patient));
+		sb.append("data");
+		sb.append(sep);
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		sb.append(df.format(from));
+		sb.append("_");
+		sb.append(df.format(to));
+		sb.append(extension);
+		return new FileOutputStream(sb.toString());
 	}
 
 	private String moveSensorFile(String oldFilePath, Patient patient) {
@@ -106,7 +140,6 @@ public class ImportWizard extends Wizard {
 				e.printStackTrace();
 			}
 		}
-
 
 		return returns;
 

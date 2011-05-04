@@ -1,6 +1,12 @@
 package de.lmu.ifi.dbs.medmon.medic.core.sensor;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
+import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
 public class SensorAdapter {
@@ -41,6 +47,22 @@ public class SensorAdapter {
 		this.type = type(sensorEntity.getType());
 		
 		this.available = false;
+	}
+	
+	public void copy(OutputStream out) throws IOException {
+		if(sensorEntity == null || sensorExtension == null)
+			throw new IOException("Unable to find sensor in database( "+sensorEntity+" )or extension-registry( "+sensorExtension+" )");
+		IConverter converter = sensorExtension.getConverter();
+		converter.setDirectory(sensorEntity.getDefaultpath());
+		converter.copy(out);
+	}
+	
+	public IBlock convert() throws IOException {
+		if(sensorEntity == null || sensorExtension == null)
+			throw new IOException("Unable to find sensor in database( "+sensorEntity+" )or extension-registry( "+sensorExtension+" )");
+		IConverter converter = sensorExtension.getConverter();
+		converter.setDirectory(sensorEntity.getDefaultpath());
+		return converter.convert();
 	}
 
 	public boolean isAvailable() {
@@ -116,6 +138,4 @@ public class SensorAdapter {
 		return builder.toString();
 	}
 	
-	
-
 }

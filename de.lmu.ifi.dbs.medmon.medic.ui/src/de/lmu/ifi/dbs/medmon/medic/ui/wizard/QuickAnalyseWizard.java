@@ -9,12 +9,12 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDPUPage;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
 
 public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutableExtension {

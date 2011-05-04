@@ -5,7 +5,7 @@ package de.sendsor.accelerationSensor.converter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,8 +39,6 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 	public static final String ID = "de.sendsor.accelerationSensor.converter.SDRLoader";
 	public static final String URL = "input.url";
 	public static final String FILE = "input.file";
-
-	private Properties properties = new Properties();
 
 	/* ==== Loader ==== */
 	public static String FILE_EXTENSION = ".sdr";
@@ -84,10 +82,32 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 			return;
 		// super.setSource(input);
 	}
+	
+	@Override
+	public void setDirectory(String path) throws IOException {
+		File dir = new File(path);
+		File[] files = dir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(FILE_EXTENSION);
+			}
+		});
+		if(files.length == 0)
+			throw new IOException("No files found in this directory");
+		//TODO SDRLoader - setDirectory warning if more than one file found
+		//Setting the first file found
+		setFile(files[0]);
+	}
 
 	@Override
 	public Instances getStructure() throws IOException {
 		return m_structure;
+	}
+	
+	@Override
+	public void copy(OutputStream out) throws IOException {
+		//Assuming the sensor can't record future data
+		copy(out, new Date(0), new Date());
 	}
 
 	@Override
@@ -233,7 +253,7 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 				instance.setValue(timeAttribute, timestamp.getTimeInMillis());
 				instance.setValue(xAttribute, x);
 				instance.setValue(yAttribute, y);
-				instance.setValue(z, z);
+				instance.setValue(zAttribute, z);
 				dataset.add(instance);
 			}
 
@@ -311,24 +331,5 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 	 * //log.error("Couldn't set file for SDRLoader", e); } return new
 	 * SynchronizedLoader(loader); }
 	 */
-
-	public static void main(String[] args) {
-		SDRLoader loader = new SDRLoader();
-		try {
-			loader.setFile(new File("/home/muki/input.sdr"));
-
-//			Calendar cal = Calendar.getInstance();
-//			cal.set(2010, 6, 7);
-//			Date from = (Date) cal.getTime().clone();
-//			cal.set(2010, 6, 9);
-//			Date to = (Date) cal.getTime().clone();
-//			loader.copy(new FileOutputStream("/home/muki/copied.sdr"), from, to);
-			IBlock block = loader.convert();
-			System.out.println(block);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 }
