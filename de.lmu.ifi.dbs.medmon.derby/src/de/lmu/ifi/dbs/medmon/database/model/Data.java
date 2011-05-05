@@ -25,7 +25,12 @@ import javax.persistence.TemporalType;
 @Table(name="DATA")
 @NamedQueries({
     @NamedQuery(name = "Data.findAll", query = "SELECT d FROM Data d"),
-    @NamedQuery(name = "Data.findByPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient")})
+    @NamedQuery(name = "Data.findByPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient"),
+    @NamedQuery(name = "Data.findByPatientAndDate", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from = :from AND d.to = :to"),
+    @NamedQuery(name = "Data.findByPatientAndAfterTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to < :date"),
+    @NamedQuery(name = "Data.findByPatientAndBeforeTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to > :date"),
+    @NamedQuery(name = "Data.findByPatientAndAfterFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from < :date"),
+    @NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date")})
 public class Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 

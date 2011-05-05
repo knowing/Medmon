@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
@@ -17,6 +20,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +45,7 @@ public class SelectDataPage extends WizardPage {
 	private Label lDataSizeVal;
 	
 	private SensorAdapter sensor;
+	private Patient patient;
 
 	/**
 	 * Create the wizard.
@@ -176,9 +183,69 @@ public class SelectDataPage extends WizardPage {
 		}
 	}
 	
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+	
 	private boolean validate() {
 		//TODO check db for existing data
-		return true;
+		EntityManager em = JPAUtil.createEntityManager();
+		
+		//First check if the data is new
+		List<Data> results = em.createNamedQuery("Data.findByPatientAndAfterTo")
+			.setParameter("patient", patient)
+			.setParameter("date", getFrom())
+			.getResultList();
+		System.out.println("Results: " + results);
+		if(results.isEmpty()){
+			setMessage("Auswahl in Ordnung");
+			return true;
+		}
+		//Check if the identical dataset exists in db
+		results = em.createNamedQuery("Data.findByPatientAndDate")
+		.setParameter("patient", patient)
+		.setParameter("from", getFrom())
+		.setParameter("to",getTo())
+		.getResultList();
+		if(!results.isEmpty()) {
+			setErrorMessage("Datensatz bereits vorhanden");
+			return false;
+		}
+		
+		//Check if sensor data are older than all datasets in db
+		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
+		.setParameter("patient", patient)
+		.setParameter("date", getTo())
+		.getResultList();
+		if(results.isEmpty()) {
+			setMessage("Auswahl in Ordnung ");
+			return true;
+		}
+		
+		//Check if new sensor data fills a gap in the db or overlaps
+		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
+		.setParameter("patient", patient)
+		.setParameter("date", getTo())
+		.getResultList();
+		Date closest = null; //Store closest date for user feedback
+		for (Data data : results) {
+			if(closest == null)
+				closest = data.getTo();
+			if(closest.before(data.getTo()))
+				closest = data.getTo();
+			
+			if(getFrom().after(data.getTo())) 
+				return true; //gap found
+		}
+		//No gap found
+		DateFormat df = DateFormat.getDateTimeInstance();
+		String fromString = "";
+		if(closest != null)
+			fromString = df.format(closest);
+		setErrorMessage("Datensatz ueberlappt von " + fromString + " bis " + df.format(getFrom()));
+		return false;
+		
 	}
+	
 
 }

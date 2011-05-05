@@ -52,8 +52,11 @@ public class ImportWizard extends Wizard {
 	
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
-		if(page == sourcePage)
+		if(page == sourcePage) {
 			dataPage.setSensor(sourcePage.getSensor());
+			dataPage.setPatient(sourcePage.getPatient());
+		}
+			
 		return super.getNextPage(page);
 	}
 
