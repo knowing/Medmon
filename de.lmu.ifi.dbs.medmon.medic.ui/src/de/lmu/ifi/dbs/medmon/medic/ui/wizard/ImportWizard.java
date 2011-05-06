@@ -1,22 +1,20 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+
+import javax.persistence.EntityManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
+import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
@@ -56,7 +54,6 @@ public class ImportWizard extends Wizard {
 			dataPage.setSensor(sourcePage.getSensor());
 			dataPage.setPatient(sourcePage.getPatient());
 		}
-			
 		return super.getNextPage(page);
 	}
 
@@ -70,11 +67,28 @@ public class ImportWizard extends Wizard {
 			try {
 				Date from = dataPage.getFrom();
 				Date to = dataPage.getTo();
-				String extension = sensor.getSensorExtension().getConverter().getFileExtension();
-				sensor.copy(createOutputFile(from, to, extension));
 				
+				//Store on filesystem
+				String extension = sensor.getSensorExtension().getConverter().getFileExtension();
+				String path = createOutputPath(from, to, extension);
+				sensor.copy(new FileOutputStream(path));
+				
+				//Store in db
+				EntityManager em = JPAUtil.createEntityManager();
+				em.getTransaction().begin();
+				Data data = new Data();
+				data.setPatient(patient);
+				data.setSensor(sensor.getSensorEntity());
+				data.setFile(path);
+				data.setFrom(from);
+				data.setTo(to);
+				em.persist(data);
+				em.getTransaction().commit();
 			} catch (IOException e) {
-				MessageDialog.openError(getShell(), "Failed to import data", e.getMessage());
+				MessageDialog.openError(getShell(), "Fehler beim Daten importieren", e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				MessageDialog.openError(getShell(), "Unbekannter Fehler speichern der Sensordaten", e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -96,7 +110,7 @@ public class ImportWizard extends Wizard {
 		return true;
 	}
 	
-	private OutputStream createOutputFile(Date from, Date to, String extension) throws IOException {
+	private String createOutputPath(Date from, Date to, String extension) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		String sep = System.getProperty("file.separator");
 		
@@ -108,44 +122,7 @@ public class ImportWizard extends Wizard {
 		sb.append("_");
 		sb.append(df.format(to));
 		sb.append(extension);
-		return new FileOutputStream(sb.toString());
-	}
-
-	private String moveSensorFile(String oldFilePath, Patient patient) {
-		String sep = System.getProperty("file.separator");
-		String returns = ApplicationConfigurationUtil.getPatientFolder(patient);
-		returns += "data" + sep;
-		String name = oldFilePath.substring(oldFilePath.lastIndexOf(sep) + 1);
-		// DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-		// DateFormat.SHORT);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh:mm");
-		returns += df.format(new Date()) + "-" + name;
-
-		File in = new File(oldFilePath);
-		File out = new File(returns);
-		FileChannel inChannel = null;
-		FileChannel outChannel = null;
-		try {
-			out.createNewFile();
-
-			inChannel = new FileInputStream(in).getChannel();
-			outChannel = new FileOutputStream(out).getChannel();
-			inChannel.transferTo(0, inChannel.size(), outChannel);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inChannel != null)
-					inChannel.close();
-				if (outChannel != null)
-					outChannel.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return returns;
-
+		return sb.toString();
 	}
 
 }
