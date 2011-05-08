@@ -29,6 +29,7 @@ public interface IMedmonConstants {
 	
 	//Images 16x16
 	public static final String IMG_ADD_16 = "icons/16/gtk-add.png";
+	public static final String IMG_CHECKED_16 = "icons/checked_16.png"; //Base-UI
 	public static final String IMG_ARROW_DOWN_16 = "icons/16/gtk-go-down.png";
 	public static final String IMG_ARROW_UP_16 = "icons/16/gtk-go-up.png";
 	public static final String IMG_HELP_16 = "icons/16/help.png";

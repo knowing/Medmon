@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 	/* ==== Factory ==== */
-	public static final String ID = "de.sendsor.accelerationSensor.converter.SDRLoader";
+	public static final String ID = SDRLoader.class.getName();
 	public static final String URL = "url";
 	public static final String FILE = "file";
 

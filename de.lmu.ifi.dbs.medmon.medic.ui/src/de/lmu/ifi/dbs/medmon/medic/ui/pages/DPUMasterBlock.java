@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportDPUHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.DPUContentProvider;
 
 public class DPUMasterBlock extends MasterDetailsBlock {
+	public DPUMasterBlock() {
+	}
 
 	private FormToolkit toolkit;
 	private Text tSearch;

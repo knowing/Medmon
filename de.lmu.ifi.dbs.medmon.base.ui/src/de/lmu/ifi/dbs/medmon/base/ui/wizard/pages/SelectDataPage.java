@@ -229,7 +229,6 @@ public class SelectDataPage extends WizardPage {
 			em.close();
 			return false;
 		}
-		printResults(results, "No identical found");
 
 		// Check if the data is new
 		results = em.createNamedQuery("Data.findByPatientAndBeforeTo")
@@ -241,7 +240,6 @@ public class SelectDataPage extends WizardPage {
 			em.close();
 			return true;
 		}
-		printResults(results, "Didn't Found newer data");
 		// Check if sensor data are older than all datasets in db
 		results = em.createNamedQuery("Data.findByPatientAndAfterFrom")
 				.setParameter("patient", patient)
@@ -252,14 +250,12 @@ public class SelectDataPage extends WizardPage {
 			em.close();
 			return true;
 		}
-		printResults(results, "Found no older data");
 		// Check if new sensor data fills a gap in the db or overlaps
 		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
 				.setParameter("patient", patient)
 				.setParameter("date", getTo())
 				.getResultList();
 		
-		printResults(results, "Searching for gaps");
 		Date closest = null; // Store closest date for user feedback
 		for (Data data : results) {
 			if (closest == null)
@@ -283,23 +279,6 @@ public class SelectDataPage extends WizardPage {
 		em.close();
 		return false;
 
-	}
-
-	private void printResults(List<Data> results, String msg) {
-		DateFormat df = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss:SS ");
-		System.out.println(" #### " + msg + " ####");
-		for (Data data : results) {
-			System.out.println("db.to   " + df.format(data.getTo()));
-			System.out.println("sn.from " + df.format(getFrom()));
-			System.out.println(" ------------------- ");
-			System.out.println("db.from/to   " + df.format(data.getFrom()) + "/" + df.format(data.getTo()));
-			System.out.println("sn.from/to " + df.format(getFrom()) + "/" + df.format(getTo()));
-			System.out.println(" ------------------- ");
-			System.out.println("db.from/to   " + data.getFrom().getTime() + "/" + data.getTo().getTime());
-			System.out.println("sn.from/to " + getFrom().getTime() + "/" + getTo().getTime());
-			System.out.println("Offset: " + (data.getFrom().getTime() - getFrom().getTime()) + " / "
-					+ (data.getTo().getTime() - getTo().getTime()));
-		}
 	}
 
 	public void initPage() {

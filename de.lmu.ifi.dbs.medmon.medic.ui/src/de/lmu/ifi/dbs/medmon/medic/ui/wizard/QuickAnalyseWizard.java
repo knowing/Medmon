@@ -4,24 +4,25 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
 
 public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutableExtension {
 
 	private SensorPage sourcePage = new SensorPage();
 	private SelectDataPage dataPage = new SelectDataPage();
-	private SelectDPUPage mpuPage;
+	private SelectDPUPage dpuPage;
 
 	/* to prevent getNextPage setting input twice */
 	private boolean firstcall = true;
@@ -41,7 +42,18 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 		initSelections(service);
 		addPage(sourcePage);
 		addPage(dataPage);
-		addPage(mpuPage = new SelectDPUPage());
+		addPage(dpuPage = new SelectDPUPage());
+	}
+	
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if(page == sourcePage) {
+			dataPage.setSensor(sourcePage.getSensor());
+			dataPage.setPatient(sourcePage.getPatient());
+		} else if(page == dataPage) {
+			dpuPage.setSensor(sourcePage.getSensor());
+		}
+		return super.getNextPage(page);
 	}
 
 	@Override

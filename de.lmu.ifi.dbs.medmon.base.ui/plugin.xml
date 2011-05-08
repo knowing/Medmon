@@ -14,8 +14,8 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.datamining.core.cluster.ClusterUnit"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.ClusterAdapterFactory">
+            adaptableType="de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.DPUAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -25,7 +25,7 @@
       </factory>
       <factory
             adaptableType="de.lmu.ifi.dbs.medmon.base.ui.adapter.PatientClusterAdapter"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.ClusterAdapterFactory">
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.DPUAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>

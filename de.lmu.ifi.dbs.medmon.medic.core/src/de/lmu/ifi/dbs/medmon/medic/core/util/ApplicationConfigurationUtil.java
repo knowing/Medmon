@@ -10,6 +10,17 @@ import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 
 public class ApplicationConfigurationUtil {
 	
+	private static String dpuPath;
+	
+	/* =========================== */
+	/* == Patient configuration == */
+	/* =========================== */
+	
+	/**
+	 * Creates if not exists and returns path to patient-folder
+	 * @param patient
+	 * @return path to patient folder: {user.home}/.medmon/{id}-lastname/
+	 */
 	public static String getPatientFolder(Patient patient) {
 		String path = getPreferenceStore().getString(IMedicPreferences.DIR_PATIENT_ID);
 		String sep  = getPreferenceStore().getString(IMedicPreferences.DIR_SEPERATOR_ID);
@@ -35,6 +46,10 @@ public class ApplicationConfigurationUtil {
 		
 	}
 	
+	/**
+	 * 
+	 * @param patient
+	 */
 	public static void createPatientFolder(Patient patient)  {
 		String sep  = getPreferenceStore().getString(IMedicPreferences.DIR_SEPERATOR_ID);
 		
@@ -53,6 +68,10 @@ public class ApplicationConfigurationUtil {
 		
 	}
 	
+	/* =========================== */
+	/* ====== Patient data ======= */
+	/* =========================== */
+	
 	public static String createClusterUnitFile(Object cu, Patient patient) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getPatientFolder(patient));
@@ -69,6 +88,17 @@ public class ApplicationConfigurationUtil {
 		return patientFolder  + "cluster" + sep;
 	}
 		
+	/* =========================== */
+	/* == Data Processing Unit === */
+	/* =========================== */
+
+	
+	
+	/* =========================== */
+	/* == General configuration == */
+	/* =========================== */
+	
+	
 	public static IPreferenceStore getPreferenceStore() {
 		return Activator.getDefault().getPreferenceStore();
 	}
