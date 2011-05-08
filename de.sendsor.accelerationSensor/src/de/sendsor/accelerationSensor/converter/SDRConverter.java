@@ -15,7 +15,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Properties;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -33,12 +32,12 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
  * @since 01.04.2011
  * 
  */
-public class SDRLoader extends AbstractFileLoader implements IConverter {
+public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 	/* ==== Factory ==== */
 	public static final String ID = "de.sendsor.accelerationSensor.converter.SDRLoader";
-	public static final String URL = "input.url";
-	public static final String FILE = "input.file";
+	public static final String URL = "url";
+	public static final String FILE = "file";
 
 	/* ==== Loader ==== */
 	public static String FILE_EXTENSION = ".sdr";
@@ -58,7 +57,7 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 	private Attribute yAttribute;
 	private Attribute zAttribute;
 
-	public SDRLoader() {
+	public SDRConverter() {
 		m_structure = ResultsUtil.dateAndValuesResult(Arrays.asList(new String[] { "x", "y", "z" }));
 		dataset = new Instances(m_structure);
 
@@ -315,6 +314,11 @@ public class SDRLoader extends AbstractFileLoader implements IConverter {
 	@Override
 	public String getFileDescription() {
 		return "Sendsor - Acceleration Input Format";
+	}
+	
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 	@Override

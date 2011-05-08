@@ -54,4 +54,10 @@ public interface IConverter extends Loader, BatchConverter {
 	 */
 	String getFileExtension();
 	
+	/**
+	 * 
+	 * @return
+	 */
+	String getId();
+	
 }

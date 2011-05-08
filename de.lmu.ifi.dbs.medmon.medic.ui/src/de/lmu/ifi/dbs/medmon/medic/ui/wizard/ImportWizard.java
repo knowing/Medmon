@@ -53,6 +53,7 @@ public class ImportWizard extends Wizard {
 		if(page == sourcePage) {
 			dataPage.setSensor(sourcePage.getSensor());
 			dataPage.setPatient(sourcePage.getPatient());
+			dataPage.initPage();
 		}
 		return super.getNextPage(page);
 	}

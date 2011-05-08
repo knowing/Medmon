@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +35,7 @@ import org.eclipse.swt.layout.RowData;
  * @author Nepomuk Seiler
  * @version 0.1
  * @since 01.05.2011
- *
+ * 
  */
 public class SelectDataPage extends WizardPage {
 
@@ -44,7 +46,7 @@ public class SelectDataPage extends WizardPage {
 	private Label lBlockFromVal;
 	private Label lBlockToVal;
 	private Label lDataSizeVal;
-	
+
 	private SensorAdapter sensor;
 	private Patient patient;
 	private IBlock block;
@@ -61,6 +63,7 @@ public class SelectDataPage extends WizardPage {
 
 	/**
 	 * Create contents of the wizard.
+	 * 
 	 * @param parent
 	 */
 	public void createControl(Composite parent) {
@@ -70,7 +73,7 @@ public class SelectDataPage extends WizardPage {
 		RowLayout layout = new RowLayout(SWT.VERTICAL);
 		layout.fill = true;
 		container.setLayout(layout);
-		
+
 		bLatestData = new Button(container, SWT.RADIO);
 		bLatestData.setText("Neueste Sensordaten");
 		bLatestData.setSelection(true);
@@ -79,9 +82,10 @@ public class SelectDataPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				dateTimeFrom.setEnabled(!bLatestData.getSelection());
 				dateTimeTo.setEnabled(!bLatestData.getSelection());
+				setPageComplete(validate());
 			}
 		});
-		
+
 		bTimespanData = new Button(container, SWT.RADIO);
 		bTimespanData.setText("Sensordaten im Zeitraum");
 		bTimespanData.addSelectionListener(new SelectionAdapter() {
@@ -89,193 +93,217 @@ public class SelectDataPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				dateTimeFrom.setEnabled(!bLatestData.getSelection());
 				dateTimeTo.setEnabled(!bLatestData.getSelection());
-				if(isImportLatest())
+				if (isImportLatest())
 					updateDateTimes();
+				setPageComplete(validate());
 			}
 		});
-		
+
 		Group gTimespan = new Group(container, SWT.NONE);
 		gTimespan.setText("Zeitraum");
 		gTimespan.setLayout(new GridLayout(2, false));
-		
+
 		Label lFrom = new Label(gTimespan, SWT.NONE);
 		lFrom.setText("Von: ");
-		
+
 		dateTimeFrom = new CDateTime(gTimespan, CDT.CLOCK_24_HOUR | CDT.DATE_SHORT | CDT.TIME_SHORT);
 		dateTimeFrom.setEnabled(false);
 		dateTimeFrom.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				if(getFrom().after(getTo()))
+					dateTimeTo.setSelection(new Date(getFrom().getTime()));
 				setPageComplete(validate());
 			}
 		});
-		
+
 		Label lTo = new Label(gTimespan, SWT.NONE);
 		lTo.setText("Bis: ");
-		
+
 		dateTimeTo = new CDateTime(gTimespan, CDT.TAB_FIELDS | CDT.CLOCK_24_HOUR | CDT.DATE_SHORT | CDT.TIME_SHORT);
 		dateTimeTo.setEnabled(false);
 		dateTimeTo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				if(getFrom().after(getTo()))
+					dateTimeFrom.setSelection(new Date(getTo().getTime()));
 				setPageComplete(validate());
 			}
 		});
-		
+
 		Group gSensor = new Group(container, SWT.NONE);
 		gSensor.setLayoutData(new RowData(200, SWT.DEFAULT));
 		gSensor.setText("Sensor-Information");
 		gSensor.setLayout(new GridLayout(2, false));
-		
+
 		Label lBlockFrom = new Label(gSensor, SWT.NONE);
 		lBlockFrom.setText("Von");
-		
+
 		lBlockFromVal = new Label(gSensor, SWT.NONE);
 		lBlockFromVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lBlockFromVal.setText("-");
-		
+
 		Label lBlockTo = new Label(gSensor, SWT.NONE);
 		lBlockTo.setText("Bis");
-		
+
 		lBlockToVal = new Label(gSensor, SWT.NONE);
 		lBlockToVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lBlockToVal.setText("-");
-		
+
 		Label lDataSize = new Label(gSensor, SWT.NONE);
 		lDataSize.setText("Datensaetze");
-		
+
 		lDataSizeVal = new Label(gSensor, SWT.NONE);
 		lDataSizeVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lDataSizeVal.setText("0 MByte");
 		setPageComplete(validate());
 	}
-	
+
 	public boolean isImportLatest() {
 		return bLatestData.getSelection();
 	}
-	
+
 	public Date getFrom() {
-		return dateTimeFrom.getSelection();
+		return eraseMilliSeconds(dateTimeFrom.getSelection());
 	}
-	
+
 	public Date getTo() {
-		return dateTimeTo.getSelection();
+		return eraseMilliSeconds(dateTimeTo.getSelection());
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
 	}
 
 	public void setSensor(SensorAdapter sensor) {
 		this.sensor = sensor;
-		if(sensor != null) {
+		if (sensor != null) {
 			try {
 				block = sensor.convert();
 				updateDateTimes();
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Fehler beim konvertieren der Sensordaten", e.getMessage());
 				e.printStackTrace();
-			} 
+			}
 		}
 	}
-	
+
 	private void updateDateTimes() {
-		if(block == null)
+		if (block == null)
 			return;
-		//Set default cdate values
+		// Set default cdate values
 		dateTimeFrom.setSelection(block.getFrom());
 		dateTimeTo.setSelection(block.getTo());
-		//Set Sensor-Information
+		// Set Sensor-Information
 		DateFormat df = DateFormat.getDateTimeInstance();
 		lBlockFromVal.setText(df.format(block.getFrom()));
 		lBlockToVal.setText(df.format(block.getTo()));
 		double size = block.getEnd() - block.getBegin();
 		size = size / (1024.0 * 1024.0);
 		String sizeString = String.valueOf(size);
-		if(sizeString.length() > 4)
+		if (sizeString.length() > 4)
 			sizeString = String.valueOf(size).substring(0, 4);
 		lDataSizeVal.setText(sizeString + " MByte");
-		
 	}
-	
-	public void setPatient(Patient patient) {
-		this.patient = patient;
+
+	private Date eraseMilliSeconds(Date date) {
+		if (date == null)
+			return null;
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	private boolean validate() {
 		EntityManager em = JPAUtil.createEntityManager();
-		
-		//Check if the identical dataset exists in db
+		// Check if the identical dataset exists in db
 		List<Data> results = em.createNamedQuery("Data.findByPatientAndDate")
-		.setParameter("patient", patient)
-		.setParameter("from", getFrom())
-		.setParameter("to",getTo())
-		.getResultList();
-		if(!results.isEmpty()) {
-			System.out.println("Found identical");
-			setErrorMessage("Datensatz bereits vorhanden");
+				.setParameter("patient", patient)
+				.setParameter("from", getFrom())
+				.setParameter("to", getTo())
+				.getResultList();
+		if (!results.isEmpty()) {
+			setMessage("Datensatz bereits vorhanden", ERROR);
 			em.close();
 			return false;
 		}
-		DateFormat df2 = DateFormat.getDateTimeInstance();
-		for (Data data : results) {
-			System.out.println("### Found identical data after");
-			System.out.println("db.from/to   " + df2.format(data.getFrom() + "/" + df2.format(data.getTo())));
-			System.out.println("sn.from/to " + df2.format(getFrom() + "/" + df2.format(getTo())));
-		}
-		
-		//Check if the data is new
+		printResults(results, "No identical found");
+
+		// Check if the data is new
 		results = em.createNamedQuery("Data.findByPatientAndBeforeTo")
-			.setParameter("patient", patient)
-			.setParameter("date", getFrom())
-			.getResultList();
-		if(results.isEmpty()){
-			setMessage("Auswahl in Ordnung");
+				.setParameter("patient", patient)
+				.setParameter("date", getFrom())
+				.getResultList();
+		if (results.isEmpty()) {
+			setMessage("Auswahl in Ordnung", INFORMATION);
 			em.close();
 			return true;
 		}
-		
-		for (Data data : results) {
-			System.out.println("### Found sensor data after");
-			System.out.println("db.to   " + df2.format(data.getTo()));
-			System.out.println("sn.from " + df2.format(getFrom()));
-		}
-		
-		//Check if sensor data are older than all datasets in db
-		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
-		.setParameter("patient", patient)
-		.setParameter("date", getTo())
-		.getResultList();
-		if(results.isEmpty()) {
-			setMessage("Auswahl in Ordnung ");
+		printResults(results, "Didn't Found newer data");
+		// Check if sensor data are older than all datasets in db
+		results = em.createNamedQuery("Data.findByPatientAndAfterFrom")
+				.setParameter("patient", patient)
+				.setParameter("date", getTo())
+				.getResultList();
+		if (results.isEmpty()) {
+			setMessage("Auswahl in Ordnung", INFORMATION);
 			em.close();
 			return true;
 		}
-		
-		//Check if new sensor data fills a gap in the db or overlaps
+		printResults(results, "Found no older data");
+		// Check if new sensor data fills a gap in the db or overlaps
 		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
-		.setParameter("patient", patient)
-		.setParameter("date", getTo())
-		.getResultList();
-		Date closest = null; //Store closest date for user feedback
+				.setParameter("patient", patient)
+				.setParameter("date", getTo())
+				.getResultList();
+		
+		printResults(results, "Searching for gaps");
+		Date closest = null; // Store closest date for user feedback
 		for (Data data : results) {
-			if(closest == null)
+			if (closest == null)
 				closest = data.getTo();
-			if(closest.before(data.getTo()))
+			if (closest.before(data.getTo()))
 				closest = data.getTo();
-			
-			if(getFrom().after(data.getTo()))  {
+
+			if (getFrom().after(data.getTo())) {
+				setMessage("Auswahl in Ordnung", INFORMATION);
 				em.close();
-				return true; //gap found
+				return true; // gap found
 			}
-				
+
 		}
-		//No gap found
+		// No gap found
 		DateFormat df = DateFormat.getDateTimeInstance();
 		String fromString = "";
-		if(closest != null)
+		if (closest != null)
 			fromString = df.format(closest);
-		setErrorMessage("Datensatz ueberlappt von " + fromString + " bis " + df.format(getFrom()));
+		setMessage("Datensatz ueberlappt von " + fromString + " bis " + df.format(getFrom()), ERROR);
 		em.close();
 		return false;
-		
+
 	}
-	
+
+	private void printResults(List<Data> results, String msg) {
+		DateFormat df = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss:SS ");
+		System.out.println(" #### " + msg + " ####");
+		for (Data data : results) {
+			System.out.println("db.to   " + df.format(data.getTo()));
+			System.out.println("sn.from " + df.format(getFrom()));
+			System.out.println(" ------------------- ");
+			System.out.println("db.from/to   " + df.format(data.getFrom()) + "/" + df.format(data.getTo()));
+			System.out.println("sn.from/to " + df.format(getFrom()) + "/" + df.format(getTo()));
+			System.out.println(" ------------------- ");
+			System.out.println("db.from/to   " + data.getFrom().getTime() + "/" + data.getTo().getTime());
+			System.out.println("sn.from/to " + getFrom().getTime() + "/" + getTo().getTime());
+			System.out.println("Offset: " + (data.getFrom().getTime() - getFrom().getTime()) + " / "
+					+ (data.getTo().getTime() - getTo().getTime()));
+		}
+	}
+
+	public void initPage() {
+		setPageComplete(validate());
+	}
 
 }
