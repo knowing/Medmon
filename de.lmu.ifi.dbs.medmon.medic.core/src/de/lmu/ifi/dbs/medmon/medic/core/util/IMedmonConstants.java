@@ -34,6 +34,7 @@ public interface IMedmonConstants {
 	public static final String IMG_ARROW_UP_16 = "icons/16/gtk-go-up.png";
 	public static final String IMG_HELP_16 = "icons/16/help.png";
 	public static final String IMG_IMAGE_16 = "icons/16/gtk-image.png";
+	public static final String IMG_IMPORT_16 = "icons/import_16.png"; //Base-UI
 	public static final String IMG_OPEN_16 = "icons/16/gtk-open.png";
 	public static final String IMG_REMOVE_16 = "icons/16/gtk-remove.png";
 	public static final String IMG_REFRESH_16 = "icons/16/gtk-refresh.png";

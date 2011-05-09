@@ -33,6 +33,13 @@
                type="de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter">
          </adapter>
       </factory>
+      <factory
+            adaptableType="de.lmu.ifi.dbs.knowing.core.graph.Node"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.NodeAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
    </extension>
 
 </plugin>

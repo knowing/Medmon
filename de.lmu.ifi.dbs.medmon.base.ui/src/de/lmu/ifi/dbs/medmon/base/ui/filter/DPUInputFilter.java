@@ -31,13 +31,11 @@ public class DPUInputFilter extends ViewerFilter {
 			if(type.equals("loader")) {
 				String id = node.factoryId();
 				dpuLoader.add(id);
-				System.out.println("Id: " + id);
 			}
 		}
-		for(String id : loaderIds)  {
-			System.out.println("Remove id: " + id);
+		
+		for(String id : loaderIds) 
 			dpuLoader.remove(id);
-		}
 			
 		
 		return dpuLoader.isEmpty();
