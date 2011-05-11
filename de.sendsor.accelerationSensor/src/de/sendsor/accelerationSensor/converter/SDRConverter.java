@@ -81,7 +81,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			return;
 		// super.setSource(input);
 	}
-	
+
 	@Override
 	public void setDirectory(String path) throws IOException {
 		File dir = new File(path);
@@ -91,10 +91,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				return name.endsWith(FILE_EXTENSION);
 			}
 		});
-		if(files.length == 0)
+		if (files.length == 0)
 			throw new IOException("No files found in this directory");
-		//TODO SDRLoader - setDirectory warning if more than one file found
-		//Setting the first file found
+		// TODO SDRLoader - setDirectory warning if more than one file found
+		// Setting the first file found
 		setFile(files[0]);
 	}
 
@@ -102,10 +102,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public Instances getStructure() throws IOException {
 		return m_structure;
 	}
-	
+
 	@Override
 	public void copy(OutputStream out) throws IOException {
-		//Assuming the sensor can't record future data
+		// Assuming the sensor can't record future data
 		copy(out, new Date(0), new Date());
 	}
 
@@ -143,10 +143,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			// Write data only "from >= date"
 			if (!date.getTime().before(from) && date.after(last))
 				out.write(data);
-			/* Reasons for break
-			 * 1) record ends when zeros appear
-			 * 2) record ends when new date is before the previous entry
-			 * 3) given parameter `to` is reached 
+			/*
+			 * Reasons for break 1) record ends when zeros appear 2) record ends
+			 * when new date is before the previous entry 3) given parameter
+			 * `to` is reached
 			 */
 			else if (recordEnd(day, hour) || date.before(last) || date.getTime().after(to))
 				break;
@@ -190,9 +190,8 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				first.set(year, month, day, hour, minute, second);
 			}
 			// Checks if the recorded data ended or "date < to"
-			if (recordEnd(day, hour) || date.before(last)) 
+			if (recordEnd(day, hour) || date.before(last))
 				break;
-			
 
 			last.setTimeInMillis(date.getTimeInMillis());
 			length += read;
@@ -218,13 +217,13 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		// Initialize data handling
 		// TODO SDRLoader -> replace RandomAccessFile with FileInputStream?
-		RandomAccessFile in = new RandomAccessFile(m_sourceFile, "r");
+		// RandomAccessFile in = new RandomAccessFile(m_sourceFile, "r");
+
+		FileInputStream in = new FileInputStream(m_sourceFile);
+		int read = in.read(data);
 
 		// Convert each block
-		for (long i = 0; i <= in.length(); i++) {
-			// Search position
-			long position = i * BLOCKSIZE;
-			in.seek(position);
+		while (read != -1) {
 			// Load Data into data-Buffer
 			in.read(data, 0, BLOCKSIZE);
 
@@ -255,7 +254,8 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				instance.setValue(zAttribute, z);
 				dataset.add(instance);
 			}
-
+			System.out.println("Read: " + date.getTime());
+			read = in.read(data);
 			// Checks if the recorded data ended
 			if (recordEnd(day, hour))
 				break;
@@ -315,7 +315,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public String getFileDescription() {
 		return "Sendsor - Acceleration Input Format";
 	}
-	
+
 	@Override
 	public String getId() {
 		return ID;

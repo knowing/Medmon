@@ -4,6 +4,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.sendsor.accelerationSensor.converter.SDRLoaderFactory;
 
 /**
@@ -32,7 +33,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		sdrService = context.registerService(SDRLoaderFactory.class.getName(), new SDRLoaderFactory(), null);
+		sdrService = context.registerService(TFactory.class.getName(), new SDRLoaderFactory(), null);
 	}
 
 	/*

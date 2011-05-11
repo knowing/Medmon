@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,20 +15,21 @@ import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowData;
 
 /**
  * @author Nepomuk Seiler
@@ -37,7 +37,7 @@ import org.eclipse.swt.layout.RowData;
  * @since 01.05.2011
  * 
  */
-public class SelectDataPage extends WizardPage {
+public class SelectDataPage extends WizardPage implements IValidationPage {
 
 	private CDateTime dateTimeFrom;
 	private CDateTime dateTimeTo;
@@ -47,7 +47,6 @@ public class SelectDataPage extends WizardPage {
 	private Label lBlockToVal;
 	private Label lDataSizeVal;
 
-	private SensorAdapter sensor;
 	private Patient patient;
 	private IBlock block;
 
@@ -82,7 +81,7 @@ public class SelectDataPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				dateTimeFrom.setEnabled(!bLatestData.getSelection());
 				dateTimeTo.setEnabled(!bLatestData.getSelection());
-				setPageComplete(validate());
+				checkContents();
 			}
 		});
 
@@ -95,7 +94,7 @@ public class SelectDataPage extends WizardPage {
 				dateTimeTo.setEnabled(!bLatestData.getSelection());
 				if (isImportLatest())
 					updateDateTimes();
-				setPageComplete(validate());
+				checkContents();
 			}
 		});
 
@@ -111,9 +110,9 @@ public class SelectDataPage extends WizardPage {
 		dateTimeFrom.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(getFrom().after(getTo()))
+				if (getFrom().after(getTo()))
 					dateTimeTo.setSelection(new Date(getFrom().getTime()));
-				setPageComplete(validate());
+				checkContents();
 			}
 		});
 
@@ -125,9 +124,9 @@ public class SelectDataPage extends WizardPage {
 		dateTimeTo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(getFrom().after(getTo()))
+				if (getFrom().after(getTo()))
 					dateTimeFrom.setSelection(new Date(getTo().getTime()));
-				setPageComplete(validate());
+				checkContents();
 			}
 		});
 
@@ -156,7 +155,6 @@ public class SelectDataPage extends WizardPage {
 		lDataSizeVal = new Label(gSensor, SWT.NONE);
 		lDataSizeVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lDataSizeVal.setText("0 MByte");
-		setPageComplete(validate());
 	}
 
 	public boolean isImportLatest() {
@@ -176,16 +174,17 @@ public class SelectDataPage extends WizardPage {
 	}
 
 	public void setSensor(SensorAdapter sensor) {
-		this.sensor = sensor;
-		if (sensor != null) {
-			try {
-				block = sensor.convert();
-				updateDateTimes();
-			} catch (IOException e) {
-				MessageDialog.openError(getShell(), "Fehler beim konvertieren der Sensordaten", e.getMessage());
-				e.printStackTrace();
-			}
+		if (sensor == null)
+			return;
+
+		try {
+			block = sensor.convert();
+			updateDateTimes();
+		} catch (IOException e) {
+			MessageDialog.openError(getShell(), "Fehler beim konvertieren der Sensordaten", e.getMessage());
+			e.printStackTrace();
 		}
+
 	}
 
 	private void updateDateTimes() {
@@ -215,47 +214,42 @@ public class SelectDataPage extends WizardPage {
 		return cal.getTime();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	private boolean validate() {
+	public void checkContents() {
 		EntityManager em = JPAUtil.createEntityManager();
 		// Check if the identical dataset exists in db
-		List<Data> results = em.createNamedQuery("Data.findByPatientAndDate")
-				.setParameter("patient", patient)
-				.setParameter("from", getFrom())
-				.setParameter("to", getTo())
-				.getResultList();
+		List<Data> results = em.createNamedQuery("Data.findByPatientAndDate").setParameter("patient", patient)
+				.setParameter("from", getFrom()).setParameter("to", getTo()).getResultList();
 		if (!results.isEmpty()) {
 			setMessage("Datensatz bereits vorhanden", ERROR);
 			em.close();
-			return false;
+			setPageComplete(false);
+			return;
 		}
 
 		// Check if the data is new
-		results = em.createNamedQuery("Data.findByPatientAndBeforeTo")
-				.setParameter("patient", patient)
-				.setParameter("date", getFrom())
+		results = em.createNamedQuery("Data.findByPatientAndBeforeTo").setParameter("patient", patient).setParameter("date", getFrom())
 				.getResultList();
 		if (results.isEmpty()) {
 			setMessage("Auswahl in Ordnung", INFORMATION);
 			em.close();
-			return true;
+			setPageComplete(true);
+			return;
 		}
 		// Check if sensor data are older than all datasets in db
-		results = em.createNamedQuery("Data.findByPatientAndAfterFrom")
-				.setParameter("patient", patient)
-				.setParameter("date", getTo())
+		results = em.createNamedQuery("Data.findByPatientAndAfterFrom").setParameter("patient", patient).setParameter("date", getTo())
 				.getResultList();
 		if (results.isEmpty()) {
 			setMessage("Auswahl in Ordnung", INFORMATION);
 			em.close();
-			return true;
+			setPageComplete(true);
+			return;
 		}
 		// Check if new sensor data fills a gap in the db or overlaps
-		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom")
-				.setParameter("patient", patient)
-				.setParameter("date", getTo())
+		results = em.createNamedQuery("Data.findByPatientAndBeforeFrom").setParameter("patient", patient).setParameter("date", getTo())
 				.getResultList();
-		
+
 		Date closest = null; // Store closest date for user feedback
 		for (Data data : results) {
 			if (closest == null)
@@ -266,7 +260,8 @@ public class SelectDataPage extends WizardPage {
 			if (getFrom().after(data.getTo())) {
 				setMessage("Auswahl in Ordnung", INFORMATION);
 				em.close();
-				return true; // gap found
+				setPageComplete(true);
+				return; // gap found
 			}
 
 		}
@@ -277,12 +272,7 @@ public class SelectDataPage extends WizardPage {
 			fromString = df.format(closest);
 		setMessage("Datensatz ueberlappt von " + fromString + " bis " + df.format(getFrom()), ERROR);
 		em.close();
-		return false;
-
-	}
-
-	public void initPage() {
-		setPageComplete(validate());
+		setPageComplete(false);
 	}
 
 }

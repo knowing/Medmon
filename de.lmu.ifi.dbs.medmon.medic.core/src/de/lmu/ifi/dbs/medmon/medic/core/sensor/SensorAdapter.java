@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.medmon.medic.core.sensor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
@@ -55,6 +55,15 @@ public class SensorAdapter {
 		IConverter converter = sensorExtension.getConverter();
 		converter.setDirectory(sensorEntity.getDefaultpath());
 		converter.copy(out);
+	}
+	
+	
+	public void copy(OutputStream out, Date from, Date to) throws IOException {
+		if(sensorEntity == null || sensorExtension == null)
+			throw new IOException("Unable to find sensor in database( "+sensorEntity+" )or extension-registry( "+sensorExtension+" )");
+		IConverter converter = sensorExtension.getConverter();
+		converter.setDirectory(sensorEntity.getDefaultpath());
+		converter.copy(out, from, to);
 	}
 	
 	public IBlock convert() throws IOException {
