@@ -65,13 +65,15 @@ public class Activator extends AbstractUIPlugin {
 		String dpu_dir = store.getString(IMedicPreferences.DIR_DPU_ID);
 		String patient_dir = store.getString(IMedicPreferences.DIR_PATIENT_ID);
 		String cluster_dir = store.getString(IMedicPreferences.DIR_CU_ID);
+		String tmp_dir = store.getString(IMedicPreferences.DIR_TMP_ID);
 		
 		File root = new File(root_dir);
 		if(!root.exists()) {
 			root.mkdirs();
 			new File(dpu_dir).mkdir();
 			new File(patient_dir).mkdir();
-			new File(cluster_dir).mkdir();		
+			new File(cluster_dir).mkdir();
+			new File(tmp_dir).mkdir();
 		} else {
 			File dpu = new File(dpu_dir);
 			if(!dpu.exists())
@@ -82,6 +84,15 @@ public class Activator extends AbstractUIPlugin {
 			File cluster = new File(cluster_dir);
 			if(!cluster.exists())
 				cluster.mkdir();
+			File tmp = new File(tmp_dir);
+			if(tmp.exists()) {
+				//wipe tmp dir
+				for(File file : tmp.listFiles())
+					file.delete();
+			} else {
+				tmp.mkdir();
+			}
+				
 		}
 		
 	}	

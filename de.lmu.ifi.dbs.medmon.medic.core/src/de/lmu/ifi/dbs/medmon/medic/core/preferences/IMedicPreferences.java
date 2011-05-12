@@ -10,4 +10,5 @@ public interface IMedicPreferences {
 	public static final String DIR_DPU_ID = "DIR_DPU";
 	public static final String DIR_CU_ID = "DIR_CU";
 	public static final String DIR_PATIENT_ID = "DIR_PATIENT";
+	public static final String DIR_TMP_ID = "DIR_TEMP";
 }

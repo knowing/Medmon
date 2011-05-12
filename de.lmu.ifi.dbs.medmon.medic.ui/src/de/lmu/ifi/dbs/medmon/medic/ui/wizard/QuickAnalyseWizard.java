@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil.getPatientFolder;
+import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil.getPreferenceStore;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -82,8 +82,9 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 		Date from = dataPage.getFrom();
 		Date to = dataPage.getTo();
 		
-		String dir = getPatientFolder(patient);
-		String path = dir + ".tmp-sensor-data";
+		String dir = getPreferenceStore().getString(IMedicPreferences.DIR_TMP_ID);
+		String sep = getPreferenceStore().getString(IMedicPreferences.DIR_SEPERATOR_ID);
+		String path = dir + sep + patient.getLastname();
 		
 		try {
 			FileOutputStream out = new FileOutputStream(path);
@@ -96,14 +97,10 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			return false;
 		}
 		Node[] nodes = dpu.node("loader", converter.getId());
-		System.err.println("Nodes: " + nodes);
 		for (Node node : nodes) {
 			Properties properties = node.properties();
-			System.err.println("Properties before: " + properties);
 			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
 			properties.setProperty("file", path);
-			System.err.println("Properties after: " + properties);
-			System.err.println("Properties reference: " + node.properties());
 		}
 		EvaluateHandler.evaluate(dpu);
 		return true;

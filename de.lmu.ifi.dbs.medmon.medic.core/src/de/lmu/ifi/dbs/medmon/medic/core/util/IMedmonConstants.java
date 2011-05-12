@@ -16,12 +16,12 @@ public interface IMedmonConstants {
 	/* ====== Folders ===== */
 	/* ==================== */
 	
-	public static final String DIR_USER_HOME = System.getProperty("user.home");
-	public static final String DIR_SEPERATOR = System.getProperty("file.separator");
-	public static final String DIR_MEDMON = DIR_USER_HOME + DIR_SEPERATOR + ".medmon";
-	public static final String DIR_DERBY = DIR_MEDMON + DIR_SEPERATOR + "db";
-	public static final String DIR_DPU = DIR_MEDMON + DIR_SEPERATOR + "dpu";
-	public static final String DIR_CU = DIR_MEDMON + DIR_SEPERATOR + "cluster";
+	@Deprecated public static final String DIR_USER_HOME = System.getProperty("user.home");
+	@Deprecated public static final String DIR_SEPERATOR = System.getProperty("file.separator");
+	@Deprecated public static final String DIR_MEDMON = DIR_USER_HOME + DIR_SEPERATOR + ".medmon";
+	@Deprecated public static final String DIR_DERBY = DIR_MEDMON + DIR_SEPERATOR + "db";
+	@Deprecated public static final String DIR_DPU = DIR_MEDMON + DIR_SEPERATOR + "dpu";
+	@Deprecated public static final String DIR_CU = DIR_MEDMON + DIR_SEPERATOR + "cluster";
 	
 	/* ==================== */
 	/* ====== Images ====== */

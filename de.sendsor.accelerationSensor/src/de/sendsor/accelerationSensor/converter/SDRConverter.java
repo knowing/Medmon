@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.sendsor.accelerationSensor.converter;
 
 import java.io.File;
@@ -9,7 +6,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -243,9 +239,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				int y = data[j + 1];
 				int z = data[j + 2];
 
-				// Avoiding Call-by-Reference effect
-
-				// datalist.add(new Data(timestamp.getTimeInMillis(), x, y, z));
 				time += TIME_CORRECTION_AFTER;
 				DenseInstance instance = new DenseInstance(4);
 				instance.setValue(timeAttribute, timestamp.getTimeInMillis());
@@ -254,14 +247,12 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				instance.setValue(zAttribute, z);
 				dataset.add(instance);
 			}
-			System.out.println("Read: " + date.getTime());
 			read = in.read(data);
 			// Checks if the recorded data ended
 			if (recordEnd(day, hour))
 				break;
 
 		}
-		// log.info("Converted Data[]: " + datalist.size());
 		in.close();
 
 		return dataset;
@@ -325,15 +316,5 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public String getRevision() {
 		return "";
 	}
-
-	/*
-	 * @Override public ILoader getInstance(Properties properties) { String
-	 * pathname = properties.getProperty(FILE, "/home/muki/input.sdr");
-	 * SDRLoader loader = new SDRLoader();
-	 * System.out.println("Set loader file"); try { loader.setFile(new
-	 * File(pathname)); } catch (IOException e) { e.printStackTrace();
-	 * //log.error("Couldn't set file for SDRLoader", e); } return new
-	 * SynchronizedLoader(loader); }
-	 */
 
 }

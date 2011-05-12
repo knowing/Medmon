@@ -23,6 +23,7 @@ public class MedmonPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.put(IMedicPreferences.DIR_DPU_ID, DIR_MEDMON + DIR_SEPERATOR + "dpu");
 		node.put(IMedicPreferences.DIR_CU_ID, DIR_MEDMON + DIR_SEPERATOR + "cluster");
 		node.put(IMedicPreferences.DIR_PATIENT_ID, DIR_MEDMON + DIR_SEPERATOR + "patients");
+		node.put(IMedicPreferences.DIR_TMP_ID, DIR_MEDMON + DIR_SEPERATOR + ".tmp");
 		
 	}	
 
