@@ -44,7 +44,7 @@ public class ImportWizard extends Wizard {
 			addPage(sourcePage);
 		}
 
-		dataPage = new SelectDataPage();
+		dataPage = new SelectDataPage(true);
 		addPage(dataPage);
 	}
 	

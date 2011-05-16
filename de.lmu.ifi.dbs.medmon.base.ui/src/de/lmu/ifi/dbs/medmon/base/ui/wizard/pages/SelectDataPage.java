@@ -49,12 +49,18 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 
 	private Patient patient;
 	private IBlock block;
+	private final boolean validate;
 
 	/**
 	 * Create the wizard.
 	 */
 	public SelectDataPage() {
+		this(false);
+	}
+	
+	public SelectDataPage(boolean validate) {
 		super("Sensordaten");
+		this.validate = validate;
 		setTitle("Sensordaten");
 		setDescription("Bitte waehlen Sie aus welche Sensordaten Sie importieren moechten");
 		setPageComplete(true);
@@ -217,6 +223,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void checkContents() {
+		//No validation
+		if(!validate)
+			return; 
 		EntityManager em = JPAUtil.createEntityManager();
 		// Check if the identical dataset exists in db
 		List<Data> results = em.createNamedQuery("Data.findByPatientAndDate").setParameter("patient", patient)
