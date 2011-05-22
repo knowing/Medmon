@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Medmon Medic UI
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.medic.ui;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms;bundle-version="3.5.2",
@@ -53,3 +53,4 @@ Import-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
  scala.runtime;version="2.9.0.final",
  scala.util;version="2.9.0.final"
 Bundle-ClassPath: .
+Bundle-Vendor: LMU Munich - Database Systems Group

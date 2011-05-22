@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Sendsor AccelerationSensor
 Bundle-SymbolicName: de.sendsor.accelerationSensor;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.sendsor.accelerationSensor.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -37,3 +37,4 @@ Import-Package: de.lmu.ifi.dbs.medmon.database.model,
  scala.util.matching;version="2.9.0.final"
 Export-Package: de.sendsor.accelerationSensor.converter,
  de.sendsor.accelerationSensor.sensor
+Bundle-Vendor: LMU Munich - Database Systems Group

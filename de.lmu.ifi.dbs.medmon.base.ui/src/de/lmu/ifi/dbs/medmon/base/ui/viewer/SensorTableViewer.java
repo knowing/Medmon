@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.viewer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -127,16 +128,20 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 				@Override
 				public void run() {
 					int timer = 1;
-					while(viewer == null && timer < 7) {
+					Collection<SensorAdapter> values = model.values();
+					while(values == null && timer < 7) {
 						try {
 							Thread.sleep(timer++ * 500L);
+							values = model.values();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 					//TODO SensorTableViewer check NullPointer
-					viewer.setInput(model.values().toArray());
-					viewer.refresh();
+					if(timer != 7) {
+						viewer.setInput(values.toArray());
+						viewer.refresh();
+					}
 				
 				}
 			});

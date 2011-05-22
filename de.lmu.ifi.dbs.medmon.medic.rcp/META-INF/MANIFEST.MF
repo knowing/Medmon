@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipselabs.p2.rcpupdate.utils
+Bundle-Vendor: LMU Munich - Database Systems Group

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Libs
+Bundle-Name: ELKI Library
 Bundle-SymbolicName: de.lmu.ifi.dbs.elki.libs
 Bundle-Version: 1.0.0
 Bundle-ClassPath: .
@@ -142,3 +142,4 @@ Export-Package: de.lmu.ifi.dbs.elki,
  de.lmu.ifi.dbs.utilities.io,
  experimentalcode
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: LMU Munich - Database Systems Group

@@ -20,7 +20,6 @@
 
    <windowImages i16="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/alt_window_16.gif" i32="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/alt_window_32.gif"/>
 
-
    <launcher name="Medmon">
       <solaris/>
       <win useIco="false">
@@ -28,11 +27,9 @@
       </win>
    </launcher>
 
-
    <vm>
       <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
    </vm>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -64,7 +61,8 @@
    </plugins>
 
    <features>
-      <feature id="medmon.feature" version="1.0.0.ALPHA1"/>
+      <feature id="medmon.core.feature" version="1.0.0.qualifier"/>
+      <feature id="medmon.medic.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
