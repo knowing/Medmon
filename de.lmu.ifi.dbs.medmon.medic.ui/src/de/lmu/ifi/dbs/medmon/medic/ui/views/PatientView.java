@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -69,7 +70,11 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	private TabItem tabCluster;
 
 	public PatientView() {
-		Activator.getPatientService().addPropertyChangeListener(IPatientService.PATIENT, this);
+		IPatientService patientService = Activator.getPatientService();
+		if(patientService != null)
+			patientService.addPropertyChangeListener(IPatientService.PATIENT, this);
+		else
+			MessageDialog.openError(getSite().getShell(), "Fail", "Patient Service offline");
 	}
 
 	/**

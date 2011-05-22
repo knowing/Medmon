@@ -23,6 +23,22 @@
                name="appName"
                value="Medmon for Medics">
          </property>
+         <property
+               name="aboutImage"
+               value="medmon.trans.png">
+         </property>
+         <property
+               name="aboutText"
+               value="Medmon Medic App">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
       </product>
    </extension>
 

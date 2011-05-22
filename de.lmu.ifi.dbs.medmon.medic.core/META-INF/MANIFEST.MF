@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Core
+Bundle-Name: Medmon Medic Core
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.medic.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.core.Activator
@@ -20,3 +20,4 @@ Export-Package: de.lmu.ifi.dbs.medmon.medic.core.job,
  de.lmu.ifi.dbs.medmon.medic.core.sensor,
  de.lmu.ifi.dbs.medmon.medic.core.service,
  de.lmu.ifi.dbs.medmon.medic.core.util
+Bundle-Vendor: LMU Munich - Database Systems Group

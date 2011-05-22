@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Database2
+Bundle-Name: Medmon Derby
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.derby;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Export-Package: de.lmu.ifi.dbs.medmon.database.model,
  de.lmu.ifi.dbs.medmon.database.util
@@ -16,3 +16,4 @@ Bundle-Activator: de.lmu.ifi.dbs.medmon.database.Activator
 JPA-PersistenceUnits: medmon
 Meta-Persistence: META-INF/persistence.xml
 Import-Package: org.osgi.service.jdbc;version="1.0.0"
+Bundle-Vendor: LMU Munich - Database Systems Group
