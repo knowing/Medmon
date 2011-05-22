@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Medic
+Bundle-Name: Medmon Medic UI
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.medic.ui;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms;bundle-version="3.5.2",
@@ -17,14 +17,39 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.nebula.widgets.cdatetime;bundle-version="0.14.0",
  org.eclipse.nebula.widgets.datechooser;bundle-version="1.0.0",
  org.eclipse.nebula.widgets.formattedtext;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0",
  de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.base.ui;bundle-version="1.0.0",
- org.scala-ide.scala.library
+ de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.lmu.ifi.dbs.medmon.medic.ui.handler,
  de.lmu.ifi.dbs.medmon.medic.ui.perspective,
  de.lmu.ifi.dbs.medmon.medic.ui.views
-Import-Package: javax.persistence;version="1.0.0",
- org.eclipse.ui.model
+Import-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
+ de.lmu.ifi.dbs.medmon.base.ui.analyzed,
+ de.lmu.ifi.dbs.medmon.base.ui.cluster,
+ de.lmu.ifi.dbs.medmon.base.ui.dialog,
+ de.lmu.ifi.dbs.medmon.base.ui.filter,
+ de.lmu.ifi.dbs.medmon.base.ui.provider,
+ de.lmu.ifi.dbs.medmon.base.ui.util,
+ de.lmu.ifi.dbs.medmon.base.ui.validation,
+ de.lmu.ifi.dbs.medmon.base.ui.viewer,
+ de.lmu.ifi.dbs.medmon.base.ui.widgets,
+ de.lmu.ifi.dbs.medmon.base.ui.wizard,
+ de.lmu.ifi.dbs.medmon.base.ui.wizard.pages,
+ javax.persistence;version="1.0.0",
+ org.eclipse.ui.model,
+ org.eclipselabs.p2.rcpupdate.utils,
+ scala;version="2.9.0.final",
+ scala.collection;version="2.9.0.final",
+ scala.collection.generic;version="2.9.0.final",
+ scala.collection.immutable;version="2.9.0.final",
+ scala.collection.interfaces;version="2.9.0.final",
+ scala.collection.mutable;version="2.9.0.final",
+ scala.io;version="2.9.0.final",
+ scala.math;version="2.9.0.final",
+ scala.ref;version="2.9.0.final",
+ scala.reflect;version="2.9.0.final",
+ scala.reflect.generic;version="2.9.0.final",
+ scala.runtime;version="2.9.0.final",
+ scala.util;version="2.9.0.final"
+Bundle-ClassPath: .

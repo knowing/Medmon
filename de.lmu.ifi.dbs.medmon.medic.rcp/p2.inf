@@ -1,0 +1,11 @@
+instructions.configure=\
+  addRepository(type:0,location:http${#58}//medmon.mukis.de/update/);\
+  addRepository(type:1,location:http${#58}//medmon.mukis.de/update/);
+
+instructions.configure=\
+  addRepository(type:0,location:http${#58}//localhost/update/);\
+  addRepository(type:1,location:http${#58}//localhost/update/);
+
+instructions.configure=\
+  addRepository(type:0,location:http${#58}//localhost/repository/);\
+  addRepository(type:1,location:http${#58}//localhost/repository/);

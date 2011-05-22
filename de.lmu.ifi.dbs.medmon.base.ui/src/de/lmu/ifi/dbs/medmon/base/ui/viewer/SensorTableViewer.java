@@ -75,8 +75,13 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 			new Thread(new WaitingForInput(this)).start();
 		} else {
 			Map<String, SensorAdapter> model = daemon.getModel();
-			setInput(model.values().toArray());
-			daemon.addPropertyChangeListener(this);
+			if(model == null) {
+				new Thread(new WaitingForInput(this)).start();
+			} else {
+				setInput(model.values().toArray());
+				daemon.addPropertyChangeListener(this);
+			}
+
 		}
 
 	}
@@ -104,11 +109,12 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 		@Override
 		public void run() {
 			SensorDaemon daemon = SensorDaemon.getDaemon();
+			int timer = 1;
 			//Try getting the Daemon
-			while (daemon == null) {
+			while (daemon == null && timer < 7 ) {
 				daemon = SensorDaemon.getDaemon();
 				try {
-					Thread.sleep(500L);
+					Thread.sleep(timer++ * 500L);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -120,8 +126,18 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 				
 				@Override
 				public void run() {
+					int timer = 1;
+					while(viewer == null && timer < 7) {
+						try {
+							Thread.sleep(timer++ * 500L);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					//TODO SensorTableViewer check NullPointer
 					viewer.setInput(model.values().toArray());
-					viewer.refresh();					
+					viewer.refresh();
+				
 				}
 			});
 
