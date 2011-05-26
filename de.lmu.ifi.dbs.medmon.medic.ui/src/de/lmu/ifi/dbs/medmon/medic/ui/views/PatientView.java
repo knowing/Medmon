@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -74,7 +75,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		if(patientService != null)
 			patientService.addPropertyChangeListener(IPatientService.PATIENT, this);
 		else
-			MessageDialog.openError(getSite().getShell(), "Fail", "Patient Service offline");
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "Fail", "Patient Service offline");
 	}
 
 	/**

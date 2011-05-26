@@ -192,6 +192,13 @@ public class SensorDaemon implements Runnable {
 						continue;
 					}
 					ISensor sensor = adapter.getSensorExtension();
+					//Sensor extension not available
+					if(sensor == null) {
+						adapter.setAvailable(false);
+						changed = true;
+						continue;
+					}
+					//Sensor not null
 					if (sensor.isSensor(dir)) {
 						if (!available) {
 							adapter.setAvailable(true);

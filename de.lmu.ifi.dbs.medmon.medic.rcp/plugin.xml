@@ -24,6 +24,10 @@
                value="Medmon for Medics">
          </property>
          <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
                name="aboutImage"
                value="medmon.trans.png">
          </property>
@@ -36,8 +40,16 @@
                value="icons/alt_window_16.gif,icons/alt_window_32.gif">
          </property>
          <property
-               name="preferenceCustomization"
-               value="plugin_customization.ini">
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,145,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,170,445,15">
          </property>
       </product>
    </extension>
