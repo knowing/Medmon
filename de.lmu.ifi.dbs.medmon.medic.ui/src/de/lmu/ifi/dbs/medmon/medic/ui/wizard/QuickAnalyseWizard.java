@@ -102,7 +102,7 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
 			properties.setProperty("file", path);
 		}
-		EvaluateHandler.evaluate(dpu);
+		EvaluateHandler.evaluate(dpu, dir + sep);
 		return true;
 	}
 

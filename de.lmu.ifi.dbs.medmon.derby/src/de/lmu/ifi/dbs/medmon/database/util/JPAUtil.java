@@ -6,12 +6,16 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
+import de.lmu.ifi.dbs.medmon.database.Activator;
 
 /**
  * 
@@ -57,6 +61,11 @@ public class JPAUtil implements ServiceTrackerCustomizer {
 	private JPAUtil(String punit, Map properties) {
 		this.punit = punit;
 		this.properties = properties;
+		try {
+			startGemini();
+		} catch (BundleException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public EntityManagerFactory createEntityManagerFactory() {
@@ -102,6 +111,22 @@ public class JPAUtil implements ServiceTrackerCustomizer {
 		JPAUtil util = utils.get(punit);
 		return util.createEntityManagerFactory().createEntityManager();
 	}
+	
+	/* ====================== */
+	/* == Start Gemini JPA == */
+	/* ====================== */
+	
+	private void startGemini() throws BundleException {
+		BundleContext context = Activator.getDefault().getBundle().getBundleContext();
+		for(Bundle bundle : context.getBundles()) {
+			if(!bundle.getSymbolicName().equals("org.eclipse.gemini.jpa"))
+				continue;
+			int state = bundle.getState();
+			if(!(state == Bundle.ACTIVE) && !(state == Bundle.STARTING)) 
+				bundle.start();
+		}
+	}
+		
 
 	/* ====================== */
 	/* == Service Tracker === */

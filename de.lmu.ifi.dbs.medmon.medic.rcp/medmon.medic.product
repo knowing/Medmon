@@ -32,7 +32,6 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
@@ -82,8 +81,8 @@
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="3" />
-      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.gemini.jpa" autoStart="false" startLevel="4" />
    </configurations>
 
 </product>
