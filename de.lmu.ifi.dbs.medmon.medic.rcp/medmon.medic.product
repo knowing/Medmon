@@ -71,18 +71,18 @@
    <configurations>
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="false" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="4" />
+      <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.derby" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.ui" autoStart="false" startLevel="4" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="false" startLevel="5" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="false" startLevel="3" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="4" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="4" />
-      <plugin id="org.eclipse.gemini.jpa" autoStart="false" startLevel="4" />
+      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="4" />
    </configurations>
 
 </product>
