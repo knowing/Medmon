@@ -54,11 +54,12 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	private Attribute zAttribute;
 
 	public SDRConverter() {
-		m_structure = ResultsUtil.dateAndValuesResult(Arrays.asList(new String[] { "x", "y", "z" }));
+		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
 		dataset = new Instances(m_structure);
 
 		timeAttribute = dataset.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes
+		//TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
 		List<Attribute> valueAttributes = ResultsUtil.findValueAttributes(dataset);
 		for (Attribute attribute : valueAttributes) {
 			String name = attribute.getMetadata().getProperty(ResultsUtil.META_ATTRIBUTE_NAME());
@@ -75,6 +76,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public void setSource(InputStream input) throws IOException {
 		if (!(input instanceof FileInputStream))
 			return;
+		//TODO SDRConverter -> implement setSource
 		// super.setSource(input);
 	}
 
