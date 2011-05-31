@@ -6,17 +6,13 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.sendsor.accelerationSensor.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- javax.persistence;bundle-version="2.0.1",
+ javax.persistence;bundle-version="2.0.0",
  nz.ac.waikato.cs.weka;bundle-version="3.7.3",
- de.lmu.ifi.dbs.elki.libs;bundle-version="1.0.0",
  de.lmu.ifi.dbs.medmon.jfreechart.libs;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.base.ui;bundle-version="1.0.0",
- se.scalablesolutions.akka.osgi.dependencies.bundle;bundle-version="1.0.0"
+ de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: de.lmu.ifi.dbs.medmon.database.model,
- scala;version="2.9.0.final",
+Import-Package: scala;version="2.9.0.final",
  scala.collection;version="2.9.0.final",
  scala.collection.generic;version="2.9.0.final",
  scala.collection.immutable;version="2.9.0.final",

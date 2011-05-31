@@ -330,7 +330,13 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	 * Initalize input
 	 */
 	private void update() {
-		Patient patient = (Patient) Activator.getPatientService().getSelection(IPatientService.PATIENT);
+		IPatientService service = Activator.getPatientService();
+		if(service == null) {
+			MessageDialog.openError(getSite().getShell(), "Error", "Patient Service Offline");
+			return;
+		}
+			
+		Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);
 		if (patient == null)
 			return;
 		

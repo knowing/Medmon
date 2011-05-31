@@ -30,13 +30,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="de.lmu.ifi.dbs.elki.libs"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.lmu.ifi.dbs.knowing.core"
          download-size="0"
          install-size="0"
@@ -206,13 +199,6 @@
          unpack="false"/>
 
    <plugin
-         id="se.scalablesolutions.akka.osgi.dependencies.bundle"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="slf4j.api"
          download-size="0"
          install-size="0"
@@ -284,6 +270,13 @@
 
    <plugin
          id="com.google.inject"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.codehaus.aspectwerkz"
          download-size="0"
          install-size="0"
          version="0.0.0"

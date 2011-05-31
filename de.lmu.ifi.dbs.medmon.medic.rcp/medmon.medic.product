@@ -14,7 +14,7 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-clean</programArgs>
+      <programArgs>-clean -console -consoleLog</programArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -70,7 +70,7 @@
 
    <configurations>
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="false" startLevel="4" />
+      <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.derby" autoStart="false" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="false" startLevel="5" />
