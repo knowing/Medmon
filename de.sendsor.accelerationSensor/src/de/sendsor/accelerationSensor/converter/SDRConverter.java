@@ -11,12 +11,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.AbstractFileLoader;
+import weka.core.converters.ArffSaver;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
@@ -53,13 +55,16 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	private Attribute yAttribute;
 	private Attribute zAttribute;
 
+	private String interval = SDRLoaderFactory.INTERVAL_SECOND();
+	private String aggregate = SDRLoaderFactory.AGGREGATE_AVERAGE();
+
 	public SDRConverter() {
 		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
 		dataset = new Instances(m_structure);
 
 		timeAttribute = dataset.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes
-		//TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
+		// TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
 		List<Attribute> valueAttributes = ResultsUtil.findValueAttributes(dataset);
 		for (Attribute attribute : valueAttributes) {
 			String name = attribute.getMetadata().getProperty(ResultsUtil.META_ATTRIBUTE_NAME());
@@ -72,11 +77,19 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		}
 	}
 
+	public void setInterval(String interval) {
+		this.interval = interval;
+	}
+
+	public void setAggregate(String aggregate) {
+		this.aggregate = aggregate;
+	}
+
 	@Override
 	public void setSource(InputStream input) throws IOException {
 		if (!(input instanceof FileInputStream))
 			return;
-		//TODO SDRConverter -> implement setSource
+		// TODO SDRConverter -> implement setSource
 		// super.setSource(input);
 	}
 
@@ -205,7 +218,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public Instances getDataSet() throws IOException {
 		if (!dataset.isEmpty())
 			return dataset;
-
+		
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];
 
@@ -213,12 +226,18 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		Calendar date = new GregorianCalendar();
 		Calendar timestamp = new GregorianCalendar();
 
+		Calendar intervalstart = new GregorianCalendar();
+		Calendar intervalcurrent = new GregorianCalendar();
 		// Initialize data handling
-		// TODO SDRLoader -> replace RandomAccessFile with FileInputStream?
-		// RandomAccessFile in = new RandomAccessFile(m_sourceFile, "r");
 
 		FileInputStream in = new FileInputStream(m_sourceFile);
 		int read = in.read(data);
+
+		int avg_x = 0;
+		int avg_y = 0;
+		int avg_z = 0;
+		boolean newInterval = true;
+		long interval = getIntervalLength();
 
 		// Convert each block
 		while (read != -1) {
@@ -235,28 +254,51 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			date.set(year, month, day, hour, minute, second);
 			long time = date.getTimeInMillis() - TIME_CORRECTION_BEFORE;
 
+			// Checks if the recorded data ended 
+			if (recordEnd(day, hour))
+				break;
+			
+			//Fill in the data
 			for (int j = 0; j < CONTENT_BLOCK; j += 3) {
 				timestamp.setTimeInMillis(time);
 				int x = data[j];
 				int y = data[j + 1];
 				int z = data[j + 2];
 
+				if (newInterval) {
+					avg_x = x;
+					avg_y = y;
+					avg_z = z;
+					newInterval = false;
+					intervalstart.setTimeInMillis(time);
+					intervalcurrent.setTimeInMillis(time);
+				}
 				time += TIME_CORRECTION_AFTER;
-				DenseInstance instance = new DenseInstance(4);
-				instance.setValue(timeAttribute, timestamp.getTimeInMillis());
-				instance.setValue(xAttribute, x);
-				instance.setValue(yAttribute, y);
-				instance.setValue(zAttribute, z);
-				dataset.add(instance);
+				if (intervalcurrent.getTimeInMillis()-intervalstart.getTimeInMillis() < interval) {
+					avg_x = (avg_x + x) / 2;
+					avg_y = (avg_y + y) / 2;
+					avg_z = (avg_z + z) / 2;
+					intervalcurrent.setTimeInMillis(time);
+				} else {
+					DenseInstance instance = new DenseInstance(4);
+					instance.setValue(timeAttribute, timestamp.getTimeInMillis());
+					instance.setValue(xAttribute, avg_x);
+					instance.setValue(yAttribute, avg_y);
+					instance.setValue(zAttribute, avg_z);
+					dataset.add(instance);
+					avg_x = x;
+					avg_y = y;
+					avg_z = z;
+					intervalstart.setTimeInMillis(time);
+					intervalcurrent.setTimeInMillis(time);
+				}
+
 			}
 			read = in.read(data);
-			// Checks if the recorded data ended
-			if (recordEnd(day, hour))
-				break;
 
 		}
 		in.close();
-
+		System.out.println("Dataset size: " + dataset.numInstances());
 		return dataset;
 	}
 
@@ -287,6 +329,19 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	 */
 	private boolean recordEnd(int day, int hour) {
 		return (day == 48) && (hour == 48);
+	}
+
+	private long getIntervalLength() {
+		if (interval.equals(SDRLoaderFactory.INTERVAL_SECOND()))
+			return TimeUnit.SECONDS.toMillis(1);
+		else if (interval.equals(SDRLoaderFactory.INTERVAL_MINUTE()))
+			return TimeUnit.MINUTES.toMillis(1);
+		else if (interval.equals(SDRLoaderFactory.INTERVAL_HOUR()))
+			return TimeUnit.HOURS.toMillis(1);
+		else if (interval.equals(SDRLoaderFactory.INTERVAL_DAY()))
+			return TimeUnit.DAYS.toMillis(1);
+		else
+			return TimeUnit.SECONDS.toMillis(1);
 	}
 
 	@Override
