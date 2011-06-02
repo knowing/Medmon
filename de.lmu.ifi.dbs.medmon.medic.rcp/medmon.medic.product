@@ -21,9 +21,8 @@
    <windowImages i16="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/icon_16.gif" i32="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/icon_32.gif" i64="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/icon_64.gif" i128="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/icon_128.gif"/>
 
    <splash
-      startupProgressRect="5,170,445,15"
-      startupMessageRect="7,145,445,20"
-      startupForegroundColor="000000" />
+      location="de.lmu.ifi.dbs.medmon.medic.rcp"
+      handlerType="extensible" />
    <launcher name="Medmon">
       <linux icon="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/alt_launcher.xpm"/>
       <solaris/>
@@ -73,8 +72,8 @@
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.derby" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="false" startLevel="5" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="false" startLevel="3" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="true" startLevel="4" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="true" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.medic.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="4" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+   <extension-point id="splashExtension" name="Splash Extensions" schema="schema/splashExtension.exsd"/>
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
       <application
-            icon="icons/alt_window_16.gif"
+            icon="icons/icon_16.gif"
             visible="true">
          <run
                class="de.lmu.ifi.dbs.medmon.medic.rcp.Application">
@@ -39,19 +39,33 @@
                name="windowImages"
                value="icons/icon_16.gif,icons/icon_32.gif,icons/icon_64.gif,icons/icon_128.gif">
          </property>
-         <property
-               name="startupForegroundColor"
-               value="000000">
-         </property>
-         <property
-               name="startupMessageRect"
-               value="7,145,445,20">
-         </property>
-         <property
-               name="startupProgressRect"
-               value="5,170,445,15">
-         </property>
       </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.splashHandlers">
+      <splashHandler
+            class="de.lmu.ifi.dbs.medmon.medic.rcp.splashHandlers.ExtensibleSplashHandler"
+            id="de.lmu.ifi.dbs.medmon.medic.rcp.splashHandlers.extensible">
+      </splashHandler>
+      <splashHandlerProductBinding
+            productId="de.lmu.ifi.dbs.medmon.medic.rcp.product"
+            splashId="de.lmu.ifi.dbs.medmon.medic.rcp.splashHandlers.extensible">
+      </splashHandlerProductBinding>
+   </extension>
+   <extension
+         point="de.lmu.ifi.dbs.medmon.medic.rcp.splashExtension">
+      <splashExtension
+            icon="icons/icon_50.png"
+            id="medmon.core"
+            plugin-id="de.lmu.ifi.dbs.medmon.medic.core"
+            tooltip="Medmon Core">
+      </splashExtension>
+      <splashExtension
+            icon="icons/gemini_50.png"
+            id="gemini.jpa"
+            plugin-id="org.eclipse.gemini.jpa"
+            tooltip="Gemini JPA">
+      </splashExtension>
    </extension>
 
 </plugin>
