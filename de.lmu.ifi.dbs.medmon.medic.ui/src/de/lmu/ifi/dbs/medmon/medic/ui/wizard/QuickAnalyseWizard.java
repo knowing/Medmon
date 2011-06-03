@@ -100,7 +100,7 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 		for (Node node : nodes) {
 			Properties properties = node.properties();
 			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
-			properties.setProperty("file", path);
+			properties.setProperty("file", patient.getLastname());
 		}
 		EvaluateHandler.evaluate(dpu, dir + sep);
 		return true;

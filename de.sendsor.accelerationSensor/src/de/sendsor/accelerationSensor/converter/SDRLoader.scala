@@ -27,7 +27,7 @@ class SDRLoader extends TLoader {
   def getDataSet(): Instances = converter.getDataSet
 
   def configure(properties: Properties) = {
-    val path = properties.getProperty(FILE)
+    val path = TLoader.getFilePath(properties)
     converter.setFile(new File(path));
     
     val average = properties.getProperty(AGGREGATE)
@@ -39,6 +39,9 @@ class SDRLoader extends TLoader {
     if(INTERVAL_PROPERTIES contains(interval)) {
       converter.setInterval(interval)
     }
+    
+    val units = properties.getProperty(UNITS)
+    converter.setUnits(units.toInt)
   }
 
   def reset = converter.reset
@@ -57,12 +60,20 @@ class SDRLoaderFactory extends TFactory {
     props.setProperty(URL, "")
     props.setProperty(AGGREGATE, AGGREGATE_AVERAGE )
     props.setProperty(INTERVAL, INTERVAL_SECOND)
+    props.setProperty(UNITS, "1")
     props
   }
 
-  def createPropertyValues(): Map[String, Array[Any]] = Map()
+  def createPropertyValues(): Map[String, Array[Any]] = {
+    Map(AGGREGATE -> AGGREGATE_PROPERTIES.toArray ,
+        INTERVAL -> INTERVAL_PROPERTIES.toArray)
+  }
 
-  def createPropertyDescription(): Map[String, String] = Map()
+  def createPropertyDescription(): Map[String, String] = {
+    Map(AGGREGATE -> "Aggregate: none|average|interval_first|interval_last .",
+        INTERVAL -> "In which interval should the data be aggregated: second|minute|hour|day",
+        UNITS -> "Must be greater than 0. Determines the interval size (units*interval). E.g 15 minutes")
+  }
 
 }
 
@@ -72,6 +83,7 @@ object SDRLoaderFactory {
 
   val AGGREGATE = "average"
   val INTERVAL = "interval"
+  val UNITS = "units"
 
   val AGGREGATE_NONE = "none"
   val AGGREGATE_AVERAGE = "average"

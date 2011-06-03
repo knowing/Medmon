@@ -312,6 +312,7 @@
             </command>
             <command
                   commandId="de.lmu.ifi.dbs.medmon.medic.ui.quickanalyse"
+                  icon="icons/run_16.png"
                   label="Schnellanalyse"
                   style="push">
             </command>

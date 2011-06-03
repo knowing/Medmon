@@ -15,7 +15,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
 
@@ -69,7 +68,7 @@ public class DataTreeView extends ViewPart implements PropertyChangeListener, IP
 
 		dataTreeViewer = new TreeViewer(cData, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
-		dataTreeViewer.setContentProvider(new WorkbenchContentProvider());
+//		dataTreeViewer.setContentProvider(new WorkbenchContentProvider());
 		dataTreeViewer.setLabelProvider(new WorkbenchLabelProvider());
 //		dataTreeViewer.setInput(Activator.getPatientService().getSelection(IPatientService.SENSOR_CONTAINER));
 

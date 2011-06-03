@@ -18,7 +18,6 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.AbstractFileLoader;
-import weka.core.converters.ArffSaver;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
@@ -57,6 +56,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 	private String interval = SDRLoaderFactory.INTERVAL_SECOND();
 	private String aggregate = SDRLoaderFactory.AGGREGATE_AVERAGE();
+	private int units = 1;
 
 	public SDRConverter() {
 		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
@@ -77,13 +77,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		}
 	}
 
-	public void setInterval(String interval) {
-		this.interval = interval;
-	}
-
-	public void setAggregate(String aggregate) {
-		this.aggregate = aggregate;
-	}
 
 	@Override
 	public void setSource(InputStream input) throws IOException {
@@ -137,6 +130,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		FileInputStream in = new FileInputStream(m_sourceFile);
 		int read = in.read(data);
+		System.out.println("Copy sensor data: " + from + " -> " + to);
 		while (read != -1) {
 			// Create timestamp
 			int year = calcYear(data[506]);
@@ -218,6 +212,8 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public Instances getDataSet() throws IOException {
 		if (!dataset.isEmpty())
 			return dataset;
+		if (m_sourceFile == null)
+			throw new IOException("No source file!");
 		
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];
@@ -238,6 +234,8 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		int avg_z = 0;
 		boolean newInterval = true;
 		long interval = getIntervalLength();
+		if(units > 0)
+			interval *= units;
 
 		// Convert each block
 		while (read != -1) {
@@ -265,6 +263,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				int y = data[j + 1];
 				int z = data[j + 2];
 
+				//for the very first run
 				if (newInterval) {
 					avg_x = x;
 					avg_y = y;
@@ -273,13 +272,16 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 					intervalstart.setTimeInMillis(time);
 					intervalcurrent.setTimeInMillis(time);
 				}
+				//Increase time interval
 				time += TIME_CORRECTION_AFTER;
 				if (intervalcurrent.getTimeInMillis()-intervalstart.getTimeInMillis() < interval) {
+					//Still in our time interval bounds
 					avg_x = (avg_x + x) / 2;
 					avg_y = (avg_y + y) / 2;
 					avg_z = (avg_z + z) / 2;
 					intervalcurrent.setTimeInMillis(time);
 				} else {
+					//New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
 					instance.setValue(timeAttribute, timestamp.getTimeInMillis());
 					instance.setValue(xAttribute, avg_x);
@@ -298,7 +300,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		}
 		in.close();
-		System.out.println("Dataset size: " + dataset.numInstances());
 		return dataset;
 	}
 
@@ -320,7 +321,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 	/**
 	 * Currently a SDR file is a bunch of zeros. Those zeros are placeholders
-	 * and will be overitten. This method checks if the end of the recorded data
+	 * and will be overwritten. This method checks if the end of the recorded data
 	 * is reached, however not the end of the file.
 	 * 
 	 * @param day
@@ -347,6 +348,18 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	@Override
 	public Instance getNextInstance(Instances structure) throws IOException {
 		return null;
+	}
+	
+	public void setInterval(String interval) {
+		this.interval = interval;
+	}
+
+	public void setAggregate(String aggregate) {
+		this.aggregate = aggregate;
+	}
+	
+	public void setUnits(int units) {
+		this.units = units;
 	}
 
 	@Override

@@ -33,9 +33,11 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Shell shell = HandlerUtil.getActiveShell(event);
 		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-		dialog.setFilterExtensions(new String[] { "*.xml" });
+		dialog.setFilterExtensions(new String[] { "*.dpu" });
 		dialog.setFilterNames(new String[] { "Data Processing Unit" });
 		String dpufile = dialog.open();
+		if(dpufile == null || dpufile.isEmpty())
+			return null;
 		try {
 			JAXBContext context = JAXBContext.newInstance(DataProcessingUnit.class);
 			Unmarshaller um = context.createUnmarshaller();
@@ -48,10 +50,10 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 					if(!MessageDialog.openConfirm(shell, "Ueberschreiben?", "Verfahren existiert bereits! Wollen Sie es ueberschreiben?"))
 						return null;
 					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde nach importiert");
+					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde importiert");
 				} else {
 					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde nach importiert");
+					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde importiert");
 				}
 			} else {
 				Status status = new Status(IStatus.ERROR, "Medic Plugin", createErrorList(validator.getErrors()));
