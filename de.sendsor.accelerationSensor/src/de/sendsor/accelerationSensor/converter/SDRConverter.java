@@ -13,6 +13,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import scala.annotation.target.getter;
+
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -133,17 +135,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		System.out.println("Copy sensor data: " + from + " -> " + to);
 		while (read != -1) {
 			// Create timestamp
-			int year = calcYear(data[506]);
-			int month = data[507] - 1;
-			int day = data[508];
-			int hour = data[509];
-			int minute = data[510];
-			int second = data[511];
-
-			date.set(year, month, day, hour, minute, second);
+			boolean recordEnd = setTime(date, data);
 			if (!init) {
 				init = true;
-				last.set(year, month, day, hour, minute, second);
+				last.setTimeInMillis(date.getTimeInMillis());
 			}
 			// Write data only "from >= date"
 			if (!date.getTime().before(from) && date.after(last))
@@ -153,7 +148,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			 * when new date is before the previous entry 3) given parameter
 			 * `to` is reached
 			 */
-			else if (recordEnd(day, hour) || date.before(last) || date.getTime().after(to))
+			else if (recordEnd || date.before(last) || date.getTime().after(to))
 				break;
 
 			last.setTimeInMillis(date.getTimeInMillis());
@@ -181,21 +176,14 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		long length = 0;
 		while (read != -1) {
 			// Create timestamp
-			int year = calcYear(data[506]);
-			int month = data[507] - 1;
-			int day = data[508];
-			int hour = data[509];
-			int minute = data[510];
-			int second = data[511];
-
-			date.set(year, month, day, hour, minute, second);
+			boolean recordEnd = setTime(date, data);
 			if (!init) {
 				init = true;
-				last.set(year, month, day, hour, minute, second);
-				first.set(year, month, day, hour, minute, second);
+				last.setTimeInMillis(date.getTimeInMillis());
+				first.setTimeInMillis(date.getTimeInMillis());
 			}
 			// Checks if the recorded data ended or "date < to"
-			if (recordEnd(day, hour) || date.before(last))
+			if (recordEnd || date.before(last))
 				break;
 
 			last.setTimeInMillis(date.getTimeInMillis());
@@ -243,17 +231,11 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			in.read(data, 0, BLOCKSIZE);
 
 			// Create timestamp
-			int year = calcYear(data[506]);
-			int month = data[507] - 1;
-			int day = data[508];
-			int hour = data[509];
-			int minute = data[510];
-			int second = data[511];
-			date.set(year, month, day, hour, minute, second);
+			boolean recordEnd = setTime(date, data);
 			long time = date.getTimeInMillis() - TIME_CORRECTION_BEFORE;
 
 			// Checks if the recorded data ended 
-			if (recordEnd(day, hour))
+			if (recordEnd)
 				break;
 			
 			//Fill in the data
@@ -318,6 +300,24 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		return year;
 	}
+	
+	/**
+	 * <p>Set the calendar object with the given SDR-Byte array<br>
+	 * and checks if the current timestamp is zero (end of file) </p>
+	 * @param calendar
+	 * @param data
+	 * @return boolean
+	 */
+	private boolean setTime(Calendar calendar, byte[] data) {
+		int year = calcYear(data[506]);
+		int month = data[507] - 1;
+		int day = data[508];
+		int hour = data[509];
+		int minute = data[510];
+		int second = data[511];
+		calendar.set(year, month, day, hour, minute, second);
+		return recordEnd(day, hour);
+	}
 
 	/**
 	 * Currently a SDR file is a bunch of zeros. Those zeros are placeholders
@@ -332,6 +332,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		return (day == 48) && (hour == 48);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	private long getIntervalLength() {
 		if (interval.equals(SDRLoaderFactory.INTERVAL_SECOND()))
 			return TimeUnit.SECONDS.toMillis(1);
