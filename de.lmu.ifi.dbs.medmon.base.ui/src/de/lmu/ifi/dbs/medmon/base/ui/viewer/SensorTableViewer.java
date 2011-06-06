@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
 public class SensorTableViewer extends TableViewer implements PropertyChangeListener {
 
 	private static final String[] columns = new String[] { "Name", "Version", "Typ", "Pfad", "Status" };
-	private static final int[] width = new int[] { 120, 70, 60, 150, 50 };
+	private static final int[] width = new int[] { 120, 70, 60, 150, 80 };
 
 	public SensorTableViewer(Composite parent, int style) {
 		super(parent, style);

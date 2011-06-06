@@ -13,8 +13,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import scala.annotation.target.getter;
-
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;

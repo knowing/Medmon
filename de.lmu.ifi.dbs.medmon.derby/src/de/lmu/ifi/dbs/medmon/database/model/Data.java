@@ -30,7 +30,8 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Data.findByPatientAndAfterTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to < :date"),
     @NamedQuery(name = "Data.findByPatientAndBeforeTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to > :date"),
     @NamedQuery(name = "Data.findByPatientAndAfterFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from < :date"),
-    @NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date")})
+    @NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date"),
+    @NamedQuery(name = "Data.findByPatientAndSensor", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.sensor = :sensor")})
 public class Data implements Serializable {
 	private static final long serialVersionUID = 1L;
 
