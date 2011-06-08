@@ -41,7 +41,17 @@ class SDRLoader extends TLoader {
     }
     
     val units = properties.getProperty(UNITS)
-    converter.setUnits(units.toInt)
+    converter.setUnits(units.toDouble)
+    
+    val timestamp = properties.getProperty(RELATIVE_TIMESTAMP)
+    timestamp match {
+      case RELATIVE_TIMESTAMP_ABSOLUTE => converter.setRelativeTimestamp(false)
+      case RELATIVE_TIMESTAMP_RELATIVE => converter.setRelativeTimestamp(true)
+      case _ => converter.setRelativeTimestamp(true) //Print warning
+    }
+    
+    val output = properties.getProperty(OUTPUT)
+    converter.setOutput(output)
   }
 
   def reset = converter.reset
@@ -61,18 +71,21 @@ class SDRLoaderFactory extends TFactory {
     props.setProperty(AGGREGATE, AGGREGATE_AVERAGE )
     props.setProperty(INTERVAL, INTERVAL_SECOND)
     props.setProperty(UNITS, "1")
+    props.setProperty(RELATIVE_TIMESTAMP,  RELATIVE_TIMESTAMP_ABSOLUTE)
     props
   }
 
   def createPropertyValues(): Map[String, Array[Any]] = {
     Map(AGGREGATE -> AGGREGATE_PROPERTIES.toArray ,
-        INTERVAL -> INTERVAL_PROPERTIES.toArray)
+        INTERVAL -> INTERVAL_PROPERTIES.toArray ,
+        RELATIVE_TIMESTAMP -> Array( RELATIVE_TIMESTAMP_RELATIVE,  RELATIVE_TIMESTAMP_ABSOLUTE))
   }
 
   def createPropertyDescription(): Map[String, String] = {
     Map(AGGREGATE -> "Aggregate: none|average|interval_first|interval_last .",
         INTERVAL -> "In which interval should the data be aggregated: second|minute|hour|day",
-        UNITS -> "Must be greater than 0. Determines the interval size (units*interval). E.g 15 minutes")
+        UNITS -> "Must be greater than 0. Determines the interval size (units*interval). E.g 15 minutes",
+        RELATIVE_TIMESTAMP -> "relative | absolute .Relative uses the first timestamp and assumes correct recorded data")
   }
 
 }
@@ -81,19 +94,24 @@ object SDRLoaderFactory {
   val name: String = "SDR Loader"
   val id: String = classOf[SDRLoader].getName
 
-  val AGGREGATE = "average"
+  val AGGREGATE = "aggregate"
   val INTERVAL = "interval"
   val UNITS = "units"
+  val RELATIVE_TIMESTAMP = "timestamp"
+  val OUTPUT = "output"
 
   val AGGREGATE_NONE = "none"
-  val AGGREGATE_AVERAGE = "average"
+  val AGGREGATE_AVERAGE = "average" //Default
   val AGGREGATE_INTERVAL_FIRST = "interval_first"
   val AGGREGATE_INTERVAL_LAST = "interval_last"
   val AGGREGATE_PROPERTIES = Array(AGGREGATE_NONE, AGGREGATE_AVERAGE, AGGREGATE_INTERVAL_FIRST, AGGREGATE_INTERVAL_LAST)
     
-  val INTERVAL_SECOND = "second"
+  val INTERVAL_SECOND = "second" //Default
   val INTERVAL_MINUTE = "minute"
   val INTERVAL_HOUR = "hour"
   val INTERVAL_DAY = "day"
   val INTERVAL_PROPERTIES = Array(INTERVAL_SECOND, INTERVAL_MINUTE, INTERVAL_HOUR, INTERVAL_DAY)
+  
+  val RELATIVE_TIMESTAMP_RELATIVE = "relative"
+  val RELATIVE_TIMESTAMP_ABSOLUTE = "absolute" //Default
 }
