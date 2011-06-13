@@ -1,10 +1,13 @@
 package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
@@ -15,15 +18,29 @@ import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.osgi.framework.BundleContext;
 
+import scala.Option;
+import weka.core.Instances;
+import weka.core.converters.ArffLoader;
+import akka.actor.ActorRef;
+import akka.actor.TypedActor;
+import akka.actor.TypedActorFactory;
+import de.lmu.ifi.dbs.knowing.core.events.*;
+import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
+import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
+import de.lmu.ifi.dbs.knowing.core.swt.handler.SWTListener;
+import de.lmu.ifi.dbs.knowing.core.util.Util;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -46,18 +63,23 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	private Label lBlockFromVal;
 	private Label lBlockToVal;
 	private Label lDataSizeVal;
-
+	private Group gPreview;
+	
 	private Patient patient;
 	private IBlock block;
 	private final boolean validate;
 
+	private SensorAdapter sensor;
+
 	/**
 	 * Create the wizard.
+	 * 
+	 * @wbp.parser.constructor
 	 */
 	public SelectDataPage() {
 		this(false);
 	}
-	
+
 	public SelectDataPage(boolean validate) {
 		super("Sensordaten");
 		this.validate = validate;
@@ -75,9 +97,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		Composite container = new Composite(parent, SWT.NULL);
 
 		setControl(container);
-		RowLayout layout = new RowLayout(SWT.VERTICAL);
-		layout.fill = true;
-		container.setLayout(layout);
+		container.setLayout(new GridLayout(2, false));
 
 		bLatestData = new Button(container, SWT.RADIO);
 		bLatestData.setText("Neueste Sensordaten");
@@ -88,6 +108,91 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				dateTimeFrom.setEnabled(!bLatestData.getSelection());
 				dateTimeTo.setEnabled(!bLatestData.getSelection());
 				checkContents();
+			}
+		});
+
+		Group gSensor = new Group(container, SWT.NONE);
+		gSensor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 3));
+		gSensor.setText("Sensor-Information");
+		gSensor.setLayout(new GridLayout(2, false));
+
+		Label lBlockFrom = new Label(gSensor, SWT.NONE);
+		lBlockFrom.setText("Von");
+
+		lBlockFromVal = new Label(gSensor, SWT.NONE);
+		lBlockFromVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lBlockFromVal.setText("-");
+
+		Label lBlockTo = new Label(gSensor, SWT.NONE);
+		lBlockTo.setText("Bis");
+
+		lBlockToVal = new Label(gSensor, SWT.NONE);
+		lBlockToVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lBlockToVal.setText("-");
+
+		Label lDataSize = new Label(gSensor, SWT.NONE);
+		lDataSize.setText("Datensaetze");
+
+		lDataSizeVal = new Label(gSensor, SWT.NONE);
+		lDataSizeVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lDataSizeVal.setText("0 MByte");
+		new Label(gSensor, SWT.NONE);
+		
+		Button bPreview = new Button(gSensor, SWT.NONE);
+		bPreview.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		bPreview.setText("Vorschau");
+		bPreview.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Option loader = Util.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
+				Option presenter = Util.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
+				
+				TFactory presenterFactory = (TFactory) presenter.get();
+				TFactory loaderFactory = (TFactory) loader.get();
+				
+				ActorRef presenterActor = presenterFactory.getInstance().start();
+				ActorRef loaderActor = loaderFactory.getInstance().start();
+				UIFactory uiFactory = TypedActor.newInstance(UIFactory.class, new TypedActorFactory() {
+					@Override
+					public TypedActor create() {
+						return new DataPageUIFactory(gPreview);
+					}
+				});
+				presenterActor.sendOneWay(new UIFactoryEvent(uiFactory, null));
+				presenterActor.sendOneWay(new SWTListener(SWT.MouseDown, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						System.out.println("[MouseDown] Handle event: " + event);
+					}
+				}));
+				presenterActor.sendOneWay(new SWTListener(SWT.MouseMove, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						System.out.println("[MouseMove] Handle event: " + event);
+					}
+				}));
+				File dir = new File(sensor.getDefaultPath());
+				String[] sdrFiles = dir.list(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith(".sdr");
+					}
+				});
+				Properties properties = loaderFactory.createDefaultProperties();
+				properties.setProperty("file", dir.getAbsolutePath() + sdrFiles[0]);
+				loaderActor.sendOneWay(new Configure(properties));
+				loaderActor.sendOneWay(new Register(presenterActor));
+				loaderActor.sendOneWay(new Start());
+				//TODO Preview doesn't work
+//				ArffLoader loader = new ArffLoader();
+//				try {
+//					loader.setFile(new File(sensor.getDefaultPath()));
+//					Instances dataSet = loader.getDataSet();
+//					actorRef.sendOneWay(new Results(dataSet));
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
+				
 			}
 		});
 
@@ -105,6 +210,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		});
 
 		Group gTimespan = new Group(container, SWT.NONE);
+		gTimespan.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		gTimespan.setText("Zeitraum");
 		gTimespan.setLayout(new GridLayout(2, false));
 
@@ -135,32 +241,12 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				checkContents();
 			}
 		});
+		
+		gPreview = new Group(container, SWT.NONE);
+		gPreview.setLayout(new FillLayout());
+		gPreview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		gPreview.setText("Vorschau");
 
-		Group gSensor = new Group(container, SWT.NONE);
-		gSensor.setLayoutData(new RowData(200, SWT.DEFAULT));
-		gSensor.setText("Sensor-Information");
-		gSensor.setLayout(new GridLayout(2, false));
-
-		Label lBlockFrom = new Label(gSensor, SWT.NONE);
-		lBlockFrom.setText("Von");
-
-		lBlockFromVal = new Label(gSensor, SWT.NONE);
-		lBlockFromVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		lBlockFromVal.setText("-");
-
-		Label lBlockTo = new Label(gSensor, SWT.NONE);
-		lBlockTo.setText("Bis");
-
-		lBlockToVal = new Label(gSensor, SWT.NONE);
-		lBlockToVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		lBlockToVal.setText("-");
-
-		Label lDataSize = new Label(gSensor, SWT.NONE);
-		lDataSize.setText("Datensaetze");
-
-		lDataSizeVal = new Label(gSensor, SWT.NONE);
-		lDataSizeVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		lDataSizeVal.setText("0 MByte");
 	}
 
 	public boolean isImportLatest() {
@@ -182,7 +268,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	public void setSensor(SensorAdapter sensor) {
 		if (sensor == null)
 			return;
-
+		this.sensor = sensor;
 		try {
 			block = sensor.convert();
 			updateDateTimes();
@@ -223,9 +309,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void checkContents() {
-		//No validation
-		if(!validate)
-			return; 
+		// No validation
+		if (!validate)
+			return;
 		EntityManager em = JPAUtil.createEntityManager();
 		// Check if the identical dataset exists in db
 		List<Data> results = em.createNamedQuery("Data.findByPatientAndDate").setParameter("patient", patient)
@@ -283,5 +369,5 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		em.close();
 		setPageComplete(false);
 	}
-
+	
 }
