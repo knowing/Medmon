@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  javax.persistence;bundle-version="2.0.3",
  de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
  de.lmu.ifi.dbs.medmon.jfreechart.libs;bundle-version="1.0.0",
- de.lmu.ifi.dbs.knowing.core.swt;bundle-version="1.0.0"
+ de.lmu.ifi.dbs.knowing.core.swt;bundle-version="1.0.0",
+ de.lmu.ifi.dbs.knowing.core.swt.charts;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,

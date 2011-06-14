@@ -23,30 +23,41 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.osgi.framework.BundleContext;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.chart.event.ChartChangeListener;
+import org.jfree.chart.event.ChartChangeEvent;
+import org.jfree.chart.event.ChartProgressEvent;
+import org.jfree.chart.event.ChartProgressListener;
 
 import scala.Option;
-import weka.core.Instances;
-import weka.core.converters.ArffLoader;
 import akka.actor.ActorRef;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorFactory;
-import de.lmu.ifi.dbs.knowing.core.events.*;
+import de.lmu.ifi.dbs.knowing.core.events.Configure;
+import de.lmu.ifi.dbs.knowing.core.events.Register;
+import de.lmu.ifi.dbs.knowing.core.events.Start;
+import de.lmu.ifi.dbs.knowing.core.events.UIFactoryEvent;
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.handler.SWTListener;
 import de.lmu.ifi.dbs.knowing.core.util.Util;
-import de.lmu.ifi.dbs.medmon.base.ui.Activator;
+import de.lmu.ifi.dbs.knowing.core.swt.charts.events.*;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.RowData;
 
 /**
  * @author Nepomuk Seiler
@@ -56,6 +67,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
  */
 public class SelectDataPage extends WizardPage implements IValidationPage {
 
+	private final DateFormat df = DateFormat.getDateTimeInstance();
+
 	private CDateTime dateTimeFrom;
 	private CDateTime dateTimeTo;
 	private Button bLatestData;
@@ -64,12 +77,16 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	private Label lBlockToVal;
 	private Label lDataSizeVal;
 	private Group gPreview;
-	
+
 	private Patient patient;
 	private IBlock block;
 	private final boolean validate;
 
 	private SensorAdapter sensor;
+
+	private ActorRef presenterActor;
+	private ActorRef loaderActor;
+	private Text tDatePreview;
 
 	/**
 	 * Create the wizard.
@@ -136,65 +153,6 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		lDataSizeVal = new Label(gSensor, SWT.NONE);
 		lDataSizeVal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lDataSizeVal.setText("0 MByte");
-		new Label(gSensor, SWT.NONE);
-		
-		Button bPreview = new Button(gSensor, SWT.NONE);
-		bPreview.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		bPreview.setText("Vorschau");
-		bPreview.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Option loader = Util.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
-				Option presenter = Util.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
-				
-				TFactory presenterFactory = (TFactory) presenter.get();
-				TFactory loaderFactory = (TFactory) loader.get();
-				
-				ActorRef presenterActor = presenterFactory.getInstance().start();
-				ActorRef loaderActor = loaderFactory.getInstance().start();
-				UIFactory uiFactory = TypedActor.newInstance(UIFactory.class, new TypedActorFactory() {
-					@Override
-					public TypedActor create() {
-						return new DataPageUIFactory(gPreview);
-					}
-				});
-				presenterActor.sendOneWay(new UIFactoryEvent(uiFactory, null));
-				presenterActor.sendOneWay(new SWTListener(SWT.MouseDown, new Listener() {
-					@Override
-					public void handleEvent(Event event) {
-						System.out.println("[MouseDown] Handle event: " + event);
-					}
-				}));
-				presenterActor.sendOneWay(new SWTListener(SWT.MouseMove, new Listener() {
-					@Override
-					public void handleEvent(Event event) {
-						System.out.println("[MouseMove] Handle event: " + event);
-					}
-				}));
-				File dir = new File(sensor.getDefaultPath());
-				String[] sdrFiles = dir.list(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return name.endsWith(".sdr");
-					}
-				});
-				Properties properties = loaderFactory.createDefaultProperties();
-				properties.setProperty("file", dir.getAbsolutePath() + sdrFiles[0]);
-				loaderActor.sendOneWay(new Configure(properties));
-				loaderActor.sendOneWay(new Register(presenterActor));
-				loaderActor.sendOneWay(new Start());
-				//TODO Preview doesn't work
-//				ArffLoader loader = new ArffLoader();
-//				try {
-//					loader.setFile(new File(sensor.getDefaultPath()));
-//					Instances dataSet = loader.getDataSet();
-//					actorRef.sendOneWay(new Results(dataSet));
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-				
-			}
-		});
 
 		bTimespanData = new Button(container, SWT.RADIO);
 		bTimespanData.setText("Sensordaten im Zeitraum");
@@ -241,11 +199,95 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				checkContents();
 			}
 		});
-		
+
 		gPreview = new Group(container, SWT.NONE);
 		gPreview.setLayout(new FillLayout());
 		gPreview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		gPreview.setText("Vorschau");
+
+		Composite cPreview = new Composite(container, SWT.NONE);
+		cPreview.setLayout(new RowLayout(SWT.HORIZONTAL));
+		cPreview.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
+
+		Label lDatePreview = new Label(cPreview, SWT.NONE);
+		lDatePreview.setText("Datum");
+
+		tDatePreview = new Text(cPreview, SWT.BORDER);
+		tDatePreview.setLayoutData(new RowData(150, SWT.DEFAULT));
+
+		Button bPreview = new Button(container, SWT.NONE);
+		bPreview.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		bPreview.setText("Vorschau");
+		bPreview.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				disposePreview();
+				Option loader = Util.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
+				Option presenter = Util.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
+
+				TFactory presenterFactory = (TFactory) presenter.get();
+				TFactory loaderFactory = (TFactory) loader.get();
+
+				presenterActor = presenterFactory.getInstance().start();
+				loaderActor = loaderFactory.getInstance().start();
+				UIFactory uiFactory = TypedActor.newInstance(UIFactory.class, new TypedActorFactory() {
+					@Override
+					public TypedActor create() {
+						return new DataPageUIFactory(gPreview);
+					}
+				});
+				presenterActor.sendOneWay(new UIFactoryEvent(uiFactory, null));
+				presenterActor.sendOneWay(new SWTListener(SWT.MouseMove, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						//TODO Doesn't work!
+						JFreeChart chart = (JFreeChart) event.data;
+						XYPlot plot = (XYPlot) chart.getPlot();
+						XYDataset dataset = plot.getDataset();
+						Comparable seriesKey = dataset.getSeriesKey(0);
+						double time = plot.getDomainCrosshairValue();
+						tDatePreview.setText(df.format(new Date((long) time)));
+					}
+				}));
+				presenterActor.sendOneWay(new ChartProgressListenerRegister(new ChartProgressListener() {
+					@Override
+					public void chartProgress(ChartProgressEvent event) {
+						if (event.getType() != ChartProgressEvent.DRAWING_FINISHED)
+							return;
+
+						JFreeChart chart = null;
+						XYPlot plot = null;
+						if (event.getSource() instanceof JFreeChart) {
+							chart = (JFreeChart) event.getSource();
+							plot = (XYPlot) chart.getPlot();
+						} else if (event.getSource() instanceof XYPlot) {
+							plot = (XYPlot) event.getSource();
+						}
+						XYDataset dataset = plot.getDataset();
+						Comparable seriesKey = dataset.getSeriesKey(0);
+						double xx = plot.getDomainCrosshairValue();
+						System.out.println("[ChartChanged] seriesKey: " + seriesKey + " value: " + new Date((long) xx));
+					}
+				}));
+				File dir = new File(sensor.getDefaultPath());
+				String[] sdrFiles = dir.list(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.endsWith(".sdr");
+					}
+				});
+				Properties properties = loaderFactory.createDefaultProperties();
+				String sep = System.getProperty("file.separator");
+				String path = sensor.getDefaultPath() + sep + sdrFiles[0];
+				properties.setProperty("file", path);
+				// properties.setProperty("absolute-path", "true");
+				loaderActor.sendOneWay(new Configure(properties));
+				loaderActor.sendOneWay(new Register(presenterActor));
+				loaderActor.sendOneWay(new Start());
+
+			}
+		});
 
 	}
 
@@ -304,6 +346,21 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		cal.setTime(date);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
+	}
+
+	private void disposePreview() {
+		if (loaderActor != null)
+			loaderActor.stop();
+		if (presenterActor != null)
+			presenterActor.stop();
+		for (Control c : gPreview.getChildren())
+			c.dispose();
+	}
+
+	@Override
+	public void dispose() {
+		disposePreview();
+		super.dispose();
 	}
 
 	@Override
@@ -369,5 +426,5 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		em.close();
 		setPageComplete(false);
 	}
-	
+
 }
