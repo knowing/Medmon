@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,14 +28,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.chart.event.ChartChangeListener;
-import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartProgressEvent;
 import org.jfree.chart.event.ChartProgressListener;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.XYDataset;
 
 import scala.Option;
 import akka.actor.ActorRef;
@@ -46,18 +46,14 @@ import de.lmu.ifi.dbs.knowing.core.events.Start;
 import de.lmu.ifi.dbs.knowing.core.events.UIFactoryEvent;
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
-import de.lmu.ifi.dbs.knowing.core.swt.handler.SWTListener;
+import de.lmu.ifi.dbs.knowing.core.swt.charts.events.ChartProgressListenerRegister;
 import de.lmu.ifi.dbs.knowing.core.util.Util;
-import de.lmu.ifi.dbs.knowing.core.swt.charts.events.*;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.layout.RowData;
 
 /**
  * @author Nepomuk Seiler
@@ -69,14 +65,12 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 
 	private final DateFormat df = DateFormat.getDateTimeInstance();
 
-	private CDateTime dateTimeFrom;
-	private CDateTime dateTimeTo;
-	private Button bLatestData;
-	private Button bTimespanData;
-	private Label lBlockFromVal;
-	private Label lBlockToVal;
-	private Label lDataSizeVal;
+	private CDateTime dateTimeFrom, dateTimeTo;
+	private Button bLatestData, bTimespanData;
+	private Button bToPreview, bFromPreview;
+	private Label lBlockFromVal, lBlockToVal, lDataSizeVal;
 	private Group gPreview;
+	private Text tDatePreview;
 
 	private Patient patient;
 	private IBlock block;
@@ -84,9 +78,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 
 	private SensorAdapter sensor;
 
-	private ActorRef presenterActor;
-	private ActorRef loaderActor;
-	private Text tDatePreview;
+	private ActorRef loaderActor,presenterActor;
+
 
 	/**
 	 * Create the wizard.
@@ -122,8 +115,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		bLatestData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				dateTimeFrom.setEnabled(!bLatestData.getSelection());
-				dateTimeTo.setEnabled(!bLatestData.getSelection());
+				updateDateSelectionComponents();
 				checkContents();
 			}
 		});
@@ -159,8 +151,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		bTimespanData.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				dateTimeFrom.setEnabled(!bLatestData.getSelection());
-				dateTimeTo.setEnabled(!bLatestData.getSelection());
+				updateDateSelectionComponents();
 				if (isImportLatest())
 					updateDateTimes();
 				checkContents();
@@ -170,7 +161,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		Group gTimespan = new Group(container, SWT.NONE);
 		gTimespan.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		gTimespan.setText("Zeitraum");
-		gTimespan.setLayout(new GridLayout(2, false));
+		gTimespan.setLayout(new GridLayout(3, false));
 
 		Label lFrom = new Label(gTimespan, SWT.NONE);
 		lFrom.setText("Von: ");
@@ -182,6 +173,22 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 			public void widgetSelected(SelectionEvent e) {
 				if (getFrom().after(getTo()))
 					dateTimeTo.setSelection(new Date(getFrom().getTime()));
+				checkContents();
+			}
+		});
+
+		bFromPreview = new Button(gTimespan, SWT.NONE);
+		bFromPreview.setText("aus Vorschau");
+		bFromPreview.setEnabled(false);
+		bFromPreview.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Date date = selectedDate();
+				if (date != null) {
+					dateTimeFrom.setSelection(date);
+					dateTimeFrom.notifyListeners(SWT.Selection, new Event());
+				}
+
 				checkContents();
 			}
 		});
@@ -200,20 +207,38 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 			}
 		});
 
+		bToPreview = new Button(gTimespan, SWT.NONE);
+		bToPreview.setText("aus Vorschau");
+		bToPreview.setEnabled(false);
+		bToPreview.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Date date = selectedDate();
+				if (date != null) {
+					dateTimeTo.setSelection(date);
+					dateTimeTo.notifyListeners(SWT.Selection, new Event());
+				}
+
+				checkContents();
+			}
+		});
+
 		gPreview = new Group(container, SWT.NONE);
 		gPreview.setLayout(new FillLayout());
 		gPreview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		gPreview.setText("Vorschau");
 
 		Composite cPreview = new Composite(container, SWT.NONE);
-		cPreview.setLayout(new RowLayout(SWT.HORIZONTAL));
 		cPreview.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
+		cPreview.setLayout(new GridLayout(2, false));
 
 		Label lDatePreview = new Label(cPreview, SWT.NONE);
 		lDatePreview.setText("Datum");
 
 		tDatePreview = new Text(cPreview, SWT.BORDER);
-		tDatePreview.setLayoutData(new RowData(150, SWT.DEFAULT));
+		GridData gd_tDatePreview = new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 1);
+		gd_tDatePreview.widthHint = 130;
+		tDatePreview.setLayoutData(gd_tDatePreview);
 
 		Button bPreview = new Button(container, SWT.NONE);
 		bPreview.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -222,7 +247,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				//Dispose old preview
 				disposePreview();
+				//Get new actors
 				Option loader = Util.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
 				Option presenter = Util.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
 
@@ -237,25 +264,14 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 						return new DataPageUIFactory(gPreview);
 					}
 				});
+				//Configure PresenterActor
 				presenterActor.sendOneWay(new UIFactoryEvent(uiFactory, null));
-				presenterActor.sendOneWay(new SWTListener(SWT.MouseMove, new Listener() {
-					@Override
-					public void handleEvent(Event event) {
-						//TODO Doesn't work!
-						JFreeChart chart = (JFreeChart) event.data;
-						XYPlot plot = (XYPlot) chart.getPlot();
-						XYDataset dataset = plot.getDataset();
-						Comparable seriesKey = dataset.getSeriesKey(0);
-						double time = plot.getDomainCrosshairValue();
-						tDatePreview.setText(df.format(new Date((long) time)));
-					}
-				}));
 				presenterActor.sendOneWay(new ChartProgressListenerRegister(new ChartProgressListener() {
 					@Override
 					public void chartProgress(ChartProgressEvent event) {
 						if (event.getType() != ChartProgressEvent.DRAWING_FINISHED)
 							return;
-
+						//Detect mouse clicks and print the date to tDatePreview
 						JFreeChart chart = null;
 						XYPlot plot = null;
 						if (event.getSource() instanceof JFreeChart) {
@@ -265,16 +281,16 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 							plot = (XYPlot) event.getSource();
 						}
 						XYDataset dataset = plot.getDataset();
-						Comparable seriesKey = dataset.getSeriesKey(0);
-						double xx = plot.getDomainCrosshairValue();
-						System.out.println("[ChartChanged] seriesKey: " + seriesKey + " value: " + new Date((long) xx));
+						double time = plot.getDomainCrosshairValue();
+						tDatePreview.setText(df.format(new Date((long) time)));
 					}
 				}));
+				//Get SDR files, assumes that there is a least one and takes the first
 				File dir = new File(sensor.getDefaultPath());
 				String[] sdrFiles = dir.list(new FilenameFilter() {
 					@Override
 					public boolean accept(File dir, String name) {
-						return name.endsWith(".sdr");
+						return name.toLowerCase().endsWith(".sdr");
 					}
 				});
 				Properties properties = loaderFactory.createDefaultProperties();
@@ -285,7 +301,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				loaderActor.sendOneWay(new Configure(properties));
 				loaderActor.sendOneWay(new Register(presenterActor));
 				loaderActor.sendOneWay(new Start());
-
+				//TODO SelectDataPage update preview after evaluating preview
+				uiFactory.update();
 			}
 		});
 
@@ -356,6 +373,30 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		for (Control c : gPreview.getChildren())
 			c.dispose();
 	}
+
+	private Date selectedDate() {
+		String dateString = tDatePreview.getText();
+		if (dateString == null || dateString.isEmpty())
+			return null;
+		try {
+			return df.parse(dateString);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * <p>Enabled or disables menu</p>
+	 */
+	private void updateDateSelectionComponents() {
+		boolean enabled = !bLatestData.getSelection();
+		dateTimeFrom.setEnabled(enabled);
+		dateTimeTo.setEnabled(enabled);
+		bToPreview.setEnabled(enabled);
+		bFromPreview.setEnabled(enabled);
+	}
+
 
 	@Override
 	public void dispose() {

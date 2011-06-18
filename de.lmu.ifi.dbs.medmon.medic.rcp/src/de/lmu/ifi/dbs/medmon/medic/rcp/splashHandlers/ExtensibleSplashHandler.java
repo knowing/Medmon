@@ -13,14 +13,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.splash.AbstractSplashHandler;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.SynchronousBundleListener;
 
 import de.lmu.ifi.dbs.medmon.medic.rcp.Activator;
@@ -314,14 +312,12 @@ public class ExtensibleSplashHandler extends AbstractSplashHandler {
 				if (bundle.getSymbolicName().equals(pluginId)) {
 					int state = bundle.getState();
 					if (state != Bundle.RESOLVED && state != Bundle.ACTIVE) {
-						System.out.println("Bundle not Resolved/Active: " + pluginId + " state: " + state);
+						System.err.println("Bundle not Resolved/Active: " + pluginId + " state: " + state);
 						return false;
 					}
-					System.out.println("Bundle okay: " + pluginId);
 				}
 			}
 		}
-		System.out.println("Bundles checked ok!");
 		return true;
 	}
 
