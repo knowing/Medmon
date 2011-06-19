@@ -117,6 +117,13 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	public Instances getStructure() throws IOException {
 		return m_structure;
 	}
+	
+	@Override
+	public void reset() throws IOException {
+		super.reset();
+		dataset = new Instances(m_structure);
+	}
+
 
 	@Override
 	public void copy(OutputStream out) throws IOException {
@@ -157,7 +164,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			 * when new date is before the previous entry 3) given parameter
 			 * `to` is reached
 			 */
-			else if (recordEnd || date.before(last) || date.getTime().after(to))
+			if (recordEnd || date.before(last) || date.getTime().after(to))
 				break;
 
 			last.setTimeInMillis(date.getTimeInMillis());

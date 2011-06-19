@@ -1,5 +1,7 @@
 package de.sendsor;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -33,6 +35,8 @@ public class TimeSeriesChart {
 	private Map<String, TimeSeries> series;
 	private JFreeChart chart;
 
+	private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+
 	/**
 	 * 
 	 */
@@ -45,13 +49,9 @@ public class TimeSeriesChart {
 		return new ChartPanel(chart);
 	}
 
-	public void buildContent(Instances instances) {
-		// TODO TimeSeriesPresenter -> Check for right Instances format
-		// guessAndSetClassLabel(instances)
-		// Attribute classAttr = instances.attribute("class");
-		// instances.setClass(classAttr);
+	public void buildContent(final Instances instances) {
 		// First buildContent call
-		TimeSeriesCollection dataset = (TimeSeriesCollection) this.dataset;
+		final TimeSeriesCollection dataset = (TimeSeriesCollection) this.dataset;
 		if (series == null) {
 			initSeries(instances);
 		} else {
@@ -61,32 +61,43 @@ public class TimeSeriesChart {
 		}
 
 		// Fill content
-		Enumeration<Instance> enumeration = instances.enumerateInstances();
-		int numInst = instances.numInstances();
-		int last = 0;
-		int i = 0;
-		System.out.println("Compute TimeSeries model with " + numInst +	" instances");
-		System.out.println("[                    ][0%]");
-		while (enumeration.hasMoreElements()) {
-			Instance inst = enumeration.nextElement();
-			double dateTime = inst.value(instances.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP()));
-			Date date = new Date((long) dateTime);
-			// Add value to every corresponing TimeSeries
-			for (String name : series.keySet()) {
-				TimeSeries s = series.get(name);
-				Attribute attribute = instances.attribute(name);
-				double value = inst.value(attribute);
-				s.add(new Millisecond(date), value);
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				Enumeration<Instance> enumeration = instances.enumerateInstances();
+				int numInst = instances.numInstances();
+				System.out.println("Compute TimeSeries model with " + numInst + " instances");
+				System.out.println("[                    ][0%]");
+				support.firePropertyChange("progress", -1, 0);
+				int last = 0;
+				int i = 0;
+				while (enumeration.hasMoreElements()) {
+					Instance inst = enumeration.nextElement();
+					double dateTime = inst.value(instances.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP()));
+					Date date = new Date((long) dateTime);
+					// Add value to every corresponing TimeSeries
+					for (String name : series.keySet()) {
+						TimeSeries s = series.get(name);
+						Attribute attribute = instances.attribute(name);
+						double value = inst.value(attribute);
+						s.add(new Millisecond(date), value);
+					}
+					last = printProgress(i, numInst, last);
+					support.firePropertyChange("progress", -1, last);
+					i++;
+				}
+				System.out.println("[....................][100%]");
+				support.firePropertyChange("progress", -1, 100);
+				for (TimeSeries s : series.values()) {
+					dataset.addSeries(s);
+				}
+				//Better with SwingWorker.invokeLater
+				if (chart != null)
+					chart.fireChartChanged();
 			}
-			 last = printProgress(i, numInst, last);
-			i++;
-		}
-		System.out.println("[....................][100%]");
-		for (TimeSeries s : series.values()) {
-			dataset.addSeries(s);
-		}
-		if (chart != null)
-			chart.fireChartChanged();
+		}).start();
 
 	}
 
@@ -97,7 +108,7 @@ public class TimeSeriesChart {
 	}
 
 	protected JFreeChart createChart(Dataset dataset) {
-		chart = ChartFactory.createTimeSeriesChart("Vorschau", "", "", (XYDataset) dataset, false, false, false);
+		chart = ChartFactory.createTimeSeriesChart("Vorschau", "", "", (XYDataset) dataset, true, false, false);
 		XYPlot xyplot = chart.getXYPlot();
 		xyplot.setDomainCrosshairVisible(true);
 		return chart;
@@ -118,7 +129,7 @@ public class TimeSeriesChart {
 			series.put(attr.name(), new TimeSeries(key));
 		}
 	}
-	
+
 	/**
 	 * @return the chart
 	 */
@@ -144,4 +155,13 @@ public class TimeSeriesChart {
 		}
 		return dots;
 	}
+
+	/**
+	 * @param listener
+	 * @see java.beans.PropertyChangeSupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		support.addPropertyChangeListener(listener);
+	}
+
 }

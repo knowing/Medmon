@@ -71,7 +71,7 @@ public class SDRConverter extends AbstractFileLoader {
 
 	private Instances dataset;
 
-	private final Attribute timeAttribute;
+	private Attribute timeAttribute;
 	private Attribute xAttribute;
 	private Attribute yAttribute;
 	private Attribute zAttribute;
@@ -87,9 +87,12 @@ public class SDRConverter extends AbstractFileLoader {
 	private boolean firstRun = true;
 
 	public SDRConverter() {
+		initStructure();
+	}
+	
+	private void initStructure() {
 		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
 		dataset = new Instances(m_structure);
-
 		timeAttribute = dataset.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes
 		// TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
@@ -103,6 +106,7 @@ public class SDRConverter extends AbstractFileLoader {
 			else if (name.equals("z"))
 				zAttribute = attribute;
 		}
+		
 	}
 
 	@Override
@@ -132,6 +136,12 @@ public class SDRConverter extends AbstractFileLoader {
 	public Instances getStructure() throws IOException {
 		return m_structure;
 	}
+	
+	@Override
+	public void reset() throws IOException {
+		super.reset();
+		initStructure();
+	}
 
 	public void copy(OutputStream out) throws IOException {
 		// Assuming the sensor can't record future data
@@ -149,7 +159,7 @@ public class SDRConverter extends AbstractFileLoader {
 
 		// Initialize time handling
 		Calendar date = new GregorianCalendar();
-		Calendar last = new GregorianCalendar();
+		Calendar prev = new GregorianCalendar();
 		boolean init = false;
 
 		FileInputStream in = new FileInputStream(m_sourceFile);
@@ -160,25 +170,25 @@ public class SDRConverter extends AbstractFileLoader {
 			boolean recordEnd = setTime(date, data);
 			if (!init) {
 				init = true;
-				last.setTimeInMillis(date.getTimeInMillis());
+				prev.setTimeInMillis(date.getTimeInMillis());
 			}
 			// Write data only "from >= date"
-			if (!date.getTime().before(from) && date.after(last))
+			if (date.getTime().after(from) && date.after(prev)) 
 				out.write(data);
+				
 			/*
 			 * Reasons for break 1) record ends when zeros appear 2) record ends
 			 * when new date is before the previous entry 3) given parameter
 			 * `to` is reached
 			 */
-			else if (recordEnd || date.before(last) || date.getTime().after(to))
+			if (recordEnd || date.before(prev) || date.getTime().after(to))
 				break;
 
-			last.setTimeInMillis(date.getTimeInMillis());
+			prev.setTimeInMillis(date.getTimeInMillis());
 			read = in.read(data);
 		}
 		in.close();
 	}
-
 
 	@Override
 	public Instances getDataSet() throws IOException {

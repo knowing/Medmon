@@ -69,6 +69,7 @@ public class Persister {
 		// Copy raw data to tmp file
 		converter.copy(new FileOutputStream(tmp), from, to);
 		// Set converter to tmp file and convert again
+		converter.reset();
 		converter.setFile(tmp);
 		Instances returns = converter.getDataSet();
 		//Set to old source and delete tmp file

@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -36,6 +38,7 @@ import org.jfree.chart.event.ChartProgressListener;
 import org.jfree.chart.plot.XYPlot;
 
 import weka.core.Instances;
+import javax.swing.JProgressBar;
 
 /**
  * @author Nepomuk Seiler
@@ -43,7 +46,7 @@ import weka.core.Instances;
  * @since 19.06.2011
  * 
  */
-public class AppFrame extends JFrame {
+public class AppFrame extends JFrame implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,6 +60,8 @@ public class AppFrame extends JFrame {
 
 	private File outputFile;
 
+	private JProgressBar progressBar;
+
 	/**
 	 * Create the frame.
 	 */
@@ -68,9 +73,9 @@ public class AppFrame extends JFrame {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0 };
-		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
 		gbl_contentPane.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
 		JLabel lInput = new JLabel("Input");
@@ -228,7 +233,7 @@ public class AppFrame extends JFrame {
 
 		JPanel buttonPanel = new JPanel();
 		GridBagConstraints gbc_buttonPanel = new GridBagConstraints();
-		gbc_buttonPanel.insets = new Insets(0, 0, 0, 5);
+		gbc_buttonPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_buttonPanel.anchor = GridBagConstraints.SOUTHWEST;
 		gbc_buttonPanel.gridwidth = 2;
 		gbc_buttonPanel.gridx = 0;
@@ -281,6 +286,7 @@ public class AppFrame extends JFrame {
 
 		JButton bPreview = new JButton("Preview");
 		GridBagConstraints gbc_bPreview = new GridBagConstraints();
+		gbc_bPreview.insets = new Insets(0, 0, 5, 0);
 		gbc_bPreview.gridx = 2;
 		gbc_bPreview.gridy = 4;
 		contentPane.add(bPreview, gbc_bPreview);
@@ -305,6 +311,26 @@ public class AppFrame extends JFrame {
 
 			}
 		});
+		
+		progressBar = new JProgressBar();
+		progressBar.setMaximum(100);
+		progressBar.setMinimum(0);
+		progressBar.setStringPainted(true);
+		GridBagConstraints gbc_progressBar = new GridBagConstraints();
+		gbc_progressBar.fill = GridBagConstraints.HORIZONTAL;
+		gbc_progressBar.gridwidth = 3;
+		gbc_progressBar.insets = new Insets(0, 0, 0, 5);
+		gbc_progressBar.gridx = 0;
+		gbc_progressBar.gridy = 5;
+		contentPane.add(progressBar, gbc_progressBar);
+		chart.addPropertyChangeListener(this);
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent e) {
+		Integer progress = (Integer) e.getNewValue();
+		progressBar.setValue(progress);
+		progressBar.setString(progress + "%");
 	}
 
 	/**
@@ -334,6 +360,13 @@ public class AppFrame extends JFrame {
 		});
 	}
 
+	/**
+	 * 
+	 * @author Nepomuk Seiler
+	 * @version 0.1
+	 * @since 19.06.2011
+	 *
+	 */
 	private class ChartListener implements ChartProgressListener {
 		
 		private final JFormattedTextField tDate;
@@ -359,4 +392,5 @@ public class AppFrame extends JFrame {
 			tDate.setText(df.format(new Date((long) time)));
 		}
 	}
+
 }
