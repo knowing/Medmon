@@ -358,6 +358,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 			calendar.setTimeInMillis(time);
 			firstRun = false;
 		} else {
+			System.out.println("relative timestamp: " + calendar.getTime());
 			calendar.setTimeInMillis(calendar.getTimeInMillis() + SAMPLE_DISTANCE);
 		}
 		return recordEnd(day, hour);

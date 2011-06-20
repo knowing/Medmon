@@ -59,10 +59,10 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 	private final DateFormat df = DateFormat.getDateTimeInstance();
 
 	private File outputFile;
+	private Configuration configuration = new Configuration();
 
 	private JProgressBar progressBar;
 	private JPanel chartPanel;
-	
 
 	/**
 	 * Create the frame.
@@ -148,7 +148,11 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showConfirmDialog(contentPane,"Not implemented yet" , "Not implemented", JOptionPane.WARNING_MESSAGE);
+				ConfigDialog dialog = new ConfigDialog(configuration);
+				dialog.setVisible(true);
+				if (!dialog.isCanceled())
+					configuration = dialog.getConfiguration();
+				System.out.println("Config: " + configuration);
 			}
 		});
 
@@ -191,8 +195,10 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 				try {
 					// Reset old chart
 					chart.reset();
+					converter.reset();
 					chartPanel.removeAll();
 					// Create new chart
+					configureConverter();
 					Instances dataSet = converter.getDataSet();
 					chart.buildContent(dataSet);
 					chartPanel.add(chart.getChartPanel(), BorderLayout.CENTER);
@@ -278,20 +284,25 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		bWrite.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent event) {
 				JFileChooser dialog = new JFileChooser();
 				int ret = dialog.showSaveDialog(contentPane);
-				if (ret == JFileChooser.APPROVE_OPTION) {
-					outputFile = dialog.getSelectedFile();
-				}
+				if (ret != JFileChooser.APPROVE_OPTION)
+					return;
+
+				outputFile = dialog.getSelectedFile();
+				configureConverter();
 				Date from = (Date) sFrom.getValue();
 				Date to = (Date) sTo.getValue();
 				Persister persister = new Persister(from, to, converter);
 				try {
-					persister.persistAsCSV(outputFile);
-				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(contentPane, e1.getMessage(), "Error while converting", JOptionPane.ERROR_MESSAGE);
-					e1.printStackTrace();
+					if (configuration.getOutput().equals("arff"))
+						persister.persistAsCSV(outputFile);
+					else 
+						persister.persistAsCSV(outputFile);
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(contentPane, e.getMessage(), "Error while converting", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
 				}
 				JOptionPane.showMessageDialog(contentPane, "Conversion successfull to file " + outputFile.getAbsolutePath());
 			}
@@ -315,6 +326,13 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		Integer progress = (Integer) e.getNewValue();
 		progressBar.setValue(progress);
 		progressBar.setString(progress + "%");
+	}
+
+	private void configureConverter() {
+		converter.setAggregate(configuration.getAggregation());
+		converter.setInterval(configuration.getInterval());
+		converter.setUnits(configuration.getUnit());
+		converter.setRelativeTimestamp(configuration.isRelative());
 	}
 
 	/**

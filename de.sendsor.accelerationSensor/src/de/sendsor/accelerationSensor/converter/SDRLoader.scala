@@ -47,7 +47,7 @@ class SDRLoader extends TLoader {
     timestamp match {
       case RELATIVE_TIMESTAMP_ABSOLUTE => converter.setRelativeTimestamp(false)
       case RELATIVE_TIMESTAMP_RELATIVE => converter.setRelativeTimestamp(true)
-      case _ => converter.setRelativeTimestamp(true) //Print warning
+      case _ => converter.setRelativeTimestamp(false) //Print warning
     }
     
     val output = properties.getProperty(OUTPUT)
