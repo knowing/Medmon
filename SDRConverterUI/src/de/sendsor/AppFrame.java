@@ -52,7 +52,7 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 
 	private JPanel contentPane;
 	private JTextField tInput;
-	private JTextField tOutput;
+	private JFormattedTextField tDate;
 
 	private final SDRConverter converter = new SDRConverter();
 	private final TimeSeriesChart chart = new TimeSeriesChart();
@@ -61,6 +61,8 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 	private File outputFile;
 
 	private JProgressBar progressBar;
+	private JPanel chartPanel;
+	
 
 	/**
 	 * Create the frame.
@@ -135,41 +137,18 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 			}
 		});
 
-		JLabel lOutput = new JLabel("Output");
-		GridBagConstraints gbc_lOutput = new GridBagConstraints();
-		gbc_lOutput.anchor = GridBagConstraints.EAST;
-		gbc_lOutput.insets = new Insets(0, 0, 5, 5);
-		gbc_lOutput.gridx = 0;
-		gbc_lOutput.gridy = 1;
-		contentPane.add(lOutput, gbc_lOutput);
-
-		tOutput = new JTextField();
-		GridBagConstraints gbc_tOutput = new GridBagConstraints();
-		gbc_tOutput.insets = new Insets(0, 0, 5, 5);
-		gbc_tOutput.fill = GridBagConstraints.HORIZONTAL;
-		gbc_tOutput.gridx = 1;
-		gbc_tOutput.gridy = 1;
-		contentPane.add(tOutput, gbc_tOutput);
-		tOutput.setColumns(10);
-
-		JButton bSave = new JButton("save");
-		GridBagConstraints gbc_bSave = new GridBagConstraints();
-		gbc_bSave.insets = new Insets(0, 0, 5, 0);
-		gbc_bSave.fill = GridBagConstraints.HORIZONTAL;
-		gbc_bSave.gridx = 2;
-		gbc_bSave.gridy = 1;
-		contentPane.add(bSave, gbc_bSave);
-		bSave.addActionListener(new ActionListener() {
+		JButton bConfigure = new JButton("configure ");
+		GridBagConstraints gbc_bConfigure = new GridBagConstraints();
+		gbc_bConfigure.anchor = GridBagConstraints.NORTHEAST;
+		gbc_bConfigure.insets = new Insets(0, 0, 5, 0);
+		gbc_bConfigure.gridx = 2;
+		gbc_bConfigure.gridy = 1;
+		contentPane.add(bConfigure, gbc_bConfigure);
+		bConfigure.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser dialog = new JFileChooser();
-				int ret = dialog.showSaveDialog(contentPane);
-				if (ret == JFileChooser.APPROVE_OPTION) {
-					outputFile = dialog.getSelectedFile();
-					tOutput.setText(outputFile.getAbsolutePath());
-				}
-
+				JOptionPane.showConfirmDialog(contentPane,"Not implemented yet" , "Not implemented", JOptionPane.WARNING_MESSAGE);
 			}
 		});
 
@@ -198,31 +177,36 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		sTo.setModel(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_YEAR));
 		timePanel.add(sTo);
 
-		JButton bWrite = new JButton("write");
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
-		gbc_btnNewButton.gridx = 2;
-		gbc_btnNewButton.gridy = 2;
-		contentPane.add(bWrite, gbc_btnNewButton);
-		bWrite.addActionListener(new ActionListener() {
-			
+		JButton bPreview = new JButton("Preview");
+		GridBagConstraints gbc_bPreview = new GridBagConstraints();
+		gbc_bPreview.fill = GridBagConstraints.HORIZONTAL;
+		gbc_bPreview.insets = new Insets(0, 0, 5, 0);
+		gbc_bPreview.gridx = 2;
+		gbc_bPreview.gridy = 2;
+		contentPane.add(bPreview, gbc_bPreview);
+		bPreview.addActionListener(new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Date from = (Date) sFrom.getValue();
-				Date to = (Date)sTo.getValue();
-				Persister persister = new Persister(from, to, converter);
 				try {
-					persister.persistAsCSV(outputFile);
+					// Reset old chart
+					chart.reset();
+					chartPanel.removeAll();
+					// Create new chart
+					Instances dataSet = converter.getDataSet();
+					chart.buildContent(dataSet);
+					chartPanel.add(chart.getChartPanel(), BorderLayout.CENTER);
+					chartPanel.validate();
+					chart.getChart().addProgressListener(new ChartListener(tDate));
+
 				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(contentPane, e1.getMessage(), "Error while converting", JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				}
-				JOptionPane.showMessageDialog(contentPane, "Conversion successfull to file " + outputFile.getAbsolutePath());
+
 			}
 		});
 
-		final JPanel chartPanel = new JPanel(new BorderLayout());
+		chartPanel = new JPanel(new BorderLayout());
 		GridBagConstraints gbc_chartPanel = new GridBagConstraints();
 		gbc_chartPanel.insets = new Insets(0, 0, 5, 0);
 		gbc_chartPanel.gridwidth = 3;
@@ -245,7 +229,7 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		buttonPanel.add(lDate);
 
 		/* === Shows selected date === */
-		final JFormattedTextField tDate = new JFormattedTextField();
+		tDate = new JFormattedTextField();
 		tDate.setEditable(false);
 		tDate.setColumns(20);
 		buttonPanel.add(tDate);
@@ -254,7 +238,7 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		JButton bSaveAsFrom = new JButton("From");
 		buttonPanel.add(bSaveAsFrom);
 		bSaveAsFrom.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String text = tDate.getText();
@@ -271,7 +255,7 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		JButton bSaveAsTo = new JButton("  To  ");
 		buttonPanel.add(bSaveAsTo);
 		bSaveAsTo.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String text = tDate.getText();
@@ -284,34 +268,35 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 			}
 		});
 
-		JButton bPreview = new JButton("Preview");
-		GridBagConstraints gbc_bPreview = new GridBagConstraints();
-		gbc_bPreview.insets = new Insets(0, 0, 5, 0);
-		gbc_bPreview.gridx = 2;
-		gbc_bPreview.gridy = 4;
-		contentPane.add(bPreview, gbc_bPreview);
-		bPreview.addActionListener(new ActionListener() {
+		JButton bWrite = new JButton("write");
+		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
+		gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnNewButton.insets = new Insets(0, 0, 5, 0);
+		gbc_btnNewButton.gridx = 2;
+		gbc_btnNewButton.gridy = 4;
+		contentPane.add(bWrite, gbc_btnNewButton);
+		bWrite.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JFileChooser dialog = new JFileChooser();
+				int ret = dialog.showSaveDialog(contentPane);
+				if (ret == JFileChooser.APPROVE_OPTION) {
+					outputFile = dialog.getSelectedFile();
+				}
+				Date from = (Date) sFrom.getValue();
+				Date to = (Date) sTo.getValue();
+				Persister persister = new Persister(from, to, converter);
 				try {
-					//Reset old chart
-					chart.reset();
-					chartPanel.removeAll();
-					//Create new chart
-					Instances dataSet = converter.getDataSet();
-					chart.buildContent(dataSet);
-					chartPanel.add(chart.getChartPanel(), BorderLayout.CENTER);
-					chartPanel.validate();
-					chart.getChart().addProgressListener(new ChartListener(tDate));
-
+					persister.persistAsCSV(outputFile);
 				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(contentPane, e1.getMessage(), "Error while converting", JOptionPane.ERROR_MESSAGE);
 					e1.printStackTrace();
 				}
-
+				JOptionPane.showMessageDialog(contentPane, "Conversion successfull to file " + outputFile.getAbsolutePath());
 			}
 		});
-		
+
 		progressBar = new JProgressBar();
 		progressBar.setMaximum(100);
 		progressBar.setMinimum(0);
@@ -319,13 +304,12 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 		GridBagConstraints gbc_progressBar = new GridBagConstraints();
 		gbc_progressBar.fill = GridBagConstraints.HORIZONTAL;
 		gbc_progressBar.gridwidth = 3;
-		gbc_progressBar.insets = new Insets(0, 0, 0, 5);
 		gbc_progressBar.gridx = 0;
 		gbc_progressBar.gridy = 5;
 		contentPane.add(progressBar, gbc_progressBar);
 		chart.addPropertyChangeListener(this);
 	}
-	
+
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		Integer progress = (Integer) e.getNewValue();
@@ -365,12 +349,12 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 	 * @author Nepomuk Seiler
 	 * @version 0.1
 	 * @since 19.06.2011
-	 *
+	 * 
 	 */
 	private class ChartListener implements ChartProgressListener {
-		
+
 		private final JFormattedTextField tDate;
-		
+
 		public ChartListener(JFormattedTextField tDate) {
 			this.tDate = tDate;
 		}

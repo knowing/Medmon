@@ -71,6 +71,7 @@ public class Persister {
 		// Set converter to tmp file and convert again
 		converter.reset();
 		converter.setFile(tmp);
+		converter.setAggregate(SDRConverter.AGGREGATE_NONE);
 		Instances returns = converter.getDataSet();
 		//Set to old source and delete tmp file
 		converter.setFile(oldSource);
