@@ -286,6 +286,11 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				JFileChooser dialog = new JFileChooser();
+				String sep = System.getProperty("file.separator");
+				String out = tInput.getText();
+				int index = out.lastIndexOf(sep);
+				out = out.substring(index, out.length()-3) + configuration.getOutput();
+				dialog.setSelectedFile(new File(out.substring(0, index) + out));
 				int ret = dialog.showSaveDialog(contentPane);
 				if (ret != JFileChooser.APPROVE_OPTION)
 					return;
@@ -294,17 +299,17 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 				configureConverter();
 				Date from = (Date) sFrom.getValue();
 				Date to = (Date) sTo.getValue();
-				Persister persister = new Persister(from, to, converter);
+				Persister persister = new Persister(from, to, converter, configuration.isRelativeOutput());
+				
 				try {
 					if (configuration.getOutput().equals("arff"))
-						persister.persistAsCSV(outputFile);
+						persister.persistAsARFF(outputFile);
 					else 
-						persister.persistAsCSV(outputFile);
+						persister.persistAsCSV(outputFile, getAppFrame());
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(contentPane, e.getMessage(), "Error while converting", JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
 				}
-				JOptionPane.showMessageDialog(contentPane, "Conversion successfull to file " + outputFile.getAbsolutePath());
 			}
 		});
 
@@ -323,17 +328,32 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
+		if(e.getPropertyName().equals("error")) {
+			Exception exc = (Exception) e.getNewValue();
+			JOptionPane.showMessageDialog(contentPane, "Error!" + exc.getMessage());
+			progressBar.setValue(0);
+			progressBar.setString("Error!");
+			return;
+		}
 		Integer progress = (Integer) e.getNewValue();
 		progressBar.setValue(progress);
 		progressBar.setString(progress + "%");
+		if(progress == 100)
+			progressBar.setString("Successfull");
+			
 	}
 
 	private void configureConverter() {
 		converter.setAggregate(configuration.getAggregation());
 		converter.setInterval(configuration.getInterval());
 		converter.setUnits(configuration.getUnit());
-		converter.setRelativeTimestamp(configuration.isRelative());
+		converter.setRelativeTimestamp(configuration.isRelativePreview());
 	}
+	
+	private AppFrame getAppFrame() {
+		return this;
+	}
+
 
 	/**
 	 * Launch the application.
@@ -361,7 +381,7 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 			}
 		});
 	}
-
+	
 	/**
 	 * 
 	 * @author Nepomuk Seiler

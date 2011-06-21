@@ -8,22 +8,37 @@ package de.sendsor;
  */
 public class Configuration {
 
-	private boolean relative = false;
+	private boolean relativePreview = false;
+	private boolean relativeOutput = false;
 	private String output = "csv";
 	private String aggregation = SDRConverter.AGGREGATE_AVERAGE;
 	private double unit = 1.0;
 	private String interval = SDRConverter.INTERVAL_SECOND;
 	/**
-	 * @return the relative
+	 * @return the relativeInput
 	 */
-	public boolean isRelative() {
-		return relative;
+	public boolean isRelativePreview() {
+		return relativePreview;
 	}
 	/**
-	 * @param relative the relative to set
+	 * @param relativePreview the relative to set
 	 */
-	public void setRelative(boolean relative) {
-		this.relative = relative;
+	public void setRelativePreview(boolean relativePreview) {
+		this.relativePreview = relativePreview;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isRelativeOutput() {
+		return relativeOutput;
+	}
+	
+	/**
+	 * @param relativeOutput
+	 */
+	public void setRelativeOutput(boolean relativeOutput) {
+		this.relativeOutput = relativeOutput;
 	}
 	/**
 	 * @return the output
@@ -75,10 +90,9 @@ public class Configuration {
 	}
 	@Override
 	public String toString() {
-		return "Configuration [relative=" + relative + ", output=" + output + ", aggregation=" + aggregation + ", unit=" + unit
-				+ ", interval=" + interval + "]";
+		return "Configuration [relativeInput=" + relativePreview + ", relativeOutput=" + relativeOutput + ", output=" + output
+				+ ", aggregation=" + aggregation + ", unit=" + unit + ", interval=" + interval + "]";
 	}
-	
-	
+
 	
 }

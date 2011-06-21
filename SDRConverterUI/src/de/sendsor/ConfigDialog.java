@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.sendsor;
 
 import java.awt.BorderLayout;
@@ -62,39 +59,104 @@ public class ConfigDialog extends JDialog {
 		JPanel timePanel = new JPanel();
 		timePanel.setBorder(new TitledBorder(null, "Timestamp", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagConstraints gbc_timePanel = new GridBagConstraints();
-		gbc_timePanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_timePanel.anchor = GridBagConstraints.NORTH;
+		gbc_timePanel.fill = GridBagConstraints.BOTH;
 		gbc_timePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_timePanel.gridx = 0;
 		gbc_timePanel.gridy = 0;
 		contentPanel.add(timePanel, gbc_timePanel);
-		timePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 
-		ButtonGroup timeGroup = new ButtonGroup();
-		final JRadioButton bRadioAbsolute = new JRadioButton("absolute");
-		bRadioAbsolute.setSelected(true);
-		timePanel.add(bRadioAbsolute);
+		GridBagLayout gbl_timePanel = new GridBagLayout();
+		gbl_timePanel.columnWidths = new int[] { 0, 77, 68, 0 };
+		gbl_timePanel.rowHeights = new int[] { 34, 18, 0 };
+		gbl_timePanel.columnWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_timePanel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+		timePanel.setLayout(gbl_timePanel);
 
-		JRadioButton bRadioRelative = new JRadioButton("relative");
-		timePanel.add(bRadioRelative);
+		/* == Timestamp Output == */
+		JLabel lOutput = new JLabel("Output");
+		GridBagConstraints gbc_lOutput = new GridBagConstraints();
+		gbc_lOutput.insets = new Insets(0, 0, 5, 5);
+		gbc_lOutput.gridx = 0;
+		gbc_lOutput.gridy = 0;
+		timePanel.add(lOutput, gbc_lOutput);
 
-		timeGroup.add(bRadioRelative);
-		timeGroup.add(bRadioAbsolute);
+		final JRadioButton bRadioAbsoluteOutput = new JRadioButton("absolute");
+		bRadioAbsoluteOutput.setSelected(true);
+		GridBagConstraints gbc_bRadioAbsoluteOutput = new GridBagConstraints();
+		gbc_bRadioAbsoluteOutput.insets = new Insets(0, 0, 5, 5);
+		gbc_bRadioAbsoluteOutput.gridx = 1;
+		gbc_bRadioAbsoluteOutput.gridy = 0;
+		timePanel.add(bRadioAbsoluteOutput, gbc_bRadioAbsoluteOutput);
 
-		bRadioAbsolute.setSelected(!config.isRelative());
-		bRadioRelative.setSelected(config.isRelative());
-		ActionListener timestampListener = new ActionListener() {
+		final JRadioButton bRadioRelativeOutput = new JRadioButton("relative");
+		GridBagConstraints gbc_bRadioRelativeOutput = new GridBagConstraints();
+		gbc_bRadioRelativeOutput.insets = new Insets(0, 0, 5, 0);
+		gbc_bRadioRelativeOutput.gridx = 2;
+		gbc_bRadioRelativeOutput.gridy = 0;
+		timePanel.add(bRadioRelativeOutput, gbc_bRadioRelativeOutput);
+		
+		ActionListener outputListener2 = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (bRadioAbsolute.isSelected())
-					configuration.setRelative(false);
+				if (bRadioAbsoluteOutput.isSelected())
+					configuration.setRelativeOutput(false);
 				else
-					configuration.setRelative(true);
+					configuration.setRelativeOutput(true);
 			}
 		};
-		bRadioAbsolute.addActionListener(timestampListener);
-		bRadioRelative.addActionListener(timestampListener);
+		
+		bRadioAbsoluteOutput.addActionListener(outputListener2);
+		bRadioRelativeOutput.addActionListener(outputListener2);
+		ButtonGroup timeOutputGroup = new ButtonGroup();
+		timeOutputGroup.add(bRadioAbsoluteOutput);
+		timeOutputGroup.add(bRadioRelativeOutput);
+		bRadioAbsoluteOutput.setSelected(!config.isRelativeOutput());
+		bRadioRelativeOutput.setSelected(config.isRelativeOutput());
 
+		/* == Preview Relative/Absolute == */
+		ButtonGroup timePreviewGroup = new ButtonGroup();
+		JLabel lPreview = new JLabel("Preview");
+		GridBagConstraints gbc_lPreview = new GridBagConstraints();
+		gbc_lPreview.insets = new Insets(0, 0, 0, 5);
+		gbc_lPreview.gridx = 0;
+		gbc_lPreview.gridy = 1;
+		timePanel.add(lPreview, gbc_lPreview);
+		final JRadioButton bRadioAbsolutePreview = new JRadioButton("absolute");
+		bRadioAbsolutePreview.setSelected(true);
+		GridBagConstraints gbc_bRadioAbsolutePreview = new GridBagConstraints();
+		gbc_bRadioAbsolutePreview.anchor = GridBagConstraints.NORTHWEST;
+		gbc_bRadioAbsolutePreview.insets = new Insets(0, 0, 0, 5);
+		gbc_bRadioAbsolutePreview.gridx = 1;
+		gbc_bRadioAbsolutePreview.gridy = 1;
+		timePanel.add(bRadioAbsolutePreview, gbc_bRadioAbsolutePreview);
+		timePreviewGroup.add(bRadioAbsolutePreview);
+
+		bRadioAbsolutePreview.setSelected(!config.isRelativePreview());
+
+		final JRadioButton bRadioRelativePreview = new JRadioButton("relative");
+		GridBagConstraints gbc_bRadioRelativePreview = new GridBagConstraints();
+		gbc_bRadioRelativePreview.anchor = GridBagConstraints.NORTHWEST;
+		gbc_bRadioRelativePreview.gridx = 2;
+		gbc_bRadioRelativePreview.gridy = 1;
+		timePanel.add(bRadioRelativePreview, gbc_bRadioRelativePreview);
+
+		timePreviewGroup.add(bRadioRelativePreview);
+		bRadioRelativePreview.setSelected(config.isRelativePreview());
+
+		ActionListener previewListener = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (bRadioAbsolutePreview.isSelected())
+					configuration.setRelativePreview(false);
+				else
+					configuration.setRelativePreview(true);
+			}
+		};
+		bRadioAbsolutePreview.addActionListener(previewListener);
+		bRadioRelativePreview.addActionListener(previewListener);
 		/* == Aggregation Panel == */
 		JPanel aggPanel = new JPanel();
 		aggPanel.setBorder(new TitledBorder(null, "Aggregation", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -266,5 +328,4 @@ public class ConfigDialog extends JDialog {
 	public boolean isCanceled() {
 		return canceled;
 	}
-
 }

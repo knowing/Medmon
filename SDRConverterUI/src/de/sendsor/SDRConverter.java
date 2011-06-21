@@ -91,7 +91,7 @@ public class SDRConverter extends AbstractFileLoader {
 	}
 	
 	private void initStructure() {
-		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
+		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }), "yyyy-MM-dd HH:mm:ss.SSS");
 		dataset = new Instances(m_structure);
 		timeAttribute = dataset.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes

@@ -85,7 +85,7 @@ public class TimeSeriesChart {
 						s.add(new Millisecond(date), value);
 					}
 					last = printProgress(i, numInst, last);
-					support.firePropertyChange("progress", -1, last);
+					support.firePropertyChange("progress", -1, 5*last); //last [0,20]
 					i++;
 				}
 				System.out.println("[....................][100%]");

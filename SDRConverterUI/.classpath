@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="WEKA_HOME/weka.jar"/>
+	<classpathentry kind="var" path="WEKA_HOME/weka.jar" sourcepath="/WEKA_HOME/weka-src.jar"/>
 	<classpathentry kind="var" path="JFREECHART_HOME/jcommon-1.0.16.jar"/>
 	<classpathentry kind="var" path="JFREECHART_HOME/jfreechart-1.0.13.jar"/>
 	<classpathentry kind="var" path="KNOWING_HOME/de.lmu.ifi.dbs.knowing.core_1.0.0.jar"/>
