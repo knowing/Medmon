@@ -286,11 +286,10 @@ public class AppFrame extends JFrame implements PropertyChangeListener {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				JFileChooser dialog = new JFileChooser();
-				String sep = System.getProperty("file.separator");
 				String out = tInput.getText();
-				int index = out.lastIndexOf(sep);
-				out = out.substring(index, out.length()-3) + configuration.getOutput();
-				dialog.setSelectedFile(new File(out.substring(0, index) + out));
+				int index = out.lastIndexOf(File.separator);
+				String file = out.substring(index, out.length()-3) + configuration.getOutput();
+				dialog.setSelectedFile(new File(out.substring(0, index) + file));
 				int ret = dialog.showSaveDialog(contentPane);
 				if (ret != JFileChooser.APPROVE_OPTION)
 					return;

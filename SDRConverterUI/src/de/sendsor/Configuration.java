@@ -9,7 +9,7 @@ package de.sendsor;
 public class Configuration {
 
 	private boolean relativePreview = false;
-	private boolean relativeOutput = false;
+	private boolean relativeOutput = true;
 	private String output = "csv";
 	private String aggregation = SDRConverter.AGGREGATE_AVERAGE;
 	private double unit = 1.0;

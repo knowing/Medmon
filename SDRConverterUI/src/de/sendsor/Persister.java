@@ -23,15 +23,20 @@ public class Persister {
 	private final Date to;
 	private final boolean relative;
 	private final SDRConverter converter;
-	
+
 	/**
-	 * <p>Converter must have a valid sourceFile</p>
+	 * <p>
+	 * Converter must have a valid sourceFile
+	 * </p>
 	 * 
-	 * @param from - from which date to persist
-	 * @param to - to which date to persist
+	 * @param from
+	 *            - from which date to persist
+	 * @param to
+	 *            - to which date to persist
 	 * @param converter
 	 */
-	public Persister(Date from, Date to, SDRConverter converter, boolean relative) {
+	public Persister(Date from, Date to, SDRConverter converter,
+			boolean relative) {
 		this.from = from;
 		this.to = to;
 		this.relative = relative;
@@ -39,11 +44,13 @@ public class Persister {
 	}
 
 	/**
-	 * @param listener 
-	 * @param path - output file
+	 * @param listener
+	 * @param path
+	 *            - output file
 	 * @throws IOException
 	 */
-	public void persistAsCSV(File file, PropertyChangeListener listener) throws IOException {
+	public void persistAsCSV(File file, PropertyChangeListener listener)
+			throws IOException {
 		Instances dataset = convert(file.getAbsolutePath());
 		CSVSaver saver = new CSVSaver();
 		saver.addPropertyChangeListener(listener);
@@ -54,7 +61,8 @@ public class Persister {
 	}
 
 	/**
-	 * @param file - output file
+	 * @param file
+	 *            - output file
 	 * @throws IOException
 	 */
 	public void persistAsARFF(File file) throws IOException {
@@ -78,12 +86,13 @@ public class Persister {
 		converter.setAggregate(SDRConverter.AGGREGATE_NONE);
 		converter.setRelativeTimestamp(relative);
 		Instances returns = converter.getDataSet();
-		//Set to old source and delete tmp file
+		// Set to old source and delete tmp file
 		converter.setFile(oldSource);
-		tmp.delete();
+		if (!tmp.delete())
+			System.err.println("temporary file couldn't be deleted, .converter.sdr");
+
 		return returns;
 	}
-	
 
 	private String directory(String path) {
 		int index = path.lastIndexOf(sep);
