@@ -2,6 +2,8 @@ package de.sendsor;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class TimeSeriesChart {
 	private JFreeChart chart;
 
 	private final PropertyChangeSupport support = new PropertyChangeSupport(this);
-
+	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd / hh:mm:ss:SSS");
 	/**
 	 * 
 	 */

@@ -225,7 +225,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		// Initialize time handling
 		Calendar date = new GregorianCalendar();
-		Calendar timestamp = new GregorianCalendar();
 
 		Calendar intervalstart = new GregorianCalendar();
 		Calendar intervalcurrent = new GregorianCalendar();
@@ -257,7 +256,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 			// Fill in the data
 			for (int j = 0; j < CONTENT_BLOCK; j += 3) {
-				timestamp.setTimeInMillis(time);
 				int x = data[j];
 				int y = data[j + 1];
 				int z = data[j + 2];
@@ -272,12 +270,11 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 					intervalcurrent.setTimeInMillis(time);
 				}
 				// Increase time interval
-				time += SAMPLE_DISTANCE;
 				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
 				if (aggregate.equals("none") || !insideBounds) {
 					// New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
-					instance.setValue(timeAttribute, timestamp.getTimeInMillis());
+					instance.setValue(timeAttribute, time);
 					instance.setValue(xAttribute, avg_x);
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
@@ -294,8 +291,10 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 					avg_z = (avg_z + z) / 2;
 					intervalcurrent.setTimeInMillis(time);
 				}
+				time += SAMPLE_DISTANCE;
 
 			}
+			date.setTimeInMillis(time);
 			read = in.read(data);
 
 		}

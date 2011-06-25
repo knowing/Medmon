@@ -2,10 +2,14 @@ package de.sendsor;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -81,7 +85,6 @@ public class SDRConverter extends AbstractFileLoader {
 	private String aggregate = AGGREGATE_AVERAGE;
 	private double units = 1.0;
 	private boolean relativeTimestamp = false;
-	private String output = null;
 
 	/* */
 	private boolean firstRun = true;
@@ -202,7 +205,6 @@ public class SDRConverter extends AbstractFileLoader {
 
 		// Initialize time handling
 		Calendar date = new GregorianCalendar();
-		Calendar timestamp = new GregorianCalendar();
 
 		Calendar intervalstart = new GregorianCalendar();
 		Calendar intervalcurrent = new GregorianCalendar();
@@ -228,14 +230,13 @@ public class SDRConverter extends AbstractFileLoader {
 			boolean recordEnd = setTime(date, data);
 			// For relative time handling
 			long time = date.getTimeInMillis();
-
+			
 			// Checks if the recorded data ended
 			if (recordEnd)
 				break;
 
 			// Fill in the data
 			for (int j = 0; j < CONTENT_BLOCK; j += 3) {
-				timestamp.setTimeInMillis(time);
 				int x = data[j];
 				int y = data[j + 1];
 				int z = data[j + 2];
@@ -249,13 +250,11 @@ public class SDRConverter extends AbstractFileLoader {
 					intervalstart.setTimeInMillis(time);
 					intervalcurrent.setTimeInMillis(time);
 				}
-				// Increase time interval
-				time += SAMPLE_DISTANCE;
 				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
 				if (aggregate.equals("none") || !insideBounds) {
 					// New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
-					instance.setValue(timeAttribute, timestamp.getTimeInMillis());
+					instance.setValue(timeAttribute, time);
 					instance.setValue(xAttribute, avg_x);
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
@@ -272,20 +271,14 @@ public class SDRConverter extends AbstractFileLoader {
 					avg_z = (avg_z + z) / 2;
 					intervalcurrent.setTimeInMillis(time);
 				}
-
+				// Increase time interval
+				time += SAMPLE_DISTANCE;
 			}
+			date.setTimeInMillis(time);
 			read = in.read(data);
 
 		}
 		in.close();
-		// Saves to output if option set
-		if (output != null) {
-			File out = new File(output);
-			ArffSaver arffSaver = new ArffSaver();
-			arffSaver.setFile(out);
-			arffSaver.setInstances(dataset);
-			arffSaver.writeBatch();
-		}
 		return dataset;
 	}
 
@@ -390,10 +383,6 @@ public class SDRConverter extends AbstractFileLoader {
 
 	public void setRelativeTimestamp(boolean relativeTimestamp) {
 		this.relativeTimestamp = relativeTimestamp;
-	}
-
-	public void setOutput(String output) {
-		this.output = output;
 	}
 
 	@Override
