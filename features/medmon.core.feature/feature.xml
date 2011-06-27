@@ -2,7 +2,7 @@
 <feature
       id="medmon.core.feature"
       label="Medmon Core"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="LMU Munich - Database Systems Group">
 
    <description url="http://www.example.com/description">
