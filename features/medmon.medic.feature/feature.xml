@@ -2,7 +2,7 @@
 <feature
       id="medmon.medic.feature"
       label="Medmon Medic Feature"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="Nepomuk Seiler">
 
    <description url="http://www.example.com/description">

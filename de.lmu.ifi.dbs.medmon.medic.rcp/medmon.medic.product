@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.0.APLHA1" useFeatures="true" includeLaunchers="true">
+<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.1.ALPHA1" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/de.lmu.ifi.dbs.medmon.medic.rcp/medmon.trans.png"/>
@@ -63,8 +63,8 @@
    </plugins>
 
    <features>
-      <feature id="medmon.core.feature" version="1.0.0.qualifier"/>
-      <feature id="medmon.medic.feature" version="1.0.0.qualifier"/>
+      <feature id="medmon.core.feature" version="1.0.1.qualifier"/>
+      <feature id="medmon.medic.feature" version="1.0.1.qualifier"/>
    </features>
 
    <configurations>
