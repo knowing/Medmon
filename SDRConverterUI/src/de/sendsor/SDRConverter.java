@@ -2,14 +2,10 @@ package de.sendsor;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,8 +18,6 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.AbstractFileLoader;
-import weka.core.converters.ArffSaver;
-
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 
 /**
@@ -39,6 +33,8 @@ import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
  */
 public class SDRConverter extends AbstractFileLoader {
 
+	private static final long serialVersionUID = 844517021738164815L;
+	
 	/* ==== Configuration Options ==== */
 	public static final String URL = "url";
 	public static final String FILE = "file";
@@ -223,9 +219,6 @@ public class SDRConverter extends AbstractFileLoader {
 
 		// Convert each block
 		while (read != -1) {
-			// Load Data into data-Buffer
-			in.read(data, 0, BLOCKSIZE);
-
 			// Create timestamp
 			boolean recordEnd = setTime(date, data);
 			// For relative time handling
@@ -275,6 +268,7 @@ public class SDRConverter extends AbstractFileLoader {
 				time += SAMPLE_DISTANCE;
 			}
 			date.setTimeInMillis(time);
+			//Load next data
 			read = in.read(data);
 
 		}

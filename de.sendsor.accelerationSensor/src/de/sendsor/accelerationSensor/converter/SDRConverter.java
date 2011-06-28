@@ -242,9 +242,6 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 		// Convert each block
 		while (read != -1) {
-			// Load Data into data-Buffer
-			in.read(data, 0, BLOCKSIZE);
-
 			// Create timestamp
 			boolean recordEnd = setTime(date, data);
 			// For relative time handling
@@ -295,6 +292,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 
 			}
 			date.setTimeInMillis(time);
+			// Load Data into data-Buffer
 			read = in.read(data);
 
 		}
