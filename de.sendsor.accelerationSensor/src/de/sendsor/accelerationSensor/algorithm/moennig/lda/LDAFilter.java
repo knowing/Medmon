@@ -12,6 +12,7 @@ import Jama.Matrix;
 
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -42,7 +43,7 @@ public class LDAFilter extends SimpleBatchFilter{
 		//determine the amount of numeric input dimensions
 		inDimensions = 0;
 		for(int i=0;i<inputFormat.numAttributes();i++){
-			if(i!=inputFormat.classIndex() && inputFormat.attribute(i).isNumeric()){
+			if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
 				inDimensions++;
 			}
 		}
@@ -54,7 +55,7 @@ public class LDAFilter extends SimpleBatchFilter{
 			if(inDimensions > outDimensions){
 				int toDelete = inDimensions - outDimensions;
 				for(int i=inputFormat.numAttributes()-1; toDelete>0 && i>=0; i--){
-					if(i!=inputFormat.classIndex() && inputFormat.attribute(i).isNumeric()){
+					if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
 						result.deleteAttributeAt(i);
 						toDelete--;
 					}
@@ -130,7 +131,7 @@ public class LDAFilter extends SimpleBatchFilter{
 				if(cla.equals(currentClasss)){
 					ArrayList<Double> al = new ArrayList<Double>();
 					for(int k=0;k<in.numAttributes();k++){
-						if(k!=inst.classIndex() && inst.attribute(k).isNumeric()){
+						if(k!=inst.classIndex() && inst.attribute(k).type() == Attribute.NUMERIC){
 							al.add(in.value(k));
 						}
 					}
@@ -291,7 +292,7 @@ public class LDAFilter extends SimpleBatchFilter{
 			Instance in = input.get(i);
 			int dj = 0;
 			for(int j=0;j<input.numAttributes();j++){				
-				if(j!=in.classIndex() && in.attribute(j).isNumeric()){
+				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC){
 					data[i][dj] = in.value(j);
 					dj++;
 				}
@@ -310,7 +311,7 @@ public class LDAFilter extends SimpleBatchFilter{
 			Instance r = new DenseInstance(output.numAttributes());			
 			int rj = 0;
 			for(int j=0;j<output.numAttributes();j++){
-				if(j!=in.classIndex() && in.attribute(j).isNumeric()){
+				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC){
 					r.setValue(j, rm[i][rj]);
 					rj++;
 				}
