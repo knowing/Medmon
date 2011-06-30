@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
  */
 public class SDRConverter extends AbstractFileLoader implements IConverter {
 
+	private static final long serialVersionUID = 7663052852394853876L;
+	
 	/* ==== Factory ==== */
 	public static final String ID = SDRLoader.class.getName();
 	public static final String URL = "url";
@@ -268,7 +270,17 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 				}
 				// Increase time interval
 				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
-				if (aggregate.equals("none") || !insideBounds) {
+				if (aggregate.equals("none")) {
+					//Don't aggregate, just take raw values
+					DenseInstance instance = new DenseInstance(4);
+					instance.setValue(timeAttribute, time);
+					instance.setValue(xAttribute, x);
+					instance.setValue(yAttribute, y);
+					instance.setValue(zAttribute, z);
+					dataset.add(instance);
+					intervalstart.setTimeInMillis(time);
+					intervalcurrent.setTimeInMillis(time);
+				} else if (!insideBounds) {
 					// New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
 					instance.setValue(timeAttribute, time);
@@ -276,6 +288,8 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
 					dataset.add(instance);
+					//Start for new aggregation 
+					//if aggregation < SAMPLE_DISTANCE first sample will be used twice!
 					avg_x = x;
 					avg_y = y;
 					avg_z = z;

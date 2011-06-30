@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 public class SDRConverter extends AbstractFileLoader {
 
 	private static final long serialVersionUID = 844517021738164815L;
-	
+
 	/* ==== Configuration Options ==== */
 	public static final String URL = "url";
 	public static final String FILE = "file";
@@ -88,7 +88,7 @@ public class SDRConverter extends AbstractFileLoader {
 	public SDRConverter() {
 		initStructure();
 	}
-	
+
 	private void initStructure() {
 		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }), "yyyy-MM-dd HH:mm:ss.SSS");
 		dataset = new Instances(m_structure);
@@ -105,7 +105,7 @@ public class SDRConverter extends AbstractFileLoader {
 			else if (name.equals("z"))
 				zAttribute = attribute;
 		}
-		
+
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class SDRConverter extends AbstractFileLoader {
 	public Instances getStructure() throws IOException {
 		return m_structure;
 	}
-	
+
 	@Override
 	public void reset() throws IOException {
 		super.reset();
@@ -172,9 +172,9 @@ public class SDRConverter extends AbstractFileLoader {
 				prev.setTimeInMillis(date.getTimeInMillis());
 			}
 			// Write data only "from >= date"
-			if (date.getTime().after(from) && date.after(prev)) 
+			if (date.getTime().after(from) && date.after(prev))
 				out.write(data);
-				
+
 			/*
 			 * Reasons for break 1) record ends when zeros appear 2) record ends
 			 * when new date is before the previous entry 3) given parameter
@@ -223,7 +223,7 @@ public class SDRConverter extends AbstractFileLoader {
 			boolean recordEnd = setTime(date, data);
 			// For relative time handling
 			long time = date.getTimeInMillis();
-			
+
 			// Checks if the recorded data ended
 			if (recordEnd)
 				break;
@@ -244,7 +244,17 @@ public class SDRConverter extends AbstractFileLoader {
 					intervalcurrent.setTimeInMillis(time);
 				}
 				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
-				if (aggregate.equals("none") || !insideBounds) {
+				if (aggregate.equals("none")) {
+					//Don't aggregate, just take raw values
+					DenseInstance instance = new DenseInstance(4);
+					instance.setValue(timeAttribute, time);
+					instance.setValue(xAttribute, x);
+					instance.setValue(yAttribute, y);
+					instance.setValue(zAttribute, z);
+					dataset.add(instance);
+					intervalstart.setTimeInMillis(time);
+					intervalcurrent.setTimeInMillis(time);
+				} else if (!insideBounds) {
 					// New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
 					instance.setValue(timeAttribute, time);
@@ -252,6 +262,8 @@ public class SDRConverter extends AbstractFileLoader {
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
 					dataset.add(instance);
+					//Start for new aggregation 
+					//if aggregation < SAMPLE_DISTANCE first sample will be used twice!
 					avg_x = x;
 					avg_y = y;
 					avg_z = z;
@@ -268,7 +280,7 @@ public class SDRConverter extends AbstractFileLoader {
 				time += SAMPLE_DISTANCE;
 			}
 			date.setTimeInMillis(time);
-			//Load next data
+			// Load next data
 			read = in.read(data);
 
 		}

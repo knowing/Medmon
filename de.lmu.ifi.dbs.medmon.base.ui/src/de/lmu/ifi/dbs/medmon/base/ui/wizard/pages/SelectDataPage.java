@@ -298,8 +298,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				String path = sensor.getDefaultPath() + sep + sdrFiles[0];
 				properties.setProperty("file", path);
 				// properties.setProperty("absolute-path", "true");
+				Option<String> none = scala.Option.apply(null);
 				loaderActor.sendOneWay(new Configure(properties));
-				loaderActor.sendOneWay(new Register(presenterActor));
+				loaderActor.sendOneWay(new Register(presenterActor, none));
 				loaderActor.sendOneWay(new Start());
 				//TODO SelectDataPage update preview after evaluating preview
 				uiFactory.update();
