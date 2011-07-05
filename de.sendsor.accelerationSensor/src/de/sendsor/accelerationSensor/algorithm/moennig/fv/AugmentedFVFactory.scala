@@ -15,37 +15,67 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
   override def createDefaultProperties: Properties = {
     val returns = new Properties
     returns.setProperty(DEBUG, "false")
-    returns.setProperty(DIMREDUCTION, "false")
+    returns.setProperty(USE_AR, "true")
+    returns.setProperty(USE_SMA, "true")
+    returns.setProperty(USE_TA, "true")
+    returns.setProperty(USE_APA, "true")
+    returns.setProperty(USE_SSR, "true")
+    returns.setProperty(USE_MV, "false")
     returns
   }
 
   //Possible property values. Editor should show these
   override def createPropertyValues: Map[String, Array[_<:Any]] = {
     Map(DEBUG -> boolean_property)
-    Map(DIMREDUCTION -> boolean_property)
+    Map(USE_AR -> boolean_property)
+    Map(USE_SMA -> boolean_property)
+    Map(USE_TA -> boolean_property)
+    Map(USE_APA -> boolean_property)
+    Map(USE_SSR -> boolean_property)
+    Map(USE_MV -> boolean_property)
+
   }
 
   //Property description
   override def createPropertyDescription: Map[String, String] = {
-        Map(DEBUG -> "Debug true/false")
-        Map(DIMREDUCTION -> "Dimension reduction true/false")        
+    Map(DEBUG -> "Debug true/false")
+    Map(USE_AR -> "use auto regressive coefficients true/false")
+    Map(USE_SMA -> "use signal magnitude area true/false")
+    Map(USE_TA -> "use tilt angle true/false")
+    Map(USE_APA -> "use average peak amplitude true/false")
+    Map(USE_SSR -> "use surrounding segmentation rate true/false")
+    Map(USE_MV -> "use mean and variance true/false")
   }
 
 }
 
 object AugmentedFVFactory{
-  val DIMREDUCTION = "dimensionreduction"
-  val OUTDIMENSIONS = "outputdimensions"
+  val USE_AR = "useAR";
+  val USE_SMA = "useSMA";
+  val USE_TA = "useTA";
+  val USE_APA = "useAPA";
+  val USE_SSR = "useSSR";
+  val USE_MV = "useMV";  	
 }
 
 class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
   
    override def configure(properties:Properties) = {
      //Configure your classifier here with
-     val myFilter = filter.asInstanceOf[AugmentedFV]
+     val augmentedFV = filter.asInstanceOf[AugmentedFV]
      val debug = properties.getProperty(DEBUG)
-     val dimreduction = properties.getProperty(DIMREDUCTION)
-     val outdimensions = properties.getProperty(OUTDIMENSIONS)
-     myFilter.setDebug(debug.toBoolean)     
+     val useAR = properties.getProperty(USE_AR)
+     val useSMA = properties.getProperty(USE_SMA)
+     val useTA = properties.getProperty(USE_TA)
+     val useAPA = properties.getProperty(USE_APA)
+     val useSSR = properties.getProperty(USE_SSR)
+     val useMV = properties.getProperty(USE_MV)
+     augmentedFV.setDebug(debug.toBoolean)
+     augmentedFV.setUseAR(useAR.toBoolean)
+     augmentedFV.setUseSMA(useSMA.toBoolean)
+     augmentedFV.setUseTA(useTA.toBoolean)
+     augmentedFV.setUseAPA(useAPA.toBoolean)
+     augmentedFV.setUseSSR(useSSR.toBoolean)
+     augmentedFV.setUseMV(useMV.toBoolean)
    }
 }

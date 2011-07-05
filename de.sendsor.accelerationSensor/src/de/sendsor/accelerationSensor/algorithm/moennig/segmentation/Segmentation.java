@@ -17,9 +17,9 @@ public class Segmentation extends SimpleBatchFilter {
 	
 	private double minCorrelation = 0.75;
 	private int patternSize = 25;	 
-	private int minLengthSegment = 100;
-	private int lengthShiftSample = 100;
-	private int minDimensionsWithSegments = 1;
+	private int minSegmentLength = 100;
+	private int shiftSampleLength = 100;
+	private int minAttributesWithSegments = 1;
 		 
 	private int dimensions;
 	private int numOuputAttributes;
@@ -29,8 +29,8 @@ public class Segmentation extends SimpleBatchFilter {
 	
 	@Override
 	public String globalInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return "This batch filter finds periodical areas in the input samples and groups them into segments. " +
+				"Vice versa non periodical areas and too short periodical areas (see min \"minSegmentLength\") are grouped into non-segment.";
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class Segmentation extends SimpleBatchFilter {
 		int bestShift = bestShift();
 		
 		if(shifts[bestShift]>0){
-           for(int i = 0; i <= values[0].length-lengthShiftSample; i=i+shifts[bestShift]){
+           for(int i = 0; i <= values[0].length-shiftSampleLength; i=i+shifts[bestShift]){
                if(!isSegment){
                    getPatterns(i,values);
                    calcShifts(i,values);
@@ -111,7 +111,7 @@ public class Segmentation extends SimpleBatchFilter {
         	   
                int correlations = calcCorrelations(i, values);
 
-               if(correlations >= minDimensionsWithSegments){            	   
+               if(correlations >= minAttributesWithSegments){            	   
             	   for(int j=i;j<i+shifts[bestShift];j++){
             		   segment.add(inst.get(j));
             	   }                
@@ -122,7 +122,7 @@ public class Segmentation extends SimpleBatchFilter {
             	   isSegment = true;
                }
                else{
-                   if(segment.size() > minLengthSegment){
+                   if(segment.size() > minSegmentLength){
                 	   out.add(this.buildOutputInstance(segment,out));
                 	   segment.clear();
                    }
@@ -135,7 +135,7 @@ public class Segmentation extends SimpleBatchFilter {
                }               
            }
 
-           if(segment.size() > minLengthSegment){
+           if(segment.size() > minSegmentLength){
         	   out.add(this.buildOutputInstance(segment,out));
         	   segment.clear();
           }
@@ -157,12 +157,12 @@ public class Segmentation extends SimpleBatchFilter {
     
     private void calcShifts(int startposition, double[][] values){
         for(int i = 0; i < dimensions; i++){            
-            double[] sample = new double[lengthShiftSample];
-            System.arraycopy(values[i], startposition, sample, 0, lengthShiftSample);
+            double[] sample = new double[shiftSampleLength];
+            System.arraycopy(values[i], startposition, sample, 0, shiftSampleLength);
             double correlation = Double.NEGATIVE_INFINITY;
             int shift = 0;
             AutoCorrelation autocorrelation = new AutoCorrelation();
-            for(int j = 1; j<= lengthShiftSample-patternSize; j++){
+            for(int j = 1; j<= shiftSampleLength-patternSize; j++){
                 double[] testArray = new double[patternSize];
                 System.arraycopy(sample, j, testArray, 0, patternSize);
                 double tempcorr = autocorrelation.calcAutocorrelation(testArray, patterns[i]);
@@ -232,5 +232,70 @@ public class Segmentation extends SimpleBatchFilter {
     	
     	return result;
     }
+    
+	public double getMinCorrelation() {
+		return minCorrelation;
+	}
+
+	public void setMinCorrelation(double minCorrelation) {
+		this.minCorrelation = minCorrelation;
+	}
+
+	/**
+	 * @return the patternSize
+	 */
+	public int getPatternSize() {
+		return patternSize;
+	}
+
+	/**
+	 * @param patternSize the patternSize to set
+	 */
+	public void setPatternSize(int patternSize) {
+		this.patternSize = patternSize;
+	}
+
+	/**
+	 * @return the minSegmentLength
+	 */
+	public int getMinSegmentLength() {
+		return minSegmentLength;
+	}
+
+	/**
+	 * @param minSegmentLength the minSegmentLength to set
+	 */
+	public void setMinSegmentLength(int minSegmentLength) {
+		this.minSegmentLength = minSegmentLength;
+	}
+
+	/**
+	 * @return the shiftSampleLength
+	 */
+	public int getShiftSampleLength() {
+		return shiftSampleLength;
+	}
+
+	/**
+	 * @param shiftSampleLength the shiftSampleLength to set
+	 */
+	public void setShiftSampleLength(int shiftSampleLength) {
+		this.shiftSampleLength = shiftSampleLength;
+	}
+
+	/**
+	 * @return the minAttributesWithSegments
+	 */
+	public int getMinAttributesWithSegments() {
+		return minAttributesWithSegments;
+	}
+
+	/**
+	 * @param minAttributesWithSegments the minAttributesWithSegments to set
+	 */
+	public void setMinAttributesWithSegments(int minAttributesWithSegments) {
+		this.minAttributesWithSegments = minAttributesWithSegments;
+	}
+
 
 }
