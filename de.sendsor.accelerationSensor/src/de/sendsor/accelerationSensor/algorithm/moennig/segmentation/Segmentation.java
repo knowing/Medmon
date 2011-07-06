@@ -1,6 +1,7 @@
 package de.sendsor.accelerationSensor.algorithm.moennig.segmentation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
 import weka.core.Attribute;
@@ -14,6 +15,8 @@ import weka.filters.SimpleBatchFilter;
 public class Segmentation extends SimpleBatchFilter {
 	
 	private static final long serialVersionUID = 8254607844622030623L;
+	
+	private static final int REL_ATT_INDEX = 2;
 	
 	private double minCorrelation = 0.75;
 	private int patternSize = 25;	 
@@ -47,14 +50,21 @@ public class Segmentation extends SimpleBatchFilter {
 		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
 		attributes.add(new Attribute("start","yyyy-MM-dd\" \"HH:mm:ss.SS")); //segment start time
 		attributes.add(new Attribute("end","yyyy-MM-dd\" \"HH:mm:ss.SS")); //segment end time
-		attributes.add(new Attribute("segment", inputFormat.stringFreeStructure())); //relational attribute for the input samples belonging to the segment
 		
+		Instances relFormat = inputFormat.stringFreeStructure();
+		relFormat.setClassIndex(-1); //otherwise the class attribute won't be present in the relational attribute
+		attributes.add(new Attribute("segment", relFormat)); //relational attribute for the input samples belonging to the segment
+		
+		int classIndex = -1;
 		if(inputFormat.classIndex()>=0){
-			attributes.add(inputFormat.attribute(inputFormat.classIndex())); //add class if inputFormat contains a class value
+			//add class if inputFormat contains a class value
+			attributes.add(new Attribute(inputFormat.classAttribute().name(),Collections.list(inputFormat.classAttribute().enumerateValues())));
+			classIndex = attributes.size()-1;
 		}
 		
 		numOuputAttributes = attributes.size();
 		Instances result = new Instances(inputFormat.relationName(),attributes, 0);
+		result.setClassIndex(classIndex);
 		return result;
 	}
 	
@@ -64,6 +74,7 @@ public class Segmentation extends SimpleBatchFilter {
 	     result.enable(Capability.DATE_ATTRIBUTES); // date attribute is accepted, but is not processed
 	     result.enable(Capability.NUMERIC_ATTRIBUTES); // only numeric attributes are used for processing
 	     result.enable(Capability.STRING_CLASS);
+	     result.enable(Capability.NOMINAL_CLASS);
 	     result.enable(Capability.NO_CLASS);
 	     
 	     return result;
@@ -223,11 +234,12 @@ public class Segmentation extends SimpleBatchFilter {
     	for(Instance s : segment){
     		segmentData.add(s);
     	}
-    	    	
-    	result.setValue(2, result.attribute(2).addRelation(segmentData));
+    	segmentData.setClassIndex(result.attribute(REL_ATT_INDEX).relation().classIndex()); //make header equal!    	
+    	
+    	result.setValue(2, result.attribute(REL_ATT_INDEX).addRelation(segmentData));
     	
     	if(first.classIndex()>=0){
-    		result.setClassValue(first.classValue());
+    		result.setValue(result.classIndex(), first.stringValue(first.classIndex()));
     	}
     	
     	return result;

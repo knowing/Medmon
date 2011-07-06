@@ -16,6 +16,7 @@ class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](cl
     val returns = new Properties
     returns.setProperty(DEBUG, "false")
     returns.setProperty(DIMREDUCTION, "false")
+    returns.setProperty(ATTRIBUTE_NAME_PREFIX, "FV_");
     returns
   }
 
@@ -36,18 +37,23 @@ class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](cl
 object LDAFilterFactory{
   val DIMREDUCTION = "dimensionreduction"
   val OUTDIMENSIONS = "outputdimensions"
+  val ATTRIBUTE_NAME_PREFIX = "attributeNamePrefix"
 }
 
 class LDAFilterWrapper extends WekaFilter(new LDAFilter()) {
   
    override def configure(properties:Properties) = {
      //Configure your classifier here with
-     val myFilter = filter.asInstanceOf[LDAFilter]
+     val lda = filter.asInstanceOf[LDAFilter]
      val debug = properties.getProperty(DEBUG)
      val dimreduction = properties.getProperty(DIMREDUCTION)
      val outdimensions = properties.getProperty(OUTDIMENSIONS)
-     myFilter.setDebug(debug.toBoolean)
-     myFilter.setDimensionReduction(dimreduction.toBoolean)
-     myFilter.setOutDimensions(outdimensions.toInt)
+     val attNamePrefix = properties.getProperty(ATTRIBUTE_NAME_PREFIX);
+     lda.setDebug(debug.toBoolean)
+     lda.setDimensionReduction(dimreduction.toBoolean)
+     if(outdimensions!=null){
+    	 lda.setOutDimensions(outdimensions.toInt)
+     }
+     lda.setAttributeNamePrefix(attNamePrefix)
    }
 }

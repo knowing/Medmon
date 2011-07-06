@@ -23,11 +23,13 @@ public class LDAFilter extends SimpleBatchFilter{
 	private final static long serialVersionUID = 1L;
 	
 	private final static double DIMENSION_REDUCTION_PER = 0.95;		
-	private final static double SINGULARITY_DETECTION_THRESHOLD = 1.0E-60;	
+	private final static double SINGULARITY_DETECTION_THRESHOLD = 1.0E-100;	
 	
 	private boolean dimReduction = false;
-	private int inDimensions;
 	private int outDimensions;
+	private String attributeNamePrefix; //use only attributes with the given name prefix for the LDA
+	
+	private int inDimensions;	
 	private Matrix eigenVectorMatrix;
 	private double[] eigenValues;
 	
@@ -44,7 +46,9 @@ public class LDAFilter extends SimpleBatchFilter{
 		inDimensions = 0;
 		for(int i=0;i<inputFormat.numAttributes();i++){
 			if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
-				inDimensions++;
+				if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
+					inDimensions++;
+				}
 			}
 		}
 		
@@ -56,8 +60,10 @@ public class LDAFilter extends SimpleBatchFilter{
 				int toDelete = inDimensions - outDimensions;
 				for(int i=inputFormat.numAttributes()-1; toDelete>0 && i>=0; i--){
 					if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
-						result.deleteAttributeAt(i);
-						toDelete--;
+						if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
+							result.deleteAttributeAt(i);
+							toDelete--;
+						}
 					}
 				}
 			}
@@ -65,6 +71,16 @@ public class LDAFilter extends SimpleBatchFilter{
 				throw new IllegalArgumentException("output dimensions have to be lower than input dimensions ("+outDimensions+" !< "+inDimensions+")");
 			}
 		}
+		
+		//rename FV attributes
+		int fvc = 1;
+		for(int i=0;i<result.numAttributes();i++){
+			if(attributeNamePrefix != null && result.attribute(i).name().startsWith(attributeNamePrefix)){				
+				result.renameAttribute(i, attributeNamePrefix+fvc);
+				fvc++;
+			}
+		}
+		
 		return result;
 	}
 	
@@ -72,8 +88,10 @@ public class LDAFilter extends SimpleBatchFilter{
 	public Capabilities getCapabilities() {
 	     Capabilities result = super.getCapabilities();	     
 	     result.enable(Capability.DATE_ATTRIBUTES); // date attribute is accepted, but will only be passed through
+	     result.enable(Capability.RELATIONAL_ATTRIBUTES); // relational attributes are accepted, but will only be passed through
 	     result.enable(Capability.NUMERIC_ATTRIBUTES); // only numeric attributes are proccessed
-	     result.enable(Capability.STRING_CLASS);  // filter needs a string class to be set
+	     result.enable(Capability.NOMINAL_CLASS);  // filter needs a nominal or string class to be set
+	     result.enable(Capability.STRING_CLASS);  // filter needs a nominal or string class to be set
 	     
 	     return result;
 	}
@@ -85,30 +103,13 @@ public class LDAFilter extends SimpleBatchFilter{
 		
 		this.determineProjectionMatrix(input);
 						
-		if(dimReduction && outDimensions > 0 && inDimensions > outDimensions){
-			return this.transformData(input,output);
-		}
-		else{
+		if(dimReduction && outDimensions > 0 && inDimensions > outDimensions){			
 			return this.transformData(input,output,outDimensions);
 		}
-	}
-	
-	/**
-	 * Enables or disables the dimension reduction. 
-	 * Dimension reduction only works if a valid value for the amout of output dimensions is set.
-	 * @param b true/false
-	 */
-	public void setDimensionReduction(boolean b){
-		this.dimReduction = b;
-	}
-	
-	/**
-	 * Sets the value for the amout of output dimensions
-	 * @param outDimensions amout of output dimensions
-	 */
-	public void setOutDimensions(int outDimensions){
-		this.outDimensions = outDimensions;
-	}
+		else{
+			return this.transformData(input,output);
+		}
+	}	
 	
 	/**
 	 * perfoms a Eigenvalue decomposition to determine the optimal projection matrix for the given Instances 
@@ -117,7 +118,7 @@ public class LDAFilter extends SimpleBatchFilter{
 	 */
 	private void determineProjectionMatrix(Instances inst) throws Exception{		
 		
-		//This cast is save -> capabilities allow only String classes
+		//This cast is save -> capabilities allow only String or Norminal classes
 		ArrayList<String> classList = Collections.list((Enumeration<String>)inst.classAttribute().enumerateValues());								
 		
 		// divide data into subsets
@@ -132,7 +133,9 @@ public class LDAFilter extends SimpleBatchFilter{
 					ArrayList<Double> al = new ArrayList<Double>();
 					for(int k=0;k<in.numAttributes();k++){
 						if(k!=inst.classIndex() && inst.attribute(k).type() == Attribute.NUMERIC){
-							al.add(in.value(k));
+							if(attributeNamePrefix == null || inst.attribute(k).name().startsWith(attributeNamePrefix)){
+								al.add(in.value(k));
+							}
 						}
 					}
 					si.add(al);
@@ -165,7 +168,7 @@ public class LDAFilter extends SimpleBatchFilter{
 		for(int i=0;i<covariance.length;i++){
 			Matrix covM = new Matrix(covariance[i]);
 			double det = covM.det();			
-			if(det < SINGULARITY_DETECTION_THRESHOLD || Double.valueOf(det).isNaN()){
+			if(Math.abs(det) < SINGULARITY_DETECTION_THRESHOLD || Double.valueOf(det).isNaN()){
 				throw new Exception("matrix got singular...");
 			}
 		}
@@ -292,9 +295,10 @@ public class LDAFilter extends SimpleBatchFilter{
 			Instance in = input.get(i);
 			int dj = 0;
 			for(int j=0;j<input.numAttributes();j++){				
-				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC){
-					data[i][dj] = in.value(j);
-					dj++;
+				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC
+					&& (attributeNamePrefix == null || in.attribute(j).name().startsWith(attributeNamePrefix))){
+						data[i][dj] = in.value(j);
+						dj++;
 				}
 			}
 		}
@@ -311,9 +315,10 @@ public class LDAFilter extends SimpleBatchFilter{
 			Instance r = new DenseInstance(output.numAttributes());			
 			int rj = 0;
 			for(int j=0;j<output.numAttributes();j++){
-				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC){
-					r.setValue(j, rm[i][rj]);
-					rj++;
+				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC
+					&& (attributeNamePrefix == null || in.attribute(j).name().startsWith(attributeNamePrefix))){
+						r.setValue(j, rm[i][rj]);
+						rj++;					
 				}
 				else{				
 					r.setValue(j, in.value(j));
@@ -397,5 +402,54 @@ public class LDAFilter extends SimpleBatchFilter{
 	}
 
 	
+	/**
+	 * Enables/disables the dimension reduction. 
+	 * Dimension reduction only works if a valid value for the amout of output dimensions is set.
+	 * @param b true/false
+	 */
+	public void setDimensionReduction(boolean b){
+		this.dimReduction = b;
+	}
+	
+	/**
+	 * returns whether dimension reduction is enabled or disabled
+	 * @return true/false
+	 */
+	public boolean isDimensionReduction(){
+		return dimReduction;
+	}
+	
+	/**
+	 * returns the amount of attributes to use in the ouput if dimension reduction is enabled
+	 * @return the outDimensions
+	 */
+	public int getOutDimensions() {
+		return outDimensions;
+	}
+	
+	/**
+	 * Sets the value for the amout of output dimensions
+	 * @param outDimensions amout of output dimensions
+	 */
+	public void setOutDimensions(int outDimensions){
+		this.outDimensions = outDimensions;
+	}
 
+	/**
+	 * Sets an prefix for the attribute name. Only those attributes whose names start with the prefix are considered for the LDA
+	 * @param attributeNamePrefix the attributeNamePrefix to set
+	 */
+	public void setAttributeNamePrefix(String attributeNamePrefix) {
+		this.attributeNamePrefix = attributeNamePrefix;
+	}
+
+	/**The prefix or null if no prefix has been set
+	 * @return the attributeNamePrefix
+	 */
+	public String getAttributeNamePrefix() {
+		return attributeNamePrefix;
+	}
+
+
+	
 }

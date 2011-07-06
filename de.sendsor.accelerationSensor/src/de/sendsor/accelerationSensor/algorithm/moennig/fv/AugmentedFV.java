@@ -107,6 +107,7 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	     result.enable(Capability.DATE_ATTRIBUTES); // date attribute is accepted, but is not processed
 	     result.enable(Capability.RELATIONAL_ATTRIBUTES); // only relational attributes are used for processing
 	     result.enable(Capability.STRING_CLASS);
+	     result.enable(Capability.NOMINAL_CLASS);
 	     result.enable(Capability.NO_CLASS);
 	     
 	     return result;

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DataProcessingUnit name="lda-test">
+    <description>LDA Test DPU</description>
+    <tags>LDA</tags>
+    <nodes>                
+        <node nodeType="loader" factoryId="weka.core.converters.ArffLoader" id="ARFF">
+            <properties>
+                <item value="testdata.arff" key="file"/>
+            </properties>
+        </node>
+        
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.segmentation.Segmentation" id="Segmentation">
+            <properties>            
+            	<item key="debug" value="true" />
+            	<item key="minCorrelation" value="0.75" />
+            	<item key="patternSize" value="25" />
+            	<item key="minSegmentLength" value="100" />
+            	<item key="shiftSampleLength" value="100" />
+            	<item key="minAttributesWithSegments" value="1" />
+            </properties>
+        </node>
+        
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFV">
+            <properties>            
+            	<item key="debug" value="true" />               	
+            	<item key="useAR" value="true" />
+            	<item key="useSMA" value="true" />
+            	<item key="useTA" value="true" />
+            	<item key="useAPA" value="true" />
+            	<item key="useSSR" value="false" />
+            	<item key="useMV" value="false" />
+            </properties>
+        </node>
+        
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" id="LDAFilter">
+            <properties>            
+            	<item key="debug" value="true"/>   
+            	<item key="dimensionreduction" value="false" />
+            	<item key="attributeNamePrefix" value="FV_" />
+            </properties>
+        </node>
+        
+        <node nodeType="presenter" factoryId="de.lmu.ifi.dbs.knowing.core.swt.TablePresenter" id="TablePresenter">
+            <properties>
+                <item value="100" key="rows"/>
+            </properties>
+        </node>
+    </nodes>
+    <edges>    	
+        <edge weight="1" targetId="Segmentation" sourceId="ARFF" id="arff_validator"/>
+        <edge weight="1" targetId="AugmentedFV" sourceId="Segmentation" id="segmentation_validator" />
+        <edge weight="1" targetId="LDAFilter" sourceId="AugmentedFV" id="lda_validator" />
+		<edge weight="1" targetId="TablePresenter" sourceId="LDAFilter" id="validator_presenter"/>
+    </edges>
+</DataProcessingUnit>
