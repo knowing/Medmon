@@ -21,6 +21,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     returns.setProperty(USE_APA, "true")
     returns.setProperty(USE_SSR, "true")
     returns.setProperty(USE_MV, "false")
+    returns.setProperty(USE_IAC, "true")
     returns
   }
 
@@ -33,7 +34,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     Map(USE_APA -> boolean_property)
     Map(USE_SSR -> boolean_property)
     Map(USE_MV -> boolean_property)
-
+    Map(USE_IAC -> boolean_property)
   }
 
   //Property description
@@ -45,6 +46,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     Map(USE_APA -> "use average peak amplitude true/false")
     Map(USE_SSR -> "use surrounding segmentation rate true/false")
     Map(USE_MV -> "use mean and variance true/false")
+    Map(USE_IAC -> "use the inter axis correlation true/false")
   }
 
 }
@@ -56,6 +58,7 @@ object AugmentedFVFactory{
   val USE_APA = "useAPA";
   val USE_SSR = "useSSR";
   val USE_MV = "useMV";  	
+  val USE_IAC = "useIAC";
 }
 
 class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
@@ -70,6 +73,7 @@ class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
      val useAPA = properties.getProperty(USE_APA)
      val useSSR = properties.getProperty(USE_SSR)
      val useMV = properties.getProperty(USE_MV)
+     val useIAC = properties.getProperty(USE_IAC)
      augmentedFV.setDebug(debug.toBoolean)
      augmentedFV.setUseAR(useAR.toBoolean)
      augmentedFV.setUseSMA(useSMA.toBoolean)
@@ -77,5 +81,6 @@ class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
      augmentedFV.setUseAPA(useAPA.toBoolean)
      augmentedFV.setUseSSR(useSSR.toBoolean)
      augmentedFV.setUseMV(useMV.toBoolean)
+     augmentedFV.setUseIAC(useIAC.toBoolean)
    }
 }

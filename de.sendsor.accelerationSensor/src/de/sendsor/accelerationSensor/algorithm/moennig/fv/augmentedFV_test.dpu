@@ -18,6 +18,7 @@
             	<item key="useAPA" value="true" />
             	<item key="useSSR" value="false" />
             	<item key="useMV" value="false" />
+            	<item key="useIAC" value="true" />
             </properties>
         </node>
         

@@ -27,7 +27,7 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	private boolean useAPA = false; //use average peak amplitude
 	private boolean useSSR = false; //use surrounding segmentation rate
 	private boolean useMV = false; //use mean and variance
-	
+	private boolean useIAC = false; //use inter axis correlation
 
 	private int relAttIndex; //index of the relational attribute
 	private int ssrAttIndex; //index of the surrounding segmentation rate attribute
@@ -89,6 +89,17 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	    		result.insertAttributeAt(new Attribute("FV_MEAN"), result.numAttributes());
 	    		result.insertAttributeAt(new Attribute("FV_VAR"), result.numAttributes());
 	    		numFVattributes += 2;
+	    	}
+	    }
+	    
+	    if(useIAC){
+	    	int iacCount = 0;
+	    	for(int i=0;i<dimensions;i++){
+	    		for(int j=i+1;j<dimensions;j++){
+	    			result.insertAttributeAt(new Attribute("FV_IAC_"+iacCount), result.numAttributes());	    		
+	    			numFVattributes++;
+	    			iacCount++;
+	    		}
 	    	}
 	    }
 	    
@@ -198,6 +209,16 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 				
 				fvValues[fvIndex] = calcVariance(numData[j],mean);
 				fvIndex++;
+			}
+		}
+
+		//Inter Axis Correlation
+		if(useIAC){
+			for(int j=0;j<numData.length;j++){
+				for(int k=j+1;k<numData.length;k++){
+					fvValues[fvIndex] = calcInterAxisCorrelation(numData[j], numData[k]);
+					fvIndex++;
+				}
 			}
 		}
 
@@ -385,6 +406,28 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 		var /= window.length;
 		return var;
 	}
+	
+	/**
+	 * calcs the inter axis correlation for the given two axis
+	 * @param axis1 values for axis 1
+	 * @param axis2 vlaues for axis 2
+	 * @return correlation
+	 */
+	private double calcInterAxisCorrelation(double[] axis1, double[] axis2){
+		double mean1 = calcMean(axis1);
+		double mean2 = calcMean(axis2);
+		double std1 = Math.sqrt(calcVariance(axis1, mean1));
+		double std2 = Math.sqrt(calcVariance(axis2, mean2));
+		
+		double m = 0.0;
+		for(int i=0;i<axis1.length;i++){
+			m += (axis1[i]-mean1)*(axis2[i]-mean2);
+		}
+		m /= axis1.length;
+		m /= (std1*std2);
+		
+		return m;
+	}
 
 	/**
 	 * The model order used for calculating the AR coefficients
@@ -485,6 +528,20 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	 */
 	public void setUseMV(boolean useMV) {
 		this.useMV = useMV;
+	}
+
+	/**returns whether inter axis correlation is used as part of the FV
+	 * @return the useIAC
+	 */
+	public boolean isUseIAC() {
+		return useIAC;
+	}
+
+	/** Enables/Disables the use of inter axis correlation as part of the FV
+	 * @param useIAC the useIAC to set
+	 */
+	public void setUseIAC(boolean useIAC) {
+		this.useIAC = useIAC;
 	}
 
 }
