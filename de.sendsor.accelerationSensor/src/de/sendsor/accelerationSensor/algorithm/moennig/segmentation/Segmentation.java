@@ -2,7 +2,14 @@ package de.sendsor.accelerationSensor.algorithm.moennig.segmentation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.Vector;
+
+import akka.actor.ActorRef;
+
+import de.lmu.ifi.dbs.knowing.core.events.Results;
+import de.lmu.ifi.dbs.knowing.core.japi.AbstractProcessor;
+import de.lmu.ifi.dbs.knowing.core.japi.JProcessor;
 
 import weka.core.Attribute;
 import weka.core.Capabilities;
@@ -12,7 +19,7 @@ import weka.core.Instance;
 import weka.core.Capabilities.Capability;
 import weka.filters.SimpleBatchFilter;
 
-public class Segmentation extends SimpleBatchFilter {
+public class Segmentation extends AbstractProcessor {
 	
 	private static final long serialVersionUID = 8254607844622030623L;
 	
@@ -30,14 +37,31 @@ public class Segmentation extends SimpleBatchFilter {
 	private int[] shifts;
 	private double[] shiftsCorrelation;
 	
+	public Segmentation(JProcessor wrapper) {
+		super(wrapper);
+	}	
+
 	@Override
+	public Instances query(Instance query, ActorRef ref) {
+		return null;
+	}
+
+	@Override
+	public void result(Instances result, Instance query) {}
+
+	@Override
+	public void configure(Properties properties) {}
+
+	@Override
+	public void messageException(Object message) {}
+	
+		
 	public String globalInfo() {
 		return "This batch filter finds periodical areas in the input samples and groups them into segments. " +
 				"Vice versa non periodical areas and too short periodical areas (see min \"minSegmentLength\") are grouped into non-segment.";
 	}
-
-	@Override
-	protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
+	
+	protected Instances determineOutputFormat(Instances inputFormat) {
 
 		//determine the dimensionality of the inputFormat	
 		dimensions = 0;
@@ -68,6 +92,7 @@ public class Segmentation extends SimpleBatchFilter {
 		return result;
 	}
 	
+	/*
 	@Override
 	public Capabilities getCapabilities() {
 	     Capabilities result = super.getCapabilities();	     
@@ -79,15 +104,21 @@ public class Segmentation extends SimpleBatchFilter {
 	     
 	     return result;
 	}
-
+	*/
+	
 	@Override
-	protected Instances process(Instances input) throws Exception {
-		Instances out = determineOutputFormat(input);
-		out = this.calcSegmentation(input, out);
-		return out;
+	public void build (Instances input) {
+		
+		Instances segments = determineOutputFormat(input);
+		Instances nonSegments = determineOutputFormat(input);
+		
+		this.calcSegmentation(input, segments, nonSegments);
+		
+		sendEvent(new Results(segments), SegmentationFactory.SEGMENTS());
+		sendEvent(new Results(nonSegments), SegmentationFactory.NONSEGMENTS());
 	}
 	
-	private Instances calcSegmentation(Instances inst, Instances out){
+	private Instances calcSegmentation(Instances inst, Instances segments, Instances nonSegments){
        
 		boolean isSegment = false;
 		
@@ -134,28 +165,28 @@ public class Segmentation extends SimpleBatchFilter {
                }
                else{
                    if(segment.size() > minSegmentLength){
-                	   out.add(this.buildOutputInstance(segment,out));
-                	   segment.clear();
+                	   segments.add(this.buildOutputInstance(segment,segments));                	   
                    }
                    else{
-                	   //TODO Non Segments
+                	   nonSegments.add(this.buildOutputInstance(segment,nonSegments));                	   
                    }
                    
+                   segment.clear();
                    i=i-shifts[bestShift];
                    isSegment=false;
                }               
            }
 
            if(segment.size() > minSegmentLength){
-        	   out.add(this.buildOutputInstance(segment,out));
-        	   segment.clear();
-          }
-          else{
-        	  //TODO Non Segments
-          }
+        	   segments.add(this.buildOutputInstance(segment,segments));        	   
+           }
+           else{
+        	  nonSegments.add(this.buildOutputInstance(segment,nonSegments));       	   
+           }
+           segment.clear();
        }
 		
-		return out;
+		return segments;
     }
 	 
     private void getPatterns(int startposition, double[][] values){    	
@@ -308,6 +339,8 @@ public class Segmentation extends SimpleBatchFilter {
 	public void setMinAttributesWithSegments(int minAttributesWithSegments) {
 		this.minAttributesWithSegments = minAttributesWithSegments;
 	}
+
+
 
 
 }

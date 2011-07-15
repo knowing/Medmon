@@ -8,8 +8,16 @@ import de.lmu.ifi.dbs.knowing.core.factory.TFactory._
 import de.lmu.ifi.dbs.knowing.core.weka.{WekaFilter, WekaFilterFactory }
 import de.lmu.ifi.dbs.knowing.core.weka.WekaFilterFactory._
 import SegmentationFactory._
+import de.lmu.ifi.dbs.knowing.core.japi.JProcessor
+import akka.actor.ActorRef
+import akka.actor.Actor.actorOf
 
-class SegmentationFactory extends WekaFilterFactory[SegmentationWrapper, Segmentation](classOf[SegmentationWrapper], classOf[Segmentation]) {
+class SegmentationFactory extends TFactory {
+  
+  val id = SegmentationFactory.id // id from static field
+  val name = SegmentationFactory.name // name from static field
+  
+  def getInstance(): ActorRef = actorOf[SegmentationWrapper]
   
   //Creates default Properties which are used if properties aren't set
   override def createDefaultProperties: Properties = {
@@ -42,29 +50,41 @@ class SegmentationFactory extends WekaFilterFactory[SegmentationWrapper, Segment
 }
 
 object SegmentationFactory{
+    val id = classOf[Segmentation].getName
+    val name = "Segmentation"
+  
 	val MIN_CORRELATION = "minCorrelation"
 	val PATTERNSIZE = "patternSize"
 	val MIN_SEGMENT_LENGTH = "minSegmentLength"
 	val SHIFTSAMPLE_LENGTH = "shiftSampleLength"
 	val MIN_ATTRIBUTES_WITH_SEGMENTS = "minAttributesWithSegments"
+	  
+	val SEGMENTS = "segments"
+	val NONSEGMENTS = "nonsegments"
 }
 
-class SegmentationWrapper extends WekaFilter(new Segmentation()) {
+
+
+class SegmentationWrapper extends JProcessor {
+  
+  //processor field is abstract and must be implemented
+  val processor = new Segmentation(this) {
   
    override def configure(properties:Properties) = {
      //Configure your classifier here with
-     val segmentation = filter.asInstanceOf[Segmentation]
-     val debug = properties.getProperty(DEBUG)
+     val segmentation = this.asInstanceOf[Segmentation]
+     //val debug = properties.getProperty(DEBUG)
      val minCorrelation = properties.getProperty(MIN_CORRELATION)
      val patternSize = properties.getProperty(PATTERNSIZE)
      val minSegmentLength = properties.getProperty(MIN_SEGMENT_LENGTH)
      val shiftSampleLength = properties.getProperty(SHIFTSAMPLE_LENGTH)
      val minAttributesWithSegments = properties.getProperty(MIN_ATTRIBUTES_WITH_SEGMENTS)
-     segmentation.setDebug(debug.toBoolean)     
+     //segmentation.setDebug(debug.toBoolean)     
      segmentation.setMinCorrelation(minCorrelation.toDouble)
      segmentation.setPatternSize(patternSize.toInt)
      segmentation.setMinSegmentLength(minSegmentLength.toInt)
      segmentation.setShiftSampleLength(shiftSampleLength.toInt)
      segmentation.setMinAttributesWithSegments(minAttributesWithSegments.toInt)
    }
+  }
 }

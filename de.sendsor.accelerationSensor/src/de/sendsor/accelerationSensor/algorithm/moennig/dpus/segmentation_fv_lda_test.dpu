@@ -20,7 +20,7 @@
             </properties>
         </node>
         
-        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFV">
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFVSegments">
             <properties>            
             	<item key="debug" value="true" />               	
             	<item key="useAR" value="true" />
@@ -33,7 +33,28 @@
             </properties>
         </node>
         
-        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" id="LDAFilter">
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" id="LDASegments">
+            <properties>            
+            	<item key="debug" value="true"/>   
+            	<item key="dimensionreduction" value="false" />
+            	<item key="attributeNamePrefix" value="FV_" />
+            </properties>
+        </node>
+        
+         <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFVNonSegments">
+            <properties>            
+            	<item key="debug" value="true" />               	
+            	<item key="useAR" value="true" />
+            	<item key="useSMA" value="true" />
+            	<item key="useTA" value="false" />
+            	<item key="useAPA" value="false" />
+            	<item key="useSSR" value="false" />
+            	<item key="useMV" value="true" />
+            	<item key="useIAC" value="false" />
+            </properties>
+        </node>
+        
+        <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" id="LDANonSegments">
             <properties>            
             	<item key="debug" value="true"/>   
             	<item key="dimensionreduction" value="false" />
@@ -49,8 +70,10 @@
     </nodes>
     <edges>    	
         <edge weight="1" targetId="Segmentation" sourceId="ARFF" id="arff_validator"/>
-        <edge weight="1" targetId="AugmentedFV" sourceId="Segmentation" id="segmentation_validator" />
-        <edge weight="1" targetId="LDAFilter" sourceId="AugmentedFV" id="lda_validator" />
-		<edge weight="1" targetId="TablePresenter" sourceId="LDAFilter" id="validator_presenter"/>
+        <edge weight="1" targetId="AugmentedFVSegments" sourceId="Segmentation:segments" id="segmentation_segments_validator" />
+        <edge weight="1" targetId="AugmentedFVNonSegments" sourceId="Segmentation:nonsegments" id="segmentation_nonsegments_validator" />
+        <edge weight="1" targetId="LDASegments" sourceId="AugmentedFVSegments" id="lda_segments_validator" />
+        <edge weight="1" targetId="LDANonSegments" sourceId="AugmentedFVNonSegments" id="lda_nonsegments_validator" />
+		<edge weight="1" targetId="TablePresenter" sourceId="LDANonSegments" id="validator_presenter"/>
     </edges>
 </DataProcessingUnit>
