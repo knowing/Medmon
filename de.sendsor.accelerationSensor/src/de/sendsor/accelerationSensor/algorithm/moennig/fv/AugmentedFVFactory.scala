@@ -22,6 +22,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     returns.setProperty(USE_SSR, "true")
     returns.setProperty(USE_MV, "false")
     returns.setProperty(USE_IAC, "true")
+    returns.setProperty(SPLIT_DATA, "false");
     returns
   }
 
@@ -35,6 +36,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     Map(USE_SSR -> boolean_property)
     Map(USE_MV -> boolean_property)
     Map(USE_IAC -> boolean_property)
+    Map(SPLIT_DATA -> boolean_property)
   }
 
   //Property description
@@ -47,6 +49,7 @@ class AugmentedFVFactory extends WekaFilterFactory[AugmentedFVWrapper, Augmented
     Map(USE_SSR -> "use surrounding segmentation rate true/false")
     Map(USE_MV -> "use mean and variance true/false")
     Map(USE_IAC -> "use the inter axis correlation true/false")
+    Map(SPLIT_DATA -> "split data into chunks of fixed size and build multiple FVs")
   }
 
 }
@@ -59,6 +62,7 @@ object AugmentedFVFactory{
   val USE_SSR = "useSSR";
   val USE_MV = "useMV";  	
   val USE_IAC = "useIAC";
+  val SPLIT_DATA = "splitData";
 }
 
 class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
@@ -74,6 +78,7 @@ class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
      val useSSR = properties.getProperty(USE_SSR)
      val useMV = properties.getProperty(USE_MV)
      val useIAC = properties.getProperty(USE_IAC)
+     val splitData = properties.getProperty(SPLIT_DATA)
      augmentedFV.setDebug(debug.toBoolean)
      augmentedFV.setUseAR(useAR.toBoolean)
      augmentedFV.setUseSMA(useSMA.toBoolean)
@@ -82,5 +87,6 @@ class AugmentedFVWrapper extends WekaFilter(new AugmentedFV()) {
      augmentedFV.setUseSSR(useSSR.toBoolean)
      augmentedFV.setUseMV(useMV.toBoolean)
      augmentedFV.setUseIAC(useIAC.toBoolean)
+     augmentedFV.setSplitData(splitData.toBoolean)
    }
 }

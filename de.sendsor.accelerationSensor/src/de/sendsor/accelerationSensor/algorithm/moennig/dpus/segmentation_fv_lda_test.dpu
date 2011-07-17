@@ -30,6 +30,7 @@
             	<item key="useSSR" value="false" />
             	<item key="useMV" value="false" />
             	<item key="useIAC" value="true" />
+            	<item key="splitData" value="true" />
             </properties>
         </node>
         
@@ -51,6 +52,7 @@
             	<item key="useSSR" value="false" />
             	<item key="useMV" value="true" />
             	<item key="useIAC" value="false" />
+            	<item key="splitData" value="true" />
             </properties>
         </node>
         

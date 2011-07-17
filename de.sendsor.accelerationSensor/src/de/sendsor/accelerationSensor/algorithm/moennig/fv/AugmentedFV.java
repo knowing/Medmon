@@ -19,6 +19,9 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 
 	private static final long serialVersionUID = 5923685264303443590L;
 	
+	private static final int WINDOW_SIZE = 80;
+	private static final int MIN_SAMPLES_IN_WINDOW = 40;
+	
 	private int arModelOrder = 3;	
 	
 	private boolean useAR = false; //use auto regressive coefficients
@@ -28,6 +31,7 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	private boolean useSSR = false; //use surrounding segmentation rate
 	private boolean useMV = false; //use mean and variance
 	private boolean useIAC = false; //use inter axis correlation
+	private boolean splitData = false; //split data into fixed windows
 
 	private int relAttIndex; //index of the relational attribute
 	private int ssrAttIndex; //index of the surrounding segmentation rate attribute
@@ -86,8 +90,8 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	    }
 	    if(useMV){
 	    	for(int i=0;i<dimensions;i++){
-	    		result.insertAttributeAt(new Attribute("FV_MEAN"), result.numAttributes());
-	    		result.insertAttributeAt(new Attribute("FV_VAR"), result.numAttributes());
+	    		result.insertAttributeAt(new Attribute("FV_MEAN_"+i), result.numAttributes());
+	    		result.insertAttributeAt(new Attribute("FV_VAR_"+i), result.numAttributes());
 	    		numFVattributes += 2;
 	    	}
 	    }
@@ -137,7 +141,61 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	protected Instances process(Instances input) throws Exception {				
 		Instances output = new Instances(determineOutputFormat(input), 0);
 		for(int i=0;i<input.numInstances();i++){
-			output.add(buildFV(input.get(i), relAttIndex));
+			//split instances into windows of fixed length
+			if(splitData){				
+				Instance in = input.get(i);				
+				Instances rel = in.relationalValue(relAttIndex);	
+				
+				//find timestamp in relational attributes
+				int timeIndex = -1;
+		    	for(int j=0;j<rel.numAttributes();j++){
+		    		if(rel.attribute(j).type()==Attribute.DATE){
+		    			timeIndex = j;
+		    			break;
+		    		}
+		    	}
+				
+				for(int j=0;j<rel.numInstances();j+=WINDOW_SIZE){				
+					int samplesInWindow = Math.min(WINDOW_SIZE, rel.numInstances()-j);
+					//the fv needs a minimum of different samples
+					if(samplesInWindow>=MIN_SAMPLES_IN_WINDOW){ 						
+						Instance subIn = new DenseInstance(in.numAttributes());						
+						subIn.setDataset(input);
+						
+						//TODO - perhaps samples have to be repeated to guarantee a fixed window length
+						//have a look at the original code for further details...
+						List<Instance> subRelList = rel.subList(j, j + samplesInWindow);
+				    	Instances subRel = new Instances(subRelList.get(0).dataset(),0);
+				    	for(Instance s : subRelList){
+				    		subRel.add(s);
+				    	}
+						subIn.setValue(relAttIndex, subIn.attribute(relAttIndex).addRelation(subRel));
+						
+						int dateCount = 0;
+						for(int k=0;k<in.numAttributes();k++){
+							//copy values
+							if(k!=relAttIndex && !subIn.attribute(k).isDate()){
+								subIn.setValue(k, in.value(k));
+							}
+							//update end / start timestamp
+							else if(subIn.attribute(k).isDate()){
+								if(dateCount==0){
+									subIn.setValue(k, subRel.firstInstance().value(timeIndex));									
+								}
+								else{
+									subIn.setValue(k, subRel.lastInstance().value(timeIndex));									
+								}
+								dateCount++;
+							}
+						}
+						output.add(buildFV(subIn, relAttIndex));
+					}
+				}
+			}
+			//use all instances of the segment to build the fv
+			else{
+				output.add(buildFV(input.get(i), relAttIndex));
+			}
 		}
 		
 		return output;
@@ -166,7 +224,10 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 		//AR coeffients
 		if(useAR){			
 			for(int j=0;j<numData.length;j++){
-				double[] ar = AutoRegression.calculateARCoefficients(numData[j], arModelOrder, true);													
+				double[] ar = AutoRegression.calculateARCoefficients(numData[j], arModelOrder, true);
+				if(ar==null){
+					System.out.println("");
+				}
 				for(double c : ar){
 					fvValues[fvIndex] = c;
 					fvIndex++;
@@ -542,6 +603,20 @@ public class AugmentedFV extends SimpleBatchFilter implements MultiInstanceCapab
 	 */
 	public void setUseIAC(boolean useIAC) {
 		this.useIAC = useIAC;
+	}
+
+	/**
+	 * @return the splitData
+	 */
+	public boolean isSplitData() {
+		return splitData;
+	}
+
+	/**
+	 * @param splitData the splitData to set
+	 */
+	public void setSplitData(boolean splitData) {
+		this.splitData = splitData;
 	}
 
 }
