@@ -1,5 +1,6 @@
 package de.sendsor.accelerationSensor.algorithm.moennig.segmentation;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
@@ -24,6 +25,9 @@ public class Segmentation extends AbstractProcessor {
 	private static final long serialVersionUID = 8254607844622030623L;
 	
 	private static final int REL_ATT_INDEX = 2;
+	
+	//TODO: introduce a new optional parameter for this value
+	private static final int TIME_BETWEEN_SAMPLES = 40; //40ms according to 25Hz sample rate
 	
 	private double minCorrelation = 0.75;
 	private int patternSize = 25;	 
@@ -96,7 +100,7 @@ public class Segmentation extends AbstractProcessor {
 	@Override
 	public Capabilities getCapabilities() {
 	     Capabilities result = super.getCapabilities();	     
-	     result.enable(Capability.DATE_ATTRIBUTES); // date attribute is accepted, but is not processed
+	     result.enable(Capability.DATE_ATTRIBUTES); // date attribute is required as key, but is not processed
 	     result.enable(Capability.NUMERIC_ATTRIBUTES); // only numeric attributes are used for processing
 	     result.enable(Capability.STRING_CLASS);
 	     result.enable(Capability.NOMINAL_CLASS);
@@ -129,7 +133,16 @@ public class Segmentation extends AbstractProcessor {
         shiftsCorrelation = new double[dimensions];
 		double[][] values = new double[dimensions][inst.numInstances()];       
 
-		Vector<Instance> segment = new Vector<Instance>();		
+		Vector<Instance> segment = new Vector<Instance>();
+		Vector<Instance> nonSegment = new Vector<Instance>();
+		
+		int timeAttIndex = -1;
+		for(int i=0; i < inst.numAttributes(); i++){
+			if(inst.attribute(i).isDate()){
+				timeAttIndex = i;
+				break;
+			}			
+		}
        	       
 		for(int i = 0; i < inst.numInstances(); i++){
 		   int d = 0;
@@ -170,7 +183,24 @@ public class Segmentation extends AbstractProcessor {
                 	   segments.add(this.buildOutputInstance(segment,segments));                	   
                    }
                    else{
-                	   nonSegments.add(this.buildOutputInstance(segment,nonSegments));                	   
+                	   //first iteration
+                	   if(nonSegment.isEmpty()){
+                		   nonSegment.addAll(segment);
+                	   }
+                	   else{
+                		   Timestamp t1 = new Timestamp((long)nonSegment.lastElement().value(timeAttIndex));
+                		   Timestamp t2 = new Timestamp((long)segment.firstElement().value(timeAttIndex));
+                		   //cobine successive nonSegments
+                		   if(t2.getTime()-t1.getTime()==TIME_BETWEEN_SAMPLES){                			   
+                			   nonSegment.addAll(segment);
+                		   }
+                		   //add nonSegment to output
+                		   else{
+                			   nonSegments.add(this.buildOutputInstance(nonSegment,nonSegments));
+                			   nonSegment.clear();
+                			   nonSegment.addAll(segment);
+                		   }
+                	   }                	                   	   
                    }
                    
                    segment.clear();
