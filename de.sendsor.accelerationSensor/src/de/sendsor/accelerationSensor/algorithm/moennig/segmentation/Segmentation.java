@@ -3,6 +3,9 @@ package de.sendsor.accelerationSensor.algorithm.moennig.segmentation;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -25,6 +28,10 @@ public class Segmentation extends AbstractProcessor {
 	private static final long serialVersionUID = 8254607844622030623L;
 	
 	private static final int REL_ATT_INDEX = 2;
+	
+	private static final String SSR_ATTRIBUTE_NAME = "SSR";
+	
+	private static final int SSR_WINDOW = 1500; //amout of timestamps to calc the surrounding segmentation rate (25Hz*60=1500 -> 1 Minute)
 	
 	//TODO: introduce a new optional parameter for this value
 	private static final int TIME_BETWEEN_SAMPLES = 40; //40ms according to 25Hz sample rate
@@ -83,6 +90,8 @@ public class Segmentation extends AbstractProcessor {
 		relFormat.setClassIndex(-1); //otherwise the class attribute won't be present in the relational attribute
 		attributes.add(new Attribute("segment", relFormat)); //relational attribute for the input samples belonging to the segment
 		
+		attributes.add(new Attribute(SSR_ATTRIBUTE_NAME)); //attribute for the surroundig segmentation rate
+		
 		int classIndex = -1;
 		if(inputFormat.classIndex()>=0){
 			//add class if inputFormat contains a class value
@@ -120,11 +129,13 @@ public class Segmentation extends AbstractProcessor {
 		
 		this.calcSegmentation(input, segments, nonSegments);
 		
+		this.calcSurroundingSegmentationRates(input, segments, nonSegments);
+		
 		sendEvent(new Results(segments), SegmentationFactory.SEGMENTS());
 		sendEvent(new Results(nonSegments), SegmentationFactory.NONSEGMENTS());
 	}
 	
-	private Instances calcSegmentation(Instances inst, Instances segments, Instances nonSegments){
+	private void calcSegmentation(Instances inst, Instances segments, Instances nonSegments){
        
 		boolean isSegment = false;
 		
@@ -216,9 +227,7 @@ public class Segmentation extends AbstractProcessor {
         	  nonSegments.add(this.buildOutputInstance(segment,nonSegments));       	   
            }
            segment.clear();
-       }
-		
-		return segments;
+       }				
     }
 	 
     private void getPatterns(int startposition, double[][] values){    	
@@ -307,6 +316,77 @@ public class Segmentation extends AbstractProcessor {
     	
     	return result;
     }
+    
+	public void calcSurroundingSegmentationRates(Instances inst, Instances segments, Instances nonSegments){		
+			
+		int timeAttIndex = -1;
+		for(int i=0; i < inst.numAttributes(); i++){
+			if(inst.attribute(i).isDate()){
+				timeAttIndex = i;
+				break;
+			}			
+		}
+		
+		//set segmentation borders
+		Vector<Timestamp> segmentStarts = new Vector<Timestamp>();
+		Vector<Timestamp> segmentEnds = new Vector<Timestamp>();
+		for(Instance in : segments){
+			segmentStarts.add(new Timestamp((long)(in.relationalValue(REL_ATT_INDEX).firstInstance().value(timeAttIndex))));
+			segmentEnds.add(new Timestamp((long)(in.relationalValue(REL_ATT_INDEX).lastInstance().value(timeAttIndex))));
+		}
+		Collections.sort(segmentStarts);
+		Collections.sort(segmentEnds);						
+		
+		//calc segmentation rates
+		HashMap<Timestamp, Double> segmentationRates = new HashMap<Timestamp, Double>();
+		int segIndex = 0;
+		for(int i=0;i<inst.numInstances(); i += SSR_WINDOW ){
+			int segCount = 0;
+			int nonSegCount = 0;
+			for(int j=i;j<Math.min(inst.numInstances(), i+SSR_WINDOW);j++){
+				Timestamp t = new Timestamp((long)inst.get(j).value(timeAttIndex));
+				if((t.equals(segmentStarts.get(segIndex)) || t.after(segmentStarts.get(segIndex))) && t.before(segmentEnds.get(segIndex))){
+					segCount++;
+				}
+				else if(t.equals(segmentEnds.get(segIndex))){
+					segCount++;
+					segIndex = Math.min(segIndex+1, segmentStarts.size()-1);
+				}
+				else{
+					nonSegCount++;
+				}
+			}
+			Double rate = Double.valueOf((double)(segCount)/(double)(segCount+nonSegCount));
+			segmentationRates.put(new Timestamp((long)inst.get(i).value(timeAttIndex)), rate);				
+		}
+		
+		setSSRValues(segmentationRates, segments, timeAttIndex);
+		setSSRValues(segmentationRates, nonSegments, timeAttIndex);
+	}
+	
+	private void setSSRValues(Map<Timestamp,Double> segmentationRates, Instances inst, int timeAttIndex){
+		List<Timestamp> ts = new ArrayList<Timestamp>(segmentationRates.keySet());
+		Collections.sort(ts);
+		
+		for(Instance in : inst){
+			Timestamp start = new Timestamp((long)in.relationalValue(REL_ATT_INDEX).firstInstance().value(timeAttIndex));
+			Timestamp end = new Timestamp((long)in.relationalValue(REL_ATT_INDEX).lastInstance().value(timeAttIndex));
+		
+			int i=0;
+			while(i < ts.size()-1 && start.before(ts.get(i))){
+				i++;
+			}
+			double rate = segmentationRates.get(ts.get(i));
+			int buckets = 1;
+			i++;
+			while(i < ts.size() && end.after(ts.get(i))){
+				rate += segmentationRates.get(ts.get(i));
+				buckets++;
+				i++;
+			}
+			in.setValue(inst.attribute(SSR_ATTRIBUTE_NAME), (rate/buckets));
+		}
+	}
     
 	public double getMinCorrelation() {
 		return minCorrelation;
