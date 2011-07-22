@@ -5,6 +5,8 @@ import static de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -19,7 +21,6 @@ import org.eclipse.ui.IWorkbench;
 
 import de.lmu.ifi.dbs.knowing.core.graph.Node;
 import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
-import de.lmu.ifi.dbs.knowing.core.processing.TLoader;
 import de.lmu.ifi.dbs.knowing.core.swt.handler.EvaluateHandler;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
@@ -102,7 +103,12 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
 			properties.setProperty("file", patient.getLastname());
 		}
-		EvaluateHandler.evaluate(dpu, dir + sep);
+		//TODO QuickAnalyse Wizard -> Evaluate: THIS IS NOT TESTED YET!
+		try {
+			EvaluateHandler.evaluate(dpu, new URI("file", "./" + dir, null));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

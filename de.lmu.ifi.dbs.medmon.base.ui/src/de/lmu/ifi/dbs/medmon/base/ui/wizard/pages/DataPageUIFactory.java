@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import akka.actor.TypedActor;
 
+import de.lmu.ifi.dbs.knowing.core.events.Status;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.graph.Node;
 
@@ -39,7 +40,7 @@ public class DataPageUIFactory extends TypedActor implements UIFactory {
 	}
 
 	@Override
-	public void update() {
+	public void update(Status status) {
 		parent.update();
 	}
 }
