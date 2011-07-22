@@ -7,6 +7,7 @@ import org.osgi.framework.ServiceRegistration;
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
+import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.sendsor.accelerationSensor.converter.SDRLoaderFactory;
 
@@ -25,6 +26,7 @@ public class Activator extends AbstractUIPlugin {
 	private ServiceRegistration ldaFilterFactory;
 	private ServiceRegistration augmentedFV;
 	private ServiceRegistration segmentation;
+	private ServiceRegistration peakPrediction;
 	
 	/**
 	 * The constructor
@@ -43,6 +45,7 @@ public class Activator extends AbstractUIPlugin {
 		ldaFilterFactory = context.registerService(TFactory.class.getName(), new LDAFilterFactory(), null);
 		augmentedFV = context.registerService(TFactory.class.getName(), new AugmentedFVFactory(), null);
 		segmentation = context.registerService(TFactory.class.getName(), new SegmentationFactory(), null);
+		peakPrediction = context.registerService(TFactory.class.getName(), new TruncatedPeakPredictionFactory(), null);
 	}
 
 	/*
@@ -54,6 +57,7 @@ public class Activator extends AbstractUIPlugin {
 		ldaFilterFactory.unregister();
 		augmentedFV.unregister();
 		segmentation.unregister();
+		peakPrediction.unregister();
 		plugin = null;
 		super.stop(context);
 	}
