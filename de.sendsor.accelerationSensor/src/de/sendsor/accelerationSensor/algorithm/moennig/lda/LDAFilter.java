@@ -117,7 +117,6 @@ public class LDAFilter extends SimpleBatchFilter{
 	 * @throws Exception throws an Exception if one of the covariance matrixes gets singular 
 	 */
 	private void determineProjectionMatrix(Instances inst) throws Exception{		
-		
 		//This cast is save -> capabilities allow only String or Norminal classes
 		ArrayList<String> classList = Collections.list((Enumeration<String>)inst.classAttribute().enumerateValues());								
 		

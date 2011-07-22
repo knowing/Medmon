@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import org.eclipse.swt.widgets.Composite;
 
+import akka.actor.ActorRef;
 import akka.actor.TypedActor;
 
 import de.lmu.ifi.dbs.knowing.core.events.Status;
@@ -40,7 +41,7 @@ public class DataPageUIFactory extends TypedActor implements UIFactory {
 	}
 
 	@Override
-	public void update(Status status) {
+	public void update(ActorRef ref, Status status) {
 		parent.update();
 	}
 }

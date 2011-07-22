@@ -40,11 +40,7 @@ import scala.Option;
 import akka.actor.ActorRef;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorFactory;
-import de.lmu.ifi.dbs.knowing.core.events.Configure;
-import de.lmu.ifi.dbs.knowing.core.events.Register;
-import de.lmu.ifi.dbs.knowing.core.events.Start;
-import de.lmu.ifi.dbs.knowing.core.events.UIFactoryEvent;
-import de.lmu.ifi.dbs.knowing.core.events.UpdateUI;
+import de.lmu.ifi.dbs.knowing.core.events.*;
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.charts.events.ChartProgressListenerRegister;
@@ -304,7 +300,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				loaderActor.sendOneWay(new Register(presenterActor, none));
 				loaderActor.sendOneWay(new Start());
 				//TODO SelectDataPage update preview after evaluating preview
-				uiFactory.update(new UpdateUI());
+				uiFactory.update(presenterActor, new UpdateUI());
+				uiFactory.update(presenterActor, new Shutdown());
 			}
 		});
 
