@@ -6,6 +6,9 @@
         <node nodeType="loader" factoryId="de.lmu.ifi.dbs.knowing.core.weka.ExtendedWekaArffLoader" id="ExtendedWekaArffLoader">
             <properties>
                 <item value="2011.04.28-Joggen-SomeOtherText.arff" key="file"/>
+                <item key="assignClassFromFilename" value="true" />
+                <item key="splitchar" value="-" />
+                <item key="splitposition" value="1" />
             </properties>
         </node>                
         
