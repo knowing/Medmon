@@ -114,7 +114,7 @@ class TruncatedPeakPrediction extends TProcessor {
 	
 	def predictPeaks(data:Array[Double]):Array[Double] = {
 	
-	  val maxValue:Double = 2.0;
+	  val maxValue:Double = if(normalize){normalizationRange}else{dataMaxValue};
 	  var j:Int = 0;
 	  
 	  while(j < (data.size -1)){
