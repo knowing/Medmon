@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DataProcessingUnit name="segmentation-fv-test">
-    <description>LDA Test DPU</description>
-    <tags>LDA</tags>
+<DataProcessingUnit name="Segmentation -> FV">
+    <description>Segmentation -> FV</description>
+    <tags></tags>
     <nodes>                
         <node nodeType="loader" factoryId="weka.core.converters.ArffLoader" id="ARFF">
             <properties>

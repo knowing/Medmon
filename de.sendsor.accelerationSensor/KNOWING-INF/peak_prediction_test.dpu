@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DataProcessingUnit name="peak-prediction-test">
+<DataProcessingUnit name="Peak Prediction Test">
     <description>Peak Prediction Test DPU</description>
     <tags>Peak Prediction</tags>
     <nodes>                
