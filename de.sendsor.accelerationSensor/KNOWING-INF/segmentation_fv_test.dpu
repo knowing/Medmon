@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DataProcessingUnit name="lda-test">
+<DataProcessingUnit name="segmentation-fv-test">
     <description>LDA Test DPU</description>
     <tags>LDA</tags>
     <nodes>                
