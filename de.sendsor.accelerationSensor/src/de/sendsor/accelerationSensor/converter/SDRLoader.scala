@@ -50,8 +50,6 @@ class SDRLoader extends TLoader {
       case _ => converter.setRelativeTimestamp(false) //Print warning
     }
     
-    val output = properties.getProperty(OUTPUT)
-    converter.setOutput(output)
   }
 
   def reset = converter.reset
@@ -98,7 +96,6 @@ object SDRLoaderFactory {
   val INTERVAL = "interval"
   val UNITS = "units"
   val RELATIVE_TIMESTAMP = "timestamp"
-  val OUTPUT = "output"
 
   val AGGREGATE_NONE = "none"
   val AGGREGATE_AVERAGE = "average" //Default
