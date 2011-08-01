@@ -9,19 +9,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.WekaException;
 import akka.actor.ActorRef;
-
 import de.lmu.ifi.dbs.knowing.core.events.Results;
 import de.lmu.ifi.dbs.knowing.core.japi.AbstractProcessor;
 import de.lmu.ifi.dbs.knowing.core.japi.JProcessor;
-
-import weka.core.Attribute;
-import weka.core.Capabilities;
-import weka.core.DenseInstance;
-import weka.core.Instances;
-import weka.core.Instance;
-import weka.core.Capabilities.Capability;
-import weka.filters.SimpleBatchFilter;
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 
 public class Segmentation extends AbstractProcessor {
 	
@@ -123,14 +120,30 @@ public class Segmentation extends AbstractProcessor {
 	public void build (Instances input) {
 			    
 	    guessAndSetClassLabel(input);
-		
-		Instances segments = determineOutputFormat(input);
+	    
+	    Instances segments = determineOutputFormat(input);
 		Instances nonSegments = determineOutputFormat(input);
+	    
+	    Map<String, Instances> splittedInput = ResultsUtil.splitInstanceBySourceJava(input);
 		
-		this.calcSegmentation(input, segments, nonSegments);
-		
-		this.calcSurroundingSegmentationRates(input, segments, nonSegments);
-		
+	    for(Instances inst : splittedInput.values()){
+	    	//Important: Use the reference to the segments header structure here - avoid cloning the header structure!!!
+	    	Instances s = new Instances(segments,0);
+	    	//Important: Use the reference to the nonSegments header structure here - avoid cloning the header structure!!!
+	    	Instances n = new Instances(nonSegments,0);	    			
+	    	
+			this.calcSegmentation(inst, s, n);			
+			this.calcSurroundingSegmentationRates(inst, s, n);
+							
+			try{
+				ResultsUtil.appendInstances(segments,s);
+				ResultsUtil.appendInstances(nonSegments,n);
+			}
+			catch(WekaException we){
+				we.printStackTrace();
+			}		
+	    }		    
+	    		
 		sendEvent(new Results(segments), SegmentationFactory.SEGMENTS());
 		sendEvent(new Results(nonSegments), SegmentationFactory.NONSEGMENTS());
 	}
@@ -225,6 +238,10 @@ public class Segmentation extends AbstractProcessor {
            }
            else{
         	  nonSegments.add(this.buildOutputInstance(segment,nonSegments));       	   
+           }
+           
+           if(nonSegment.size() >0){
+        	   nonSegments.add(this.buildOutputInstance(nonSegment,nonSegments));
            }
            segment.clear();
        }				
