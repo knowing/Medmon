@@ -18,6 +18,7 @@ import de.lmu.ifi.dbs.knowing.core.graph.Node;
 public class DataPageUIFactory extends TypedActor implements UIFactory {
 
 	private Composite parent;
+	private ActorRef supervisor;
 
 
 	/**
@@ -43,5 +44,10 @@ public class DataPageUIFactory extends TypedActor implements UIFactory {
 	@Override
 	public void update(ActorRef ref, Status status) {
 		parent.update();
+	}
+
+	@Override
+	public void setSupervisor(ActorRef supervisor) {
+		this.supervisor = supervisor;
 	}
 }
