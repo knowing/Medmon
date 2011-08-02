@@ -2,12 +2,14 @@
 <DataProcessingUnit name="PeakPrediction -> Segmentation -> FV -> LDA">
     <description>PeakPrediction -> Segmentation -> FV -> LDA</description>
     <tags></tags>
-    <nodes>                
+    <nodes>                        
         <node nodeType="loader" factoryId="weka.core.converters.ArffLoader" id="ARFF">
-            <properties>
-                <item value="testdata.arff" key="file"/>
-            </properties>
-        </node>
+			<properties>
+				<item value=".\inputdata" key="dir" />
+				<item value="arff" key="extensions" />
+				<item value="true" key="source" />
+			</properties>
+		</node>
         
         <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPrediction" id="TruncatedPeakPrediction">
             <properties>            
@@ -75,7 +77,7 @@
         
         <node nodeType="presenter" factoryId="de.lmu.ifi.dbs.knowing.core.swt.TablePresenter" id="TablePresenter">
             <properties>
-                <item value="100" key="rows"/>
+                <item value="1000" key="rows"/>
             </properties>
         </node>
     </nodes>

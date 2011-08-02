@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
 import akka.actor.ActorRef
 import akka.actor.Actor.actorOf
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
 
 class TruncatedPeakPrediction extends TProcessor {
 		
@@ -67,39 +68,45 @@ class TruncatedPeakPrediction extends TProcessor {
 		    }
 		}
 		
-		//retieve the data
-		var data:Array[Array[Double]] = Array.ofDim[Double](numNumericAtts, input.numInstances)
-		for(i <- 0 to input.numInstances-1){
-			var index:Int = 0
-			for(j <- 0 to input.numAttributes-1){
-				if(input.get(i).attribute(j).`type` == Attribute.NUMERIC && input.classIndex!=j){
-				  data(index)(i) = input.get(i).value(j)
-				  index += 1
-				}
-			}			
+		val splittedInput:Map[String, Instances] = ResultsUtil.splitInstanceBySource(input);
+		
+		for(inst:Instances <- splittedInput.values){
+			//retieve the data
+			var data:Array[Array[Double]] = Array.ofDim[Double](numNumericAtts, inst.numInstances)
+			for(i <- 0 until inst.numInstances){
+				var index:Int = 0
+				for(j <- 0 until inst.numAttributes){
+					if(inst.get(i).attribute(j).`type` == Attribute.NUMERIC && inst.classIndex!=j){
+					  data(index)(i) = inst.get(i).value(j)
+					  index += 1
+					}
+				}			
+			}
+			
+			//perform prediction
+			var result:Array[Array[Double]] =  Array.ofDim[Double](numNumericAtts, inst.numInstances)
+			for(i <- 0 until numNumericAtts){
+			  if(normalize){
+			    data(i) = normalizeData(data(i))
+			  }
+			  result(i) = predictPeaks(data(i))
+			}
+			
+			//update input
+			for(i <- 0 until inst.numInstances){
+				var index:Int = 0
+				for(j <- 0 until inst.numAttributes){
+					if(inst.get(i).attribute(j).`type` == Attribute.NUMERIC && inst.classIndex!=j){
+					  inst.get(i).setValue(j,data(index)(i))
+					  index += 1
+					}
+				}			
+			}
 		}
 		
-		//perform prediction
-		var result:Array[Array[Double]] =  Array.ofDim[Double](numNumericAtts, input.numInstances)
-		for(i <- 0 to numNumericAtts-1){
-		  if(normalize){
-		    data(i) = normalizeData(data(i))
-		  }
-		  result(i) = predictPeaks(data(i))
-		}
+		val result:Instances = ResultsUtil.appendInstances(input.stringFreeStructure,splittedInput.values.toList);
 		
-		//update input
-		for(i <- 0 to input.numInstances-1){
-			var index:Int = 0
-			for(j <- 0 to input.numAttributes-1){
-				if(input.get(i).attribute(j).`type` == Attribute.NUMERIC && input.classIndex!=j){
-				  input.get(i).setValue(j,data(index)(i))
-				  index += 1
-				}
-			}			
-		}
-		
-		sendEvent(new Results(input));
+		sendEvent(new Results(result));
 	}
 
 	def normalizeData(data:Array[Double]):Array[Double] = {
