@@ -294,10 +294,10 @@ public class ExtensibleSplashHandler extends AbstractSplashHandler {
 	 */
 	private void doEventLoop() {
 		Shell splash = getSplash();
-
 		while (!bundlesLoaded) {
 			if (splash.getDisplay().readAndDispatch() == false) {
 				bundlesLoaded = checkBundleStates();
+				//TODO blocks UI Thread so no bundle events come in to checkBundleStates()
 				splash.getDisplay().sleep();
 			}
 		}
@@ -339,7 +339,6 @@ public class ExtensibleSplashHandler extends AbstractSplashHandler {
 			image.dispose();
 		}
 		Activator.getDefault().getBundle().getBundleContext().removeBundleListener(listener);
-		System.out.println("Dispose!");
 	}
 	
 	private class CheckBundleListener implements SynchronousBundleListener {
@@ -352,7 +351,8 @@ public class ExtensibleSplashHandler extends AbstractSplashHandler {
 
 		@Override
 		public void bundleChanged(BundleEvent event) {
-			System.out.println("[BundleEvent] " + event);
+			if(getSplash() == null)
+				return;
 			getSplash().getDisplay().asyncExec(new Runnable() {
 				
 				@Override
