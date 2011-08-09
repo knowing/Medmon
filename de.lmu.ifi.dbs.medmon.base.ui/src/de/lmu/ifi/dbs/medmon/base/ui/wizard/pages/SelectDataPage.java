@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.knowing.core.events.*;
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.charts.events.ChartProgressListenerRegister;
-import de.lmu.ifi.dbs.knowing.core.util.Util;
+import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -247,8 +247,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				//Dispose old preview
 				disposePreview();
 				//Get new actors
-				Option loader = Util.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
-				Option presenter = Util.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
+				Option loader = OSGIUtil.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
+				Option presenter = OSGIUtil.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
 
 				TFactory presenterFactory = (TFactory) presenter.get();
 				TFactory loaderFactory = (TFactory) loader.get();
