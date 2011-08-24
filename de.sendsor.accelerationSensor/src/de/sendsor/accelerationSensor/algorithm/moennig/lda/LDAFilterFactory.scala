@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.knowing.core.factory.TFactory._
 import de.lmu.ifi.dbs.knowing.core.weka.{WekaFilter, WekaFilterFactory }
 import de.lmu.ifi.dbs.knowing.core.weka.WekaFilterFactory._
 import LDAFilterFactory._
+import weka.core.Instances
 
 class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](classOf[LDAFilterWrapper], classOf[LDAFilter]) {
   
@@ -32,6 +33,7 @@ class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](cl
         Map(DIMREDUCTION -> "Dimension reduction true/false")        
   }
 
+
 }
 
 object LDAFilterFactory{
@@ -41,6 +43,11 @@ object LDAFilterFactory{
 }
 
 class LDAFilterWrapper extends WekaFilter(new LDAFilter()) {
+  
+   override def build(instances: Instances) {
+	   val lda = filter.asInstanceOf[LDAFilter]
+	   lda.train(instances)
+   }
   
    override def configure(properties:Properties) = {
      //Configure your classifier here with

@@ -124,7 +124,7 @@ public class Segmentation extends AbstractProcessor {
 	    Instances segments = determineOutputFormat(input);
 		Instances nonSegments = determineOutputFormat(input);
 	    
-	    Map<String, Instances> splittedInput = ResultsUtil.splitInstanceBySourceJava(input);
+	    Map<String, Instances> splittedInput = ResultsUtil.splitInstanceBySourceJava(input,false);
 		
 	    for(Instances inst : splittedInput.values()){
 	    	//Important: Use the reference to the segments header structure here - avoid cloning the header structure!!!

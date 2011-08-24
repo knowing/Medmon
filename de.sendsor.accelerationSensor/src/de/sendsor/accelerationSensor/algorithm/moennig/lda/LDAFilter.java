@@ -23,7 +23,7 @@ public class LDAFilter extends SimpleBatchFilter{
 	private final static long serialVersionUID = 1L;
 	
 	private final static double DIMENSION_REDUCTION_PER = 0.95;		
-	private final static double SINGULARITY_DETECTION_THRESHOLD = 1.0E-100;	
+	private final static double SINGULARITY_DETECTION_THRESHOLD = 1.0E-250;	
 	
 	private boolean dimReduction = false;
 	private int outDimensions;
@@ -43,14 +43,7 @@ public class LDAFilter extends SimpleBatchFilter{
 	@Override
 	protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
 		//determine the amount of numeric input dimensions
-		inDimensions = 0;
-		for(int i=0;i<inputFormat.numAttributes();i++){
-			if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
-				if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
-					inDimensions++;
-				}
-			}
-		}
+		determineInputDimensions(inputFormat);
 		
 		Instances result = new Instances(inputFormat, 0);
 		
@@ -84,6 +77,17 @@ public class LDAFilter extends SimpleBatchFilter{
 		return result;
 	}
 	
+	private void determineInputDimensions(Instances inputFormat){
+		inDimensions = 0;
+		for(int i=0;i<inputFormat.numAttributes();i++){
+			if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
+				if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
+					inDimensions++;
+				}
+			}
+		}
+	}
+	
 	@Override
 	public Capabilities getCapabilities() {
 	     Capabilities result = super.getCapabilities();	     
@@ -101,7 +105,7 @@ public class LDAFilter extends SimpleBatchFilter{
 		
 		Instances output = new Instances(determineOutputFormat(input), 0);
 		
-		this.determineProjectionMatrix(input);
+		//this.determineProjectionMatrix(input);
 						
 		if(dimReduction && outDimensions > 0 && inDimensions > outDimensions){			
 			return this.transformData(input,output,outDimensions);
@@ -116,7 +120,10 @@ public class LDAFilter extends SimpleBatchFilter{
 	 * @param inst the instances to calculate the LDA for
 	 * @throws Exception throws an Exception if one of the covariance matrixes gets singular 
 	 */
-	private void determineProjectionMatrix(Instances inst) throws Exception{		
+	public void train(Instances inst) throws Exception{
+		
+		determineInputDimensions(inst);
+		
 		//This cast is save -> capabilities allow only String or Norminal classes
 		ArrayList<String> classList = Collections.list((Enumeration<String>)inst.classAttribute().enumerateValues());								
 		

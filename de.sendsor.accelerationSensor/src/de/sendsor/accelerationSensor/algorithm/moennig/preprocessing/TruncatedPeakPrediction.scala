@@ -58,7 +58,7 @@ class TruncatedPeakPrediction extends TProcessor {
 	} 
 
 		
-	def build (input:Instances) {
+	override def build (input:Instances) {
 	 
 		//detemine the amount of numeric attributes
 		var numNumericAtts:Int = 0;  
@@ -68,7 +68,7 @@ class TruncatedPeakPrediction extends TProcessor {
 		    }
 		}
 		
-		val splittedInput:Map[String, Instances] = ResultsUtil.splitInstanceBySource(input);
+		val splittedInput:Map[String, Instances] = ResultsUtil.splitInstanceBySource(input,false);
 		
 		for(inst:Instances <- splittedInput.values){
 			//retieve the data
