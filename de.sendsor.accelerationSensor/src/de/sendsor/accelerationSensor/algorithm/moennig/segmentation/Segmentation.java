@@ -136,8 +136,8 @@ public class Segmentation extends AbstractProcessor {
 			this.calcSurroundingSegmentationRates(inst, s, n);
 							
 			try{
-				ResultsUtil.appendInstances(segments,s);
-				ResultsUtil.appendInstances(nonSegments,n);
+				segments = ResultsUtil.appendInstances(segments,s);
+				nonSegments = ResultsUtil.appendInstances(nonSegments,n);
 			}
 			catch(WekaException we){
 				we.printStackTrace();
