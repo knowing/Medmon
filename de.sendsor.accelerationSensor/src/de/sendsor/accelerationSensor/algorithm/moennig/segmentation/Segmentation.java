@@ -118,7 +118,6 @@ public class Segmentation extends AbstractProcessor {
 	
 	@Override
 	public void build (Instances input) {
-			    
 	    guessAndSetClassLabel(input);
 	    
 	    Instances segments = determineOutputFormat(input);

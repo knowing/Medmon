@@ -5,7 +5,7 @@
     <nodes>                        
         <node nodeType="loader" factoryId="weka.core.converters.ArffLoader" id="ARFF">
 			<properties>
-				<item value=".\inputdata" key="dir" />
+				<item value="./inputdata" key="dir" />
 				<item value="arff" key="extensions" />
 				<item value="true" key="source" />
 			</properties>

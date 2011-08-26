@@ -46,6 +46,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter()) {
   
    override def build(instances: Instances) {
 	   val lda = filter.asInstanceOf[LDAFilter]
+	   guessAndSetClassLabel(instances)
 	   lda.train(instances)
    }
   
