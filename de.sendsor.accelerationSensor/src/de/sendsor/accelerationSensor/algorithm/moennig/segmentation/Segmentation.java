@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import scala.Option;
+
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -141,10 +143,11 @@ public class Segmentation extends AbstractProcessor {
 			catch(WekaException we){
 				we.printStackTrace();
 			}		
-	    }		    
-	    		
-		sendEvent(new Results(segments), SegmentationFactory.SEGMENTS());
-		sendEvent(new Results(nonSegments), SegmentationFactory.NONSEGMENTS());
+	    }	
+	    //Create None Object 
+	    Option<String> none = scala.Option.apply(null);
+		sendEvent(new Results(segments, none), SegmentationFactory.SEGMENTS());
+		sendEvent(new Results(nonSegments, none), SegmentationFactory.NONSEGMENTS());
 	}
 	
 	private void calcSegmentation(Instances inst, Instances segments, Instances nonSegments){

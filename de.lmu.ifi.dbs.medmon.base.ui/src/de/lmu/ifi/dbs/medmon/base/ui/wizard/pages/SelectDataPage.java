@@ -297,7 +297,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				// properties.setProperty("absolute-path", "true");
 				Option<String> none = scala.Option.apply(null);
 				loaderActor.sendOneWay(new Configure(properties));
-				loaderActor.sendOneWay(new Register(presenterActor, none));
+				loaderActor.sendOneWay(new Register(presenterActor, none, none));
 				loaderActor.sendOneWay(new Start());
 				//TODO SelectDataPage update preview after evaluating preview
 				uiFactory.update(presenterActor, new UpdateUI());
