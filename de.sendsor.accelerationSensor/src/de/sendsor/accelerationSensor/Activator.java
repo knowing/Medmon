@@ -6,7 +6,7 @@ import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
-import de.lmu.ifi.dbs.knowing.core.provider.*;
+import de.lmu.ifi.dbs.knowing.core.service.*;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
