@@ -22,7 +22,7 @@
         
         <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.segmentation.Segmentation" id="Segmentation">
             <properties>            
-            	<item key="debug" value="true" />
+            	<item key="debug" value="false" />
             	<item key="minCorrelation" value="0.75" />
             	<item key="patternSize" value="25" />
             	<item key="minSegmentLength" value="100" />
@@ -33,7 +33,7 @@
         
         <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFVSegments">
             <properties>            
-            	<item key="debug" value="true" />               	
+            	<item key="debug" value="false" />               	
             	<item key="useAR" value="true" />
             	<item key="useSMA" value="true" />
             	<item key="useTA" value="true" />
@@ -47,7 +47,7 @@
         
          <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFV" id="AugmentedFVNonSegments">
             <properties>            
-            	<item key="debug" value="true" />               	
+            	<item key="debug" value="false" />               	
             	<item key="useAR" value="true" />
             	<item key="useSMA" value="true" />
             	<item key="useTA" value="false" />
@@ -57,16 +57,16 @@
             	<item key="useIAC" value="false" />
             	<item key="splitData" value="true" />
             </properties>
-        </node>
-        
-        
+        </node>                
+		
         <node nodeType="processor" factoryId="de.lmu.ifi.dbs.knowing.core.validation.XCrossValidator" id="validator">
 			<properties>
 				<item value="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" key="filter" />
-				<item value="weka.classifiers.bayes.NaiveBayes" key="classifier" />
+				<!-- <item value="weka.classifiers.bayes.NaiveBayes" key="classifier" /> -->
+				<item value="de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesImpl" key="classifier" /> 
 				
 				<item value="10" key="folds" />
-				<item key="debug" value="true"/>   
+				<item key="debug" value="false"/>   
             	<item key="dimensionreduction" value="false" />
             	<item key="attributeNamePrefix" value="FV_" />
 

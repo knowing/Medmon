@@ -33,6 +33,9 @@ public class LDAFilter extends SimpleBatchFilter{
 	private Matrix eigenVectorMatrix;
 	private double[] eigenValues;
 	
+	private Instances output;
+		
+	
 	@Override
 	public String globalInfo() {		
 		return "This batch filter perfoms a linear discriminant analysis (LDA) on all numeric attributes of the instances.\n\n" +
@@ -42,40 +45,43 @@ public class LDAFilter extends SimpleBatchFilter{
 	
 	@Override
 	protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
-		//determine the amount of numeric input dimensions
-		determineInputDimensions(inputFormat);
-		
-		Instances result = new Instances(inputFormat, 0);
-		
-		if(dimReduction && outDimensions > 0 ){			
+		if(output==null){
+			//determine the amount of numeric input dimensions
+			determineInputDimensions(inputFormat);
 			
-			if(inDimensions > outDimensions){
-				int toDelete = inDimensions - outDimensions;
-				for(int i=inputFormat.numAttributes()-1; toDelete>0 && i>=0; i--){
-					if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
-						if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
-							result.deleteAttributeAt(i);
-							toDelete--;
+			Instances result = new Instances(inputFormat, 0);
+			
+			if(dimReduction && outDimensions > 0 ){			
+				
+				if(inDimensions > outDimensions){
+					int toDelete = inDimensions - outDimensions;
+					for(int i=inputFormat.numAttributes()-1; toDelete>0 && i>=0; i--){
+						if(i!=inputFormat.classIndex() && inputFormat.attribute(i).type() == Attribute.NUMERIC){
+							if(attributeNamePrefix == null || inputFormat.attribute(i).name().startsWith(attributeNamePrefix)){
+								result.deleteAttributeAt(i);
+								toDelete--;
+							}
 						}
 					}
 				}
+				else{
+					throw new IllegalArgumentException("output dimensions have to be lower than input dimensions ("+outDimensions+" !< "+inDimensions+")");
+				}
 			}
-			else{
-				throw new IllegalArgumentException("output dimensions have to be lower than input dimensions ("+outDimensions+" !< "+inDimensions+")");
+			
+			//rename FV attributes
+			int fvc = 1;
+			for(int i=0;i<result.numAttributes();i++){
+				if(attributeNamePrefix != null && result.attribute(i).name().startsWith(attributeNamePrefix)){				
+					result.renameAttribute(i, attributeNamePrefix+fvc);
+					fvc++;
+				}
 			}
+			output = result;
 		}
-		
-		//rename FV attributes
-		int fvc = 1;
-		for(int i=0;i<result.numAttributes();i++){
-			if(attributeNamePrefix != null && result.attribute(i).name().startsWith(attributeNamePrefix)){				
-				result.renameAttribute(i, attributeNamePrefix+fvc);
-				fvc++;
-			}
-		}
-		
-		return result;
-	}
+				
+		return output;
+	}	
 	
 	private void determineInputDimensions(Instances inputFormat){
 		inDimensions = 0;
@@ -122,7 +128,8 @@ public class LDAFilter extends SimpleBatchFilter{
 	 */
 	public void train(Instances inst) throws Exception{
 		
-		determineInputDimensions(inst);
+		determineOutputFormat(inst);
+		//determineInputDimensions(inst);
 		
 		//This cast is save -> capabilities allow only String or Norminal classes
 		ArrayList<String> classList = Collections.list((Enumeration<String>)inst.classAttribute().enumerateValues());								
@@ -325,8 +332,11 @@ public class LDAFilter extends SimpleBatchFilter{
 					&& (attributeNamePrefix == null || in.attribute(j).name().startsWith(attributeNamePrefix))){
 						r.setValue(j, rm[i][rj]);
 						rj++;					
+				}	
+				if(in.attribute(j).isRelationValued()){
+					r.setValue(j, 0);//work around!
 				}
-				else{				
+				else{
 					r.setValue(j, in.value(j));
 				}
 			}
