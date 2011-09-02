@@ -65,4 +65,17 @@ class MyNaiveBayesImpl extends weka.classifiers.bayes.NaiveBayes{
 	    return super.classifyInstance(test); 
   }
   
+  override def distributionForInstance(instance:Instance):Array[Double] = {
+   	var test:DenseInstance = new DenseInstance(inputFormat.numAttributes());
+	  	var count:Int = 0;
+	    for(j <- 0 until instance.numAttributes){
+	      if(instance.attribute(j).name().startsWith("FV_") && instance.attribute(j).`type` == Attribute.NUMERIC && instance.classIndex!=j){
+	        test.setValue(count,instance.value(j));
+	        count += 1;
+	      }
+	    }
+	    
+	    return super.distributionForInstance(test);  
+  }
+  
 }
