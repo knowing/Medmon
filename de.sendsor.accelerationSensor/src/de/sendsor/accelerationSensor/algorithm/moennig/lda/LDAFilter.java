@@ -330,15 +330,14 @@ public class LDAFilter extends SimpleBatchFilter{
 			for(int j=0;j<output.numAttributes();j++){
 				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC
 					&& (attributeNamePrefix == null || in.attribute(j).name().startsWith(attributeNamePrefix))){
+					if(rj < discriminants){
 						r.setValue(j, rm[i][rj]);
-						rj++;					
+						rj++;				
+					}
 				}	
-				if(in.attribute(j).isRelationValued()){
-					r.setValue(j, 0);//work around!
-				}
 				else{
 					r.setValue(j, in.value(j));
-				}
+				}								
 			}
 			output.add(r);
 		}
