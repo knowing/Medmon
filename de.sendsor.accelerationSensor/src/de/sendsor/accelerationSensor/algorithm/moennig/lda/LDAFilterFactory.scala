@@ -41,7 +41,7 @@ object LDAFilterFactory {
   val ATTRIBUTE_NAME_PREFIX = "attributeNamePrefix"
 }
 
-class LDAFilterWrapper extends WekaFilter(new LDAFilter()) {
+class LDAFilterWrapper extends WekaFilter(new LDAFilter) {
 
   //LDA must be trained, before queries are being answered
   isBuild = false
@@ -54,6 +54,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter()) {
     filter.setInputFormat(header)
     lda.train(instances)
     isBuild = true
+    processStoredQueries
   }
 
   override def configure(properties: Properties) = {
