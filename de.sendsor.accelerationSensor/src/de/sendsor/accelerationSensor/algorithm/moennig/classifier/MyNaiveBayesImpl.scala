@@ -61,12 +61,14 @@ class MyNaiveBayesImpl extends weka.classifiers.bayes.NaiveBayes {
         count += 1;
       }
     }
-
+    test.setDataset(inputFormat)
+    test.setClassMissing();
+    
     return super.classifyInstance(test);
   }
 
   override def distributionForInstance(instance: Instance): Array[Double] = {
-    val dataset = new Instances(instance.dataset, 1)
+
     val test: DenseInstance = new DenseInstance(inputFormat.numAttributes)
     var count: Int = 0;
     for (j <- 0 until instance.numAttributes) {
@@ -75,7 +77,8 @@ class MyNaiveBayesImpl extends weka.classifiers.bayes.NaiveBayes {
         count += 1;
       }
     }
-    test.setDataset(dataset)
+    test.setDataset(inputFormat)
+    test.setClassMissing();
     return super.distributionForInstance(test);
   }
 
