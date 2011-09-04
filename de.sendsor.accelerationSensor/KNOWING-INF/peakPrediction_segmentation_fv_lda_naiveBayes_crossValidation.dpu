@@ -10,6 +10,13 @@
 				<item value="true" key="source" />
 			</properties>
 		</node>
+		
+		<node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverter" id="SourceToClassConverter">
+            <properties>            
+            	<item key="delimiter" value="-" />
+            	<item key="position" value="1" />            	            	            
+            </properties>
+        </node>
         
         <node nodeType="processor" factoryId="de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPrediction" id="TruncatedPeakPrediction">
             <properties>            
@@ -40,8 +47,8 @@
             	<item key="useAPA" value="true" />
             	<item key="useSSR" value="true" />
             	<item key="useMV" value="false" />
-            	<item key="useIAC" value="true" />
-            	<item key="splitData" value="true" />
+            	<item key="useIAC" value="false" />
+            	<item key="splitData" value="false" />
             </properties>
         </node>      
         
@@ -50,23 +57,24 @@
             	<item key="debug" value="false" />               	
             	<item key="useAR" value="true" />
             	<item key="useSMA" value="true" />
-            	<item key="useTA" value="false" />
-            	<item key="useAPA" value="false" />
+            	<item key="useTA" value="true" />
+            	<item key="useAPA" value="true" />
             	<item key="useSSR" value="true" />
-            	<item key="useMV" value="true" />
+            	<item key="useMV" value="false" />
             	<item key="useIAC" value="false" />
             	<item key="splitData" value="true" />
             </properties>
         </node>                
 		
-        <node nodeType="processor" factoryId="de.lmu.ifi.dbs.knowing.core.validation.XCrossValidator" id="validator">
+        <node nodeType="processor" factoryId="de.lmu.ifi.dbs.knowing.core.validation.AttributeCrossValidator" id="validator">
 			<properties>
 				<item value="de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilter" key="filter" />
 				<!-- <item value="weka.classifiers.bayes.NaiveBayes" key="classifier" /> -->
 				<item value="de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesImpl" key="classifier" /> 
 				
-				<item value="10" key="folds" />
-				<item key="debug" value="false"/>   
+				<item value="source" key="class" />
+				<item key="debug" value="false"/>
+				   
             	<item key="dimensionreduction" value="false" />
             	<item key="attributeNamePrefix" value="FV_" />
 
@@ -81,8 +89,9 @@
             </properties>
         </node>
     </nodes>
-    <edges>    	
-        <edge weight="1" targetId="TruncatedPeakPrediction" sourceId="ARFF" id="arff_peak"/>
+    <edges>
+    	<edge weight="1" targetId="SourceToClassConverter" sourceId="ARFF" id="arff_source"/>    	
+        <edge weight="1" targetId="TruncatedPeakPrediction" sourceId="SourceToClassConverter" id="source_peak"/>        
         <edge weight="1" targetId="Segmentation" sourceId="TruncatedPeakPrediction" id="peak_segmentation"/>
         <edge weight="1" targetId="AugmentedFVSegments" sourceId="Segmentation:segments" id="segmentation_segments_fv" />
         <edge weight="1" targetId="AugmentedFVNonSegments" sourceId="Segmentation:nonsegments" id="segmentation_nonsegments_fv" />

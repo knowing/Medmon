@@ -40,6 +40,8 @@ public class Segmentation extends AbstractProcessor {
 	private int minSegmentLength = 100;
 	private int shiftSampleLength = 100;
 	private int minAttributesWithSegments = 1;
+	
+	private int sourceAttIndex = -1;
 		 
 	private int dimensions;
 	private int numOuputAttributes;
@@ -90,6 +92,12 @@ public class Segmentation extends AbstractProcessor {
 		attributes.add(new Attribute("segment", relFormat)); //relational attribute for the input samples belonging to the segment
 		
 		attributes.add(new Attribute(SSR_ATTRIBUTE_NAME)); //attribute for the surroundig segmentation rate
+		
+		if(inputFormat.attribute(ResultsUtil.ATTRIBUTE_SOURCE())!=null 
+				&& !inputFormat.attribute(ResultsUtil.ATTRIBUTE_SOURCE()).equals(inputFormat.classAttribute())){
+			attributes.add(new Attribute(ResultsUtil.ATTRIBUTE_SOURCE(),Collections.list(inputFormat.attribute(ResultsUtil.ATTRIBUTE_SOURCE()).enumerateValues())));
+			sourceAttIndex = inputFormat.attribute(ResultsUtil.ATTRIBUTE_SOURCE()).index();
+		}
 		
 		int classIndex = -1;
 		if(inputFormat.classIndex()>=0){
@@ -328,6 +336,10 @@ public class Segmentation extends AbstractProcessor {
     	segmentData.setClassIndex(result.attribute(REL_ATT_INDEX).relation().classIndex()); //make header equal!    	
     	
     	result.setValue(2, result.attribute(REL_ATT_INDEX).addRelation(segmentData));
+    	
+    	if(sourceAttIndex>0){
+    		result.setValue(output.attribute(ResultsUtil.ATTRIBUTE_SOURCE()), first.stringValue(sourceAttIndex));
+    	}
     	
     	if(first.classIndex()>=0){
     		result.setValue(result.classIndex(), first.stringValue(first.classIndex()));

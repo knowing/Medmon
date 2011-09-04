@@ -4,14 +4,12 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
 import de.lmu.ifi.dbs.knowing.core.service.*;
-import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayes;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
-import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesImpl;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
+import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.sendsor.accelerationSensor.converter.SDRLoaderFactory;
@@ -50,6 +48,7 @@ public class Activator extends AbstractUIPlugin {
 		util.registerProcessor(new SegmentationFactory());
 		util.registerProcessor(new MyNaiveBayesFactory());
 		util.registerProcessor(new TruncatedPeakPredictionFactory());
+		util.registerProcessor(new SourceToClassConverterFactory());
 		dpuService = context.registerService(IDPUProvider.class.getName(), new BundleDPUProvider(context.getBundle(),"/KNOWING-INF"), null);
 	}
 
