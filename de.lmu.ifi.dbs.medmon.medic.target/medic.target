@@ -5,6 +5,5 @@
 <locations>
 <location path="${eclipse_home}" type="Profile"/>
 <location path="${project_loc:/de.lmu.ifi.dbs.medmon.medic.target/plugins}" type="Directory"/>
-<location path="/home/muki/Development/target_platform/OSGi/vaadin" type="Directory"/>
 </locations>
 </target>
