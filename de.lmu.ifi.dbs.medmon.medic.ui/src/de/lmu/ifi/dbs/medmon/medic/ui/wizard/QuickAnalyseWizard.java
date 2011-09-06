@@ -16,11 +16,13 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.sapphire.modeling.IModelElement;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import de.lmu.ifi.dbs.knowing.core.graph.Node;
 import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.swt.handler.EvaluateHandler;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
@@ -97,15 +99,16 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			e.printStackTrace();
 			return false;
 		}
-		Node[] nodes = dpu.node("loader", converter.getId());
-		for (Node node : nodes) {
-			Properties properties = node.properties();
-			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
-			properties.setProperty("file", patient.getLastname());
-		}
+//		Node[] nodes = dpu.node("loader", converter.getId());
+//		for (Node node : nodes) {
+//			Properties properties = node.properties();
+//			//TODO QuickAnalyseWizard -> node property TLoader.FILE 
+//			properties.setProperty("file", patient.getLastname());
+//		}
 		//TODO QuickAnalyse Wizard -> Evaluate: THIS IS NOT TESTED YET!
 		try {
-			EvaluateHandler.evaluate(dpu, new URI("file", "./" + dir, null));
+			IDataProcessingUnit dummy = IDataProcessingUnit.TYPE.instantiate();
+			EvaluateHandler.evaluate(dummy, new URI("file", "./" + dir, null));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
