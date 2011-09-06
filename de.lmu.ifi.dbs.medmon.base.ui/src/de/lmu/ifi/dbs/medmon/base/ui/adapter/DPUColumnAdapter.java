@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.util.ResourceManager;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
@@ -18,11 +18,11 @@ public class DPUColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
-		DataProcessingUnit dpu = (DataProcessingUnit)element;
+		IDataProcessingUnit dpu = (IDataProcessingUnit)element;
 		switch(columnIndex) {
-		case 0: return dpu.name();
-		case 1: return dpu.description();
-		case 2: return dpu.tags();
+		case 0: return dpu.getName().getText();
+		case 1: return dpu.getDescription().getText();
+		case 2: return dpu.getTags().getText();
 		default: return getLabel(dpu);
 		}
 	}

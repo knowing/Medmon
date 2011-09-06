@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.handler;
 
 import java.io.File;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,8 +20,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import de.lmu.ifi.dbs.knowing.core.graph.GraphValidator;
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.processing.GraphValidator;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
 public class ImportDPUHandler extends AbstractHandler implements IHandler {
@@ -39,21 +38,21 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 		if(dpufile == null || dpufile.isEmpty())
 			return null;
 		try {
-			JAXBContext context = JAXBContext.newInstance(DataProcessingUnit.class);
+			JAXBContext context = JAXBContext.newInstance(IDataProcessingUnit.class);
 			Unmarshaller um = context.createUnmarshaller();
-			DataProcessingUnit dpu = (DataProcessingUnit) um.unmarshal(new File(dpufile));
+			IDataProcessingUnit dpu = (IDataProcessingUnit) um.unmarshal(new File(dpufile));
 			GraphValidator validator = new GraphValidator(dpu);
 			//Validation
 			if(validator.validate()) {
-				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.name());
+				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.getName().getText());
 				if(file.exists()) {
 					if(!MessageDialog.openConfirm(shell, "Ueberschreiben?", "Verfahren existiert bereits! Wollen Sie es ueberschreiben?"))
 						return null;
-					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde importiert");
+					save(dpu, file, shell);
+//					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.getName().getText() + " wurde importiert");
 				} else {
-					save(dpu, file, context);
-					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.name() + " wurde importiert");
+					save(dpu, file, shell);
+//					MessageDialog.openInformation(shell, "Import erfolgreich", dpu.getName().getText() + " wurde importiert");
 				}
 			} else {
 				Status status = new Status(IStatus.ERROR, "Medic Plugin", createErrorList(validator.getErrors()));
@@ -69,13 +68,15 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 		}
 		return null;
 	}
-	
-	private void save(DataProcessingUnit dpu, File file, JAXBContext context) throws JAXBException {
-		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		marshaller.marshal(dpu, file);
-	}
+
 		
+	private void save(IDataProcessingUnit dpu, File file, Shell shell) {
+		Status status = new Status(IStatus.ERROR, "Medic Plugin","Nicht implementiert");
+		ErrorDialog errorDialog = new ErrorDialog(shell, "Nicht implementiert", "Die Datei ist nicht korrekt", status, IStatus.ERROR);
+		errorDialog.open();
+	}
+
+
 	private String createErrorList(String[] errors) {
 		StringBuilder sb = new StringBuilder();
 		for (String error : errors) {

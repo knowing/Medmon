@@ -10,7 +10,7 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.ClusterWizardPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataSourcePage;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
@@ -47,7 +47,7 @@ public class TrainClusterWizard extends Wizard implements IWorkbenchWizard, IExe
 			}
 		}
 
-		DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
+		IDataProcessingUnit dpu = (IDataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
 /*		Processor processor = Processor.getInstance();
 		ClusterUnit cu = null;
 		if (dataSourcePage.getCurrentKey().equals(SelectDataSourcePage.CSV)) {

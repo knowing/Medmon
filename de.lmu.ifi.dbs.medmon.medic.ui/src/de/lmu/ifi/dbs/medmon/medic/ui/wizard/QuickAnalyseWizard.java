@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -16,12 +15,9 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.sapphire.modeling.IModelElement;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-import de.lmu.ifi.dbs.knowing.core.graph.Node;
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.swt.handler.EvaluateHandler;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDPUPage;
@@ -75,7 +71,7 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 	@Override
 	public boolean performFinish() {
 //		DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
-		DataProcessingUnit dpu = dpuPage.getSelection();
+		IDataProcessingUnit dpu = dpuPage.getSelection();
 		if (dpu == null)
 			return false;
 		

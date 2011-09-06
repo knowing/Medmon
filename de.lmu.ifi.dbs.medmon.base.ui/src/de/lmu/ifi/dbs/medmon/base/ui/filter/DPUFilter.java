@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.filter;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 
 
 public class DPUFilter extends ViewerFilter {
@@ -17,17 +17,17 @@ public class DPUFilter extends ViewerFilter {
 	
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if(!(element instanceof DataProcessingUnit))
+		if(!(element instanceof IDataProcessingUnit))
 			return false;
-		DataProcessingUnit dpu = (DataProcessingUnit) element;
+		IDataProcessingUnit dpu = (IDataProcessingUnit) element;
 		if(searchString == null || searchString.isEmpty())
 			return true;
-		String[] tags = dpu.tags().split(",");
+		String[] tags = dpu.getTags().getContent().split(",");
 		for (String tag : tags) {
 			if(tag.matches(searchString))
 				return true;
 		}
-		return dpu.name().matches(searchString);
+		return dpu.getName().getText().matches(searchString);
 	}
 
 }

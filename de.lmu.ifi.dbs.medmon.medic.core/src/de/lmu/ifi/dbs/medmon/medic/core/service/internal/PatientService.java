@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.osgi.service.component.ComponentContext;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
@@ -60,8 +60,8 @@ public class PatientService implements IPatientService {
 		} else if(first instanceof SensorAdapter) {
 			Object oldSensor = selections.put(SENSOR, (SensorAdapter)first);
 			support.firePropertyChange(SENSOR, oldSensor, first);
-		} else if(first instanceof DataProcessingUnit) {
-			Object old = selections.put(DPU, (DataProcessingUnit)first);
+		} else if(first instanceof IDataProcessingUnit) {
+			Object old = selections.put(DPU, (IDataProcessingUnit)first);
 			support.firePropertyChange(DPU, old, first);
 		} else {
 			return false;

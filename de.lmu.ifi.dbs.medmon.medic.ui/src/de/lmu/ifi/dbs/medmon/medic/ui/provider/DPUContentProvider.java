@@ -3,7 +3,8 @@ package de.lmu.ifi.dbs.medmon.medic.ui.provider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.INode;
 
 
 /**
@@ -16,17 +17,17 @@ public class DPUContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if(inputElement instanceof DataProcessingUnit[])
-			return (DataProcessingUnit[])inputElement;
+		if(inputElement instanceof IDataProcessingUnit[])
+			return (IDataProcessingUnit[])inputElement;
 		return new Object[0];
 	}
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if(!(parentElement instanceof DataProcessingUnit))
+		if(!(parentElement instanceof IDataProcessingUnit))
 			return new Object[0];
-		DataProcessingUnit dpu = (DataProcessingUnit) parentElement;
-		return dpu.nodes();
+		IDataProcessingUnit dpu = (IDataProcessingUnit) parentElement;
+		return (INode[]) dpu.getNodes().toArray(new INode[dpu.getNodes().size()]);
 	}
 
 	@Override

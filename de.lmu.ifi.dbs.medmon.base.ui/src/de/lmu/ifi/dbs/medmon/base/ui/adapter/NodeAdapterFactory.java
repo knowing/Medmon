@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.lmu.ifi.dbs.knowing.core.graph.*;
+import de.lmu.ifi.dbs.knowing.core.model.INode;
 import de.lmu.ifi.dbs.medmon.base.ui.util.ResourceManager;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
@@ -20,7 +20,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
 	
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if(!(adaptableObject instanceof Node)) 
+		if(!(adaptableObject instanceof INode)) 
 			return null;
 			
 		return new IWorkbenchAdapter() {
@@ -32,7 +32,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
 			
 			@Override
 			public String getLabel(Object o) {
-				return ((Node)o).id();
+				return ((INode)o).getId().getText();
 			}
 			
 			@Override

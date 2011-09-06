@@ -5,9 +5,10 @@ import java.util.Set;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.sapphire.modeling.ModelElementList;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.*;
-import de.lmu.ifi.dbs.knowing.core.graph.*;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.INode;
 
 /**
  * @author Nepomuk Seiler
@@ -21,15 +22,15 @@ public class DPUInputFilter extends ViewerFilter {
 	
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if(!(element instanceof DataProcessingUnit))
+		if(!(element instanceof IDataProcessingUnit))
 			return false;
-		DataProcessingUnit dpu = (DataProcessingUnit) element;
-		Node[] nodes = dpu.nodes();
+		IDataProcessingUnit dpu = (IDataProcessingUnit) element;
+		ModelElementList<INode> nodes = dpu.getNodes();
 		Set<String> dpuLoader = new HashSet<String>();
-		for (Node node : nodes) {
-			String type = node.nodeType();
+		for (INode node : nodes) {
+			String type = node.getType().getText();
 			if(type.equals("loader")) {
-				String id = node.factoryId();
+				String id = node.getFactoryId().getText();
 				dpuLoader.add(id);
 			}
 		}

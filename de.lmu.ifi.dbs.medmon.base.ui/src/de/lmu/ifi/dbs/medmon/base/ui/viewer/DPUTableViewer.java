@@ -13,11 +13,14 @@ import javax.xml.bind.Unmarshaller;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.sapphire.modeling.ResourceStoreException;
+import org.eclipse.sapphire.modeling.xml.RootXmlResource;
+import org.eclipse.sapphire.modeling.xml.XmlResourceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 
@@ -25,13 +28,13 @@ import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
  * @author Nepomuk Seiler
  * @version 0.1
  * @since 08.05.2011
- *
+ * 
  */
 public class DPUTableViewer extends TableViewer {
 
 	private static final String[] columns = new String[] { "Name", "Beschreibung", "Tags", "Input" };
 	private static final int[] width = new int[] { 120, 200, 100, 100 };
-	
+
 	/**
 	 * @param parent
 	 * @param style
@@ -75,21 +78,21 @@ public class DPUTableViewer extends TableViewer {
 		setContentProvider(new ArrayContentProvider());
 		setLabelProvider(new WorkbenchTableLabelProvider());
 	}
-		
+
 	private void initInput() {
 		String path = getPreferenceStore().getString(IMedicPreferences.DIR_DPU_ID);
 		File dir = new File(path);
 		File[] files = dir.listFiles();
-		List<DataProcessingUnit> dpus = new ArrayList<DataProcessingUnit>();
-		try {
-			JAXBContext context = JAXBContext.newInstance(DataProcessingUnit.class);
-			Unmarshaller um = context.createUnmarshaller();
-			for (File file : files) {
-				DataProcessingUnit dpu = (DataProcessingUnit) um.unmarshal(file);
-				dpus.add(dpu);
+		List<IDataProcessingUnit> dpus = new ArrayList<IDataProcessingUnit>();
+		for (File file : files) {
+			try {
+				XmlResourceStore store = new XmlResourceStore(file);
+				RootXmlResource resource = new RootXmlResource(store);
+				dpus.add((IDataProcessingUnit) IDataProcessingUnit.TYPE.instantiate(resource));
+			} catch (ResourceStoreException e) {
+				e.printStackTrace();
 			}
-		} catch (JAXBException e) {
-			e.printStackTrace();
+
 		}
 		setInput(dpus);
 	}

@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
@@ -101,11 +101,11 @@ public class SelectDPUPage extends WizardPage {
 		});
 	}
 	
-	public DataProcessingUnit getSelection() {
+	public IDataProcessingUnit getSelection() {
 		if(dpuViewer.getSelection().isEmpty())
 			return null;
 		IStructuredSelection sel = (IStructuredSelection) dpuViewer.getSelection();
-		return (DataProcessingUnit) sel.getFirstElement();
+		return (IDataProcessingUnit) sel.getFirstElement();
 	}
 
 	/**

@@ -2,22 +2,22 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.*;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 
 /**
  * @author Nepomuk Seiler
@@ -32,13 +32,13 @@ public class DPUDetailsDialog extends Dialog {
 	private Text tDescription;
 	private ListViewer nodesViewer;
 	
-	private final DataProcessingUnit dpu;
+	private final IDataProcessingUnit dpu;
 
 	/**
 	 * Create the dialog.
 	 * @param parentShell
 	 */
-	public DPUDetailsDialog(Shell parentShell, DataProcessingUnit dpu) {
+	public DPUDetailsDialog(Shell parentShell, IDataProcessingUnit dpu) {
 		super(parentShell);
 		this.dpu = dpu;
 	}
@@ -104,10 +104,11 @@ public class DPUDetailsDialog extends Dialog {
 	private void createContent() {
 		if(dpu == null)
 			return;
-		tName.setText(dpu.name());
-		tTags.setText(dpu.tags());
-		tDescription.setText(dpu.description());
-		nodesViewer.setInput(dpu.loaderNodes());
+		tName.setText(dpu.getName().getContent());
+		tTags.setText(dpu.getTags().getContent());
+		tDescription.setText(dpu.getDescription().getContent());
+		//TODO set loader nodes input in DPUDetailsDialog
+//		nodesViewer.setInput(dpu.loaderNodes());
 	}
 
 	/**

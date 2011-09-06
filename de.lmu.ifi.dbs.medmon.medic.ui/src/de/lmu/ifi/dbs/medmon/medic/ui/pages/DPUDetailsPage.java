@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.pages;
 
-import java.io.File;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,7 +20,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import de.lmu.ifi.dbs.knowing.core.graph.xml.DataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 
@@ -37,7 +31,7 @@ public class DPUDetailsPage implements IDetailsPage {
 	private Text tProvider;
 	private Text tDescription;
 	private Text tTags;
-	private DataProcessingUnit dpu;
+	private IDataProcessingUnit dpu;
 
 	/**
 	 * Create the details page.
@@ -110,7 +104,8 @@ public class DPUDetailsPage implements IDetailsPage {
 				dialog.open();
 				String value = dialog.getValue();
 				if(value != null && !value.isEmpty()) {
-					dpu.addTag(value);
+					String tags = dpu.getTags().getText();
+					dpu.setTags(tags + "," + value);
 					if(tTags.getText().isEmpty())
 						tTags.setText(value);
 					else 
@@ -124,11 +119,11 @@ public class DPUDetailsPage implements IDetailsPage {
 
 
 	private void update() {
-		tName.setText(dpu.name());
-		if(dpu.description() != null)
-			tDescription.setText(dpu.description());
-		if(dpu.tags() != null)
-			tTags.setText(dpu.tags());
+		tName.setText(dpu.getName().getText());
+		if(dpu.getDescription().getText() != null)
+			tDescription.setText(dpu.getDescription().getText());
+		if(dpu.getTags().getText() != null)
+			tTags.setText(dpu.getTags().getText());
 	}
 
 
@@ -137,7 +132,7 @@ public class DPUDetailsPage implements IDetailsPage {
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		if(structuredSelection.isEmpty())
 			return;
-		dpu = (DataProcessingUnit) structuredSelection.getFirstElement();
+		dpu = (IDataProcessingUnit) structuredSelection.getFirstElement();
 		update();
 	}
 	
