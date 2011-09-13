@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.medmon.base.ui;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
+
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -14,6 +17,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	
+	private static ServiceTracker<ISensorService, ISensorService> sensorTracker;
 	
 	/**
 	 * The constructor
@@ -28,6 +33,8 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		sensorTracker = new ServiceTracker<ISensorService, ISensorService>(context, ISensorService.class, null);
+		sensorTracker.open();
 	}
 
 	/*
@@ -36,6 +43,8 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		sensorTracker.close();
+		sensorTracker = null;
 		super.stop(context);
 	}
 
@@ -50,6 +59,10 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+	
+	public static ISensorService getSensorService() {
+		return sensorTracker.getService();
 	}
 
 }

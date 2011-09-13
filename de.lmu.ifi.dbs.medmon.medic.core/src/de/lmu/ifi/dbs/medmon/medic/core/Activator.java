@@ -2,12 +2,18 @@ package de.lmu.ifi.dbs.medmon.medic.core;
 
 import java.io.File;
 
+import javax.persistence.EntityManagerFactory;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.jpa.EntityManagerFactoryBuilder;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,6 +25,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+
+	private ServiceTracker<EntityManagerFactory,EntityManagerFactory> emfTracker;
 		
 	/**
 	 * The constructor
@@ -35,7 +43,29 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		
 		createApplicationFolders();
-		SensorDaemon.start();
+        emfTracker = new ServiceTracker<EntityManagerFactory, EntityManagerFactory>(context, EntityManagerFactory.class.getName(), new ServiceTrackerCustomizer<EntityManagerFactory, EntityManagerFactory>() {
+
+			@Override
+			public EntityManagerFactory addingService(ServiceReference<EntityManagerFactory> ref) {
+		        Bundle b = ref.getBundle();
+		        EntityManagerFactory service = b.getBundleContext().getService(ref);
+		        String unitName = (String)ref.getProperty(EntityManagerFactoryBuilder.JPA_UNIT_NAME);
+		        System.err.println("Registered: " + unitName);
+		        return service;
+			}
+
+			@Override
+			public void modifiedService(ServiceReference<EntityManagerFactory> reference, EntityManagerFactory service) {
+				
+			}
+
+			@Override
+			public void removedService(ServiceReference<EntityManagerFactory> reference, EntityManagerFactory service) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+        emfTracker.open();
 	}
 
 	/*
@@ -43,8 +73,8 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		emfTracker.close();
 		plugin = null;
-		SensorDaemon.stop();
 		super.stop(context);
 	}
 

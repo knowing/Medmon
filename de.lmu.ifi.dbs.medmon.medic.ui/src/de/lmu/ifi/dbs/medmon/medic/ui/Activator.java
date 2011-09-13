@@ -6,6 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -18,7 +19,8 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	private static ServiceTracker patientTracker;
+	private static ServiceTracker<IPatientService,IPatientService> patientTracker;
+	private static ServiceTracker<ISensorService, ISensorService> sensorTracker;
 	
 	/**
 	 * The constructor
@@ -33,8 +35,12 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		patientTracker = new ServiceTracker(context, IPatientService.class.getName(), null);
+		
+		patientTracker = new ServiceTracker<IPatientService,IPatientService>(context, IPatientService.class.getName(), null);
 		patientTracker.open();
+		
+		sensorTracker = new ServiceTracker<ISensorService, ISensorService>(context, ISensorService.class, null);
+		sensorTracker.open();
 	}
 
 	/*
@@ -43,8 +49,13 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-		super.stop(context);
 		patientTracker.close();
+		patientTracker = null;
+		
+		sensorTracker.close();
+		sensorTracker = null;
+		
+		super.stop(context);
 	}
 
 	/**
@@ -68,6 +79,11 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public static IPatientService getPatientService() {
-		return (IPatientService) patientTracker.getService();
+		return patientTracker.getService();
+	}
+	
+	
+	public static ISensorService getSensorService() {
+		return sensorTracker.getService();
 	}
 }
