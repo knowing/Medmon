@@ -58,18 +58,42 @@ public class SensorService implements ISensorService {
 	private void initModel() {
 		model = Collections.synchronizedMap(new HashMap<String, SensorAdapter>());
 
-		// Assert that the database is synchronized with extension points
-		List<Sensor> entities = getSensorEntities();
-		for (Sensor sensor : entities) {
-			model.put(sensor.getId(), new SensorAdapter(sensor));
+		// Merge extension points and entites together
+		Map<String, ISensor> extensions = new HashMap<String, ISensor>();
+		for (ISensor sensor : getSensorExtensions())
+			extensions.put(Sensor.parseId(sensor.getName(), sensor.getVersion()), sensor);
+
+		Map<String, Sensor> entities = new HashMap<String, Sensor>();
+		for (Sensor sensor : getSensorEntities())
+			entities.put(sensor.getId(), sensor);
+
+		for (String key : extensions.keySet()) {
+			ISensor extension = extensions.remove(key);
+			// Sensor driver exists
+			if (entities.containsKey(key)) {
+				Sensor entity = entities.remove(key);
+				SensorAdapter sensor = new SensorAdapter(extension, entity);
+				model.put(key, sensor);
+			// New sensor driver -> create db entity
+			} else {
+				EntityManager em = dbService.createEntityManager();
+				em.getTransaction().begin();
+				Sensor entity = new Sensor(extension.getName(), extension.getVersion(), extension.getType());
+				em.persist(entity);
+				em.getTransaction().commit();
+				em.close();
+				model.put(key, new SensorAdapter(extension, entity));
+			}
+		}
+		
+		// All left drivers -> handle delete/inactive? => delete!
+		for(String key : entities.keySet()) {
+			EntityManager em = dbService.createEntityManager();
+			em.getTransaction().begin();
+			em.getTransaction().commit();
+			em.close();
 		}
 
-		List<ISensor> extensions = getSensorExtensions();
-		for (ISensor sensor : extensions) {
-			String key = Sensor.parseId(sensor.getName(), sensor.getVersion());
-			SensorAdapter adapter = model.get(key);
-			adapter.setSensorExtension(sensor);
-		}
 		fireModelChanged();
 	}
 
@@ -120,6 +144,8 @@ public class SensorService implements ISensorService {
 				changed = true;
 				adapter.setAvailable(false);
 				continue;
+			} else if (!available) {
+				// initModel();
 			} else {
 				String path = entity.getDefaultpath();
 				if (path == null || path.isEmpty()) {

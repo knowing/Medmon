@@ -1,18 +1,8 @@
 package de.lmu.ifi.dbs.medmon.database;
 
-import javax.persistence.EntityManagerFactory;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.service.jpa.EntityManagerFactoryBuilder;
-import org.osgi.util.tracker.ServiceTracker;
-
-import de.lmu.ifi.dbs.medmon.database.install.Database;
-import de.lmu.ifi.dbs.medmon.database.osgi.JPAServiceTrackerCustomizer;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 
 public class Activator extends AbstractUIPlugin {
 
@@ -21,13 +11,6 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-
-	// Database
-	private static Database database;
-
-	private static ServiceTracker emfTracker;
-
-	private ServiceTracker emfbTracker;
 
 	public Activator() {
 
@@ -43,14 +26,6 @@ public class Activator extends AbstractUIPlugin {
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		database = new Database();
-		emfTracker = new ServiceTracker(context, EntityManagerFactory.class.getName(),
-				new JPAServiceTrackerCustomizer());
-		emfTracker.open();
-
-		emfbTracker = new ServiceTracker(context, EntityManagerFactoryBuilder.class.getName(),
-				JPAUtil.getServiceTrackerCustomizer("medmon", database.getProperties()));
-		emfbTracker.open();
 	}
 
 	/*
@@ -61,8 +36,6 @@ public class Activator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
-		emfTracker.close();
-		emfbTracker.close();
 		plugin = null;
 		super.stop(context);
 	}
@@ -86,14 +59,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	public static Database getDatabase() {
-		return database;
-	}
-
-	public static ServiceTracker getEmfTracker() {
-		return emfTracker;
 	}
 
 }
