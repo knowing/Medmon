@@ -336,7 +336,12 @@ public class LDAFilter extends SimpleBatchFilter{
 					}
 				}	
 				else{
-					r.setValue(j, in.value(j));
+					if(in.attribute(j).isRelationValued()){
+						r.setValue(j, output.attribute(j).addRelation(in.relationalValue(j)));				
+					}
+					else{
+						r.setValue(j, in.value(j));
+					}
 				}								
 			}
 			output.add(r);

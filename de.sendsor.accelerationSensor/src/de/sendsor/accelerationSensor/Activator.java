@@ -6,6 +6,7 @@ import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
 import de.lmu.ifi.dbs.knowing.core.service.*;
+import de.sendsor.accelerationSensor.algorithm.moennig.classifier.InputMergeProcessorFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
@@ -49,6 +50,7 @@ public class Activator extends AbstractUIPlugin {
 		util.registerProcessor(new MyNaiveBayesFactory());
 		util.registerProcessor(new TruncatedPeakPredictionFactory());
 		util.registerProcessor(new SourceToClassConverterFactory());
+		util.registerProcessor(new InputMergeProcessorFactory());
 		dpuService = context.registerService(IDPUProvider.class.getName(), new BundleDPUProvider(context.getBundle(),"/KNOWING-INF"), null);
 	}
 
