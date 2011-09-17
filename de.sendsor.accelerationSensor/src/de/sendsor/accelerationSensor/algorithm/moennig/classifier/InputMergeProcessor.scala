@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import weka.core.DenseInstance
 import de.lmu.ifi.dbs.knowing.core.events.Results
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
 
 
 class InputMergeProcessor extends TProcessor{
@@ -88,30 +89,39 @@ class InputMergeProcessor extends TProcessor{
     
     val output = determineFormat();
     
-    var si = 0;
-    var ni = 0;
-    while(si < segments.numInstances() || ni < nonsegments.numInstances()){
-      if(si < segments.numInstances() && ni < nonsegments.numInstances()){
-    	  val sDate: Date = sdf.parse(segments.get(si).stringValue(inputStartTime));
-    	  val nDate: Date = sdf.parse(nonsegments.get(ni).stringValue(inputStartTime));
-    	  if(sDate.before(nDate)){
-    	    addInstance(output, segments.get(si));
-    	    si += 1;
-    	  }
-    	  else{
-    	    addInstance(output, nonsegments.get(ni));
-    	    ni += 1;
-    	  }
-      }
-      else if(si < segments.numInstances()){
-    	  addInstance(output, segments.get(si));
-    	  si += 1;
-      }
-      else{
-    	  addInstance(output, nonsegments.get(ni));
-    	  ni += 1;
-      }
-  	}
+    val splittedSegments: Map[String, Instances] = ResultsUtil.splitInstanceBySource(segments,false);
+    val splittedNonSegments: Map[String, Instances] = ResultsUtil.splitInstanceBySource(nonsegments,false);
+    
+    for(key: String <- splittedSegments.keys){
+    	val segs: Instances = splittedSegments.get(key).get;
+    	val nonsegs: Instances = splittedNonSegments.get(key).get;
+    	segs.sort(inputStartTime);
+    	nonsegs.sort(inputStartTime);
+	    var si = 0;
+	    var ni = 0;
+	    while(si < segs.numInstances() || ni < nonsegs.numInstances()){
+	      if(si < segs.numInstances() && ni < nonsegs.numInstances()){
+	    	  val sDate: Date = sdf.parse(segs.get(si).stringValue(inputStartTime));
+	    	  val nDate: Date = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime));
+	    	  if(sDate.before(nDate)){
+	    	    addInstance(output, segs.get(si));
+	    	    si += 1;
+	    	  }
+	    	  else{
+	    	    addInstance(output, nonsegs.get(ni));
+	    	    ni += 1;
+	    	  }
+	      }
+	      else if(si < segs.numInstances()){
+	    	  addInstance(output, segs.get(si));
+	    	  si += 1;
+	      }
+	      else{
+	    	  addInstance(output, nonsegs.get(ni));
+	    	  ni += 1;
+	      }
+	  	}
+    }
     
     sendEvent(new Results(output));
     
@@ -119,7 +129,8 @@ class InputMergeProcessor extends TProcessor{
   
   def addInstance(output: Instances, inst: Instance){
     val relAtt: Instances = inst.relationalValue(inputRelIndex);
-    System.out.println(relAtt.get(0).stringValue(relAtt.attribute("class")))
+    System.out.print(relAtt.get(0).stringValue(relAtt.attribute("class")))
+    System.out.println(inst.stringValue(inst.dataset().attribute("source")))
     for(i <- 0 until relAtt.numInstances()){
       val result: DenseInstance = new DenseInstance(output.numAttributes());
       for(j <- 0 until relAtt.get(i).numAttributes()){
