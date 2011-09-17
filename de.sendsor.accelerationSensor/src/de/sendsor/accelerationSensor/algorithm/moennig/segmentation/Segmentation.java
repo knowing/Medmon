@@ -142,7 +142,7 @@ public class Segmentation extends AbstractProcessor {
 	    	Instances n = new Instances(nonSegments,0);	    			
 	    	
 			this.calcSegmentation(inst, s, n);			
-			this.calcSurroundingSegmentationRates(inst, s, n);
+			this.calcSurroundingSegmentationRates(inst, s, n);			
 							
 			try{
 				segments = ResultsUtil.appendInstances(segments,s);
@@ -151,7 +151,8 @@ public class Segmentation extends AbstractProcessor {
 			catch(WekaException we){
 				we.printStackTrace();
 			}		
-	    }	
+	    }		    
+	    
 	    //Create None Object 
 	    Option<String> none = scala.Option.apply(null);
 		sendEvent(new Results(segments, none), SegmentationFactory.SEGMENTS());
@@ -335,7 +336,7 @@ public class Segmentation extends AbstractProcessor {
     	}
     	segmentData.setClassIndex(result.attribute(REL_ATT_INDEX).relation().classIndex()); //make header equal!    	
     	
-    	result.setValue(2, result.attribute(REL_ATT_INDEX).addRelation(segmentData));
+    	result.setValue(REL_ATT_INDEX, result.attribute(REL_ATT_INDEX).addRelation(segmentData));
     	
     	if(sourceAttIndex>0){
     		result.setValue(output.attribute(ResultsUtil.ATTRIBUTE_SOURCE()), first.stringValue(sourceAttIndex));
