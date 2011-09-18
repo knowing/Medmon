@@ -6,7 +6,7 @@ import java.util.Properties
 import akka.event.EventHandler.{ debug, info, warning, error }
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
-import InputMergeProcessorFactory._
+import ResultMergeProcessorFactory._
 import weka.core.Instances
 import weka.core.Instance
 import weka.core.Attribute
@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
 
 
-class InputMergeProcessor extends TProcessor{
+class ResultMergeProcessor extends TProcessor{
   
   var segments: Instances = null;
   var nonsegments: Instances = null;
@@ -129,8 +129,7 @@ class InputMergeProcessor extends TProcessor{
   
   def addInstance(output: Instances, inst: Instance){
     val relAtt: Instances = inst.relationalValue(inputRelIndex);
-    System.out.print(relAtt.get(0).stringValue(relAtt.attribute("class")))
-    System.out.println(inst.stringValue(inst.dataset().attribute("source")))
+    
     for(i <- 0 until relAtt.numInstances()){
       val result: DenseInstance = new DenseInstance(output.numAttributes());
       for(j <- 0 until relAtt.get(i).numAttributes()){
@@ -145,11 +144,11 @@ class InputMergeProcessor extends TProcessor{
   
 }
 
-class InputMergeProcessorFactory extends ProcessorFactory(classOf[InputMergeProcessor]) {
+class ResultMergeProcessorFactory extends ProcessorFactory(classOf[ResultMergeProcessor]) {
   
 }
 
-object InputMergeProcessorFactory {
+object ResultMergeProcessorFactory {
   val INPUT_SEGMENTS = "segments"
   val INPUT_NONSEGMENTS = "nonsegments"
 }
