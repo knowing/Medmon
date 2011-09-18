@@ -325,7 +325,8 @@ public class LDAFilter extends SimpleBatchFilter{
 		
 		for(int i=0;i<input.numInstances();i++){
 			Instance in = input.get(i);
-			Instance r = new DenseInstance(output.numAttributes());			
+			Instance r = new DenseInstance(output.numAttributes());
+			r.setDataset(output);
 			int rj = 0;
 			for(int j=0;j<output.numAttributes();j++){
 				if(j!=in.classIndex() && in.attribute(j).type() == Attribute.NUMERIC
@@ -336,11 +337,20 @@ public class LDAFilter extends SimpleBatchFilter{
 					}
 				}	
 				else{
-					r.setValue(j, in.value(j));
+					if(in.attribute(j).isRelationValued()){
+						r.setValue(j, output.attribute(j).addRelation(in.relationalValue(j)));				
+					}
+					else{
+						r.setValue(j, in.value(j));
+					}
 				}								
 			}
+						
+			
 			output.add(r);
 		}
+				
+		
 		return output;
 	}
 	
