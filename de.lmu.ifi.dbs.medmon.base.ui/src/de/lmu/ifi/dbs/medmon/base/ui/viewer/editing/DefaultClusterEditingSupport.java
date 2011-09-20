@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Table;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class DefaultClusterEditingSupport extends EditingSupport {
 

@@ -6,8 +6,8 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class SensorPathEditingSupport extends EditingSupport {
 

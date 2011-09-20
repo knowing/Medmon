@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.osgi.service.component.ComponentContext;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDerbyService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
@@ -31,7 +31,7 @@ public class SensorService implements ISensorService {
 	private Map<String, SensorAdapter> model;
 	private Thread currentThread;
 
-	private IDerbyService dbService;
+	private IEntityManagerService dbService;
 
 	protected void activate(ComponentContext context) {
 		System.out.println("SensorServiceComponent activated");
@@ -179,11 +179,11 @@ public class SensorService implements ISensorService {
 			support.firePropertyChange("model", null, model);
 	}
 
-	public void bindDerbyService(IDerbyService dbService) {
+	public void bindEntityManagerService(IEntityManagerService dbService) {
 		this.dbService = dbService;
 	}
 
-	public void unbindDerbyService(IDerbyService dbService) {
+	public void unbindEntityManagerService(IEntityManagerService dbService) {
 		this.dbService = null;
 	}
 

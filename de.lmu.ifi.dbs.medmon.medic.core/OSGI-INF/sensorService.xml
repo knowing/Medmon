@@ -4,5 +4,5 @@
    <service>
       <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService"/>
    </service>
-   <reference bind="bindDerbyService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IDerbyService" name="IDerbyService" policy="static"/>
+   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="static" unbind="unbindEntityManagerService"/>
 </scr:component>

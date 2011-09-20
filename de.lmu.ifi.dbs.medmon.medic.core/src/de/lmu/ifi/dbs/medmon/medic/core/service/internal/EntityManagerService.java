@@ -13,9 +13,9 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDerbyService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 
-public class DerbyService implements IDerbyService {
+public class EntityManagerService implements IEntityManagerService {
 
 	private List<DataSourceFactory> dsFactories = new ArrayList<DataSourceFactory>();
 	private EntityManagerFactoryBuilder emfBuilder;
