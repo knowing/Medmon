@@ -11,6 +11,7 @@ import java.util.Properties
 import java.util.HashMap
 import weka.core.Attribute
 import ReClassification._
+import ReClassificationFactory._
 import java.util.Map.Entry
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
 import akka.actor.ActorRef
@@ -123,8 +124,8 @@ object ReClassification{
 
 class ReClassificationFactory extends TFactory{
  
-  val name: String = TruncatedPeakPredictionFactory.name
-  val id: String = TruncatedPeakPredictionFactory.id
+  val name: String = ReClassificationFactory.name
+  val id: String = ReClassificationFactory.id
 
   def getInstance: ActorRef = actorOf[ReClassification]
   
@@ -143,7 +144,7 @@ class ReClassificationFactory extends TFactory{
    
 }
 
-object TruncatedPeakPredictionFactory{
+object ReClassificationFactory{
 	val name:String = "ReClassification" 
     val id:String = classOf[ReClassification].getName
 }
