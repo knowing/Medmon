@@ -13,9 +13,9 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDerbyService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 
-public class DerbyService implements IDerbyService {
+public class EntityManagerService implements IEntityManagerService {
 
 	private List<DataSourceFactory> dsFactories = new ArrayList<DataSourceFactory>();
 	private List<EntityManagerFactory> emFactories = new ArrayList<EntityManagerFactory>();
@@ -63,7 +63,6 @@ public class DerbyService implements IDerbyService {
 
 	public void bindEntityManagerFactory(EntityManagerFactory emf) {
 		emFactories.add(emf);
-		System.err.println("emf added: " + emFactories);
 	}
 
 	public void unbindEntityManagerFactory(EntityManagerFactory emf) {
@@ -71,7 +70,7 @@ public class DerbyService implements IDerbyService {
 	}
 
 	protected void activate(ComponentContext context) {
-		System.out.println("DerbyServiceComponent activated");
+		System.out.println("EntityManagerServiceComponent activated");
 	}
 
 	protected void deactivate(ComponentContext context) {

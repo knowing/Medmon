@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public interface IDerbyService {
+public interface IEntityManagerService {
 
 	/**
 	 * @return always the same EntityManager instances
