@@ -16,3 +16,7 @@
 #except this file
 !.gitignore
 
+# Eclipse Sapphire stuff
+*.layout
+*.xmi
+
