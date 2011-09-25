@@ -22,16 +22,19 @@ class ResultMergeProcessor extends TProcessor{
   
   var segments: Instances = null;
   var nonsegments: Instances = null;
+  var rawdata: Instances = null;
   
   var inputRelIndex: Int = -1; 
   var inputStartTime: Int = -1;
   
   var sdf: SimpleDateFormat = null;
+  var sdfRaw: SimpleDateFormat = null;
   
   var labels: List[Any] = null; 
 
    override def build = {    
     case (inst, None) => debug(this, "Default build is called")
+    case (inst, Some(INPUT_RAWDATA)) => addRawdata(inst)
     case (inst, Some(INPUT_SEGMENTS)) => addSegments(inst)
     case (inst, Some(INPUT_NONSEGMENTS)) => addNonSegments(inst)
     case (x, y) => warning(this, "Bullshit!")
@@ -49,14 +52,21 @@ class ResultMergeProcessor extends TProcessor{
   
   def addSegments(segs: Instances){
     segments = segs;
-    if(segments!=null && nonsegments!=null){
+    if(segments!=null && nonsegments!=null && rawdata!=null){
       merge();
     }
   }
   
   def addNonSegments(nonSegs: Instances){
     nonsegments = nonSegs;
-    if(segments!=null && nonsegments!=null){
+    if(segments!=null && nonsegments!=null && rawdata!=null){
+      merge();
+    }
+  }
+  
+  def addRawdata(rawd: Instances){
+    rawdata = rawd;
+    if(segments!=null && nonsegments!=null && rawdata!=null){
       merge();
     }
   }
@@ -89,45 +99,75 @@ class ResultMergeProcessor extends TProcessor{
     
     val output = determineFormat();
     
+    val splittedRawdata: Map[String, Instances] = ResultsUtil.splitInstanceBySource(rawdata,false);
     val splittedSegments: Map[String, Instances] = ResultsUtil.splitInstanceBySource(segments,false);
     val splittedNonSegments: Map[String, Instances] = ResultsUtil.splitInstanceBySource(nonsegments,false);
     
-    for(key: String <- splittedSegments.keys){
+    for(key: String <- splittedRawdata.keys){    	
+    	val raw: Instances = splittedRawdata.get(key).get;
     	val segs: Instances = splittedSegments.get(key).get;
     	val nonsegs: Instances = splittedNonSegments.get(key).get;
     	segs.sort(inputStartTime);
     	nonsegs.sort(inputStartTime);
 	    var si = 0;
 	    var ni = 0;
+	    var ri = 0;
+	    
+	    sdfRaw = new SimpleDateFormat(raw.attribute(inputStartTime).getDateFormat());
+	    
 	    while(si < segs.numInstances() || ni < nonsegs.numInstances()){
 	      if(si < segs.numInstances() && ni < nonsegs.numInstances()){
 	    	  val sDate: Date = sdf.parse(segs.get(si).stringValue(inputStartTime));
 	    	  val nDate: Date = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime));
+	    	  var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  while(rDate.before(sDate) && rDate.before(nDate)){
+	    	    addRawInstnace(output, raw.get(ri));
+	    	    ri += 1;
+	    	    rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  }
 	    	  if(sDate.before(nDate)){
-	    	    addInstance(output, segs.get(si));
+	    	    ri += addRelationalInstance(output, segs.get(si));
 	    	    si += 1;
 	    	  }
 	    	  else{
-	    	    addInstance(output, nonsegs.get(ni));
+	    	    ri += addRelationalInstance(output, nonsegs.get(ni));
 	    	    ni += 1;
 	    	  }
 	      }
 	      else if(si < segs.numInstances()){
-	    	  addInstance(output, segs.get(si));
+	    	  val sDate: Date = sdf.parse(segs.get(si).stringValue(inputStartTime));	    	  
+	    	  var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  while(rDate.before(sDate)){
+	    	    addRawInstnace(output, raw.get(ri));
+	    	    ri += 1;
+	    	    rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  }
+	    	  ri += addRelationalInstance(output, segs.get(si));
 	    	  si += 1;
 	      }
-	      else{
-	    	  addInstance(output, nonsegs.get(ni));
+	      else{	    	  
+	    	  val nDate: Date = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime));
+	    	  var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  while(rDate.before(nDate)){
+	    	    addRawInstnace(output, raw.get(ri));
+	    	    ri += 1;
+	    	    rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime));
+	    	  }
+	    	  ri += addRelationalInstance(output, nonsegs.get(ni));
 	    	  ni += 1;
 	      }
 	  	}
+		while(ri < raw.numInstances()){
+		    addRawInstnace(output, raw.get(ri));
+		    ri += 1;		    
+		  }
     }
     
     sendEvent(new Results(output));
     
   }
   
-  def addInstance(output: Instances, inst: Instance){
+  def addRelationalInstance(output: Instances, inst: Instance):Int = {
     val relAtt: Instances = inst.relationalValue(inputRelIndex);
     
     for(i <- 0 until relAtt.numInstances()){
@@ -140,6 +180,19 @@ class ResultMergeProcessor extends TProcessor{
       }
       output.add(result);
     }
+    return relAtt.numInstances();
+  }
+  
+  def addRawInstnace(output: Instances, inst: Instance){
+     val result: DenseInstance = new DenseInstance(output.numAttributes());
+      for(j <- 0 until inst.numAttributes()){
+    	  result.setValue(j, inst.value(j));
+      }
+      for(j <- 0  until labels.size){
+        //set unclassified
+        result.setValue(j+ inst.numAttributes(), -1.0)
+      }
+      output.add(result);
   }
   
 }
@@ -151,4 +204,5 @@ class ResultMergeProcessorFactory extends ProcessorFactory(classOf[ResultMergePr
 object ResultMergeProcessorFactory {
   val INPUT_SEGMENTS = "segments"
   val INPUT_NONSEGMENTS = "nonsegments"
+  val INPUT_RAWDATA = "rawdata"
 }
