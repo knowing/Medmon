@@ -40,9 +40,7 @@ class ResultMergeProcessor extends TProcessor{
     case (x, y) => warning(this, "Bullshit!")
   }
   
-  def build(instances: Instances) = {  
-    warning(this, "This should never be called")
-  }
+  def build(instances: Instances) = Unit
 
   def query(query: Instance): Instances = { null }
 
