@@ -9,3 +9,10 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: LMU Munich - Database Systems Group
+Import-Package: org.eclipse.sapphire.java,
+ org.eclipse.sapphire.modeling,
+ org.eclipse.sapphire.modeling.annotations,
+ org.eclipse.sapphire.modeling.serialization,
+ org.eclipse.sapphire.modeling.xml,
+ org.eclipse.sapphire.modeling.xml.annotations,
+ org.eclipse.sapphire.workspace
