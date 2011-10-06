@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataProcessingUnit name="de.sendsor.3d.SensorPreview">
+    <nodes>
+        <node id="SDRLoader" type="loader" factoryId="de.sendsor.accelerationSensor.converter.SDRLoader">
+            <properties>
+                <property key="file" value="input.sdr"></property>
+                <property key="unit" value="second"></property>
+            </properties>
+        </node>
+        <node id="TimeSeriesPresenter" type="presenter" factoryId="de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter"></node>
+    </nodes>
+    <edges>
+        <edge source="SDRLoader" target="TimeSeriesPresenter" id="loader_presenter"></edge>
+    </edges>
+    <description>Loads data from a SDR file and shows it in a TimeSeriesPresenter.</description>
+    <tags>SDR, preview</tags>
+</DataProcessingUnit>

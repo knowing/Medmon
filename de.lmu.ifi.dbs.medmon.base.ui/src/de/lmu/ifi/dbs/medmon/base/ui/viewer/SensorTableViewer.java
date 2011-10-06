@@ -2,8 +2,6 @@ package de.lmu.ifi.dbs.medmon.base.ui.viewer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.Map;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -14,10 +12,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.editing.SensorPathEditingSupport;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 
 public class SensorTableViewer extends TableViewer implements PropertyChangeListener {
 
@@ -71,20 +69,11 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 	}
 
 	private void initInput() {
-		SensorDaemon daemon = SensorDaemon.getDaemon();
-		if (daemon == null) {
-			new Thread(new WaitingForInput(this)).start();
-		} else {
-			Map<String, SensorAdapter> model = daemon.getModel();
-			if(model == null) {
-				new Thread(new WaitingForInput(this)).start();
-			} else {
-				setInput(model.values().toArray());
-				daemon.addPropertyChangeListener(this);
-			}
-
-		}
-
+		ISensorService sensorService = Activator.getSensorService();
+		if(sensorService == null)
+			return;
+		sensorService.addPropertyChangeListener(this);
+		setInput(sensorService.getSensorAdapters().values());
 	}
 
 	@Override
@@ -97,58 +86,6 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 					refresh();
 			}
 		});
-	}
-
-	private class WaitingForInput implements Runnable {
-
-		private final SensorTableViewer viewer;
-
-		public WaitingForInput(SensorTableViewer viewer) {
-			this.viewer = viewer;
-		}
-
-		@Override
-		public void run() {
-			SensorDaemon daemon = SensorDaemon.getDaemon();
-			int timer = 1;
-			//Try getting the Daemon
-			while (daemon == null && timer < 7 ) {
-				daemon = SensorDaemon.getDaemon();
-				try {
-					Thread.sleep(timer++ * 500L);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			final Map<String, SensorAdapter> model = daemon.getModel();
-			
-			//Access not from the UI Thread
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					int timer = 1;
-					Collection<SensorAdapter> values = model.values();
-					while(values == null && timer < 7) {
-						try {
-							Thread.sleep(timer++ * 500L);
-							values = model.values();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					//TODO SensorTableViewer check NullPointer
-					if(timer != 7) {
-						viewer.setInput(values.toArray());
-						viewer.refresh();
-					}
-				
-				}
-			});
-
-			daemon.addPropertyChangeListener(viewer);
-		}
-
 	}
 
 }

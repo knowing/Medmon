@@ -93,11 +93,16 @@ public class Sensor {
 		this.data = data;
 	}
 	
+	/**
+	 * Build an 'unique' identifier for each sensor, if the
+	 * version number is unique for each model.
+	 * 
+	 * @param name
+	 * @param version
+	 * @return name:version
+	 */
 	public static String parseId(String name, String version) {
 		return name + ":" + version;
 	}
-
-	
-	
 
 }

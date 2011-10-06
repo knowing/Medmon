@@ -37,9 +37,9 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorDaemon;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.PatientProposalProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.TextContentAdapter2;
 
@@ -167,7 +167,7 @@ public class SelectDBDataPage extends WizardPage {
 	}
 
 	private List<SensorAdapter> getSensorAdapter() {
-		Map<String, SensorAdapter> model = SensorDaemon.getDaemon().getModel();
+		Map<String, SensorAdapter> model = Activator.getSensorService().getSensorAdapters();
 		return new ArrayList<SensorAdapter>(model.values());
 	}
 

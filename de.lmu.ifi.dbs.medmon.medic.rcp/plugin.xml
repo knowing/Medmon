@@ -41,6 +41,7 @@
          </property>
       </product>
    </extension>
+   <!--
    <extension
          point="org.eclipse.ui.splashHandlers">
       <splashHandler
@@ -67,5 +68,5 @@
             tooltip="Gemini JPA">
       </splashExtension>
    </extension>
-
+	-->
 </plugin>

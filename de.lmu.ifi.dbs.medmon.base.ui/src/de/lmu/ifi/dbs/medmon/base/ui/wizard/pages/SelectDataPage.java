@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -29,27 +31,30 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartProgressEvent;
 import org.jfree.chart.event.ChartProgressListener;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYDataset;
 
-import scala.Option;
 import akka.actor.ActorRef;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorFactory;
-import de.lmu.ifi.dbs.knowing.core.events.*;
-import de.lmu.ifi.dbs.knowing.core.factory.TFactory;
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.knowing.core.model.INode;
+import de.lmu.ifi.dbs.knowing.core.model.NodeType;
+import de.lmu.ifi.dbs.knowing.core.service.IDPUDirectory;
+import de.lmu.ifi.dbs.knowing.core.service.IEvaluateService;
 import de.lmu.ifi.dbs.knowing.core.swt.charts.events.ChartProgressListenerRegister;
-import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
+import de.lmu.ifi.dbs.knowing.core.swt.factory.CompositeUIFactory;
+import de.lmu.ifi.dbs.knowing.core.util.DPUUtil;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
 
 /**
@@ -222,7 +227,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 
 		gPreview = new Group(container, SWT.NONE);
 		gPreview.setLayout(new FillLayout());
-		gPreview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		GridData previewData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+		previewData.heightHint = 100;
+		gPreview.setLayoutData(previewData);
 		gPreview.setText("Vorschau");
 
 		Composite cPreview = new Composite(container, SWT.NONE);
@@ -246,62 +253,63 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 			public void widgetSelected(SelectionEvent e) {
 				//Dispose old preview
 				disposePreview();
-				//Get new actors
-				Option loader = OSGIUtil.getFactoryService("de.sendsor.accelerationSensor.converter.SDRLoader");
-				Option presenter = OSGIUtil.getFactoryService("de.lmu.ifi.dbs.knowing.core.swt.charts.TimeSeriesPresenter");
-
-				TFactory presenterFactory = (TFactory) presenter.get();
-				TFactory loaderFactory = (TFactory) loader.get();
-
-				presenterActor = presenterFactory.getInstance().start();
-				loaderActor = loaderFactory.getInstance().start();
+				IEvaluateService eval = Activator.getEvaluationService();
+				IDPUDirectory dpuDir = Activator.getDPUDirectory();
+				
+				IDataProcessingUnit dpu = DPUUtil.getDPU(dpuDir, "de.sendsor.3d.SensorPreview");
+				URL url = DPUUtil.getDPUPath(dpuDir, "de.sendsor.3d.SensorPreview");
 				UIFactory uiFactory = TypedActor.newInstance(UIFactory.class, new TypedActorFactory() {
 					@Override
 					public TypedActor create() {
-						return new DataPageUIFactory(gPreview);
+						return new CompositeUIFactory(gPreview);
 					}
 				});
-				//Configure PresenterActor
-				presenterActor.sendOneWay(new UIFactoryEvent(uiFactory, null));
-				presenterActor.sendOneWay(new ChartProgressListenerRegister(new ChartProgressListener() {
-					@Override
-					public void chartProgress(ChartProgressEvent event) {
-						if (event.getType() != ChartProgressEvent.DRAWING_FINISHED)
-							return;
-						//Detect mouse clicks and print the date to tDatePreview
-						JFreeChart chart = null;
-						XYPlot plot = null;
-						if (event.getSource() instanceof JFreeChart) {
-							chart = (JFreeChart) event.getSource();
-							plot = (XYPlot) chart.getPlot();
-						} else if (event.getSource() instanceof XYPlot) {
-							plot = (XYPlot) event.getSource();
-						}
-						XYDataset dataset = plot.getDataset();
-						double time = plot.getDomainCrosshairValue();
-						tDatePreview.setText(df.format(new Date((long) time)));
-					}
-				}));
-				//Get SDR files, assumes that there is a least one and takes the first
+				// Configure dpu!
+				//Loader
 				File dir = new File(sensor.getDefaultPath());
 				String[] sdrFiles = dir.list(new FilenameFilter() {
 					@Override
 					public boolean accept(File dir, String name) {
 						return name.toLowerCase().endsWith(".sdr");
 					}
+					
 				});
-				Properties properties = loaderFactory.createDefaultProperties();
-				String sep = System.getProperty("file.separator");
-				String path = sensor.getDefaultPath() + sep + sdrFiles[0];
-				properties.setProperty("file", path);
-				// properties.setProperty("absolute-path", "true");
-				Option<String> none = scala.Option.apply(null);
-				loaderActor.sendOneWay(new Configure(properties));
-				loaderActor.sendOneWay(new Register(presenterActor, none, none));
-				loaderActor.sendOneWay(new Start());
-				//TODO SelectDataPage update preview after evaluating preview
-				uiFactory.update(presenterActor, new UpdateUI());
-				uiFactory.update(presenterActor, new Shutdown());
+				for(INode node : dpu.getNodes()) {
+					if(node.getType().getContent().equals(NodeType.LOADER)) {
+						Properties properties = DPUUtil.nodeProperties(node);
+						String sep = System.getProperty("file.separator");
+						String path = sensor.getDefaultPath() + sep + sdrFiles[0];
+						properties.setProperty("file", path);
+						properties.setProperty("absolute-path", "true");
+						DPUUtil.setNodeProperties(node, properties);
+					}
+				}
+				//Evalute
+				try {
+					ActorRef supervisor = eval.evaluate(dpu, uiFactory, url.toURI());
+					supervisor.sendOneWay(new ChartProgressListenerRegister(new ChartProgressListener() {
+						@Override
+						public void chartProgress(ChartProgressEvent event) {
+							if (event.getType() != ChartProgressEvent.DRAWING_FINISHED)
+								return;
+							//Detect mouse clicks and print the date to tDatePreview
+							JFreeChart chart = null;
+							XYPlot plot = null;
+							if (event.getSource() instanceof JFreeChart) {
+								chart = (JFreeChart) event.getSource();
+								plot = (XYPlot) chart.getPlot();
+							} else if (event.getSource() instanceof XYPlot) {
+								plot = (XYPlot) event.getSource();
+							}
+							XYDataset dataset = plot.getDataset();
+							double time = plot.getDomainCrosshairValue();
+							tDatePreview.setText(df.format(new Date((long) time)));
+						}
+					}));
+					
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 

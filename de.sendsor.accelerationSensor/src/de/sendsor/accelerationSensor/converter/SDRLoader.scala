@@ -30,17 +30,17 @@ class SDRLoader extends TLoader {
     val path = TLoader.getFilePath(properties)
     converter.setFile(new File(path));
     
-    val average = properties.getProperty(AGGREGATE)
+    val average = properties.getProperty(AGGREGATE, AGGREGATE_AVERAGE)
     if(AGGREGATE_PROPERTIES contains(average)) {
       converter.setAggregate(average)
     }
     
-    val interval = properties.getProperty(INTERVAL)
+    val interval = properties.getProperty(INTERVAL, INTERVAL_SECOND)
     if(INTERVAL_PROPERTIES contains(interval)) {
       converter.setInterval(interval)
     }
     
-    val units = properties.getProperty(UNITS)
+    val units = properties.getProperty(UNITS, "1.0")
     converter.setUnits(units.toDouble)
     
     val timestamp = properties.getProperty(RELATIVE_TIMESTAMP)

@@ -62,7 +62,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		dpuService.unregister();
-		util.unregisterAll();
+		util.deregisterAll();
 		util = null;
 		plugin = null;
 		super.stop(context);

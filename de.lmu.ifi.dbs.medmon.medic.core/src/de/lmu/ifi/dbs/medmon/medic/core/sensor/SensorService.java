@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 
@@ -17,99 +16,84 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.osgi.service.component.ComponentContext;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.database.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.medic.core.Activator;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
-/**
- * @author Nepomuk Seiler
- * @version 0.1
- * @since 01.05.2011
- * 
- */
-public class SensorDaemon implements Runnable {
+public class SensorService implements ISensorService {
 
-	private static final Logger logger = Logger.getLogger(Activator.PLUGIN_ID);
 	private static final long INTERVAL = 1000;
 
-	private static SensorDaemon daemon;
-	private static Thread currentThread;
-
-	private volatile boolean initialized;
 	private PropertyChangeSupport support;
 	private Map<String, SensorAdapter> model;
+	private Thread currentThread;
 
-	private int attempts = 0;
+	private IEntityManagerService dbService;
 
-	private SensorDaemon() {
+	protected void activate(ComponentContext context) {
+		System.out.println("SensorServiceComponent activated");
 		support = new PropertyChangeSupport(this);
-	}
+		initModel();
 
-	@Override
-	public void run() {
-		while (!currentThread.isInterrupted()) {
-			if (!initialized && JPAUtil.isAvailable()) {
-				// singleton = new SensorDaemonOld();
-				synchronize();
-				initModel();
-				checkSensorsAvailable();
-				fireModelChanged();
-				initialized = true;
-				logger.info("Daemon initialized");
-			} else if (initialized) {
-				checkSensorsAvailable();
-				logger.finest("Check Sensors");
-			}
-
-			try {
-				Thread.sleep(INTERVAL);
-			} catch (InterruptedException e) {
-				System.err.println("SensorDaemon interrupted -> terminate!");
-				initialized = false;
-				return;
-			}
-		}
-
-	}
-
-	public static SensorDaemon getDaemon() {
-		return daemon;
-	}
-
-	public static void start() {
-		if (daemon != null && currentThread.isAlive())
-			return;
-
-		daemon = new SensorDaemon();
-		currentThread = new Thread(daemon);
+		currentThread = new Thread(new SensorDaemon());
 		currentThread.setDaemon(true);
 		currentThread.setName("Sensor Daemon");
 		currentThread.setPriority(Thread.MIN_PRIORITY);
 		currentThread.start();
 	}
 
-	public static void stop() {
-		if (daemon != null && currentThread != null)
-			currentThread.interrupt();
+	protected void deactivate(ComponentContext context) {
+		currentThread.interrupt();
+		currentThread = null;
+	}
+
+	@Override
+	public Map<String, SensorAdapter> getSensorAdapters() {
+		return model;
 	}
 
 	private void initModel() {
 		model = Collections.synchronizedMap(new HashMap<String, SensorAdapter>());
 
-		// Assert that the database is synchronized with extension points
-		List<Sensor> entities = getSensorEntities();
-		for (Sensor sensor : entities) {
-			model.put(sensor.getId(), new SensorAdapter(sensor));
+		// Merge extension points and entites together
+		Map<String, ISensor> extensions = new HashMap<String, ISensor>();
+		for (ISensor sensor : getSensorExtensions())
+			extensions.put(Sensor.parseId(sensor.getName(), sensor.getVersion()), sensor);
+
+		Map<String, Sensor> entities = new HashMap<String, Sensor>();
+		for (Sensor sensor : getSensorEntities())
+			entities.put(sensor.getId(), sensor);
+
+		for (String key : extensions.keySet()) {
+			ISensor extension = extensions.remove(key);
+			// Sensor driver exists
+			if (entities.containsKey(key)) {
+				Sensor entity = entities.remove(key);
+				SensorAdapter sensor = new SensorAdapter(extension, entity);
+				model.put(key, sensor);
+			// New sensor driver -> create db entity
+			} else {
+				EntityManager em = dbService.createEntityManager();
+				em.getTransaction().begin();
+				Sensor entity = new Sensor(extension.getName(), extension.getVersion(), extension.getType());
+				em.persist(entity);
+				em.getTransaction().commit();
+				em.close();
+				model.put(key, new SensorAdapter(extension, entity));
+			}
+		}
+		
+		// All left drivers -> handle delete/inactive? => delete!
+		for(String key : entities.keySet()) {
+			EntityManager em = dbService.createEntityManager();
+			em.getTransaction().begin();
+			em.getTransaction().commit();
+			em.close();
 		}
 
-		List<ISensor> extensions = getSensorExtensions();
-		for (ISensor sensor : extensions) {
-			String key = Sensor.parseId(sensor.getName(), sensor.getVersion());
-			SensorAdapter adapter = model.get(key);
-			adapter.setSensorExtension(sensor);
-		}
 		fireModelChanged();
 	}
 
@@ -125,7 +109,7 @@ public class SensorDaemon implements Runnable {
 				ISafeRunnable runnable = new ISafeRunnable() {
 					@Override
 					public void handleException(Throwable exception) {
-						logger.severe("Exception in client");
+						exception.printStackTrace();
 					}
 
 					@Override
@@ -138,34 +122,18 @@ public class SensorDaemon implements Runnable {
 			}
 		} catch (CoreException ex) {
 			ex.printStackTrace();
-			logger.severe(ex.getMessage());
 		}
 		return extensions;
 	}
 
 	private List<Sensor> getSensorEntities() {
-		EntityManager em = getEntityManager();
+		EntityManager em = dbService.createEntityManager();
 		List<Sensor> resultList = em.createNamedQuery("Sensor.findAll", Sensor.class).getResultList();
 		em.close();
 		return resultList;
 	}
 
-	private void synchronize() {
-		List<ISensor> sensors = getSensorExtensions();
-		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		for (ISensor sensor : sensors) {
-			String id = sensor.getName() + ":" + sensor.getVersion();
-			Sensor dbsensor = em.find(Sensor.class, id);
-			if (dbsensor == null) {
-				em.persist(new Sensor(sensor.getName(), sensor.getVersion(), sensor.getType()));
-			}
-		}
-		em.getTransaction().commit();
-		em.close();
-	}
-
-	public void checkSensorsAvailable() {
+	private void checkSensorsAvailable() {
 		boolean changed = false;
 		for (SensorAdapter adapter : model.values()) {
 			// TODO search the db for new sensors
@@ -176,6 +144,8 @@ public class SensorDaemon implements Runnable {
 				changed = true;
 				adapter.setAvailable(false);
 				continue;
+			} else if (!available) {
+				// initModel();
 			} else {
 				String path = entity.getDefaultpath();
 				if (path == null || path.isEmpty()) {
@@ -192,13 +162,13 @@ public class SensorDaemon implements Runnable {
 						continue;
 					}
 					ISensor sensor = adapter.getSensorExtension();
-					//Sensor extension not available
-					if(sensor == null) {
+					// Sensor extension not available
+					if (sensor == null) {
 						adapter.setAvailable(false);
 						changed = true;
 						continue;
 					}
-					//Sensor not null
+					// Sensor not null
 					if (sensor.isSensor(dir)) {
 						if (!available) {
 							adapter.setAvailable(true);
@@ -215,42 +185,17 @@ public class SensorDaemon implements Runnable {
 				}
 			}
 		}
-		if (changed) 
+		if (changed)
 			fireModelChanged();
-		
+
 	}
 
-	private EntityManager getEntityManager() {
-		try {
-			if (attempts < 10) {
-				EntityManager em = JPAUtil.createEntityManager();
-				attempts = -1;
-				return em;
-			}
-		} catch (NullPointerException e) {
-			System.err.println("Couldn't create EntityManager: JPAUTil not available");
-			try {
-				System.err.println("Waiting for " + (500 * (attempts+1)) + " milliseconds");
-				Thread.sleep(500 * (attempts+1));
-			} catch (InterruptedException e1) {
-				System.err.println("Waiting for JPAUtil interrupted...");
-				return null;
-			}
-			attempts++;
-			if(attempts < 10)
-				return getEntityManager();
-		}
-		return null;
-	}
-
-	public Map<String, SensorAdapter> getModel() {
-		return model;
-	}
-
+	@Override
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		support.addPropertyChangeListener(listener);
 	}
 
+	@Override
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		support.removePropertyChangeListener(listener);
 	}
@@ -259,4 +204,29 @@ public class SensorDaemon implements Runnable {
 		if (support != null)
 			support.firePropertyChange("model", null, model);
 	}
+
+	public void bindEntityManagerService(IEntityManagerService dbService) {
+		this.dbService = dbService;
+	}
+
+	public void unbindEntityManagerService(IEntityManagerService dbService) {
+		this.dbService = null;
+	}
+
+	private class SensorDaemon implements Runnable {
+
+		@Override
+		public void run() {
+			try {
+				while (!currentThread.isInterrupted()) {
+					checkSensorsAvailable();
+					Thread.sleep(INTERVAL);
+				}
+			} catch (InterruptedException e) {
+				return;
+			}
+		}
+
+	}
+
 }
