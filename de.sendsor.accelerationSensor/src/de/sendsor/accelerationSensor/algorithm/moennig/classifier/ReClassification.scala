@@ -80,7 +80,7 @@ class ReClassification extends TProcessor {
           }
         }
         //reclassify
-        if (max > total / 2.0 || oldLabels(i) == null) {
+        if (max > total / 2.0 || oldLabels(i).equals(NOT_CLASSIFIED)) {
           //inst.get(0).setClassValue(newClass);
           for (j <- 0 until labels.size) {
             if (labels(j).equals(newClass)) {
@@ -109,14 +109,11 @@ class ReClassification extends TProcessor {
       windowCount.put(label, value);
     }
   }
-
 }
 
 object ReClassification {
-  val NOT_CLASSIFIED: String = "not classified";
+  val NOT_CLASSIFIED: String = ResultsUtil.NOT_CLASSIFIED;
   val WINDOW_SIZE: Int = 750;
 }
 
-class ReClassificationFactory extends ProcessorFactory(classOf[ReClassification]) {
-
-}
+class ReClassificationFactory extends ProcessorFactory(classOf[ReClassification])
