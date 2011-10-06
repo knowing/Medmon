@@ -9,9 +9,13 @@
 #.classpath
 #.project
 #.settings
+.cache
+
 
 #ignore generated .class files
 *.class
+
+
 
 #except this file
 !.gitignore
