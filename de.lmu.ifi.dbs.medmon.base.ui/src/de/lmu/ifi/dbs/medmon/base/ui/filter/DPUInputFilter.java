@@ -29,7 +29,7 @@ public class DPUInputFilter extends ViewerFilter {
 		Set<String> dpuLoader = new HashSet<String>();
 		for (INode node : nodes) {
 			String type = node.getType().getText();
-			if(type.equals("loader")) {
+			if(type != null && type.equals("loader")) {
 				String id = node.getFactoryId().getText();
 				dpuLoader.add(id);
 			}
