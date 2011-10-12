@@ -17,7 +17,6 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.handler.ClusterWizardHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportWizardHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.NewPatientHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
@@ -111,11 +110,7 @@ public class HomeView extends ViewPart {
 			public void linkActivated(HyperlinkEvent e) {
 				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
 						IHandlerService.class);
-				try {
-					handlerService.executeCommand(ClusterWizardHandler.ID, null);
-				} catch (Exception ex) {
-					throw new RuntimeException(ClusterWizardHandler.ID, ex);
-				}				
+			
 			}
 		});
 

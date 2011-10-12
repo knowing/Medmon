@@ -25,7 +25,6 @@ Export-Package: de.lmu.ifi.dbs.medmon.medic.ui.handler,
  de.lmu.ifi.dbs.medmon.medic.ui.views
 Import-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
  de.lmu.ifi.dbs.medmon.base.ui.analyzed,
- de.lmu.ifi.dbs.medmon.base.ui.cluster,
  de.lmu.ifi.dbs.medmon.base.ui.dialog,
  de.lmu.ifi.dbs.medmon.base.ui.filter,
  de.lmu.ifi.dbs.medmon.base.ui.provider,

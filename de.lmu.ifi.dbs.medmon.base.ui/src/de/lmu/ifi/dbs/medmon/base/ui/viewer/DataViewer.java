@@ -5,17 +5,22 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
 
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
-import de.lmu.ifi.dbs.medmon.base.ui.viewer.editing.SensorPathEditingSupport;
 
 public class DataViewer extends TableViewer {
 
-	private static final String[] columns = new String[] { "Patient", "Von", "Bis" };
-	private static final int[] width = new int[] { 150, 150, 150 };
+	private static final String[] columns = new String[] { "Von", "Bis", "Sensor", "Ergebnisse" };
+	private static final int[] width = new int[] { 170, 170, 120, 100 };
 
 	public DataViewer(Composite parent, int style) {
 		super(parent, style);
+		init();
+	}
+	
+	public DataViewer(Table table) {
+		super(table);
 		init();
 	}
 
@@ -36,9 +41,6 @@ public class DataViewer extends TableViewer {
 			viewerColumn.getColumn().setResizable(true);
 			// Spalten lassen sich untereinander verschieben
 			viewerColumn.getColumn().setMoveable(true);
-			if (i == 3) {
-				viewerColumn.setEditingSupport(new SensorPathEditingSupport(this));
-			}
 		}
 	}
 

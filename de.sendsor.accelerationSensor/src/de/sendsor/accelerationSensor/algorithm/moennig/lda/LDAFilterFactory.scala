@@ -47,7 +47,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) {
   isBuild = false
 
   override def build(instances: Instances) {
-    akka.event.EventHandler.debug(this, "Build and set InputFormat")
+    akka.event.EventHandler.debug(this, "Train LDA")
     guessAndSetClassLabel(instances)
     val lda = filter.asInstanceOf[LDAFilter]
     val header = new Instances(instances, 0)
