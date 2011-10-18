@@ -183,7 +183,8 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		lComment.setText("Kommentar");
 
 		tComment = new Text(cPatient, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		tComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));*/
+		tComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		*/
 	}
 
 	/* ==================================== */

@@ -15,7 +15,8 @@ public class OpenPatientHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Patient patient = DialogFactory.openPatientSelectionDialog(HandlerUtil.getActiveShell(event));
 /*		if (patient != null)
-			Activator.getPatientService().setSelection(patient, IPatientService.PATIENT);*/
+			Activator.getPatientService().setSelection(patient, IPatientService.PATIENT);
+			*/
 		return null;
 	}
 
