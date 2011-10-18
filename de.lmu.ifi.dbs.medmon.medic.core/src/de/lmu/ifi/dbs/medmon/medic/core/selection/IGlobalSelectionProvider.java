@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service;
+package de.lmu.ifi.dbs.medmon.medic.core.selection;
+
 
 
 /**
@@ -10,14 +11,14 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
  * @version 1.0
  * 
  */
-public interface IGlobalSelectionProvider {
+public interface IGlobalSelectionProvider<T> {
 
 	/**
 	 * Called by the UI component
 	 * @param clazz - the selection key
 	 * @param selection - the current selection
 	 */
-	<T> void setSelection(Class<T> clazz, T selection);
+	void setSelection(Class<T> clazz, T selection);
 	
 	/**
 	 * Called by the @IGlobalSelectionService to register itself.

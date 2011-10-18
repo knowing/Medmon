@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="de.lmu.ifi.dbs.medmon.medic.core">
+   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.selection.GlobalSelectionService"/>
+   <reference bind="bindProvider" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.selection.IGlobalSelectionProvider" name="IGlobalSelectionProvider" policy="dynamic" unbind="unbindProvider"/>
+   <reference bind="bindListener" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.selection.IGlobalSelectionListener" name="IGlobalSelectionListener" policy="dynamic" unbind="unbindListener"/>bs.medmon.medic.core.selection.GlobalSelectionService"/>
+</scr:component>
