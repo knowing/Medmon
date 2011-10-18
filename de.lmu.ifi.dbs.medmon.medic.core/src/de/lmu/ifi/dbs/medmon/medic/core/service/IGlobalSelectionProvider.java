@@ -17,7 +17,7 @@ public interface IGlobalSelectionProvider {
 	 * @param clazz - the selection key
 	 * @param selection - the current selection
 	 */
-	<T> void selectionChanged(Class<T> clazz, T selection);
+	<T> void setSelection(Class<T> clazz, T selection);
 	
 	/**
 	 * Called by the @IGlobalSelectionService to register itself.
