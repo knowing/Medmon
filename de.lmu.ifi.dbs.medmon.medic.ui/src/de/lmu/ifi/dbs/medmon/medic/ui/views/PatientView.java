@@ -50,8 +50,8 @@ import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 public class PatientView extends ViewPart implements PropertyChangeListener {
 
 	public static final String ID = "de.lmu.ifi.dbs.medmon.medic.ui.PatientView"; //$NON-NLS-1$
-	private static final String PATIENT_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
-	private static final String ARCHIV_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
+	private static final String PATIENT_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
+	private static final String ARCHIV_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv";
 	private static final String DATA_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
 
 	private TabFolder tabFolder;
@@ -60,14 +60,10 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	private Text tLastname, tFirstname, tGender, tComment;
 	private CDateTime dBirth;
 
-	private Action saveAction;
-	private Action openAction;
-
 	/* Archiv Tab */
 	private Text tArchivSearch;
 	private Table archivTable;
 	private TableViewer archivViewer;
-	private Text tPatientCluster;
 	private TabItem tabCluster;
 
 	private FormToolkit toolkit;
@@ -110,19 +106,17 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	 * 
 	 */
 	private void createPersonalTab() {
-		/****** Personal Data Tab *******/
-		/* 								*/
 		TabItem tPersonalData = new TabItem(tabFolder, SWT.NONE);
 		tPersonalData.setText("Persoenliche Daten");
 		tPersonalData.setImage(getImageDescriptor(ISharedImages.IMG_PATIENTS_16).createImage());
 
 		Composite cPatient = new Composite(tabFolder, SWT.NONE);
 		tPersonalData.setControl(cPatient);
-		GridLayout cPatientLayout = new GridLayout(4, false);
+		GridLayout cPatientLayout = new GridLayout(2, false);
 		cPatientLayout.horizontalSpacing = 10;
 		cPatient.setLayout(cPatientLayout);
 
-		Label lName = new Label(cPatient, SWT.NONE);
+/*		Label lName = new Label(cPatient, SWT.NONE);
 		lName.setText("Name");
 		lName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
@@ -189,7 +183,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		lComment.setText("Kommentar");
 
 		tComment = new Text(cPatient, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		tComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		tComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));*/
 	}
 
 	/* ==================================== */
@@ -309,7 +303,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	 * Initalize input
 	 */
 	private void update() {
-		IPatientService service = Activator.getPatientService();
+/*		IPatientService service = Activator.getPatientService();
 		if (service == null) {
 			MessageDialog.openError(getSite().getShell(), "Error", "Patient Service Offline");
 			return;
@@ -317,26 +311,22 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 
 		Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);
 		if (patient == null)
-			return;
+			return;*/
 
 		// Update Personal Data
-		tFirstname.setText(patient.getFirstname());
+/*		tFirstname.setText(patient.getFirstname());
 		tLastname.setText(patient.getLastname());
 		tGender.setText(String.valueOf(patient.getGender()));
 		dBirth.setSelection(patient.getBirth());
 		if (patient.getComment() != null)
 			tComment.setText(patient.getComment());
-
+*/
 		// Update Archiv
-		EntityManager em = JPAUtil.createEntityManager();
+/*		EntityManager em = JPAUtil.createEntityManager();
 		List<Archiv> archives = em.createNamedQuery("Archiv.findByPatient", Archiv.class).setParameter("patientId", patient.getId())
 				.getResultList();
-		archivViewer.setInput(archives);
+		archivViewer.setInput(archives);*/
 
-		// Update Cluster
-		// clusterViewer.setInput(MedicUtil.loadClusterUnits(patient));
-		// TODO clusterViewer.setInput(Clusters)
-		System.err.println("TODO: clusterViewer.setInput(Clusters)");
 	}
 
 	@Override
