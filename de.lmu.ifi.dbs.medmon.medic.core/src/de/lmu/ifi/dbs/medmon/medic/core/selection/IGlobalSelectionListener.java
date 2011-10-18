@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service;
+package de.lmu.ifi.dbs.medmon.medic.core.selection;
 
 /**
  * 
@@ -11,9 +11,9 @@ public interface IGlobalSelectionListener<T> {
 	/**
 	 * Callback for UI components
 	 * @param clazz
-	 * @param Selection
+	 * @param selection
 	 */
-	void selectionChanged(T Selection);
+	void selectionChanged(T selection);
 	
 	/**
 	 * 
