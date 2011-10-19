@@ -10,6 +10,7 @@
 #.project
 #.settings
 .cache
+*.cache
 
 
 #ignore generated .class files
