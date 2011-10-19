@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.selection;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 
 

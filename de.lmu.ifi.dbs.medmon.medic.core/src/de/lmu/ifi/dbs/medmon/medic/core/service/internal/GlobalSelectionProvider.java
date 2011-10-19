@@ -1,4 +1,7 @@
-package de.lmu.ifi.dbs.medmon.medic.core.selection;
+package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 
 public class GlobalSelectionProvider<T> implements IGlobalSelectionProvider<T> {
 
