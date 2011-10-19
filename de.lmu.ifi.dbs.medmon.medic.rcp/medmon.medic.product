@@ -22,7 +22,9 @@
 
    <splash
       location="de.lmu.ifi.dbs.medmon.medic.rcp"
-      handlerType="extensible" />
+      startupProgressRect="5,275,445,15"
+      startupMessageRect="7,252,445,20"
+      startupForegroundColor="000000" />
    <launcher name="Medmon">
       <linux icon="/de.lmu.ifi.dbs.medmon.medic.rcp/icons/alt_launcher.xpm"/>
       <solaris/>
@@ -30,6 +32,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
