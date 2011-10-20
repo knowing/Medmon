@@ -498,7 +498,55 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	public String getAttributeNamePrefix() {
 		return attributeNamePrefix;
 	}
+	
+	/**
+	 * To persist inDimensions
+	 * @return
+	 */
+	protected int getInDimensions() {
+		return inDimensions;
+	}
+	
+	protected void setInDimensions(int inDimensions) {
+		this.inDimensions = inDimensions;
+	}
+	
+	/**
+	 * To persist EigenValues
+	 * @return
+	 */
+	protected double[] getEigenValues() {
+		return eigenValues;
+	}
+	
+	protected void setEigenValues(double[] eigenValues) {
+		this.eigenValues = eigenValues;
+	}
+	
+	/**
+	 * To persist EigenVectorMatrix
+	 * @return
+	 */
+	protected Matrix getEigenVectorMatrix() {
+		return eigenVectorMatrix;
+	}
+	
+	protected void setEigenVectorMatrix(Matrix eigenVectorMatrix) {
+		this.eigenVectorMatrix = eigenVectorMatrix;
+	}
+	
+	/**
+	 * To persist output format
+	 * @return
+	 */
+	protected Instances getOutput() {
+		return new Instances(output,0);
+	}
 
+	protected void setOutput(Instances output) {
+		this.output = output;
+	}
+	
 	/**
 	 * Used for communication with the akka-actor-framework
 	 * Especially for logging and status updates.
