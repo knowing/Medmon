@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.rcp;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
-import org.eclipselabs.p2.rcpupdate.utils.P2Util;
+//import org.eclipselabs.p2.rcpupdate.utils.P2Util;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 

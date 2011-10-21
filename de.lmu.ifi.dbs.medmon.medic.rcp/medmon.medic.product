@@ -15,6 +15,11 @@
 
    <launcherArgs>
       <programArgs>-clean -console -consoleLog</programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.5
+-XX:MaxPermSize=256m
+-Xms256m
+-Xmx1024m
+-DREFRESH_BUNDLES=false</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -32,7 +37,6 @@
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -66,8 +70,13 @@
    </plugins>
 
    <features>
-      <feature id="medmon.core.feature" version="1.0.1.qualifier"/>
-      <feature id="medmon.medic.feature" version="1.0.1.qualifier"/>
+      <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.R37x_v20110906-782EpBqNKGUkZQpuT8hAlWlFbUeo"/>
+      <feature id="org.eclipse.rcp" version="3.7.1.r37x_v20110729-9DB5FmNFnFLSFCtLxnRfMqt15A4A"/>
+      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.common.core.feature" version="1.0.1.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
    </features>
 
    <configurations>
