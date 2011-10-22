@@ -18,6 +18,8 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 import Jama.Matrix
 import scala.collection.mutable.ListBuffer
+import java.io.BufferedReader
+import java.io.StringReader
 
 class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](classOf[LDAFilterWrapper], classOf[LDAFilter]) {
 
@@ -65,7 +67,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
       in match {
         case None => warning(this, "No LDA training data found!")
         case Some(i) =>
-          debug(this, "Trying to open InputStream")
+          debug(this, "Loading LDA model")
           val reader = new LineNumberReader(new InputStreamReader(i))
           val line = reader.readLine
           if (line == null) {
@@ -73,29 +75,35 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
             return
           }
           val lda = filter.asInstanceOf[LDAFilter]
-          //TODO complete this method
-          /*
-          val dimInfos = reader.readLine.split(";")
+
+          //Set InputDimension, OutputDimension, DimensionReduction
+          val dimInfos = line.split(";")
           lda.setInDimensions(dimInfos(0).toInt)
           lda.setOutDimensions(dimInfos(1).toInt)
           lda.setDimensionReduction(dimInfos(2).toBoolean)
-          
+
+          //Set EigenValues
           val eigenValues = reader.readLine.split(";").map(_.toDouble)
           lda.setEigenValues(eigenValues)
-          
+
+          //Read EigenVectorMatrix
           reader.readLine.equals(EIGENVECTOR_MATRIX)
           var row = reader.readLine
           val rows = ListBuffer[String]()
-          while(!row.equals(OUTPUT_FORMAT)) {
+          while (!row.equals(OUTPUT_FORMAT)) {
             rows += row
             row = reader.readLine
           }
-         
+          val stringMatrix = rows.foldLeft("")((l,r) => l + r + "\n")
+          val matrix = Matrix.read(new BufferedReader(new StringReader(stringMatrix)))
+          lda.setEigenVectorMatrix(matrix)
+
+          //Read output-format
           val output = new Instances(reader)
           lda.setOutput(output)
-                    
+
           isBuild = true
-          */
+
           reader.close
       }
     } catch {
@@ -108,7 +116,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
     out match {
       case None => debug(this, "Trained LDA will not be saved")
       case Some(o) =>
-        debug(this, "Trying to open OutputStream and save LDA")
+        debug(this, "Saving LDA model")
         val writer = new PrintWriter(o)
         val lda = filter.asInstanceOf[LDAFilter]
         writer.print(lda.getInDimensions + ";")
@@ -128,14 +136,21 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
   }
 
   override def build(instances: Instances) {
-    akka.event.EventHandler.debug(this, "Train LDA")
     guessAndSetClassLabel(instances)
     val lda = filter.asInstanceOf[LDAFilter]
-    val header = new Instances(instances, 0)
-    filter.setInputFormat(header)
-    lda.train(instances)
-    isBuild = true
-    processStoredQueries
+    isBuild match {
+      case true => 
+        debug(this, "Filter instances with LDA")
+        sendResults(filter(instances))
+      case false =>
+        debug(this, "Train LDA")
+        val header = new Instances(instances, 0)
+        filter.setInputFormat(header)
+        lda.train(instances)
+        isBuild = true
+        processStoredQueries
+
+    }
   }
 
   override def configure(properties: Properties) = {

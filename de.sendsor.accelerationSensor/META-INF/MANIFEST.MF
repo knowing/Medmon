@@ -6,11 +6,12 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.sendsor.accelerationSensor.Activator
 Require-Bundle: javax.persistence;bundle-version="2.0.0",
  de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.knowing.core.swt.charts;bundle-version="1.0.0",
- gov.nist.math.jama;bundle-version="1.0.2"
+ de.lmu.ifi.dbs.knowing.core.swt.charts;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.osgi.framework;version="1.6.0",
+Import-Package: Jama,
+ Jama.util,
+ org.osgi.framework;version="1.6.0",
  scala;version="2.9.0.1",
  scala.collection;version="2.9.0.1",
  scala.collection.generic;version="2.9.0.1",
