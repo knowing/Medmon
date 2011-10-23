@@ -22,6 +22,9 @@ public class PatientManagementController implements Listener {
 
 	private final TableViewer viewer;
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public PatientManagementController(TableViewer viewer) {
 		this.viewer = viewer;
 	}

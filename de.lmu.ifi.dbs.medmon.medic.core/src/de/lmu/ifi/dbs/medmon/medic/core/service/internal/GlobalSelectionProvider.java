@@ -8,7 +8,8 @@ public class GlobalSelectionProvider<T> implements IGlobalSelectionProvider<T> {
 	private IGlobalSelectionService	service = null;
 
 	@Override
-	public void setSelection(Class<T> clazz, T selection) {
+	public void setSelection(T selection) {
+		Class<T> clazz = null;
 		if(service != null)
 			service.setSelection(clazz, selection);
 		else

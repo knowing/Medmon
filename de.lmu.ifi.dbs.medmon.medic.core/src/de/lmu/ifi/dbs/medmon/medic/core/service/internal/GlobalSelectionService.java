@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -14,54 +16,64 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 
 public class GlobalSelectionService implements IGlobalSelectionService {
+	// ********************************************************************************
+	private final Logger									log					= LoggerFactory.getLogger(IGlobalSelectionService.class);
+	private List<IGlobalSelectionProvider<?>>				providerServices	= new ArrayList<IGlobalSelectionProvider<?>>();
+	private Map<Class<?>, Set<IGlobalSelectionListener<?>>>	listenerServices	= new HashMap<Class<?>, Set<IGlobalSelectionListener<?>>>();
+	private Map<Class<?>, Object>							selectionMap		= new HashMap<Class<?>, Object>();
 
-	private final Logger log = LoggerFactory.getLogger(IGlobalSelectionService.class);
-	
-	private List<IGlobalSelectionListener<?>>	listenerServices	= new ArrayList<IGlobalSelectionListener<?>>();
-	private List<IGlobalSelectionProvider<?>>	providerServices	= new ArrayList<IGlobalSelectionProvider<?>>();
-	private Map<Class<?>, Object>				selectionMap		= new HashMap<Class<?>, Object>();
-
+	// ********************************************************************************
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getSelection(Class<T> clazz) {
 		return (T) selectionMap.get(clazz);
 	}
 
+	// ********************************************************************************
 	@SuppressWarnings("unchecked")
 	@Override
-	//looks ugly - which in fact ... it is !
 	public <T> T setSelection(Class<T> clazz, T selection) {
 		T oldSelection = (T) selectionMap.get(clazz);
 		selectionMap.put(clazz, selection);
-		for (IGlobalSelectionListener<?> listener : listenerServices) {
-			if (listener.getType() == clazz) {
+		if (listenerServices.get(clazz) == null || selection == oldSelection) {
+			return oldSelection;
+		} else {
+			for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz)) {
 				((IGlobalSelectionListener<T>) listener).selectionChanged(selection);
 			}
+			return oldSelection;
 		}
-		return oldSelection;
 	}
 
+	// ********************************************************************************
 	protected void activate(ComponentContext context) {
 		log.info("GlobalSelectionService started successfully");
 	}
 
-	@SuppressWarnings("unused")
-	private void bindProvider(IGlobalSelectionProvider<?> provider) {
+	// ********************************************************************************
+	protected void bindProvider(IGlobalSelectionProvider<?> provider) {
 		providerServices.add(provider);
+		provider.setGlobalSelectionService(this);
 	}
 
-	@SuppressWarnings("unused")
-	private void unbindProvider(IGlobalSelectionProvider<?> provider) {
+	// ********************************************************************************
+	protected void unbindProvider(IGlobalSelectionProvider<?> provider) {
 		providerServices.remove(provider);
+		// provider.setGlobalSelectionService(null); ???
 	}
 
-	@SuppressWarnings("unused")
-	private void bindListener(IGlobalSelectionListener<?> listener) {
-		listenerServices.add(listener);
+	// ********************************************************************************
+	protected void bindListener(IGlobalSelectionListener<?> listener) {
+		if(listenerServices.get(listener.getType()) == null){
+			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>() );
+		}
+		listenerServices.get(listener.getType()).add(listener);
+		System.out.println("bound:" + listener.getType().toString());
 	}
 
-	@SuppressWarnings("unused")
-	private void unbindListener(IGlobalSelectionListener<?> listener) {
-		listenerServices.remove(listener);
+	// ********************************************************************************
+	protected void unbindListener(IGlobalSelectionListener<?> listener) {
+		listenerServices.get(listener.getType()).remove(listener);
 	}
+	// ********************************************************************************
 }

@@ -18,11 +18,11 @@ public interface IGlobalSelectionProvider<T> {
 	 * @param clazz - the selection key
 	 * @param selection - the current selection
 	 */
-	void setSelection(Class<T> clazz, T selection);
+	public void setSelection(T selection);
 	
 	/**
 	 * Called by the @IGlobalSelectionService to register itself.
 	 * @param service - the @IGlobalSelectionService
 	 */
-	void setGlobalSelectionService(IGlobalSelectionService service);
+	public void setGlobalSelectionService(IGlobalSelectionService service);
 }
