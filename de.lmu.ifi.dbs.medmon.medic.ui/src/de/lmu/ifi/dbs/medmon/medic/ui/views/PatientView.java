@@ -41,6 +41,7 @@ import org.eclipse.ui.part.ViewPart;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Archiv;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
@@ -68,6 +69,11 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 
 	private FormToolkit toolkit;
 	private TableViewer dataTableViewer;
+	private Text textLastName;
+	private Text textFirstname;
+	private Text textBirth;
+	private Text textGender;
+	private Text textInsuranceId;
 
 	public PatientView() {
 		IPatientService patientService = Activator.getPatientService();
@@ -102,6 +108,8 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	/* =========== Personal Tab =========== */
 	/* ==================================== */
 
+	
+	
 	/**
 	 * 
 	 */
@@ -112,10 +120,73 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 
 		Composite cPatient = new Composite(tabFolder, SWT.NONE);
 		tPersonalData.setControl(cPatient);
-		GridLayout cPatientLayout = new GridLayout(2, false);
-		cPatientLayout.horizontalSpacing = 10;
-		cPatient.setLayout(cPatientLayout);
-
+		cPatient.setLayout(new GridLayout(2, false));
+		
+		Label lblLastName = new Label(cPatient, SWT.NONE);
+		toolkit.adapt(lblLastName, true, true);
+		lblLastName.setText("Name:");
+		
+		textLastName = new Text(cPatient, SWT.BORDER);
+		textLastName.setEditable(false);
+		textLastName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(textLastName, true, true);
+		
+		Label lblFirstname = new Label(cPatient, SWT.NONE);
+		toolkit.adapt(lblFirstname, true, true);
+		lblFirstname.setText("Vorname:");
+		
+		textFirstname = new Text(cPatient, SWT.BORDER);
+		textFirstname.setEditable(false);
+		textFirstname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(textFirstname, true, true);
+		
+		Label lblBirth = new Label(cPatient, SWT.NONE);
+		toolkit.adapt(lblBirth, true, true);
+		lblBirth.setText("Geburtsdatum:");
+		
+		textBirth = new Text(cPatient, SWT.BORDER);
+		textBirth.setEditable(false);
+		textBirth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(textBirth, true, true);
+		
+		Label lblGender = new Label(cPatient, SWT.NONE);
+		toolkit.adapt(lblGender, true, true);
+		lblGender.setText("Geschlecht:");
+		
+		textGender = new Text(cPatient, SWT.BORDER);
+		textGender.setEditable(false);
+		textGender.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(textGender, true, true);
+		
+		Label lblInsuranceId = new Label(cPatient, SWT.NONE);
+		toolkit.adapt(lblInsuranceId, true, true);
+		lblInsuranceId.setText("Versicherungsnummer:");
+		
+		textInsuranceId = new Text(cPatient, SWT.BORDER);
+		textInsuranceId.setEditable(false);
+		textInsuranceId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(textInsuranceId, true, true);
+		
+		IGlobalSelectionListener<Patient> selectionListener = new IGlobalSelectionListener<Patient>() {
+			
+			@Override
+			public void selectionChanged(Patient selection) {
+				textLastName.setText(selection.getLastname());
+				textFirstname.setText(selection.getFirstname());
+				textBirth.setText(selection.getBirth().toString());
+				textGender.setText("Zwitter");
+				textInsuranceId.setText(selection.getInsuranceId());
+				System.out.println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJj");
+			}
+			
+			@Override
+			public Class<Patient> getType() {
+				return Patient.class;
+			}
+		};
+		
+		Activator.registerSelectionListener(selectionListener);
+	
 /*		Label lName = new Label(cPatient, SWT.NONE);
 		lName.setText("Name");
 		lName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -190,7 +261,6 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	/* ==================================== */
 	/* ============= Archiv Tab =========== */
 	/* ==================================== */
-
 	/**
 	 * 
 	 */
@@ -332,7 +402,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 
 	@Override
 	public void setFocus() {
-		tComment.setFocus();
+
 	}
 
 	@Override
