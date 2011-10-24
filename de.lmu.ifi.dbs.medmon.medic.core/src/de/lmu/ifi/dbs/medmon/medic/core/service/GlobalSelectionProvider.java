@@ -1,15 +1,12 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 
-public class GlobalSelectionProvider<T> implements IGlobalSelectionProvider<T> {
+public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 
 	private IGlobalSelectionService	service = null;
 
 	@Override
-	public void setSelection(T selection) {
-		Class<T> clazz = null;
+	public <T> void setSelection(Class<T> clazz, T selection) {
 		if(service != null)
 			service.setSelection(clazz, selection);
 		else

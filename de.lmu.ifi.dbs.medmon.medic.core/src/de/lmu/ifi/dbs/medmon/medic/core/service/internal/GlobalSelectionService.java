@@ -18,7 +18,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 public class GlobalSelectionService implements IGlobalSelectionService {
 	// ********************************************************************************
 	private final Logger									log					= LoggerFactory.getLogger(IGlobalSelectionService.class);
-	private List<IGlobalSelectionProvider<?>>				providerServices	= new ArrayList<IGlobalSelectionProvider<?>>();
+	private List<IGlobalSelectionProvider>					providerServices	= new ArrayList<IGlobalSelectionProvider>();
 	private Map<Class<?>, Set<IGlobalSelectionListener<?>>>	listenerServices	= new HashMap<Class<?>, Set<IGlobalSelectionListener<?>>>();
 	private Map<Class<?>, Object>							selectionMap		= new HashMap<Class<?>, Object>();
 
@@ -33,9 +33,8 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T setSelection(Class<T> clazz, T selection) {
-		T oldSelection = (T) selectionMap.get(clazz);
-		selectionMap.put(clazz, selection);
-		if (listenerServices.get(clazz) == null || selection == oldSelection) {
+		T oldSelection = (T) selectionMap.put(clazz, selection);
+		if (listenerServices.get(clazz) == null || selection.equals(oldSelection)) {
 			return oldSelection;
 		} else {
 			for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz)) {
@@ -51,21 +50,21 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 	}
 
 	// ********************************************************************************
-	protected void bindProvider(IGlobalSelectionProvider<?> provider) {
+	protected void bindProvider(IGlobalSelectionProvider provider) {
 		providerServices.add(provider);
 		provider.setGlobalSelectionService(this);
 	}
 
 	// ********************************************************************************
-	protected void unbindProvider(IGlobalSelectionProvider<?> provider) {
+	protected void unbindProvider(IGlobalSelectionProvider provider) {
 		providerServices.remove(provider);
 		// provider.setGlobalSelectionService(null); ???
 	}
 
 	// ********************************************************************************
 	protected void bindListener(IGlobalSelectionListener<?> listener) {
-		if(listenerServices.get(listener.getType()) == null){
-			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>() );
+		if (listenerServices.get(listener.getType()) == null) {
+			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>());
 		}
 		listenerServices.get(listener.getType()).add(listener);
 		System.out.println("bound:" + listener.getType().toString());

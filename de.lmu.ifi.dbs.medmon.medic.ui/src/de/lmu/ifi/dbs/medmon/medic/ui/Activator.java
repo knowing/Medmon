@@ -5,12 +5,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
-import de.lmu.ifi.dbs.medmon.medic.ui.selection.PatientSelectionProvider;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -22,20 +18,9 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator										plugin;
-	private static BundleContext									context;
-
+	
 	private static ServiceTracker<IPatientService, IPatientService>	patientTracker;
 	private static ServiceTracker<ISensorService, ISensorService>	sensorTracker;
-	private static PatientSelectionProvider							patientSelectionProvider;
-
-	public static PatientSelectionProvider getPatientSelectionProvider() {
-		return patientSelectionProvider;
-	}
-
-	public static void registerSelectionListener(IGlobalSelectionListener<?> service) {
-		context.registerService(IGlobalSelectionListener.class, service, null);
-		System.out.println("************************************REGISTER");
-	}
 
 	/**
 	 * The constructor
@@ -54,10 +39,6 @@ public class Activator extends AbstractUIPlugin {
 		System.out.println("#########################################START");
 		super.start(context);
 		plugin = this;
-		this.context = context;
-
-		patientSelectionProvider = new PatientSelectionProvider();
-		context.registerService(IGlobalSelectionProvider.class, patientSelectionProvider, null);
 
 		patientTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class.getName(), null);
 		patientTracker.open();
@@ -91,6 +72,9 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
+	}
+	public static BundleContext getBundleContext(){
+		return Activator.plugin.getBundle().getBundleContext();
 	}
 
 	/**

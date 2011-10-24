@@ -185,7 +185,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 			}
 		};
 		
-		Activator.registerSelectionListener(selectionListener);
+		Activator.getBundleContext().registerService(IGlobalSelectionListener.class, selectionListener, null);
 	
 /*		Label lName = new Label(cPatient, SWT.NONE);
 		lName.setText("Name");
