@@ -17,10 +17,10 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 
 public class GlobalSelectionService implements IGlobalSelectionService {
 	// ********************************************************************************
-	private final Logger									log					= LoggerFactory.getLogger(IGlobalSelectionService.class);
-	private List<IGlobalSelectionProvider>					providerServices	= new ArrayList<IGlobalSelectionProvider>();
-	private Map<Class<?>, Set<IGlobalSelectionListener<?>>>	listenerServices	= new HashMap<Class<?>, Set<IGlobalSelectionListener<?>>>();
-	private Map<Class<?>, Object>							selectionMap		= new HashMap<Class<?>, Object>();
+	private final Logger log = LoggerFactory.getLogger(IGlobalSelectionService.class);
+	private List<IGlobalSelectionProvider> providerServices = new ArrayList<IGlobalSelectionProvider>();
+	private Map<Class<?>, Set<IGlobalSelectionListener<?>>> listenerServices = new HashMap<Class<?>, Set<IGlobalSelectionListener<?>>>();
+	private Map<Class<?>, Object> selectionMap = new HashMap<Class<?>, Object>();
 
 	// ********************************************************************************
 	@SuppressWarnings("unchecked")
@@ -36,12 +36,10 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 		T oldSelection = (T) selectionMap.put(clazz, selection);
 		if (listenerServices.get(clazz) == null || selection.equals(oldSelection)) {
 			return oldSelection;
-		} else {
-			for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz)) {
-				((IGlobalSelectionListener<T>) listener).selectionChanged(selection);
-			}
-			return oldSelection;
 		}
+		for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz))
+			((IGlobalSelectionListener<T>) listener).selectionChanged(selection);
+		return oldSelection;
 	}
 
 	// ********************************************************************************
@@ -67,7 +65,7 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>());
 		}
 		listenerServices.get(listener.getType()).add(listener);
-		System.out.println("bound:" + listener.getType().toString());
+		log.debug("bound:" + listener.getType());
 	}
 
 	// ********************************************************************************

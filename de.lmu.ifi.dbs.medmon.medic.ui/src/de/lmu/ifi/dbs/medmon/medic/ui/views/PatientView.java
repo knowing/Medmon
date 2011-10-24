@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ArchivLabelProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 
-public class PatientView extends ViewPart implements PropertyChangeListener {
+public class PatientView extends ViewPart {
 
 	public static final String ID = "de.lmu.ifi.dbs.medmon.medic.ui.PatientView"; //$NON-NLS-1$
 	private static final String PATIENT_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
@@ -74,14 +74,6 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	private Text textBirth;
 	private Text textGender;
 	private Text textInsuranceId;
-
-	public PatientView() {
-		IPatientService patientService = Activator.getPatientService();
-		if (patientService != null)
-			patientService.addPropertyChangeListener(IPatientService.PATIENT, this);
-		else
-			MessageDialog.openError(Display.getDefault().getActiveShell(), "Fail", "Patient Service offline");
-	}
 
 	/**
 	 * Create contents of the view part.
@@ -118,7 +110,7 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		tPersonalData.setText("Persoenliche Daten");
 		tPersonalData.setImage(getImageDescriptor(ISharedImages.IMG_PATIENTS_16).createImage());
 
-		Composite cPatient = new Composite(tabFolder, SWT.NONE);
+		Composite cPatient = toolkit.createComposite(tabFolder, SWT.NONE);
 		tPersonalData.setControl(cPatient);
 		cPatient.setLayout(new GridLayout(2, false));
 		
@@ -176,7 +168,6 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 				textBirth.setText(selection.getBirth().toString());
 				textGender.setText("Zwitter");
 				textInsuranceId.setText(selection.getInsuranceId());
-				System.out.println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJj");
 			}
 			
 			@Override
@@ -187,74 +178,12 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		
 		Activator.getBundleContext().registerService(IGlobalSelectionListener.class, selectionListener, null);
 	
-/*		Label lName = new Label(cPatient, SWT.NONE);
-		lName.setText("Name");
-		lName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-
-		tLastname = new Text(cPatient, SWT.BORDER | SWT.READ_ONLY);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		data.widthHint = 150;
-		tLastname.setLayoutData(data);
-
-		Label lFirstname = new Label(cPatient, SWT.NONE);
-		lFirstname.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lFirstname.setText("Vorname");
-
-		tFirstname = new Text(cPatient, SWT.BORDER | SWT.READ_ONLY);
-		data = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		data.widthHint = 150;
-		tFirstname.setLayoutData(data);
-
-		Label lBirth = new Label(cPatient, SWT.NONE);
-		lBirth.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lBirth.setText("Geb.");
-
+/*		
 		dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT);
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		data.widthHint = 160;
 		dBirth.setLayoutData(data);
 
-		Label lGender = new Label(cPatient, SWT.NONE);
-		lGender.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lGender.setText("Geschlecht");
-
-		tGender = new Text(cPatient, SWT.BORDER | SWT.READ_ONLY);
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		data.widthHint = 150;
-		tGender.setLayoutData(data);
-
-		Label label = new Label(cPatient, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		label.setText("Vergleichsdaten");
-
-		Composite cPatientCluster = new Composite(cPatient, SWT.NONE);
-		GridLayout gl_cPatientCluster = new GridLayout(2, false);
-		gl_cPatientCluster.marginWidth = 0;
-		cPatientCluster.setLayout(gl_cPatientCluster);
-		cPatientCluster.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
-
-		tPatientCluster = new Text(cPatientCluster, SWT.BORDER);
-		tPatientCluster.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		tPatientCluster.setBounds(0, 0, 75, 25);
-
-		Button bPatientLoadCluster = new Button(cPatientCluster, SWT.NONE);
-		data = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		data.widthHint = 81;
-		bPatientLoadCluster.setLayoutData(data);
-		bPatientLoadCluster.setText("laden");
-		bPatientLoadCluster.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				tabFolder.setSelection(tabCluster);
-			}
-		});
-
-		Label lComment = new Label(cPatient, SWT.NONE);
-		lComment.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1));
-		lComment.setText("Kommentar");
-
-		tComment = new Text(cPatient, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		tComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 		*/
 	}
 
@@ -270,65 +199,15 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 		tArchiv.setText("Patienten Akte");
 		tArchiv.setImage(getImageDescriptor(ISharedImages.IMG_COMMENT_16).createImage());
 
-		Composite cArchiv = new Composite(tabFolder, SWT.NONE);
+		Composite cArchiv = toolkit.createComposite(tabFolder, SWT.NONE);
 		tArchiv.setControl(cArchiv);
 		cArchiv.setLayout(new GridLayout(3, false));
 
 		tArchivSearch = new Text(cArchiv, SWT.BORDER);
 		tArchivSearch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 
-		archivViewer = createArchivViewer(cArchiv);
-		archivTable = archivViewer.getTable();
-		archivTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-
-		Composite cArchivButtonBar = new Composite(cArchiv, SWT.NONE);
-		cArchivButtonBar.setLayout(new RowLayout());
-		cArchivButtonBar.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, false, false, 3, 1));
-
-		Button bNewArchiv = new Button(cArchivButtonBar, SWT.NONE);
-		bNewArchiv.setLayoutData(new RowData(100, SWT.DEFAULT));
-		bNewArchiv.setText("Neuer Eintrag");
-		bNewArchiv.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-			}
-		});
-
-		Button bLoadArchiv = new Button(cArchivButtonBar, SWT.NONE);
-		bLoadArchiv.setLayoutData(new RowData(100, SWT.DEFAULT));
-		bLoadArchiv.setText("Eintrag laden");
-
-		Button bRemoveArchiv = new Button(cArchivButtonBar, SWT.NONE);
-		bRemoveArchiv.setLayoutData(new RowData(100, SWT.DEFAULT));
-		bRemoveArchiv.setText("Eintrag entfernen");
 	}
 
-	private TableViewer createArchivViewer(Composite parent) {
-		TableViewer archivViewer = new TableViewer(parent, SWT.BORDER | SWT.SINGLE);
-		archivViewer.setContentProvider(new ArrayContentProvider());
-
-		// Set visible
-		archivViewer.getTable().setHeaderVisible(true);
-		archivViewer.getTable().setLinesVisible(true);
-
-		// Columns
-		TableViewerColumn viewerColumn = new TableViewerColumn(archivViewer, SWT.LEAD);
-		viewerColumn.getColumn().setText("Datum");
-		viewerColumn.getColumn().setWidth(120);
-
-		viewerColumn = new TableViewerColumn(archivViewer, SWT.LEAD);
-		viewerColumn.getColumn().setText("Titel");
-		viewerColumn.getColumn().setWidth(300);
-
-		viewerColumn = new TableViewerColumn(archivViewer, SWT.LEAD);
-		viewerColumn.getColumn().setText("Daten");
-		viewerColumn.getColumn().setWidth(60);
-
-		archivViewer.setLabelProvider(new ArchivLabelProvider());
-
-		return archivViewer;
-	}
 
 	/* ==================================== */
 	/* ============== Data Tab ============ */
@@ -374,29 +253,6 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 	 * Initalize input
 	 */
 	private void update() {
-/*		IPatientService service = Activator.getPatientService();
-		if (service == null) {
-			MessageDialog.openError(getSite().getShell(), "Error", "Patient Service Offline");
-			return;
-		}
-
-		Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);
-		if (patient == null)
-			return;*/
-
-		// Update Personal Data
-/*		tFirstname.setText(patient.getFirstname());
-		tLastname.setText(patient.getLastname());
-		tGender.setText(String.valueOf(patient.getGender()));
-		dBirth.setSelection(patient.getBirth());
-		if (patient.getComment() != null)
-			tComment.setText(patient.getComment());
-*/
-		// Update Archiv
-/*		EntityManager em = JPAUtil.createEntityManager();
-		List<Archiv> archives = em.createNamedQuery("Archiv.findByPatient", Archiv.class).setParameter("patientId", patient.getId())
-				.getResultList();
-		archivViewer.setInput(archives);*/
 
 	}
 
@@ -405,8 +261,4 @@ public class PatientView extends ViewPart implements PropertyChangeListener {
 
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		update();
-	}
 }
