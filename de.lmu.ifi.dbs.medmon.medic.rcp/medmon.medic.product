@@ -80,6 +80,8 @@
    </features>
 
    <configurations>
+      <plugin id="ch.qos.logback.classic" autoStart="true" startLevel="0" />
+      <plugin id="ch.qos.logback.core" autoStart="true" startLevel="0" />
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="false" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="5" />
