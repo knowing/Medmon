@@ -1,50 +1,27 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
-import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.eclipse.jface.viewers.ISelection;
+import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 
-
-/**
- * The PatientService handles all data corresponding to
- * the current selected Patient.
- * 
- * @author Nepomuk Seiler
- * @version 0.4b
- */
 public interface IPatientService {
+
+	public static String	TRAIN	= "train";
+	public static String	RESULT	= "result";
+	public static String	RAW		= "raw";
+	public static String	ROOT	= "root";
 	
+	public String locateDirectory(Patient p, String type);
+	public String locateFile(Data d);
+	public String locateFilename(Data d, String relativeToType);
 	
-	public static final String PATIENT = "de.lmu.ifi.dbs.medmon.database.model.patient";
-	public static final String SENSOR = "de.lmu.ifi.dbs.medmon.sensor.core.sensor.isensor";
-	public static final String ANALYZED_DATA = "de.lmu.ifi.dbs.medmon.datamining.processing.ianalyzed";
-	public static final String DPU = "de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit";
-	
-	/**
-	 * Checks if the selection is supported and add it.
-	 * @param selection
-	 * @return true if the selection was successfully set
-	 */
-	public boolean setSelection(ISelection selection);
-	
-	public boolean setSelection(Object object, String clazz);
-	
-	/**
-	 * 
-	 * @param clazz 
-	 * <li> IPatientService.PATIENT 
-	 * <li> IPatientService.SENSOR_DATA 
-	 * <li> IPatientService.SENSOR
-	 * <li> IPatientService.ANALYZED_DATA
-	 * <li> IPatientService.DPU
-	 * <li> IPatientService.SENSOR_CONTAINER
-	 * 
-	 * @return the Object if selected
-	 */
-	public Object getSelection(String clazz);
-	
-	public void addPropertyChangeListener(String property, PropertyChangeListener listener);
-	
-	public void removePropertyChangeListener(PropertyChangeListener listener);
+	public OutputStream store(Patient p, Sensor s, String type, Data from, Data to) throws IOException;
+	public InputStream load(Data d) throws IOException;
+	public OutputStream merge(Data d1, Data d2) throws IOException;
+	public boolean remove(Data d);
 
 }
