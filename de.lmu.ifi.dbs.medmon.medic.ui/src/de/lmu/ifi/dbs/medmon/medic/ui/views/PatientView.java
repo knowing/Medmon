@@ -47,12 +47,13 @@ import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Archiv;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ArchivLabelProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 import org.eclipse.nebula.widgets.datechooser.DateChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PatientView extends ViewPart {
 	public PatientView() {
@@ -63,6 +64,8 @@ public class PatientView extends ViewPart {
 	private static final String		ARCHIV_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv";
 	private static final String		DATA_TOOLBAR_CONTRIBUTIONS		= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
 
+	private static final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	private TabFolder				tabFolder;
 
 	/* Personal Data */

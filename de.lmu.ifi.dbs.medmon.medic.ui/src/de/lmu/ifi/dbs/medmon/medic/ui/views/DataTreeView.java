@@ -17,29 +17,31 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.base.ui.widgets.SensorSourceWidget;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 
 public class DataTreeView extends ViewPart implements PropertyChangeListener, IPropertyChangeListener {
 
-	public static final String ID = "de.lmu.ifi.dbs.medmon.sensor.DataTreeView";
+	public static final String	ID	= "de.lmu.ifi.dbs.medmon.sensor.DataTreeView";
+	private static final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
-	private Action saveAction;
+	private Action				saveAction;
 
-	private TreeViewer dataTreeViewer;
+	private TreeViewer			dataTreeViewer;
 
-	private TabFolder tabFolder;
+	private TabFolder			tabFolder;
 
-	private SensorSourceWidget sensorSource;
+	private SensorSourceWidget	sensorSource;
 
-	private TabItem tabData;
+	private TabItem				tabData;
 
 	public DataTreeView() {
-//		Activator.getPatientService().addPropertyChangeListener(IPatientService.SENSOR_CONTAINER, this);
+		log.debug("DataTreeView::DataTreeView => Activator.getPatientService().addPropertyChangeListener(IPatientService.SENSOR_CONTAINER, this);");
 	}
 
 	@Override
@@ -68,9 +70,10 @@ public class DataTreeView extends ViewPart implements PropertyChangeListener, IP
 
 		dataTreeViewer = new TreeViewer(cData, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
-//		dataTreeViewer.setContentProvider(new WorkbenchContentProvider());
+		log.debug("DataTreeView::createPartControl => dataTreeViewer.{some Stuff with the PatientService}");
+		// dataTreeViewer.setContentProvider(new WorkbenchContentProvider());
 		dataTreeViewer.setLabelProvider(new WorkbenchLabelProvider());
-//		dataTreeViewer.setInput(Activator.getPatientService().getSelection(IPatientService.SENSOR_CONTAINER));
+		// dataTreeViewer.setInput(Activator.getPatientService().getSelection(IPatientService.SENSOR_CONTAINER));
 
 		createActions();
 		initializeToolBar();
@@ -97,7 +100,10 @@ public class DataTreeView extends ViewPart implements PropertyChangeListener, IP
 	@Override
 	public void propertyChange(org.eclipse.jface.util.PropertyChangeEvent event) {
 		if (event.getProperty().equals("sensor")) {
-			Activator.getPatientService().setSelection(event.getNewValue(), IPatientService.SENSOR);
+			//Activator.getPatientService().setSelection(event.getNewValue(), IPatientService.SENSOR);
+			log.debug("DataTreeView::propertyChange =>"); 
+			log.debug("if (event.getProperty().equals('sensor')) {"); 
+			log.debug("    Activator.getPatientService().setSelection(event.getNewValue(), IPatientService.SENSOR); ... ... ..."); 
 		} else if (event.getProperty().equals("file")) {
 			String file = (String) event.getNewValue();
 			ISensor sensor = sensorSource.getSensor().getSensorExtension();

@@ -5,7 +5,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 
 /**
@@ -14,13 +16,16 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
+	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui";			//$NON-NLS-1$
 
 	// The shared instance
 	private static Activator										plugin;
-	
-	private static ServiceTracker<IPatientService, IPatientService>	patientTracker;
+
+	// private static ServiceTracker<IPatientService, IPatientService>
+	// patientTracker;
 	private static ServiceTracker<ISensorService, ISensorService>	sensorTracker;
+
+	private static final Logger										log			= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	/**
 	 * The constructor
@@ -36,13 +41,12 @@ public class Activator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
-		System.out.println("#########################################START");
 		super.start(context);
 		plugin = this;
 
-		patientTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class.getName(), null);
-		patientTracker.open();
-
+		log.debug("patientTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class.getName(), null);");
+		log.debug("patientTracker.open();");
+		
 		sensorTracker = new ServiceTracker<ISensorService, ISensorService>(context, ISensorService.class, null);
 		sensorTracker.open();
 	}
@@ -56,8 +60,8 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-		patientTracker.close();
-		patientTracker = null;
+		// patientTracker.close();
+		// patientTracker = null;
 
 		sensorTracker.close();
 		sensorTracker = null;
@@ -73,7 +77,8 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
-	public static BundleContext getBundleContext(){
+
+	public static BundleContext getBundleContext() {
 		return Activator.plugin.getBundle().getBundleContext();
 	}
 
@@ -87,10 +92,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	public static IPatientService getPatientService() {
-		return patientTracker.getService();
 	}
 
 	public static ISensorService getSensorService() {

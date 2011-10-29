@@ -17,6 +17,8 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.swt.handler.EvaluateHandler;
@@ -35,23 +37,31 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 	private SensorPage sourcePage = new SensorPage();
 	private SelectDataPage dataPage = new SelectDataPage();
 	private SelectDPUPage dpuPage;
-
+	
+	private static final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	/* to prevent getNextPage setting input twice */
 	private boolean firstcall = true;
 
 	private void initSelections(IPatientService service) {
 		/* Can skip sensorPage */
-		Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);
-		SensorAdapter sensor = (SensorAdapter) service.getSelection(IPatientService.SENSOR);
-		if (patient != null && sensor != null)
-			sourcePage = new SensorPage(patient, sensor);
+		log.debug("QuickAnalyseWizard::initSelections() => Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);");
+		log.debug("QuickAnalyseWizard::initSelections() => SensorAdapter sensor = (SensorAdapter) service.getSelection(IPatientService.SENSOR);");
+		log.debug("QuickAnalyseWizard::initSelections() => if (patient != null && sensor != null)");
+		log.debug("QuickAnalyseWizard::initSelections() =>     sourcePage = new SensorPage(patient, sensor);");
+		//Patient patient = (Patient) service.getSelection(IPatientService.PATIENT);
+		//SensorAdapter sensor = (SensorAdapter) service.getSelection(IPatientService.SENSOR);
+		//if (patient != null && sensor != null)
+		//	sourcePage = new SensorPage(patient, sensor);
 
 	}
 
 	@Override
 	public void addPages() {
-		IPatientService service = Activator.getPatientService();
-		initSelections(service);
+		log.debug("QuickAnalyseWizard::addPages() => initSelections(service);");
+		log.debug("QuickAnalyseWizard::addPages() => DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);");
+		//initSelections(service);
+		//DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
 		addPage(sourcePage);
 		addPage(dataPage);
 		addPage(dpuPage = new SelectDPUPage());
@@ -70,6 +80,7 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 
 	@Override
 	public boolean performFinish() {
+		log.debug("QuickAnalyseWizard::performFinish() => DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);");
 //		DataProcessingUnit dpu = (DataProcessingUnit) Activator.getPatientService().getSelection(IPatientService.DPU);
 		IDataProcessingUnit dpu = dpuPage.getSelection();
 		if (dpu == null)

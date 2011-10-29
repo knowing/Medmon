@@ -32,6 +32,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
@@ -41,6 +43,9 @@ import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportDPUHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.DPUContentProvider;
 
 public class DPUMasterBlock extends MasterDetailsBlock {
+	
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	public DPUMasterBlock() {
 	}
 
@@ -97,7 +102,7 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 		dpuViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				Activator.getPatientService().setSelection(event.getSelection());
+				log.debug("MasterDetailsBlock::createMasterPart -> dpuViewer.addSelectionChangedListener => Activator.getPatientService().setSelection(event.getSelection());");
 				managedForm.fireSelectionChanged(part, event.getSelection());
 			}
 		});
