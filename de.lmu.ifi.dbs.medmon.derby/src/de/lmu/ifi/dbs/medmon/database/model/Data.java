@@ -51,8 +51,9 @@ public class Data implements Serializable {
 	private String file;
 	
 	@Column
-	private String originalFile;
-		
+	//private String originalFile;
+	private String type;
+	
 	@ManyToOne
 	@JoinColumn(name="SENSOR_ID", nullable=false)
 	private Sensor sensor;
@@ -103,12 +104,12 @@ public class Data implements Serializable {
 		this.file = file;
 	}
 	
-	public String getOriginalFile() {
-		return originalFile;
+	public String getType() {
+		return type;
 	}
 	
-	public void setOriginalFile(String originalFile) {
-		this.originalFile = originalFile;
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 	public Archiv getArchiv() {
