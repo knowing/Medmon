@@ -8,9 +8,12 @@ import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 
+/**
+ * 
+ * @author Nepomuk Seiler
+ * 
+ */
 public class ApplicationConfigurationUtil {
-	
-	private static String dpuPath;
 	
 	/* =========================== */
 	/* == Patient configuration == */
@@ -72,6 +75,7 @@ public class ApplicationConfigurationUtil {
 	/* ====== Patient data ======= */
 	/* =========================== */
 	
+	@Deprecated
 	public static String createClusterUnitFile(Object cu, Patient patient) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getPatientFolder(patient));
@@ -82,6 +86,7 @@ public class ApplicationConfigurationUtil {
 		return sb.toString();
 	}
 	
+	@Deprecated
 	public static String getClusterUnitFolder(Patient patient) {
 		String sep = getPreferenceStore().getString(IMedicPreferences.DIR_SEPERATOR_ID);
 		String patientFolder = getPatientFolder(patient);

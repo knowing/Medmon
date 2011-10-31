@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 
+
 /**
  * <p>Used by UI components to propagate selection changes
  * to the @IGlobalSelectionService </p>
@@ -17,11 +18,11 @@ public interface IGlobalSelectionProvider {
 	 * @param clazz - the selection key
 	 * @param selection - the current selection
 	 */
-	<T> void setSelection(Class<T> clazz, T selection);
+	public <T> void setSelection(Class<T> clazz, T selection);
 	
 	/**
 	 * Called by the @IGlobalSelectionService to register itself.
 	 * @param service - the @IGlobalSelectionService
 	 */
-	void setGlobalSelectionService(IGlobalSelectionService service);
+	public void setGlobalSelectionService(IGlobalSelectionService service);
 }

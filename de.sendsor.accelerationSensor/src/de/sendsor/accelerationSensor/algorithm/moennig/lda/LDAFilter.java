@@ -178,7 +178,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}
 		}
 
-		log.statusChanged( new Progress("Calculate totalMean", 3, 8));
+		log.statusChanged(new Progress("Calculate totalMean", 3, 8));
 		// calculate total mean
 		double[] totalMean = new double[inDimensions];
 		for (int i = 0; i < totalMean.length; i++) {
@@ -192,7 +192,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			covariance[i] = getCovarianceMatrix(subset.get(i), groupMean[i]);
 		}
 		
-		log.statusChanged( new Progress("Check matrices", 4, 8));
+		log.statusChanged(new Progress("Check matrices", 4, 8));
 		//test for matrix singularity
 		for(int i=0;i<covariance.length;i++){
 			Matrix covM = new Matrix(covariance[i]);
@@ -202,7 +202,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}
 		}
 		
-		log.statusChanged( new Progress("Calculate within-class scatter", 5, 8));
+		log.statusChanged(new Progress("Calculate within-class scatter", 5, 8));
 		//calculate the within-class scatter matrix
 		double[][] sw = new double[inDimensions][inDimensions];
 		for (int i = 0; i < covariance.length; i++){
@@ -213,7 +213,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}			
 		}
 		
-		log.statusChanged( new Progress("Calculate between-class scatter", 6, 8));
+		log.statusChanged(new Progress("Calculate between-class scatter", 6, 8));
 		//calculate the between-class scatter matrix
 		double[][] sb = new double[inDimensions][inDimensions];
 		for(int i=0; i < subset.size();i++){			
@@ -228,13 +228,13 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		Matrix sbm = new Matrix(sb);
 		Matrix swm = new Matrix(sw);
 		
-		log.statusChanged( new Progress("EigenvalueDecomposition", 7, 8));
+		log.statusChanged(new Progress("EigenvalueDecomposition", 7, 8));
 		Matrix criterion = (swm.inverse()).times(sbm);
 		EigenvalueDecomposition evd = new EigenvalueDecomposition(criterion);
 		eigenVectorMatrix = evd.getV();		
 		eigenValues = evd.getRealEigenvalues();
 		
-		log.statusChanged( new Progress("Sort eigenvalues", 8, 8));
+		log.statusChanged(new Progress("Sort eigenvalues", 8, 8));
 		sortEigenvalues();
 	}
 	

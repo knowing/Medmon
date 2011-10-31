@@ -14,7 +14,7 @@ public class MedmonPreferenceInitializer extends AbstractPreferenceInitializer {
 	
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = new DefaultScope().getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		node.put(IMedicPreferences.DIR_USER_HOME_ID, System.getProperty("user.home"));
 		node.put(IMedicPreferences.DIR_SEPERATOR_ID, System.getProperty("file.separator"));
 		
