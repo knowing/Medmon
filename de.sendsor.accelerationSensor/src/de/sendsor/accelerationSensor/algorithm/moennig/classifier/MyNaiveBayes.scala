@@ -4,6 +4,7 @@ import java.io.{InputStream, OutputStream}
 import java.util.{ArrayList,Properties}
 import akka.actor.ActorRef
 import akka.actor.Actor.actorOf
+import akka.event.EventHandler.{debug,info, warning, error}
 import weka.core.{Attribute,Instances, Instance, DenseInstance}
 import weka.classifiers.Classifier
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
@@ -25,6 +26,9 @@ class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
   override def deserialize(in: InputStream) {
     val oin = new ObjectInputStream(in)
     classifier = oin.readObject.asInstanceOf[MyNaiveBayesImpl]
+    val c = classifier.asInstanceOf[MyNaiveBayesImpl]
+    guessAndCreateClassLabels(c.inputFormat)
+    debug(this,"MyNaiveBayes model loaded")
   }
   
   override def configure(properties:Properties) = {
