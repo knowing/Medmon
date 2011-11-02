@@ -22,11 +22,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.SimpleBatchFilter;
 
-import static de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor.debug;
-import static de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor.info;
-import static de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor.warning;
-import static de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor.error;
-import static de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor.statusChanged;
+import de.lmu.ifi.dbs.knowing.core.japi.LoggableProcessor;
 
 public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	
@@ -45,7 +41,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	
 	private Instances output;
 
-	private TProcessor processor;
+	private LoggableProcessor log;
 		
 	
 	@Override
@@ -139,14 +135,14 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	 * @throws Exception throws an Exception if one of the covariance matrixes gets singular 
 	 */
 	public void train(Instances inst) throws Exception{
-		statusChanged(processor, new Progress("Training", 0, 8));
+		log.statusChanged(new Progress("Training", 0, 8));
 		determineOutputFormat(inst);
 		//determineInputDimensions(inst);
 		
 		//This cast is save -> capabilities allow only String or Norminal classes
 		ArrayList<String> classList = Collections.list((Enumeration<String>)inst.classAttribute().enumerateValues());								
 		
-		statusChanged(processor, new Progress("Create Subsets", 1, 8));
+		log.statusChanged(new Progress("Create Subsets", 1, 8));
 		// divide data into subsets
 		ArrayList<ArrayList<ArrayList<Double>>> subset = new ArrayList<ArrayList<ArrayList<Double>>>();
 		for (int i = 0; i < classList.size(); i++) {
@@ -173,7 +169,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			subset.add(i, si);
 		}
 		
-		statusChanged(processor, new Progress("Calculate groupMean", 2, 8));
+		log.statusChanged(new Progress("Calculate groupMean", 2, 8));
 		// calculate group mean
 		double[][] groupMean = new double[subset.size()][inDimensions];
 		for (int i = 0; i < groupMean.length; i++) {
@@ -182,21 +178,21 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}
 		}
 
-		statusChanged(processor, new Progress("Calculate totalMean", 3, 8));
+		log.statusChanged(new Progress("Calculate totalMean", 3, 8));
 		// calculate total mean
 		double[] totalMean = new double[inDimensions];
 		for (int i = 0; i < totalMean.length; i++) {
 			totalMean[i] = getTotalMean(i, inst);
 		}
 		
-		statusChanged(processor, new Progress("Calculate covariance matrices", 2, 8));
+		log.statusChanged(new Progress("Calculate covariance matrices", 2, 8));
 		// calculate covariance matrices
 		double[][][] covariance = new double[subset.size()][inDimensions][inDimensions];
 		for (int i = 0; i < subset.size(); i++){
 			covariance[i] = getCovarianceMatrix(subset.get(i), groupMean[i]);
 		}
 		
-		statusChanged(processor, new Progress("Check matrices", 4, 8));
+		log.statusChanged(new Progress("Check matrices", 4, 8));
 		//test for matrix singularity
 		for(int i=0;i<covariance.length;i++){
 			Matrix covM = new Matrix(covariance[i]);
@@ -206,7 +202,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}
 		}
 		
-		statusChanged(processor, new Progress("Calculate within-class scatter", 5, 8));
+		log.statusChanged(new Progress("Calculate within-class scatter", 5, 8));
 		//calculate the within-class scatter matrix
 		double[][] sw = new double[inDimensions][inDimensions];
 		for (int i = 0; i < covariance.length; i++){
@@ -217,7 +213,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 			}			
 		}
 		
-		statusChanged(processor, new Progress("Calculate between-class scatter", 6, 8));
+		log.statusChanged(new Progress("Calculate between-class scatter", 6, 8));
 		//calculate the between-class scatter matrix
 		double[][] sb = new double[inDimensions][inDimensions];
 		for(int i=0; i < subset.size();i++){			
@@ -232,13 +228,13 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		Matrix sbm = new Matrix(sb);
 		Matrix swm = new Matrix(sw);
 		
-		statusChanged(processor, new Progress("EigenvalueDecomposition", 7, 8));
+		log.statusChanged(new Progress("EigenvalueDecomposition", 7, 8));
 		Matrix criterion = (swm.inverse()).times(sbm);
 		EigenvalueDecomposition evd = new EigenvalueDecomposition(criterion);
 		eigenVectorMatrix = evd.getV();		
 		eigenValues = evd.getRealEigenvalues();
 		
-		statusChanged(processor, new Progress("Sort eigenvalues", 8, 8));
+		log.statusChanged(new Progress("Sort eigenvalues", 8, 8));
 		this.sortEigenvalues();
 	}
 	
@@ -506,7 +502,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	 */
 	@Override
 	public void setProcessor(TProcessor processor) {
-		this.processor = processor;
+		log = new LoggableProcessor(processor);
 	}
 
 
