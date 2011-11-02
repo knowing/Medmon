@@ -177,7 +177,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 				groupMean[i][j] = getGroupMean(j, subset.get(i));
 			}
 		}
-
+		
 		log.statusChanged(new Progress("Calculate totalMean", 3, 8));
 		// calculate total mean
 		double[] totalMean = new double[inDimensions];
@@ -235,7 +235,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		eigenValues = evd.getRealEigenvalues();
 		
 		log.statusChanged(new Progress("Sort eigenvalues", 8, 8));
-		this.sortEigenvalues();
+		sortEigenvalues();
 	}
 	
 	
@@ -316,7 +316,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		}
 	}
 		
-	private Instances transformData(Instances input, Instances output, int discriminants) throws Exception{		
+	private Instances transformData(Instances input, Instances output, int discriminants) throws Exception{	
 		double[][] eva = eigenVectorMatrix.getArray();
 		double[][] tempEva = new double[eva.length][discriminants];		
 		for(int i=0;i<eva.length;i++){
@@ -339,7 +339,6 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		Matrix evm = new Matrix(tempEva);
 		Matrix dataM = new Matrix(data);
 		Matrix resultM = (evm.transpose()).times(dataM.transpose());
-		
 		
 		double[][] rm =  resultM.transpose().getArrayCopy();
 		
@@ -494,7 +493,55 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	public String getAttributeNamePrefix() {
 		return attributeNamePrefix;
 	}
+	
+	/**
+	 * To persist inDimensions
+	 * @return
+	 */
+	protected int getInDimensions() {
+		return inDimensions;
+	}
+	
+	protected void setInDimensions(int inDimensions) {
+		this.inDimensions = inDimensions;
+	}
+	
+	/**
+	 * To persist EigenValues
+	 * @return
+	 */
+	protected double[] getEigenValues() {
+		return eigenValues;
+	}
+	
+	protected void setEigenValues(double[] eigenValues) {
+		this.eigenValues = eigenValues;
+	}
+	
+	/**
+	 * To persist EigenVectorMatrix
+	 * @return
+	 */
+	protected Matrix getEigenVectorMatrix() {
+		return eigenVectorMatrix;
+	}
+	
+	protected void setEigenVectorMatrix(Matrix eigenVectorMatrix) {
+		this.eigenVectorMatrix = eigenVectorMatrix;
+	}
+	
+	/**
+	 * To persist output format
+	 * @return
+	 */
+	protected Instances getOutput() {
+		return new Instances(output,0);
+	}
 
+	protected void setOutput(Instances output) {
+		this.output = output;
+	}
+	
 	/**
 	 * Used for communication with the akka-actor-framework
 	 * Especially for logging and status updates.

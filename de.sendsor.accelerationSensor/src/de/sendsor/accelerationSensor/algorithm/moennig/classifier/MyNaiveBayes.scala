@@ -1,20 +1,36 @@
 package de.sendsor.accelerationSensor.algorithm.moennig.classifier
-import weka.core.Instances
-import weka.core.Attribute
-import java.util.ArrayList
-import weka.core.DenseInstance
-import weka.core.Instance
-import de.lmu.ifi.dbs.knowing.core.factory.TFactory
+
+import java.io.{InputStream, OutputStream}
+import java.util.{ArrayList,Properties}
 import akka.actor.ActorRef
 import akka.actor.Actor.actorOf
+import akka.event.EventHandler.{debug,info, warning, error}
+import weka.core.{Attribute,Instances, Instance, DenseInstance}
 import weka.classifiers.Classifier
-import de.lmu.ifi.dbs.knowing.core.weka.WekaClassifier
-import java.util.Properties
+import de.lmu.ifi.dbs.knowing.core.factory.TFactory
+import de.lmu.ifi.dbs.knowing.core.weka.{WekaClassifier,WekaClassifierFactory}
 import MyNaiveBayesFactory._
-import de.lmu.ifi.dbs.knowing.core.weka.WekaClassifierFactory
+import java.io.ObjectOutputStream
+import java.io.ObjectInputStream
+
 
 class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
 
+  override def serialize(out: OutputStream) {
+    val oout = new ObjectOutputStream(out)
+    oout.writeObject(classifier)
+    oout.flush
+    oout.close
+  }
+  
+  override def deserialize(in: InputStream) {
+    val oin = new ObjectInputStream(in)
+    classifier = oin.readObject.asInstanceOf[MyNaiveBayesImpl]
+    val c = classifier.asInstanceOf[MyNaiveBayesImpl]
+    guessAndCreateClassLabels(c.inputFormat)
+    debug(this,"MyNaiveBayes model loaded")
+  }
+  
   override def configure(properties:Properties) = {
     val bayes = classifier.asInstanceOf[MyNaiveBayesImpl]
     

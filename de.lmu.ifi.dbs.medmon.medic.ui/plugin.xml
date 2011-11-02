@@ -355,6 +355,16 @@
          <menu
                id="de.lmu.ifi.dbs.medmon.ui.help"
                label="Hilfe">
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                  label="Aktualisierung"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
+                  label="Neue Funktionen installieren"
+                  style="push">
+            </command>
             <separator
                   name="de.lmu.ifi.dbs.medmon.rcp.about"
                   visible="true">
@@ -362,14 +372,6 @@
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="About Medmon"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipselabs.p2.rcpupdate.install"
-                  style="push">
-            </command>
-            <command
-                  commandId="org.eclipselabs.p2.rcpupdate.update"
                   style="push">
             </command>
          </menu>

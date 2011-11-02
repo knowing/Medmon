@@ -1,3 +1,5 @@
+classification_train.dpu
+classification_test.dpu
 peakPrediction_segmentation_fv_lda_naiveBayes_crossValidation.dpu
 peak_prediction_test.dpu
 AugmentedFVFactory.scala

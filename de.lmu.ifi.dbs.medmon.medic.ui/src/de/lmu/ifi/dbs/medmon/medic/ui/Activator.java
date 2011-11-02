@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui";			//$NON-NLS-1$
+	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator										plugin;
@@ -41,6 +41,7 @@ public class Activator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
+		System.out.println("#########################################START");
 		super.start(context);
 		plugin = this;
 
@@ -60,8 +61,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-		// patientTracker.close();
-		// patientTracker = null;
 
 		sensorTracker.close();
 		sensorTracker = null;
@@ -77,8 +76,7 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
-
-	public static BundleContext getBundleContext() {
+	public static BundleContext getBundleContext(){
 		return Activator.plugin.getBundle().getBundleContext();
 	}
 
