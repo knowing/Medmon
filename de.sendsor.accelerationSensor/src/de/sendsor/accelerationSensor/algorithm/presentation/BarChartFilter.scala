@@ -1,7 +1,7 @@
 package de.sendsor.accelerationSensor.algorithm.presentation
 
 import java.util.Properties
-import akka.event.EventHandler.{debug, info, warning, error}
+import akka.event.EventHandler.{ debug, info, warning, error }
 import weka.core.{ Instance, Instances, DenseInstance }
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
@@ -25,34 +25,26 @@ class BarChartFilter extends TFilter {
       val toIndex = intervalInst.attribute(ATTRIBUTE_TO).index
       val classIndex = intervalInst.attribute(ATTRIBUTE_CLASS).index
 
-      debug(this, "Starting fold")
-      //Fold input instances to intervalInst according to their class
-      //Timestamps?!?!?!?!?!?!?!? Wrong order during foldleft, or wrong timestamps?
-      val start = (intervalInst, "")
-      instances.foldLeft(start) {
-        case ((intervalInst, currentClass), inst) =>
-          val CurrentClass = currentClass
-          classAttr.value(inst.value(classAttr).toInt) match {
-            //same class, increase timeInterval
-            case CurrentClass =>
-              val interval = intervalInst.lastInstance
-              interval.setValue(toIndex, inst.value(timeAttr))
-              (intervalInst, currentClass)
-              
-            //new class, create new timeInterval
-            case clazz =>
-              debug(this, "New class found " + clazz)
-              intervalInst.add(new DenseInstance(intervalInst.numAttributes))
-              val interval = intervalInst.lastInstance
-              interval.setValue(toIndex, inst.value(timeAttr))
-              interval.setValue(fromIndex, inst.value(timeAttr))
-//              interval.setValue(classIndex, inst.value(classAttr))
-              interval.setClassValue(clazz)
-              (intervalInst, clazz)
-          }
-      }._1
-      //      val splitInst = ResultsUtil.splitInstanceByAttribute(instances, classAttr.name)
+      debug(this, "Create TimeIntervalInstances")      
+      var currentClass = ""
+      for (i <- 0 until instances.numInstances) {
+        val inst = instances(i)
+        classAttr.value(inst.value(classAttr).toInt) match {
+          case c if c.equals(currentClass) =>
+            val interval = intervalInst.lastInstance
+            interval.setValue(toIndex, inst.value(timeAttr))
+          case c =>
+            intervalInst.add(new DenseInstance(intervalInst.numAttributes))
+            val interval = intervalInst.lastInstance
+            interval.setValue(toIndex, inst.value(timeAttr))
+            interval.setValue(fromIndex, inst.value(timeAttr))
+            interval.setValue(classIndex, inst.value(classAttr))
+            interval.setClassValue(c)
+            currentClass = c
+        }
+      }
 
+      intervalInst
   }
 
   def query(query: Instance): Instances = null
