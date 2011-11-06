@@ -3,7 +3,12 @@ package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Date;
+
+import javax.persistence.EntityManager;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -19,8 +24,9 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
 public class PatientService implements IPatientService {
 
-	private final Logger			log	= LoggerFactory.getLogger(IGlobalSelectionService.class);
-	private IEntityManagerService	entityManagerService;
+	private final Logger log = LoggerFactory.getLogger(IGlobalSelectionService.class);
+	private IEntityManagerService entityManagerService;
+	FileSystem fileSystem = FileSystems.getDefault();
 
 	protected void activate(ComponentContext context) {
 		log.info("PatientService started successfully");
@@ -36,13 +42,12 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public Path locateDirectory(Patient p, String type) {
-		// TODO Auto-generated method stub
-		return null;
+		return fileSystem.getPath(String.valueOf(p.getId()), type);
 	}
 
 	@Override
 	public Path locateFile(Data d) {
-		return null;
+		return fileSystem.getPath(String.valueOf(d.getPatient().getId()), d.getType(), d.getFile());
 	}
 
 	@Override
@@ -52,19 +57,19 @@ public class PatientService implements IPatientService {
 	}
 
 	@Override
-	public Path store(Patient p, Sensor s, String type, Data from, Data to) {
+	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
+
+		return null;
+	}
+
+	@Override
+	public InputStream load(Data d) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Path load(Data d) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Path merge(Data d1, Data d2) {
+	public InputStream merge(Data d1, Data d2) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}

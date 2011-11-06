@@ -38,7 +38,7 @@ public class PatientView extends ViewPart {
 
 	public static final String		ID								= "de.lmu.ifi.dbs.medmon.medic.ui.PatientView";				//$NON-NLS-1$
 	private static final String		PATIENT_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
-	private static final String		ARCHIV_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv";
+	private static final String		THERAPY_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv"; //Refractor ?!?!?
 	private static final String		DATA_TOOLBAR_CONTRIBUTIONS		= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
 
 	private static final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
@@ -47,8 +47,8 @@ public class PatientView extends ViewPart {
 	/* Personal Data */
 	private Text					tLastname, tFirstname, tGender, tComment;
 	private CDateTime				dBirth;
-	private Table					archivTable;
-	private TableViewer				archivViewer;
+	private Table					therapyTable;
+	private TableViewer				therapyViewer;
 	private TabItem					tabCluster;
 
 	private FormToolkit				toolkit;
@@ -81,7 +81,7 @@ public class PatientView extends ViewPart {
 		toolkit.adapt(tabFolder, true, true);
 
 		createPersonalTab();
-		createArchivTab();
+		createTherapyTab();
 		createDataTab();
 
 		update();
@@ -195,23 +195,23 @@ public class PatientView extends ViewPart {
 	}
 
 	/* ==================================== */
-	/* ============= Archiv Tab =========== */
+	/* ============= Therapy Tab =========== */
 	/* ==================================== */
 	/**
 	 * 
 	 */
-	private void createArchivTab() {
+	private void createTherapyTab() {
 
-		TabItem tArchiv = new TabItem(tabFolder, SWT.NONE);
-		tArchiv.setText("Patienten Akte");
-		tArchiv.setImage(getImageDescriptor(ISharedImages.IMG_COMMENT_16).createImage());
+		TabItem tTherapy = new TabItem(tabFolder, SWT.NONE);
+		tTherapy.setText("Therapien");
+		tTherapy.setImage(getImageDescriptor(ISharedImages.IMG_COMMENT_16).createImage());
 
-		Composite cArchiv = toolkit.createComposite(tabFolder, SWT.NONE);
-		tArchiv.setControl(cArchiv);
-		cArchiv.setLayout(new FillLayout());
+		Composite cTherapy = toolkit.createComposite(tabFolder, SWT.NONE);
+		tTherapy.setControl(cTherapy);
+		cTherapy.setLayout(new FillLayout());
 
 		patientFileDetailBlock = new PatientFileDetailBlock();
-		patientFileDetailBlock.createContent(new ManagedForm(cArchiv));
+		patientFileDetailBlock.createContent(new ManagedForm(cTherapy));
 	}
 
 	/* ==================================== */

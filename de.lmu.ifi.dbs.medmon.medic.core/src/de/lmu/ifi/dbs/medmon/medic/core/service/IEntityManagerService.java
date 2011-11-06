@@ -8,17 +8,17 @@ public interface IEntityManagerService {
 	/**
 	 * @return always the same EntityManager instances
 	 */
-	EntityManager getEntityManager();
+	public EntityManager getEntityManager();
 	
 	/**
 	 * 
 	 * @return creates a new EntityManager
 	 */
-	EntityManager createEntityManager();
+	public EntityManager createEntityManager();
 	
 	/**
 	 * 
 	 * @return
 	 */
-	EntityManagerFactory getEntityManagerFactory();
+	public EntityManagerFactory getEntityManagerFactory();
 }

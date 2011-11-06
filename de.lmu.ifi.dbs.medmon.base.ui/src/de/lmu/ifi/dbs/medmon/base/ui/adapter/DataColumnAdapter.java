@@ -11,6 +11,7 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
 	private final DateFormat df = DateFormat.getDateTimeInstance();
 	
+	
 	@Override
 	public Object[] getChildren(Object o) {
 		return null;
@@ -50,5 +51,4 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 	public Image getColumnImage(Object element, int columnIndex) {
 		return null;
 	}
-
 }

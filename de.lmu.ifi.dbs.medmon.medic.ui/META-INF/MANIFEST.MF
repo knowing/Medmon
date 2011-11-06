@@ -55,6 +55,7 @@ Import-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
  scala.reflect.generic;version="[2.9.0.1,2.9.3.0]",
  scala.runtime;version="[2.9.0.1,2.9.3.0]",
  scala.util;version="[2.9.0.1,2.9.3.0]"
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ swing2swt.jar
 Bundle-Vendor: LMU Munich - Database Systems Group
 Bundle-ActivationPolicy: lazy

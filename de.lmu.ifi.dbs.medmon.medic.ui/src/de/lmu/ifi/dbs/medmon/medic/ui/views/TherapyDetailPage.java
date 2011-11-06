@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -26,18 +29,33 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Group;
 
-public class PatientDetailPage implements IDetailsPage {
+import de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter;
+import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.layout.RowLayout;
+import swing2swt.layout.FlowLayout;
+import org.eclipse.swt.widgets.Link;
 
-	private IManagedForm	managedForm;
-	private Text			textTherapy;
-	private Text			textSuccess;
-	private Text			txtNewText;
-	private Scale			scaleSuccess;
+public class TherapyDetailPage implements IDetailsPage {
+
+	private IManagedForm managedForm;
+	private Text textTherapy;
+	private Text textSuccess;
+	private Scale scaleSuccess;
+	private Therapy therapy;
+	private CDateTime dateStart;
+	private CDateTime dateEnd;
+	private Listener successChangedListener;
 
 	/**
 	 * Create the details page.
 	 */
-	public PatientDetailPage() {
+	public TherapyDetailPage() {
 		// Create the details page
 	}
 
@@ -59,12 +77,12 @@ public class PatientDetailPage implements IDetailsPage {
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
 		//
-		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
-		section.setText("Empty Section");
+		Section sctnTherapie = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
+		sctnTherapie.setText("Therapie");
 		//
-		Composite composite = toolkit.createComposite(section, SWT.NONE);
+		Composite composite = toolkit.createComposite(sctnTherapie, SWT.NONE);
 		// toolkit.paintBordersFor(composite);
-		section.setClient(composite);
+		sctnTherapie.setClient(composite);
 		composite.setLayout(new GridLayout(5, false));
 
 		Label lblTherapy = new Label(composite, SWT.NONE);
@@ -82,13 +100,13 @@ public class PatientDetailPage implements IDetailsPage {
 		toolkit.adapt(lblFrom, true, true);
 		lblFrom.setText("Von:");
 
-		CDateTime dateTime = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
-		GridData gd_dateTime = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_dateTime.heightHint = 20;
-		dateTime.setLayoutData(gd_dateTime);
+		dateStart = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
+		GridData gd_dateStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_dateStart.heightHint = 20;
+		dateStart.setLayoutData(gd_dateStart);
 
-		toolkit.adapt(dateTime);
-		toolkit.paintBordersFor(dateTime);
+		toolkit.adapt(dateStart);
+		toolkit.paintBordersFor(dateStart);
 
 		Label lblNewLabel_2 = new Label(composite, SWT.NONE);
 		GridData gd_lblNewLabel_2 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -97,12 +115,12 @@ public class PatientDetailPage implements IDetailsPage {
 		toolkit.adapt(lblNewLabel_2, true, true);
 		lblNewLabel_2.setText("Bis:");
 
-		CDateTime dateTime_1 = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
-		GridData gd_dateTime_1 = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_dateTime_1.heightHint = 20;
-		dateTime_1.setLayoutData(gd_dateTime_1);
-		toolkit.adapt(dateTime_1);
-		toolkit.paintBordersFor(dateTime_1);
+		dateEnd = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
+		GridData gd_dateEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_dateEnd.heightHint = 20;
+		dateEnd.setLayoutData(gd_dateEnd);
+		toolkit.adapt(dateEnd);
+		toolkit.paintBordersFor(dateEnd);
 		new Label(composite, SWT.NONE);
 
 		Label lblNewLabel_3 = new Label(composite, SWT.NONE);
@@ -110,27 +128,32 @@ public class PatientDetailPage implements IDetailsPage {
 		lblNewLabel_3.setText("Erfolg:");
 
 		scaleSuccess = new Scale(composite, SWT.NONE);
-		scaleSuccess.addListener(SWT.Selection, new Listener() {
+		scaleSuccess.setEnabled(false);
+		successChangedListener = new Listener() {
+			private int success;
+
 			public void handleEvent(Event event) {
-				int value = scaleSuccess.getMaximum() - scaleSuccess.getSelection() + scaleSuccess.getMinimum();
-				textSuccess.setText(value + "%");
+				success = scaleSuccess.getSelection();
+				textSuccess.setText(success + "%");
 			}
-		});
+		};
+		scaleSuccess.addListener(SWT.Selection, successChangedListener);
 
 		scaleSuccess.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(scaleSuccess, true, true);
 
 		textSuccess = new Text(composite, SWT.BORDER | SWT.READ_ONLY);
+		textSuccess.setText("0%");
 		GridData gd_textSuccess = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_textSuccess.widthHint = 40;
 		textSuccess.setLayoutData(gd_textSuccess);
 		toolkit.adapt(textSuccess, true, true);
 		new Label(composite, SWT.NONE);
-
-		ImageHyperlink mghprlnkNewImagehyperlink = toolkit.createImageHyperlink(composite, SWT.NONE);
-		mghprlnkNewImagehyperlink.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		toolkit.paintBordersFor(mghprlnkNewImagehyperlink);
-		mghprlnkNewImagehyperlink.setText("New ImageHyperlink");
+		
+		Link link = new Link(composite, SWT.NONE);
+		toolkit.adapt(link, true, true);
+		link.setText("<a>Datensatz anzeigen</a>");
+		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
 		new Label(composite, SWT.NONE);
 
@@ -138,11 +161,26 @@ public class PatientDetailPage implements IDetailsPage {
 		groupComment.setText("Kommentar:");
 		groupComment.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 5, 1));
 		toolkit.adapt(groupComment);
-		// toolkit.paintBordersFor(groupComment);
+		toolkit.paintBordersFor(groupComment);
 		groupComment.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		txtNewText = toolkit.createText(groupComment, "New Text", SWT.MULTI);
+		Text txtComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
 
+		Composite compositeLinks = new Composite(composite, SWT.NONE);
+		compositeLinks.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		compositeLinks.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 5, 1));
+		toolkit.adapt(compositeLinks);
+		toolkit.paintBordersFor(compositeLinks);
+
+		Link linkSave = new Link(compositeLinks, SWT.NONE);
+		toolkit.adapt(linkSave, true, true);
+		linkSave.setText("<a>Speichern</a>");
+		linkSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				commit(true);
+			}
+		});
 	}
 
 	public void dispose() {
@@ -162,12 +200,38 @@ public class PatientDetailPage implements IDetailsPage {
 	}
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
+
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+		therapy = (Therapy) structuredSelection.getFirstElement();
+
+		GlobalSelectionProvider selectionProvider = new GlobalSelectionProvider();
+		selectionProvider.setSelection(Therapy.class, therapy);
+		selectionProvider.unregister();
+
+		textTherapy.setText("<empty>");
+		dateStart.setSelection(therapy.getTherapyStart());
+		dateEnd.setSelection(therapy.getTherapyEnd());
+		scaleSuccess.setSelection(therapy.getSuccess());
+		successChangedListener.handleEvent(null);
+
 		update();
 	}
 
 	public void commit(boolean onSave) {
-		// Commit
+		GlobalSelectionProvider selectionProvider = new GlobalSelectionProvider();
+		Therapy therapy = selectionProvider.getSelection(Therapy.class);
+		selectionProvider.unregister();
+
+		therapy.setSuccess(scaleSuccess.getSelection());
+		therapy.setTherapyStart(dateStart.getSelection());
+		therapy.setTherapyEnd(dateEnd.getSelection());
+
+		EntityManager entityManager = JPAUtil.createEntityManager();
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		therapy = entityManager.merge(therapy);
+		entityTransaction.commit();
+		entityManager.close();
 	}
 
 	public boolean isDirty() {

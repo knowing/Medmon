@@ -9,12 +9,14 @@
 		<class>de.lmu.ifi.dbs.medmon.database.model.Archiv</class>
 		<class>de.lmu.ifi.dbs.medmon.database.model.Sensor</class>
 		<class>de.lmu.ifi.dbs.medmon.database.model.Data</class>
+		<class>de.lmu.ifi.dbs.medmon.database.model.Therapy</class>
+		<class>de.lmu.ifi.dbs.medmon.database.model.TherapyResult</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
 		<properties>
 			<!-- Embedded Derby Login -->
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:medmon;create=true" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:c://medmon/;create=true" />
 			<!-- don't need userid/password in embedded Derby -->
 
 			<property name="eclipselink.target-database" value="Derby" />

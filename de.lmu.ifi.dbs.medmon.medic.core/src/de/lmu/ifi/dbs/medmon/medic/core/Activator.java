@@ -23,6 +23,9 @@ public class Activator extends AbstractUIPlugin {
 
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> emServiceTracker;
 
+	public static BundleContext getBundleContext(){
+		return Activator.plugin.getBundle().getBundleContext();
+	}
 	/**
 	 * The constructor
 	 */

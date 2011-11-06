@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.medmon.database.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,7 +20,7 @@ import java.util.Set;
 		@NamedQuery(name = "Patient.findByLastname", query = "SELECT p FROM Patient p WHERE p.lastname = :lastname"),
 		@NamedQuery(name = "Patient.findByInsuranceId", query = "SELECT p FROM Patient p WHERE p.insuranceId = :insuranceId"),
 		@NamedQuery(name = "Patient.findIdentical", query = "SELECT p FROM Patient p WHERE p.firstname = :firstname AND p.lastname = :lastname AND p.birth = :birth"),
-		@NamedQuery(name = "Patient.likeName", query = "SELECT p FROM Patient p WHERE lower(p.lastname) LIKE :lastname OR lower(p.firstname) LIKE :firstname")})	
+		@NamedQuery(name = "Patient.likeName", query = "SELECT p FROM Patient p WHERE lower(p.lastname) LIKE :lastname OR lower(p.firstname) LIKE :firstname") })
 public class Patient implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -69,7 +71,7 @@ public class Patient implements Serializable {
 	// bi-directional many-to-one association to Therapy
 	@OneToMany(mappedBy = "patient")
 	private Set<Therapy> therapies;
-	
+
 	public Patient() {
 	}
 
@@ -173,6 +175,14 @@ public class Patient implements Serializable {
 
 	public void setArchives(Set<Archiv> archives) {
 		this.archives = archives;
+	}
+
+	public void setTherapies(Set<Therapy> therapies) {
+		this.therapies = therapies;
+	}
+	
+	public Set<Therapy> getTherapies() {
+		return therapies;
 	}
 
 	@Override

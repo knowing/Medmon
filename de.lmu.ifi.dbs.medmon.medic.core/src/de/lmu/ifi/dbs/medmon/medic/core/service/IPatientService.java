@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.Date;
 
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -20,9 +21,9 @@ public interface IPatientService {
 	public Path locateFile(Data d);
 	public Path locateFilename(Data d, String relativeToType);
 	
-	public Path store(Patient p, Sensor s, String type, Data from, Data to);
-	public Path load(Data d);
-	public Path merge(Data d1, Data d2);
+	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
+	public InputStream load(Data d) throws IOException;
+	public InputStream merge(Data d1, Data d2) throws IOException;
 	public boolean remove(Data d);
 
 }

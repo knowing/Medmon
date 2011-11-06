@@ -11,7 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="SENSOR")
+@Table(name = "SENSOR")
 @NamedQueries({
 	@NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s")
 })
