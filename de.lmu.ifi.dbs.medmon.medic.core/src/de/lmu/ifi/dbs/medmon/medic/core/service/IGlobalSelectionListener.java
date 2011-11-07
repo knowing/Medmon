@@ -11,6 +11,7 @@ public interface IGlobalSelectionListener<T> {
 
 	void selectionChanged(T selection);
 	
-
+	void selectionUpdated();
+	
 	Class<T> getType();
 }

@@ -36,31 +36,32 @@ public class PatientView extends ViewPart {
 	public PatientView() {
 	}
 
-	public static final String		ID								= "de.lmu.ifi.dbs.medmon.medic.ui.PatientView";				//$NON-NLS-1$
-	private static final String		PATIENT_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
-	private static final String		THERAPY_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv"; //Refractor ?!?!?
-	private static final String		DATA_TOOLBAR_CONTRIBUTIONS		= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
+	public static final String ID = "de.lmu.ifi.dbs.medmon.medic.ui.PatientView"; //$NON-NLS-1$
+	private static final String PATIENT_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
+	private static final String THERAPY_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv"; // Refractor
+																																// ?!?!?
+	private static final String DATA_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
 
-	private static final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	private TabFolder				tabFolder;
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private TabFolder tabFolder;
 
 	/* Personal Data */
-	private Text					tLastname, tFirstname, tGender, tComment;
-	private CDateTime				dBirth;
-	private Table					therapyTable;
-	private TableViewer				therapyViewer;
-	private TabItem					tabCluster;
+	private Text tLastname, tFirstname, tGender, tComment;
+	private CDateTime dBirth;
+	private Table therapyTable;
+	private TableViewer therapyViewer;
+	private TabItem tabCluster;
 
-	private FormToolkit				toolkit;
-	private TableViewer				dataTableViewer;
-	private Text					textLastName;
-	private Text					textFirstname;
-	private Text					textInsuranceId;
-	private Button					btnMale;
-	private Button					btnFemale;
-	private CDateTime				dateBirth;
+	private FormToolkit toolkit;
+	private TableViewer dataTableViewer;
+	private Text textLastName;
+	private Text textFirstname;
+	private Text textInsuranceId;
+	private Button btnMale;
+	private Button btnFemale;
+	private CDateTime dateBirth;
 
-	private PatientFileDetailBlock	patientFileDetailBlock;
+	private PatientFileDetailBlock patientFileDetailBlock;
 
 	/**
 	 * @wbp.nonvisual location=82,149
@@ -167,18 +168,24 @@ public class PatientView extends ViewPart {
 				textFirstname.setText(selection.getFirstname());
 				dateBirth.setSelection(selection.getBirth());
 				switch (selection.getGender()) {
-					case 0:
-						btnFemale.setSelection(false);
-						btnMale.setSelection(true);
-						break;
-					case 1:
-						btnFemale.setSelection(true);
-						btnMale.setSelection(false);
-						break;
+				case 0:
+					btnFemale.setSelection(false);
+					btnMale.setSelection(true);
+					break;
+				case 1:
+					btnFemale.setSelection(true);
+					btnMale.setSelection(false);
+					break;
 				}
 				textInsuranceId.setText(selection.getInsuranceId());
 			}
 
+			@Override
+			public void selectionUpdated() {
+				// TODO Auto-generated method stub
+				
+			}
+			
 			@Override
 			public Class<Patient> getType() {
 				return Patient.class;
@@ -265,5 +272,4 @@ public class PatientView extends ViewPart {
 	public void setFocus() {
 
 	}
-
 }

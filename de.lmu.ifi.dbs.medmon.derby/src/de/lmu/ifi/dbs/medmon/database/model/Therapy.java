@@ -79,6 +79,14 @@ public class Therapy implements Serializable {
 	public int getSuccess() {
 		return success;
 	}
+	
+	public void setTherapyResults(Set<TherapyResult> therapyResults) {
+		this.therapyResults = therapyResults;
+	}
+	
+	public Set<TherapyResult> getTherapyResults() {
+		return therapyResults;
+	}
 
 
 

@@ -36,5 +36,37 @@ public class TherapyResult {
 
 	@Column
 	int success;
+	
+	public void setTherapy(Therapy therapy) {
+		this.therapy = therapy;
+	}
+	
+	public Therapy getTherapy() {
+		return therapy;
+	}
+	
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+	
+	public Date getTimestamp() {
+		return timestamp;
+	}
+	
+	public void setReport(String report) {
+		this.report = report;
+	}
+	
+	public String getReport() {
+		return report;
+	}
+	
+	public void setSuccess(int success) {
+		this.success = success;
+	}
+	
+	public int getSuccess() {
+		return success;
+	}
 
 }

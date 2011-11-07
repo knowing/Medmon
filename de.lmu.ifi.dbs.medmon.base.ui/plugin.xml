@@ -50,6 +50,27 @@
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
+      <factory
+            adaptableType="de.lmu.ifi.dbs.medmon.database.model.Therapy"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.lmu.ifi.dbs.medmon.database.model.TherapyResult"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.lmu.ifi.dbs.medmon.database.model.Patient"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter">
+         </adapter>
+      </factory>
    </extension>
 
 </plugin>
