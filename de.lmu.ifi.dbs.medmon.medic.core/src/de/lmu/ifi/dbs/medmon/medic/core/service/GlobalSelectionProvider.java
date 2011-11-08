@@ -12,7 +12,7 @@ public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 
 	private BundleContext bundleContext = null;
 	private IGlobalSelectionService service = null;
-	private ServiceRegistration<IGlobalSelectionProvider> registerService = null;
+	private ServiceRegistration<IGlobalSelectionProvider> registration = null;
 	private Map<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>> registrationMap = new HashMap<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>>();
 
 	/**
@@ -25,17 +25,17 @@ public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 		if (bundleContext == null)
 			throw new NullPointerException("GlobalSelectionProvider() => bundleContext mustnot be null");
 		this.bundleContext = bundleContext;
-		registerService = bundleContext.registerService(IGlobalSelectionProvider.class, this, null);
+		registration = bundleContext.registerService(IGlobalSelectionProvider.class, this, null);
 	}
 
 	@Override
 	public void unregister() {
-		if (registerService == null)
+		if (registration == null)
 			return;
 		for (Map.Entry<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>> entry : registrationMap.entrySet()) {
 			entry.getValue().unregister();
 		}
-		registerService.unregister();
+		registration.unregister();
 	}
 
 	@Override

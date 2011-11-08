@@ -40,6 +40,9 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SADeleteTherapy;
+import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SADeleteTherapyResult;
+
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.RowLayout;
 import swing2swt.layout.FlowLayout;
@@ -51,8 +54,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private Text textTherapy;
 	private Text textSuccess;
 	private Scale scaleSuccess;
-	private Therapy therapy;
-	private CDateTime dateStart;
+	private CDateTime dateTimestamp;
 	private Listener successChangedListener;
 	private IGlobalSelectionProvider selectionProvider;
 
@@ -105,14 +107,14 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		toolkit.adapt(lblTimestamp, true, true);
 		lblTimestamp.setText("Timestamp:");
 
-		dateStart = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
-		GridData gd_dateStart = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		gd_dateStart.widthHint = 100;
-		gd_dateStart.heightHint = 20;
-		dateStart.setLayoutData(gd_dateStart);
+		dateTimestamp = new CDateTime(composite, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
+		GridData gd_dateTimestamp = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd_dateTimestamp.widthHint = 100;
+		gd_dateTimestamp.heightHint = 20;
+		dateTimestamp.setLayoutData(gd_dateTimestamp);
 
-		toolkit.adapt(dateStart);
-		toolkit.paintBordersFor(dateStart);
+		toolkit.adapt(dateTimestamp);
+		toolkit.paintBordersFor(dateTimestamp);
 
 		Label lblPlaceholder2 = new Label(composite, SWT.NONE);
 		lblPlaceholder2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
@@ -154,11 +156,16 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		Text txtComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
 
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
-		compositeLinks.setLayout(new GridLayout(2, false));
+		compositeLinks.setLayout(new GridLayout(3, false));
 		compositeLinks.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		toolkit.adapt(compositeLinks);
 		toolkit.paintBordersFor(compositeLinks);
-
+		
+		Link linkDelete = new Link(compositeLinks, SWT.NONE);
+		toolkit.adapt(linkDelete, true, true);
+		linkDelete.setText("<a>l\u00F6schen</a>");
+		linkDelete.addSelectionListener(new SADeleteTherapyResult());
+		
 		Label lblPlaceholder = new Label(compositeLinks, SWT.NONE);
 		lblPlaceholder.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(lblPlaceholder, true, true);
@@ -192,10 +199,24 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	}
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
+		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+		TherapyResult therapyResult = (TherapyResult) structuredSelection.getFirstElement();
+
+		selectionProvider.setSelection(TherapyResult.class, therapyResult);
+
+		textTherapy.setText("<empty>");
+		dateTimestamp.setSelection(therapyResult.getTimestamp());
+		scaleSuccess.setSelection(therapyResult.getSuccess());
+		successChangedListener.handleEvent(null);
+		
 		update();
 	}
 
 	public void commit(boolean onSave) {
+		TherapyResult therapyResult = selectionProvider.getSelection(TherapyResult.class);
+
+		therapyResult.setSuccess(scaleSuccess.getSelection());
+		therapyResult.setTimestamp(dateTimestamp.getSelection());
 	}
 
 	public boolean isDirty() {

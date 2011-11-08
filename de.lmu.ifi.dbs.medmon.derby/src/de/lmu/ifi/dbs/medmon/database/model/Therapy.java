@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.medmon.database.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,34 +30,47 @@ public class Therapy implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	//bi-directional many-to-one association to Patient
-    @ManyToOne
-	@JoinColumn(name="PATIENT_ID", nullable=false )
+	// bi-directional many-to-one association to Patient
+	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+	@JoinColumn(name = "PATIENT_ID", nullable = false)
 	private Patient patient;
+
+	@OneToMany(mappedBy = "therapy", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	Set<TherapyResult> therapyResults = new HashSet<TherapyResult>();
 
 	@Temporal(TemporalType.DATE)
 	Date therapyStart;
 
 	@Temporal(TemporalType.DATE)
 	Date therapyEnd;
-	
+
 	@Column
 	String comment;
 
 	@Column(/* 0-100 ? */)
 	int success;
 
-	@OneToMany(mappedBy="therapy")
-	Set<TherapyResult> therapyResults;
-	
+
+	public void updateSuccess(){
+		int sum = 0;
+		for(TherapyResult therapyResult : therapyResults){
+			sum += therapyResult.getSuccess();
+		}
+		sum /= therapyResults.size();
+		setSuccess(sum);
+	}
+
+	/**
+	 * Getters and Setters
+	 */
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
-	
+
 	public Patient getPatient() {
 		return patient;
 	}
-	
+
 	public void setTherapyStart(Date start) {
 		this.therapyStart = start;
 	}
@@ -79,15 +94,13 @@ public class Therapy implements Serializable {
 	public int getSuccess() {
 		return success;
 	}
-	
+
 	public void setTherapyResults(Set<TherapyResult> therapyResults) {
 		this.therapyResults = therapyResults;
 	}
-	
+
 	public Set<TherapyResult> getTherapyResults() {
 		return therapyResults;
 	}
-
-
 
 }

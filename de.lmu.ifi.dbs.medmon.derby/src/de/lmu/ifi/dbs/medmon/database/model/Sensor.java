@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.medmon.database.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class Sensor {
 	private String defaultpath;
 	
 	@OneToMany(mappedBy="sensor")
-	private Set<Data> data;
+	private Set<Data> data = new HashSet<Data>();
 	
 	protected Sensor() {
 	}
