@@ -201,18 +201,11 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 
-		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-		therapy = (Therapy) structuredSelection.getFirstElement();
-
-		GlobalSelectionProvider selectionProvider = new GlobalSelectionProvider();
-		selectionProvider.setSelection(Therapy.class, therapy);
-		selectionProvider.unregister();
-
 		textTherapy.setText("<empty>");
-		dateStart.setSelection(therapy.getTherapyStart());
-		dateEnd.setSelection(therapy.getTherapyEnd());
-		scaleSuccess.setSelection(therapy.getSuccess());
-		successChangedListener.handleEvent(null);
+//		dateStart.setSelection(therapy.getTherapyStart());
+//		dateEnd.setSelection(therapy.getTherapyEnd());
+//		scaleSuccess.setSelection(therapy.getSuccess());
+//		successChangedListener.handleEvent(null);
 
 		update();
 	}

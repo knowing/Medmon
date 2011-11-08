@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.forms.DetailsPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.MasterDetailsBlock;
@@ -28,53 +29,33 @@ import org.eclipse.ui.forms.SectionPart;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Label;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
-import de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.swt.widgets.Link;
 
 public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 	private FormToolkit toolkit;
 	private Text text;
-	private Table tableTherapies;
-	private TableViewer tableViewerTherapies;
-	private TableColumn clmTherapy;
-	private TableViewerColumn cvTherapy;
-	private TableColumn clmEnd;
-	private TableViewerColumn cvEnd;
-	private TableColumn clmStart;
-	private TableViewerColumn cvStart;
-	private Calendar calendar = Calendar.getInstance();
+	private ListViewer therapiesViewer;
 	private Link linkAdd;
 	private Link linkRemove;
+
+	private EntityManager entityManager;
+	private Patient localPatientSelection;
+	private Therapy localTherapySelection;
+	private GlobalSelectionProvider provider;
 
 	/**
 	 * Create the master details block.
 	 */
 	public PatientFileDetailBlock() {
-		// Create the master details block
+		entityManager = JPAUtil.createEntityManager();
+		provider = new GlobalSelectionProvider();
 	}
 
 	/**
@@ -104,30 +85,23 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				GlobalSelectionProvider sp = new GlobalSelectionProvider();
-				Patient selectedPatient = sp.getSelection(Patient.class);
-				sp.unregister();
-
-				if (selectedPatient == null)
+				if (localPatientSelection == null)
 					return;
 				Therapy t = new Therapy();
 				t.setTherapyStart(new Date());
 				t.setTherapyEnd(new Date());
-				t.setPatient(selectedPatient);
-				selectedPatient.getTherapies().add(t);
+				t.setPatient(localPatientSelection);
 
-				EntityManager entityManager = JPAUtil.createEntityManager();
 				EntityTransaction trans = entityManager.getTransaction();
 				trans.begin();
-
 				entityManager.persist(t);
-				entityManager.merge(selectedPatient);
-
 				trans.commit();
-				entityManager.close();
 
-				tableViewerTherapies.refresh();
+				trans.begin();
+				entityManager.refresh(localPatientSelection);
+				trans.commit();
 
+				refresh();
 			}
 		});
 
@@ -137,25 +111,19 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		linkRemove.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				GlobalSelectionProvider sp = new GlobalSelectionProvider();
-				Therapy selectedTherapy = sp.getSelection(Therapy.class);
-
-				if (selectedTherapy == null) {
+				if (localTherapySelection == null)
 					return;
-				}
 
-				EntityManager entityManager = JPAUtil.createEntityManager();
-				EntityTransaction entityTransaction = entityManager.getTransaction();
-				entityTransaction.begin();
+				EntityTransaction trans = entityManager.getTransaction();
+				trans.begin();
+				entityManager.remove(localTherapySelection);
+				trans.commit();
 
-				selectedTherapy = entityManager.merge(selectedTherapy);
-				entityManager.remove(selectedTherapy);
-				entityTransaction.commit();
-				entityManager.close();
+				trans.begin();
+				entityManager.refresh(localPatientSelection);
 
-				sp.setSelection(Therapy.class, null);
-				sp.unregister();
-
+				trans.commit();
+				refresh();
 			}
 		});
 
@@ -165,66 +133,35 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		toolkit.adapt(text, true, true);
 
-		tableViewerTherapies = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
-		tableTherapies = tableViewerTherapies.getTable();
-		tableTherapies.setLinesVisible(true);
-		tableTherapies.setHeaderVisible(true);
+		therapiesViewer = new ListViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
+		List therapiesTree = therapiesViewer.getList();
 		GridData gd_tableTherapies = new GridData(SWT.FILL, SWT.FILL, false, true, 3, 1);
 		gd_tableTherapies.heightHint = 42;
 		gd_tableTherapies.widthHint = 102;
-		tableTherapies.setLayoutData(gd_tableTherapies);
-		toolkit.paintBordersFor(tableTherapies);
-		tableViewerTherapies.setContentProvider(ArrayContentProvider.getInstance());
+		therapiesTree.setLayoutData(gd_tableTherapies);
+
+		therapiesViewer.setContentProvider(new ArrayContentProvider());
+		therapiesViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((Therapy) element).toString();
+			}
+		});
 
 		final SectionPart therapyPart = new SectionPart(section);
 		managedForm.addPart(therapyPart);
-		tableViewerTherapies.addSelectionChangedListener(new ISelectionChangedListener() {
+		therapiesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				managedForm.fireSelectionChanged(therapyPart, event.getSelection());
-			}
-		});
+				IStructuredSelection structuredSelection = (IStructuredSelection) event.getSelection();
+				Therapy therapy = (Therapy) structuredSelection.getFirstElement();
+				if (localTherapySelection != null && !localTherapySelection.equals(therapy))
+					entityManager.detach(localTherapySelection);
+				localTherapySelection = entityManager.merge(therapy);
+				provider.setSelection(Therapy.class, therapy);
 
-		cvTherapy = new TableViewerColumn(tableViewerTherapies, SWT.NONE);
-		clmTherapy = cvTherapy.getColumn();
-		clmTherapy.setWidth(100);
-		clmTherapy.setText("Ma\u00DFnahmen");
-
-		cvStart = new TableViewerColumn(tableViewerTherapies, SWT.NONE);
-		clmStart = cvStart.getColumn();
-		clmStart.setWidth(100);
-		clmStart.setText("Start");
-
-		cvEnd = new TableViewerColumn(tableViewerTherapies, SWT.NONE);
-		clmEnd = cvEnd.getColumn();
-		clmEnd.setWidth(100);
-		clmEnd.setText("Ende");
-
-		cvTherapy.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(ViewerCell cell) {
-				Therapy t = (Therapy) cell.getElement();
-				cell.setText("<>");
-			}
-		});
-		cvStart.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(ViewerCell cell) {
-				Therapy t = (Therapy) cell.getElement();
-				calendar.setTime(t.getTherapyStart());
-				String text = calendar.get(Calendar.DAY_OF_MONTH) + " "
-						+ calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.GERMAN) + " " + calendar.get(Calendar.YEAR);
-				cell.setText(text);
-			}
-		});
-		cvEnd.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(ViewerCell cell) {
-				Therapy t = (Therapy) cell.getElement();
-				calendar.setTime(t.getTherapyEnd());
-				String text = calendar.get(Calendar.DAY_OF_MONTH) + " "
-						+ calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.GERMAN) + " " + calendar.get(Calendar.YEAR);
-				cell.setText(text);
 			}
 		});
 
@@ -233,19 +170,15 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 		// selectionListener for Patient.class
 		IGlobalSelectionListener<Patient> selectionListener = new IGlobalSelectionListener<Patient>() {
+
 			@Override
 			public void selectionChanged(Patient selection) {
 				if (selection == null) {
-					tableViewerTherapies.setInput(null);
+					therapiesViewer.setInput(null);
 				} else {
-					//EntityManager entityManager = JPAUtil.createEntityManager();
-					//EntityTransaction entityTransaction = entityManager.getTransaction();
-					//entityTransaction.begin();
-					//selection = entityManager.merge(selection);
-					//entityTransaction.commit();
-					//entityManager.close();
-					tableViewerTherapies.setInput(selection.getTherapies());
-					}
+					localPatientSelection = entityManager.merge(selection);
+					therapiesViewer.setInput(localPatientSelection.getTherapies());
+				}
 			}
 
 			@Override
@@ -255,6 +188,11 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		};
 		Activator.getBundleContext().registerService(IGlobalSelectionListener.class, selectionListener, null);
 
+	}
+
+	private void refresh() {
+		if (localPatientSelection != null)
+			therapiesViewer.setInput(localPatientSelection.getTherapies());
 	}
 
 	/**

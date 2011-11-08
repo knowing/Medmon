@@ -23,27 +23,27 @@ public class PatientServiceTest {
 	protected void activate(ComponentContext context) {
 		log.info("GlobalSelectionService started successfully");
 		
-		try {
-			Patient p1 = patientService.createPatient();
-			log.info(patientService.locateDirectory(p1, IPatientService.ROOT).toString());
-			
-			EntityManager em = ems.createEntityManager();
-			em.getTransaction().begin();
-			Patient patient = em.merge(p1);
-			patient.setFirstname("John");
-			patient.setLastname("Smith");
-			em.getTransaction().commit();
-			em.close();
-			
-			Patient p2 = patientService.createPatient();
-			log.info(patientService.locateDirectory(p2, IPatientService.ROOT).toString());
-			
-			patientService.deletePatient(p2);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+//		try {
+//			Patient p1 = patientService.createPatient();
+//			log.info(patientService.locateDirectory(p1, IPatientService.ROOT).toString());
+//			
+//			EntityManager em = ems.createEntityManager();
+//			em.getTransaction().begin();
+//			Patient patient = em.merge(p1);
+//			patient.setFirstname("John");
+//			patient.setLastname("Smith");
+//			em.getTransaction().commit();
+//			em.close();
+//			
+//			Patient p2 = patientService.createPatient();
+//			log.info(patientService.locateDirectory(p2, IPatientService.ROOT).toString());
+//			
+//			patientService.deletePatient(p2);
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
 	}
 	
 	protected void bindPatientService(IPatientService patientService) {
