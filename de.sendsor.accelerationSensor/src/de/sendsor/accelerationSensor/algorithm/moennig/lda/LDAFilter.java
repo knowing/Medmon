@@ -10,6 +10,7 @@ import java.util.Vector;
 import de.lmu.ifi.dbs.knowing.core.japi.ILoggableProcessor;
 import de.lmu.ifi.dbs.knowing.core.processing.TProcessor;
 import de.lmu.ifi.dbs.knowing.core.events.*;
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
@@ -86,6 +87,13 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 				}
 			}
 			output = result;
+		} else {
+			//Update the values of the SOURCE_ATTRIBUTE
+			//TODO reset the attribute 
+			/*
+			Instances relHeader = output.attribute(j).relation();
+			int index = relHeader.attribute(ResultsUtil.ATTRIBUTE_SOURCE()).index();
+			*/
 		}
 				
 		return output;
