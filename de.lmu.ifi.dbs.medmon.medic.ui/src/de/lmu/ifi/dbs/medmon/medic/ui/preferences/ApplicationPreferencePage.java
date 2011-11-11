@@ -6,7 +6,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
-import de.lmu.ifi.dbs.medmon.medic.core.util.ApplicationConfigurationUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class ApplicationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -41,7 +41,7 @@ public class ApplicationPreferencePage extends FieldEditorPreferencePage impleme
 	 * Initialize the preference page.
 	 */
 	public void init(IWorkbench workbench) {
-		setPreferenceStore(ApplicationConfigurationUtil.getPreferenceStore());
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 		setDescription("Programmeinstellungen");
 	}
 

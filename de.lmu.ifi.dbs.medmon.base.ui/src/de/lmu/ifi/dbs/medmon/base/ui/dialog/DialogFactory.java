@@ -5,11 +5,13 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.eclipse.core.internal.registry.osgi.Activator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.service.EntityManagerProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class DialogFactory {
@@ -23,10 +25,13 @@ public class DialogFactory {
 		
 	
 	private static Patient[] loadPatients() {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManagerProvider emp = new EntityManagerProvider(Activator.getContext());
+		EntityManager em = emp.getEntityManager();
+		emp.unregister();
+		
 		Query allPatients = em.createNamedQuery("Patient.findAll");
 		List<Patient> patients = allPatients.getResultList();
-		em.close();
+		//em.close();
 		return patients.toArray(new Patient[patients.size()]);
 	}
 }

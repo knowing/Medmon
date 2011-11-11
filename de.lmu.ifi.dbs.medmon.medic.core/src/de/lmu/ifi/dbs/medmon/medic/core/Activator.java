@@ -1,11 +1,17 @@
 package de.lmu.ifi.dbs.medmon.medic.core;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
@@ -20,6 +26,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	
+	private static final Logger log = LoggerFactory.getLogger(PLUGIN_ID);
 
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> emServiceTracker;
 
@@ -76,38 +84,14 @@ public class Activator extends AbstractUIPlugin {
 	private void createApplicationFolders() {
 		IPreferenceStore store = plugin.getPreferenceStore();
 
-		String root_dir = store.getString(IMedicPreferences.DIR_MEDMON_ID);
-		String dpu_dir = store.getString(IMedicPreferences.DIR_DPU_ID);
-		String patient_dir = store.getString(IMedicPreferences.DIR_PATIENT_ID);
-		String cluster_dir = store.getString(IMedicPreferences.DIR_CU_ID);
-		String tmp_dir = store.getString(IMedicPreferences.DIR_TMP_ID);
-
-		File root = new File(root_dir);
-		if (!root.exists()) {
-			root.mkdirs();
-			new File(dpu_dir).mkdir();
-			new File(patient_dir).mkdir();
-			new File(cluster_dir).mkdir();
-			new File(tmp_dir).mkdir();
-		} else {
-			File dpu = new File(dpu_dir);
-			if (!dpu.exists())
-				dpu.mkdir();
-			File patient = new File(patient_dir);
-			if (!patient.exists())
-				patient.mkdir();
-			File cluster = new File(cluster_dir);
-			if (!cluster.exists())
-				cluster.mkdir();
-			File tmp = new File(tmp_dir);
-			if (tmp.exists()) {
-				// wipe tmp dir
-				for (File file : tmp.listFiles())
-					file.delete();
-			} else {
-				tmp.mkdir();
-			}
-
+		Path root = Paths.get(store.getString(IMedicPreferences.DIR_MEDMON_ID));
+		try {
+			Files.createDirectory(root);
+			Files.createDirectories(root.resolve(store.getString(IMedicPreferences.DIR_DPU_ID)));
+		} catch (FileAlreadyExistsException e) {
+			log.debug("Medmon folder already exists");
+		} catch (IOException e) {
+			log.error("IOException in Activator", e);
 		}
 
 	}

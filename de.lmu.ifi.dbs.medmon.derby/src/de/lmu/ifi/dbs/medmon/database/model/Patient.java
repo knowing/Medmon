@@ -58,19 +58,19 @@ public class Patient implements Serializable {
 
 	// bi-directional many-to-one association to Appointment
 	@OneToMany(mappedBy = "patient")
-	private Set<Appointment> appointments;
+	private Set<Appointment> appointments = new HashSet<Appointment>();
 
 	// bi-directional many-to-one association to Data
 	@OneToMany(mappedBy = "patient")
-	private Set<Data> data;
+	private Set<Data> data = new HashSet<Data>();
 
 	// bi-directional many-to-one association to Archives
 	@OneToMany(mappedBy = "patient")
-	private Set<Archiv> archives;
+	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient")
-	private Set<Therapy> therapies;
+	@OneToMany(mappedBy = "patient", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
 	}
@@ -180,7 +180,7 @@ public class Patient implements Serializable {
 	public void setTherapies(Set<Therapy> therapies) {
 		this.therapies = therapies;
 	}
-	
+
 	public Set<Therapy> getTherapies() {
 		return therapies;
 	}

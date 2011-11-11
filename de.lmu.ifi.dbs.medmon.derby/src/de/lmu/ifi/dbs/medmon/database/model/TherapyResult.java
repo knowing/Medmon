@@ -2,8 +2,10 @@ package de.lmu.ifi.dbs.medmon.database.model;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,7 +23,7 @@ public class TherapyResult {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinColumn(name = "THERAPY_ID", nullable = false)
 	private Therapy therapy;
 
@@ -36,5 +38,38 @@ public class TherapyResult {
 
 	@Column
 	int success;
+
+	public void setTherapy(Therapy therapy) {
+		this.therapy = therapy;
+	}
+
+	public Therapy getTherapy() {
+		return therapy;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setReport(String report) {
+		this.report = report;
+	}
+
+	public String getReport() {
+		return report;
+	}
+
+	public void setSuccess(int success) {
+		this.success = success;
+		therapy.updateSuccess();
+	}
+
+	public int getSuccess() {
+		return success;
+	}
 
 }

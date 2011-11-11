@@ -22,19 +22,17 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 	private Map<Class<?>, Set<IGlobalSelectionListener<?>>> listenerServices = new HashMap<Class<?>, Set<IGlobalSelectionListener<?>>>();
 	private Map<Class<?>, Object> selectionMap = new HashMap<Class<?>, Object>();
 
-	// ********************************************************************************
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getSelection(Class<T> clazz) {
 		return (T) selectionMap.get(clazz);
 	}
 
-	// ********************************************************************************
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T setSelection(Class<T> clazz, T selection) {
 		T oldSelection = (T) selectionMap.put(clazz, selection);
-		if (listenerServices.get(clazz) == null || selection.equals(oldSelection)) {
+		if (listenerServices.get(clazz) == null) {
 			return oldSelection;
 		}
 		for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz))
@@ -42,24 +40,30 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 		return oldSelection;
 	}
 
-	// ********************************************************************************
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> void updateSelection(Class<T> clazz) {
+		T selection = (T) selectionMap.get(clazz);
+		if(selection == null || listenerServices.get(clazz) == null)
+			return;
+		for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz))
+			((IGlobalSelectionListener<T>) listener).selectionUpdated();	
+	}
+
 	protected void activate(ComponentContext context) {
 		log.info("GlobalSelectionService started successfully");
 	}
 
-	// ********************************************************************************
 	protected void bindProvider(IGlobalSelectionProvider provider) {
 		providerServices.add(provider);
 		provider.setGlobalSelectionService(this);
 	}
 
-	// ********************************************************************************
 	protected void unbindProvider(IGlobalSelectionProvider provider) {
 		providerServices.remove(provider);
 		// provider.setGlobalSelectionService(null); ???
 	}
 
-	// ********************************************************************************
 	protected void bindListener(IGlobalSelectionListener<?> listener) {
 		if (listenerServices.get(listener.getType()) == null) {
 			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>());
@@ -68,9 +72,7 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 		log.debug("bound:" + listener.getType());
 	}
 
-	// ********************************************************************************
 	protected void unbindListener(IGlobalSelectionListener<?> listener) {
 		listenerServices.get(listener.getType()).remove(listener);
 	}
-	// ********************************************************************************
 }
