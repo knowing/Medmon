@@ -11,7 +11,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: Jama,
  Jama.util,
- org.osgi.framework;version="1.6.0",  scala;version="[2.9.0.1,2.9.3.0]",
+ org.osgi.framework;version="1.6.0",
+ scala;version="[2.9.0.1,2.9.3.0]",
  scala.collection;version="[2.9.0.1,2.9.3.0]",
  scala.collection.generic;version="[2.9.0.1,2.9.3.0]",
  scala.collection.immutable;version="[2.9.0.1,2.9.3.0]",

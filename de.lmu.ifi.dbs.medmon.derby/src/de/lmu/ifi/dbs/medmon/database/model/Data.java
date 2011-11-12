@@ -70,7 +70,15 @@ public class Data implements Serializable {
 	private Patient patient;
 
     public Data() {  }
-  
+    
+
+	public Data(Patient patient,Sensor sensor, String type, Date from, Date to ) {
+		this.from = from;
+		this.to = to;
+		this.type = type;
+		this.sensor = sensor;
+		this.patient = patient;
+	}
 
 	public int getId() {
 		return id;
