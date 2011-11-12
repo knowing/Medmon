@@ -13,7 +13,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 
 public class EntityManagerService implements IEntityManagerService {
@@ -68,10 +67,6 @@ public class EntityManagerService implements IEntityManagerService {
 
 	public void unbindEntityManagerFactory(EntityManagerFactory emf) {
 		emFactories.remove(emf);
-	}
-
-	public void bindEntityManagerProvider(IEntityManagerProvider provider) {
-		provider.setEntityManagerService(this);
 	}
 
 	protected void activate(ComponentContext context) {

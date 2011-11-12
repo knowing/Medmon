@@ -1,11 +1,16 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -28,27 +33,24 @@ import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SACreateTherapy;
-import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SADeleteTherapy;
 import org.eclipse.swt.widgets.Label;
 
 public class PatientFileDetailBlock extends MasterDetailsBlock {
 
-	private FormToolkit toolkit;
-	private Text text;
-	private Calendar calendar = Calendar.getInstance();
-	private Link linkAdd;
-	private IGlobalSelectionProvider selectionProvider;
-	private Tree tree;
-	private TreeViewer treeViewerTherapies;
+	private FormToolkit					toolkit;
+	private Calendar					calendar	= Calendar.getInstance();
+	private IGlobalSelectionProvider	selectionProvider;
+	private TreeViewer					therapiesViewer;
+	private EntityManager				entityManager;
+	private Patient						localPatientSelection;
 
 	/**
 	 * Create the master details block.
 	 */
 	public PatientFileDetailBlock() {
 		// Create the master details block
-		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
 	}
 
 	/**
@@ -60,6 +62,8 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	@Override
 	protected void createMasterPart(final IManagedForm managedForm, Composite parent) {
 		toolkit = managedForm.getToolkit();
+		entityManager = JPAUtil.createEntityManager();
+		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
 		//
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
 		section.setText("Empty Master Section");
@@ -71,26 +75,57 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		gl_composite.horizontalSpacing = 15;
 		composite.setLayout(gl_composite);
 
-		linkAdd = new Link(composite, SWT.NONE);
+		Link linkAdd = new Link(composite, SWT.NONE);
 		toolkit.adapt(linkAdd, true, true);
 		linkAdd.setText("<a>neue Therapie</a>");
-		linkAdd.addSelectionListener(new SACreateTherapy());
+		linkAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				if (localPatientSelection == null)
+					return;
+
+				/************************************************************
+				 * Database Access Begin
+				 ************************************************************/
+
+				Therapy mTherapy = new Therapy();
+
+				mTherapy.setTherapyStart(new Date());
+				mTherapy.setTherapyEnd(new Date());
+				mTherapy.setPatient(localPatientSelection);
+
+				entityManager.getTransaction().begin();
+				entityManager.persist(mTherapy);
+				entityManager.getTransaction().commit();
+
+				//entityManager.getTransaction().begin();
+				//entityManager.refresh(localPatientSelection);
+				//entityManager.getTransaction().commit();
+
+				/************************************************************
+				 * Database Access End
+				 ************************************************************/
+				
+				selectionProvider.updateSelection(Patient.class);
+			}
+		});
 		new Label(composite, SWT.NONE);
 
-		text = new Text(composite, SWT.BORDER);
+		Text text = new Text(composite, SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		toolkit.adapt(text, true, true);
 
 		final SectionPart sectionPart = new SectionPart(section);
 		managedForm.addPart(sectionPart);
 
-		treeViewerTherapies = new TreeViewer(composite, SWT.BORDER);
-		tree = treeViewerTherapies.getTree();
+		therapiesViewer = new TreeViewer(composite, SWT.BORDER);
+		Tree tree = therapiesViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		toolkit.paintBordersFor(tree);
-		treeViewerTherapies.setContentProvider(new BaseWorkbenchContentProvider());
-		treeViewerTherapies.setLabelProvider(new WorkbenchLabelProvider());
-		treeViewerTherapies.addSelectionChangedListener(new ISelectionChangedListener() {
+		therapiesViewer.setContentProvider(new BaseWorkbenchContentProvider());
+		therapiesViewer.setLabelProvider(new WorkbenchLabelProvider());
+		therapiesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				managedForm.fireSelectionChanged(sectionPart, event.getSelection());
@@ -107,15 +142,40 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 			@Override
 			public void selectionChanged(Patient selection) {
 				if (selection == null) {
-					treeViewerTherapies.setInput(null);
+					localPatientSelection = null;
+					therapiesViewer.setInput(null);
 				} else {
-					treeViewerTherapies.setInput(selection);
+					
+					/************************************************************
+					 * Database Access Begin
+					 ************************************************************/
+					
+					localPatientSelection = entityManager.merge(selection);	
+					therapiesViewer.setInput(localPatientSelection);
+					
+					/************************************************************
+					 * Database Access End
+					 ************************************************************/
 				}
 			}
 
 			@Override
 			public void selectionUpdated() {
-				treeViewerTherapies.refresh();
+				
+				/************************************************************
+				 * Database Access Begin
+				 ************************************************************/
+				System.out.println("refresh");
+				
+				entityManager.getTransaction().begin();
+				entityManager.refresh(localPatientSelection);
+				entityManager.getTransaction().commit();
+				
+				therapiesViewer.refresh();
+				
+				/************************************************************
+				 * Database Access End
+				 ************************************************************/
 			}
 
 			@Override

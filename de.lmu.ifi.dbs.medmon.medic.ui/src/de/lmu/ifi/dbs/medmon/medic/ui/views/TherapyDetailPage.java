@@ -3,69 +3,58 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.nebula.widgets.cdatetime.CDateTime;
-import org.eclipse.nebula.widgets.cdatetime.CDT;
-import org.eclipse.swt.widgets.Scale;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Group;
 
-import de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.EntityManagerProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SACreateTherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.ui.selectionadapters.SADeleteTherapy;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.RowLayout;
-import swing2swt.layout.FlowLayout;
-import org.eclipse.swt.widgets.Link;
 
 public class TherapyDetailPage implements IDetailsPage {
 
-	private IManagedForm managedForm;
-	private Text textTherapy;
-	private Text textSuccess;
-	private Scale scaleSuccess;
-	private CDateTime dateStart;
-	private CDateTime dateEnd;
-	private Listener successChangedListener;
-	private IGlobalSelectionProvider selectionProvider;
+	private IManagedForm				managedForm;
+	private Text						textTherapy;
+	private Text						textSuccess;
+	private Scale						scaleSuccess;
+	private CDateTime					dateStart;
+	private CDateTime					dateEnd;
+	private Listener					successChangedListener;
+	private EntityManager				entityManager;
+	private IGlobalSelectionProvider	selectionProvider;
 
 	/**
 	 * Create the details page.
 	 */
 	public TherapyDetailPage() {
 		// Create the details page
-		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
+		
 	}
 
 	/**
@@ -83,6 +72,9 @@ public class TherapyDetailPage implements IDetailsPage {
 	 * @param parent
 	 */
 	public void createContents(Composite parent) {
+		entityManager = JPAUtil.createEntityManager();
+		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
+		
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
 		//
@@ -147,7 +139,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		scaleSuccess = new Scale(composite, SWT.NONE);
 		scaleSuccess.setEnabled(false);
 		successChangedListener = new Listener() {
-			private int success;
+			private int	success;
 
 			public void handleEvent(Event event) {
 				success = scaleSuccess.getSelection();
@@ -191,8 +183,37 @@ public class TherapyDetailPage implements IDetailsPage {
 		Link linkDelete = new Link(compositeLinks, SWT.NONE);
 		toolkit.adapt(linkDelete, true, true);
 		linkDelete.setText("<a>l\u00F6schen</a>");
-		linkDelete.addSelectionListener(new SADeleteTherapy());
-		
+		linkDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+
+				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
+				if (selectedTherapy == null) {
+					return;
+				}
+
+				/************************************************************
+				 * Database Access Begin
+				 ************************************************************/
+
+				entityManager.getTransaction().begin();
+				Therapy mTherapy = entityManager.merge(selectedTherapy);
+				entityManager.getTransaction().commit();
+				
+				entityManager.getTransaction().begin();
+				entityManager.remove(mTherapy);
+				entityManager.getTransaction().commit();
+							
+				/************************************************************
+				 * Database Access End
+				 ************************************************************/
+
+				selectionProvider.setSelection(Therapy.class, null);
+				selectionProvider.updateSelection(Patient.class);
+
+			}
+		});
+
 		Label lblPlaceholder = new Label(compositeLinks, SWT.NONE);
 		lblPlaceholder.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(lblPlaceholder, true, true);
@@ -200,7 +221,34 @@ public class TherapyDetailPage implements IDetailsPage {
 		Link linkNewResult = new Link(compositeLinks, SWT.NONE);
 		toolkit.adapt(linkNewResult, true, true);
 		linkNewResult.setText("<a>neues Ergebnis</a>");
-		linkNewResult.addSelectionListener(new SACreateTherapyResult());
+		linkNewResult.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
+				
+				/************************************************************
+				 * Database Access Begin
+				 ************************************************************/
+				
+				TherapyResult mTherapyResult = new TherapyResult();
+				Therapy mTherapy = entityManager.merge(selectedTherapy);
+				//SetSomeStuff
+				mTherapyResult.setTherapy(mTherapy);
+				
+				entityManager.getTransaction().begin();
+				entityManager.persist(mTherapyResult);
+				entityManager.getTransaction().commit();
+				
+
+				/************************************************************
+				 * Database Access End
+				 ************************************************************/
+				 
+				selectionProvider.updateSelection(Patient.class);
+				selectionProvider.updateSelection(Therapy.class);
+			}
+		});
 
 		Link linkSave = new Link(compositeLinks, SWT.NONE);
 		toolkit.adapt(linkSave, true, true);
@@ -215,6 +263,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void dispose() {
 		// Dispose
+		entityManager.close();
 		selectionProvider.unregister();
 	}
 
