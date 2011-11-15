@@ -17,8 +17,11 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
@@ -26,9 +29,10 @@ import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 public class SensorService implements ISensorService {
 
 	private static final long INTERVAL = 1000;
-
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	private PropertyChangeSupport support;
-	private Map<String, SensorAdapter> model;
+	//private Map<String, SensorAdapter> model;
 	private Thread currentThread;
 
 	private IEntityManagerService dbService;
@@ -38,7 +42,8 @@ public class SensorService implements ISensorService {
 		support = new PropertyChangeSupport(this);
 		initModel();
 
-		currentThread = new Thread(new SensorDaemon());
+		//currentThread = new Thread(new SensorDaemon());
+		log.debug("currentThread = new Thread(new SensorDaemon());");
 		currentThread.setDaemon(true);
 		currentThread.setName("Sensor Daemon");
 		currentThread.setPriority(Thread.MIN_PRIORITY);
@@ -51,11 +56,17 @@ public class SensorService implements ISensorService {
 	}
 
 	@Override
-	public Map<String, SensorAdapter> getSensorAdapters() {
+	public Map<String, Object> getSensorAdapters() {
+		log.debug("SensorService::getSensorAdapters()");
+		return null;
+		/*
 		return model;
+		*/
 	}
 
 	private void initModel() {
+		log.debug("SensorService::initModel()");
+		/*
 		model = Collections.synchronizedMap(new HashMap<String, SensorAdapter>());
 
 		// Merge extension points and entites together
@@ -95,6 +106,7 @@ public class SensorService implements ISensorService {
 		}
 
 		fireModelChanged();
+		*/
 	}
 
 	private List<ISensor> getSensorExtensions() {
@@ -134,6 +146,8 @@ public class SensorService implements ISensorService {
 	}
 
 	private void checkSensorsAvailable() {
+		log.debug("SensorService::checkSensorsAvailable()");
+		/*
 		boolean changed = false;
 		for (SensorAdapter adapter : model.values()) {
 			// TODO search the db for new sensors
@@ -187,7 +201,7 @@ public class SensorService implements ISensorService {
 		}
 		if (changed)
 			fireModelChanged();
-
+*/
 	}
 
 	@Override
@@ -201,8 +215,11 @@ public class SensorService implements ISensorService {
 	}
 
 	protected void fireModelChanged() {
+		log.debug("SensorService::fireModelChanged()");
+		/*
 		if (support != null)
 			support.firePropertyChange("model", null, model);
+			*/
 	}
 
 	public void bindEntityManagerService(IEntityManagerService dbService) {
@@ -212,21 +229,4 @@ public class SensorService implements ISensorService {
 	public void unbindEntityManagerService(IEntityManagerService dbService) {
 		this.dbService = null;
 	}
-
-	private class SensorDaemon implements Runnable {
-
-		@Override
-		public void run() {
-			try {
-				while (!currentThread.isInterrupted()) {
-					checkSensorsAvailable();
-					Thread.sleep(INTERVAL);
-				}
-			} catch (InterruptedException e) {
-				return;
-			}
-		}
-
-	}
-
 }

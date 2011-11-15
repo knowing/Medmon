@@ -1,10 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -13,15 +9,10 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -33,12 +24,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.PatientProposalProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.TextContentAdapter2;
@@ -50,6 +41,8 @@ public class SelectDBDataPage extends WizardPage {
 	private DateChooserCombo dateCustomEnd;
 	private TableViewer dataViewer;
 	private ComboViewer comboViewer;
+	
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	/**
 	 * Create the wizard.
@@ -117,7 +110,12 @@ public class SelectDBDataPage extends WizardPage {
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		comboViewer.setLabelProvider(new WorkbenchLabelProvider());
 		comboViewer.setContentProvider(ArrayContentProvider.getInstance());
-		comboViewer.setInput(getSensorAdapter());
+		
+	log.debug("comboViewer.setInput(getSensorAdapter());");
+		//comboViewer.setInput(getSensorAdapter());
+		
+	log.debug("comboViewer.addSelectionChangedListener(new ISelectionChangedListener()");
+	/*
 		comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			@Override
@@ -128,7 +126,7 @@ public class SelectDBDataPage extends WizardPage {
 				SensorAdapter adapter = (SensorAdapter) selection.getFirstElement();
 				dataViewer.setInput(getSensorData(adapter));
 			}
-		});
+		});*/
 
 		dataViewer = new DataViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		Table table = dataViewer.getTable();
@@ -136,6 +134,9 @@ public class SelectDBDataPage extends WizardPage {
 
 		Button bRefresh = new Button(container, SWT.PUSH);
 		bRefresh.setText("Aktualisieren");
+		
+		log.debug("bRefresh.addSelectionListener(new SelectionAdapter() {");
+		/*
 		bRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -145,7 +146,7 @@ public class SelectDBDataPage extends WizardPage {
 				SensorAdapter adapter = (SensorAdapter) selection.getFirstElement();
 				dataViewer.setInput(getSensorData(adapter));
 			}
-		});
+		});*/
 		
 		Composite buttonPanel = new Composite(container, SWT.NONE);
 		RowLayout rl_buttonPanel = new RowLayout(SWT.HORIZONTAL);
@@ -166,15 +167,23 @@ public class SelectDBDataPage extends WizardPage {
 		return PatientProposalProvider.parsePatient(tPatient.getText());
 	}
 
-	private List<SensorAdapter> getSensorAdapter() {
+	private List<Object> getSensorAdapter() {
+		log.debug("SelectDBDataPage::getSensorAdapter()");
+		/*
 		Map<String, SensorAdapter> model = Activator.getSensorService().getSensorAdapters();
 		return new ArrayList<SensorAdapter>(model.values());
+		*/
+		return null;
 	}
 
-	private List<Data> getSensorData(SensorAdapter adapter) {
+	private List<Data> getSensorData(Object adapter) {
+		log.debug("SelectDBDataPage::getSensorData()");
+		/*
 		EntityManager em = JPAUtil.createEntityManager();
 		em.getTransaction().begin();
 		return em.createNamedQuery("Data.findByPatientAndSensor").setParameter("patient", getPatient())
 				.setParameter("sensor", adapter.getSensorEntity()).getResultList();
+				*/
+		return null;
 	}
 }

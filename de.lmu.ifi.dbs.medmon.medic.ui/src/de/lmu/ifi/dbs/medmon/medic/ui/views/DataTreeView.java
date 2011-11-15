@@ -106,17 +106,15 @@ public class DataTreeView extends ViewPart implements PropertyChangeListener, IP
 			log.debug("    Activator.getPatientService().setSelection(event.getNewValue(), IPatientService.SENSOR); ... ... ..."); 
 		} else if (event.getProperty().equals("file")) {
 			String file = (String) event.getNewValue();
-			ISensor sensor = sensorSource.getSensor().getSensorExtension();
-			try {
-//				ISensorDataContainer c = sensor.getConverter().convertToContainer(file, ContainerType.WEEK, ContainerType.HOUR,
-//						null);
-//				Activator.getPatientService().setSelection(c, IPatientService.SENSOR_CONTAINER);
-				System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
-				Instances dataSet = sensor.getConverter().getDataSet();
-				tabFolder.setSelection(tabData);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			//ISensor sensor = sensorSource.getSensor().getSensorExtension();
+			log.debug("ISensor sensor = sensorSource.getSensor().getSensorExtension();"); 
+			//				ISensorDataContainer c = sensor.getConverter().convertToContainer(file, ContainerType.WEEK, ContainerType.HOUR,
+			//						null);
+			//				Activator.getPatientService().setSelection(c, IPatientService.SENSOR_CONTAINER);
+							System.err.println("NOT IMPLEMENTED YET: " + getClass().getName());
+							//Instances dataSet = sensor.getConverter().getDataSet();
+							log.debug("Instances dataSet = sensor.getConverter().getDataSet();"); 
+							tabFolder.setSelection(tabData);
 
 		}
 

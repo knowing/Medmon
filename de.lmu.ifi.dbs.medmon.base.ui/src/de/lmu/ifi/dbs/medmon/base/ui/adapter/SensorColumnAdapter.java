@@ -2,12 +2,15 @@ package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 public class SensorColumnAdapter implements IWorkbenchColumnAdapter {
 
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	@Override
 	public Object[] getChildren(Object o) {
 		return null;
@@ -20,7 +23,8 @@ public class SensorColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getLabel(Object o) {
-		return ((SensorAdapter) o).getName();
+		log.debug("SensorColumnAdapter::getLabel()");
+		return null;
 	}
 
 	@Override
@@ -30,6 +34,9 @@ public class SensorColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
+		log.debug("SensorColumnAdapter::getColumnText()");
+		return null;
+		/*
 		SensorAdapter adapter = (SensorAdapter) element;
 		switch (columnIndex) {
 		case 0:
@@ -45,16 +52,19 @@ public class SensorColumnAdapter implements IWorkbenchColumnAdapter {
 		default:
 			return "-";
 		}
+		*/
 	}
 
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
+		log.debug("SensorColumnAdapter::getColumnImage()");
+		/*
 		if (columnIndex == 4) {
 			SensorAdapter adapter = (SensorAdapter) element;
 			if (adapter.isAvailable())
 				return Activator.getImageDescriptor("icons/sensor_16.png").createImage();
 			return Activator.getImageDescriptor("icons/sensor_disabled_16.png").createImage();
-		}
+		}*/
 
 		return null;
 	}

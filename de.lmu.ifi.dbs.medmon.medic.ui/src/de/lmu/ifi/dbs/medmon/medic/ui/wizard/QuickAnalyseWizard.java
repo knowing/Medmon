@@ -1,12 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -18,17 +11,11 @@ import org.eclipse.ui.IWorkbench;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
-import de.lmu.ifi.dbs.knowing.core.swt.handler.EvaluateHandler;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDPUPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectDataPage;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SensorPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutableExtension {
 
@@ -67,6 +54,8 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 	
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
+		log.debug("QuickAnalyseWizard::getNextPage()");
+		/*
 		if(page == sourcePage) {
 			dataPage.setSensor(sourcePage.getSensor());
 			dataPage.setPatient(sourcePage.getPatient());
@@ -74,6 +63,8 @@ public class QuickAnalyseWizard extends Wizard implements INewWizard, IExecutabl
 			dpuPage.setSensor(sourcePage.getSensor());
 		}
 		return super.getNextPage(page);
+		*/
+		return null;
 	}
 
 	@Override
