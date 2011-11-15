@@ -41,6 +41,7 @@
    <vm>
    </vm>
 
+
    <plugins>
       <plugin id="com.ibm.icu"/>
       <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp"/>

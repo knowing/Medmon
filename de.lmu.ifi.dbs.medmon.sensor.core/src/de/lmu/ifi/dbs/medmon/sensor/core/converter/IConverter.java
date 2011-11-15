@@ -1,63 +1,31 @@
 package de.lmu.ifi.dbs.medmon.sensor.core.converter;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
+import java.io.InputStream;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
+import org.joda.time.Interval;
 
 import weka.core.Instances;
-import weka.core.converters.BatchConverter;
-import weka.core.converters.FileSourcedConverter;
-import weka.core.converters.Loader;
 
-/**
- * <p>Converts sensor data into {@link Instances}
- * 
- * @author Nepomuk Seiler
- * @version 0.3
- */
-public interface IConverter extends Loader, BatchConverter {
+public interface IConverter {
+
+	/**
+	 * returns the attributes of the sensor data
+	 */
+	public Instances getHeader();
 	
 	/**
-	 * 
-	 * @param path
+	 * returns the data of the sensor
 	 */
-	void setDirectory(String path) throws IOException;
+	public Instances getData();
 	
 	/**
-	 * 
-	 * @param out
-	 * @throws IOException
+	 * returns the interval of the sensor data
 	 */
-	void copy(OutputStream out) throws IOException;
+	public Interval getInterval();
 	
 	/**
-	 * 
-	 * @param out
-	 * @param from
-	 * @param to
-	 * @throws IOException
+	 * get the input stream
 	 */
-	void copy(OutputStream out, Date from, Date to) throws IOException;
-	
-	/**
-	 * 
-	 * @return
-	 * @throws IOException
-	 */
-	IBlock convert() throws IOException;
-	
-	/**
-	 * 
-	 * @return 
-	 */
-	String getFileExtension();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	String getId();
+	public InputStream getInputStream();
 	
 }

@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.wizard.Wizard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
@@ -17,6 +19,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
+import de.lmu.ifi.dbs.medmon.sensor.core.annotations.DataConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
@@ -24,7 +27,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
 public class DataSelectionWizard extends Wizard {
 
 	private SelectDBDataPage page;
-
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	public DataSelectionWizard() {
 		setWindowTitle("Data Selection Wizard");
 	}
@@ -65,7 +69,9 @@ public class DataSelectionWizard extends Wizard {
 		}
 
 		// The new input for the Viewer
-		IConverter converter = sensor.getConverter();
+		
+		log.debug("IConverter converter = sensor.getConverter();");
+		IConverter converter = null;
 		for (Data data : results) {
 			try {
 //				ISensorDataContainer c = converter.convertToContainer(data.getFile(), ContainerType.WEEK, ContainerType.HOUR, null);

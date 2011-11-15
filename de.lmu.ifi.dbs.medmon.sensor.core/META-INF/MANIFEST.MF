@@ -16,3 +16,6 @@ Export-Package: de.lmu.ifi.dbs.medmon.sensor.core.annotations,
  de.lmu.ifi.dbs.medmon.sensor.core.sensor,
  de.lmu.ifi.dbs.medmon.sensor.core.util
 Bundle-Vendor: LMU Munich - Database Systems Group
+Import-Package: de.lmu.ifi.dbs.medmon.sensor.core.sensor,
+ org.joda.time,
+ org.slf4j;version="1.6.1"

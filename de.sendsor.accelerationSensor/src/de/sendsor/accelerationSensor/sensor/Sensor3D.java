@@ -6,11 +6,11 @@ import java.io.IOException;
 
 import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.Sensor;
 import de.sendsor.accelerationSensor.converter.SDRConverter;
 
-public class Sensor3D extends Sensor {
+public class Sensor3D { //extends Sensor {
 
+	/*
 	private static final SDRConverter converter = new SDRConverter();
 	
 	public Sensor3D() {
@@ -62,5 +62,5 @@ public class Sensor3D extends Sensor {
 	public String getDescription() {
 		return "3D Bewegungssensor zum Aufzeichnen von Bewegungsdaten.";
 	}
-	
+	*/
 }
