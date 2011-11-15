@@ -10,20 +10,20 @@ import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 
 public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 
-	private BundleContext bundleContext = null;
-	private IGlobalSelectionService service = null;
-	private ServiceRegistration<IGlobalSelectionProvider> registration = null;
-	private Map<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>> registrationMap = new HashMap<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>>();
+	private BundleContext																	bundleContext	= null;
+	private IGlobalSelectionService															service			= null;
+	private ServiceRegistration<IGlobalSelectionProvider>									registration	= null;
+	private Map<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>>	registrationMap	= new HashMap<IGlobalSelectionListener, ServiceRegistration<IGlobalSelectionListener>>();
 
-	/**
-	 * create a new GlobalSelectionProvider service
-	 * 
-	 * this service will be registered automatically. when finished working with
-	 * the service call unregister().
-	 */
-	public GlobalSelectionProvider(BundleContext bundleContext) {
+	public static IGlobalSelectionProvider newInstance(BundleContext bundleContext) {
+		IGlobalSelectionProvider instance = new GlobalSelectionProvider(bundleContext);
 		if (bundleContext == null)
 			throw new NullPointerException("GlobalSelectionProvider() => bundleContext mustnot be null");
+
+		return instance;
+	}
+
+	private GlobalSelectionProvider(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 		registration = bundleContext.registerService(IGlobalSelectionProvider.class, this, null);
 	}
@@ -49,7 +49,7 @@ public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 		if (service != null)
 			service.updateSelection(clazz);
 	}
-	
+
 	@Override
 	public <T> T getSelection(Class<T> clazz) {
 		if (service == null)
@@ -58,14 +58,14 @@ public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 	}
 
 	@Override
-	public void registerListener(IGlobalSelectionListener<?> listener) {
+	public void registerSelectionListener(IGlobalSelectionListener<?> listener) {
 		ServiceRegistration<IGlobalSelectionListener> registration;
 		registration = bundleContext.registerService(IGlobalSelectionListener.class, listener, null);
 		registrationMap.put(listener, registration);
 	}
 
 	@Override
-	public void unregisterListener(IGlobalSelectionListener<?> listener) {
+	public void unregisterSelectionListener(IGlobalSelectionListener<?> listener) {
 		ServiceRegistration<IGlobalSelectionListener> registration = registrationMap.get(listener);
 		if (registration == null)
 			return;

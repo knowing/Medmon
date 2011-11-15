@@ -219,6 +219,7 @@ public class PatientView extends ViewPart {
 
 		patientFileDetailBlock = new PatientFileDetailBlock();
 		patientFileDetailBlock.createContent(new ManagedForm(cTherapy));
+
 	}
 
 	/* ==================================== */

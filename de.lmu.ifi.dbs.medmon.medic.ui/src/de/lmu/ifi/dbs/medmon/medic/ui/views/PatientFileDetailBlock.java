@@ -63,7 +63,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	protected void createMasterPart(final IManagedForm managedForm, Composite parent) {
 		toolkit = managedForm.getToolkit();
 		entityManager = JPAUtil.createEntityManager();
-		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
+		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		//
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
 		section.setText("Empty Master Section");
@@ -75,13 +75,19 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		gl_composite.horizontalSpacing = 15;
 		composite.setLayout(gl_composite);
 
-		Link linkAdd = new Link(composite, SWT.NONE);
+		Composite composite_1 = new Composite(composite, SWT.NONE);
+		composite_1.setLayout(new GridLayout(2, false));
+		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		toolkit.adapt(composite_1);
+		toolkit.paintBordersFor(composite_1);
+
+		Link linkAdd = new Link(composite_1, SWT.NONE);
 		toolkit.adapt(linkAdd, true, true);
 		linkAdd.setText("<a>neue Therapie</a>");
 		linkAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
 				if (localPatientSelection == null)
 					return;
 
@@ -99,19 +105,24 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				entityManager.persist(mTherapy);
 				entityManager.getTransaction().commit();
 
-				//entityManager.getTransaction().begin();
-				//entityManager.refresh(localPatientSelection);
-				//entityManager.getTransaction().commit();
-
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
-				
+
 				selectionProvider.updateSelection(Patient.class);
 			}
 		});
-		new Label(composite, SWT.NONE);
-
+		
+		Label lblPlaceholder1 = new Label(composite_1, SWT.NONE);
+		lblPlaceholder1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(lblPlaceholder1, true, true);
+		linkAdd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+			}
+		});
+	
 		Text text = new Text(composite, SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		toolkit.adapt(text, true, true);
@@ -138,21 +149,21 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		final SectionPart spart = new SectionPart(section);
 		managedForm.addPart(spart);
 
-		selectionProvider.registerListener(new IGlobalSelectionListener<Patient>() {
+		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 			@Override
 			public void selectionChanged(Patient selection) {
 				if (selection == null) {
 					localPatientSelection = null;
 					therapiesViewer.setInput(null);
 				} else {
-					
+
 					/************************************************************
 					 * Database Access Begin
 					 ************************************************************/
-					
-					localPatientSelection = entityManager.merge(selection);	
+
+					localPatientSelection = entityManager.merge(selection);
 					therapiesViewer.setInput(localPatientSelection);
-					
+
 					/************************************************************
 					 * Database Access End
 					 ************************************************************/
@@ -161,18 +172,18 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 			@Override
 			public void selectionUpdated() {
-				
+
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/
 				System.out.println("refresh");
-				
+
 				entityManager.getTransaction().begin();
 				entityManager.refresh(localPatientSelection);
 				entityManager.getTransaction().commit();
-				
+
 				therapiesViewer.refresh();
-				
+
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/

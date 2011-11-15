@@ -20,7 +20,7 @@ public class OpenPatientHandler extends AbstractHandler implements IHandler {
 		if (patient == null) {
 			return null;
 		}
-		GlobalSelectionProvider selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
+		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		selectionProvider.setSelection(Patient.class, patient);
 		selectionProvider.unregister();
 		return null;

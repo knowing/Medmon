@@ -26,7 +26,7 @@ public class TherapyResult {
 	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinColumn(name = "THERAPY_ID", nullable = false)
 	private Therapy therapy;
-
+	
 	@Temporal(TemporalType.DATE)
 	Date timestamp;
 
@@ -70,6 +70,28 @@ public class TherapyResult {
 
 	public int getSuccess() {
 		return success;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TherapyResult other = (TherapyResult) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 }

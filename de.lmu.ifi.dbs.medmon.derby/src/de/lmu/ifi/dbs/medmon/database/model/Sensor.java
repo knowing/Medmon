@@ -33,6 +33,9 @@ public class Sensor {
 	@Column
 	private String defaultpath;
 	
+	@Column
+	private String filePrefix;
+	
 	@OneToMany(mappedBy="sensor")
 	private Set<Data> data = new HashSet<Data>();
 	
@@ -94,6 +97,14 @@ public class Sensor {
 		this.data = data;
 	}
 	
+	public String getFilePrefix() {
+		return filePrefix;
+	}
+	
+	public void setFilePrefix(String filePrefix) {
+		this.filePrefix = filePrefix;
+	}
+	
 	/**
 	 * Build an 'unique' identifier for each sensor, if the
 	 * version number is unique for each model.
@@ -104,6 +115,31 @@ public class Sensor {
 	 */
 	public static String parseId(String name, String version) {
 		return name + ":" + version;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Sensor other = (Sensor) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

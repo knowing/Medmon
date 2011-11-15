@@ -54,7 +54,7 @@ public class TherapyDetailPage implements IDetailsPage {
 	 */
 	public TherapyDetailPage() {
 		// Create the details page
-		
+
 	}
 
 	/**
@@ -73,8 +73,8 @@ public class TherapyDetailPage implements IDetailsPage {
 	 */
 	public void createContents(Composite parent) {
 		entityManager = JPAUtil.createEntityManager();
-		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
-		
+		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
 		//
@@ -199,11 +199,11 @@ public class TherapyDetailPage implements IDetailsPage {
 				entityManager.getTransaction().begin();
 				Therapy mTherapy = entityManager.merge(selectedTherapy);
 				entityManager.getTransaction().commit();
-				
+
 				entityManager.getTransaction().begin();
 				entityManager.remove(mTherapy);
 				entityManager.getTransaction().commit();
-							
+
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
@@ -224,27 +224,26 @@ public class TherapyDetailPage implements IDetailsPage {
 		linkNewResult.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
 				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
-				
+
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/
-				
+
 				TherapyResult mTherapyResult = new TherapyResult();
 				Therapy mTherapy = entityManager.merge(selectedTherapy);
-				//SetSomeStuff
+				// SetSomeStuff
 				mTherapyResult.setTherapy(mTherapy);
-				
+
 				entityManager.getTransaction().begin();
 				entityManager.persist(mTherapyResult);
 				entityManager.getTransaction().commit();
-				
 
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
-				 
+
 				selectionProvider.updateSelection(Patient.class);
 				selectionProvider.updateSelection(Therapy.class);
 			}

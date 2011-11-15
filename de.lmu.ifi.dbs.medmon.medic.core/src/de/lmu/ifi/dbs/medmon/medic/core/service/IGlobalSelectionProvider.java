@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
+import org.osgi.framework.BundleContext;
+
 
 
 /**
@@ -42,12 +44,12 @@ public interface IGlobalSelectionProvider {
 	/**
 	 * @param listener - a listener to register
 	 */
-	public void registerListener(IGlobalSelectionListener<?> listener);
+	public void registerSelectionListener(IGlobalSelectionListener<?> listener);
 	
 	/**
 	 * @param listener - a listener to unregister
 	 */
-	public void unregisterListener(IGlobalSelectionListener<?> listener);
+	public void unregisterSelectionListener(IGlobalSelectionListener<?> listener);
 	
 	/**
 	 * Called by the @IGlobalSelectionService to register itself.

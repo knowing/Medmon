@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.RowLayout;
-import swing2swt.layout.FlowLayout;
 import org.eclipse.swt.widgets.Link;
 
 public class TherapyResultDetailPage implements IDetailsPage {
@@ -80,7 +79,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	 */
 	public void createContents(Composite parent) {
 		entityManager = JPAUtil.createEntityManager();
-		selectionProvider = new GlobalSelectionProvider(Activator.getBundleContext());
+		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
 		//
