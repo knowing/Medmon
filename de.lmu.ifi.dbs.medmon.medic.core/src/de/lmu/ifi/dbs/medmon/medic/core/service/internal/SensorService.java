@@ -8,8 +8,8 @@ import java.util.Set;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.ISensor;
 
 public class SensorService implements ISensorService {
 
@@ -32,7 +32,7 @@ public class SensorService implements ISensorService {
 
 	@Override
 	public ISensor loadSensorEntity(Sensor sensor) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 

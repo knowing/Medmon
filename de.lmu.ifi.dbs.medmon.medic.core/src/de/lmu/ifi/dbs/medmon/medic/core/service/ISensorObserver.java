@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public interface ISensorObserver {
 

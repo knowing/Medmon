@@ -10,12 +10,11 @@ Require-Bundle: org.eclipse.ui,
  nz.ac.waikato.cs.weka;bundle-version="3.7.3"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: de.lmu.ifi.dbs.medmon.sensor.core.annotations,
+Export-Package: de.lmu.ifi.dbs.medmon.sensor.core,
+ de.lmu.ifi.dbs.medmon.sensor.core.annotations,
  de.lmu.ifi.dbs.medmon.sensor.core.container,
  de.lmu.ifi.dbs.medmon.sensor.core.converter,
- de.lmu.ifi.dbs.medmon.sensor.core.sensor,
  de.lmu.ifi.dbs.medmon.sensor.core.util
 Bundle-Vendor: LMU Munich - Database Systems Group
-Import-Package: de.lmu.ifi.dbs.medmon.sensor.core.sensor,
- org.joda.time,
+Import-Package: org.joda.time,
  org.slf4j;version="1.6.1"

@@ -19,7 +19,7 @@ public interface IConverter {
 	public Instances getData();
 	
 	/**
-	 * returns the interval of the sensor data
+	 * returns the time interval of the recorded sensor data
 	 */
 	public Interval getInterval();
 	
