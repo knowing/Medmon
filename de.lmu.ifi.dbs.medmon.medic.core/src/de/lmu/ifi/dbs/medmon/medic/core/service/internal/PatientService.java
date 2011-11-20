@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 
 public class PatientService implements IPatientService {
@@ -45,7 +46,8 @@ public class PatientService implements IPatientService {
 	/** Format dates with DateFormat.SHORT */ 
 	private final DateFormat dateF = DateFormat.getDateInstance(DateFormat.SHORT);
 	
-	private IEntityManagerService ems;
+	private IEntityManagerService entityManagerService = null;
+	private ISensorService sensorService = null;
 
 	@Override
 	public Path locateDirectory(Patient p, String type) {
@@ -59,7 +61,7 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public Path locateFile(Data d) {
-		EntityManager em = ems.createEntityManager();
+		EntityManager em = entityManagerService.createEntityManager();
 		Data data = em.merge(d);
 		String file = generateFilename(data.getSensor(), data.getType(), data.getFrom(), data.getTo());
 		Path ret = locateDirectory(data.getPatient(), data.getType()).resolve(file);
@@ -86,7 +88,7 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public Patient createPatient() throws IOException {
-		EntityManager em = ems.createEntityManager();
+		EntityManager em = entityManagerService.createEntityManager();
 		em.getTransaction().begin();
 		Patient patient = new Patient();
 		em.persist(patient);
@@ -107,7 +109,7 @@ public class PatientService implements IPatientService {
 	@Override
 	public void deletePatient(Patient p) throws IOException {
 		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
-		EntityManager em = ems.createEntityManager();
+		EntityManager em = entityManagerService.createEntityManager();
 		em.getTransaction().begin();
 		Patient patient = em.merge(p);
 		em.remove(patient);
@@ -128,7 +130,7 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
-		EntityManager em = ems.createEntityManager();
+		EntityManager em = entityManagerService.createEntityManager();
 		em.getTransaction().begin();
 		Patient patient = em.merge(p);
 		Sensor sensor = em.merge(s);
@@ -178,7 +180,7 @@ public class PatientService implements IPatientService {
 	@Override
 	public void remove(Data d) throws IOException {
 		Files.delete(locateFile(d));
-		EntityManager em = ems.createEntityManager();
+		EntityManager em = entityManagerService.createEntityManager();
 		em.getTransaction().begin();
 		Data data = em.merge(d);
 		em.remove(data);
@@ -228,11 +230,19 @@ public class PatientService implements IPatientService {
 	}
 
 	protected void bindEntityManager(IEntityManagerService service) {
-		ems = service;
+		entityManagerService = service;
 	}
 
 	protected void unbindEntityManager(IEntityManagerService service) {
-		ems = null;
+		entityManagerService = null;
+	}
+
+	protected void bindSensorService(ISensorService service) {
+		sensorService = service;
+	}
+
+	protected void unbindSensorService(ISensorService service) {
+		sensorService = null;
 	}
 
 }

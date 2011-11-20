@@ -28,6 +28,7 @@ public class DialogFactory {
 		Query allPatients = em.createNamedQuery("Patient.findAll");
 		List<Patient> patients = allPatients.getResultList();
 		
+		
 		em.close();
 		
 		return patients.toArray(new Patient[patients.size()]);

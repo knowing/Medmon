@@ -5,11 +5,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public interface ISensorObserver {
-
-	/**
-	 * 
-	 */
-	public void setSensorService(ISensorService service);
 	
 	/**
 	 * called by the SensorService.

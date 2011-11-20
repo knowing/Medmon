@@ -62,6 +62,7 @@ public class PatientView extends ViewPart {
 	private CDateTime dateBirth;
 
 	private PatientFileDetailBlock patientFileDetailBlock;
+	private Text text;
 
 	/**
 	 * @wbp.nonvisual location=82,149
@@ -246,6 +247,10 @@ public class PatientView extends ViewPart {
 		Composite cTimeline = toolkit.createComposite(formData.getBody(), SWT.NONE);
 		toolkit.paintBordersFor(cTimeline);
 		cTimeline.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		text = new Text(formData.getBody(), SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(text, true, true);
 
 		Table dataTable = toolkit.createTable(formData.getBody(), SWT.NONE);
 		dataTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
