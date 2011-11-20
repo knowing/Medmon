@@ -2,6 +2,10 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
+import java.util.Date;
+
+import javax.persistence.EntityManager;
+
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.TableViewer;
@@ -23,12 +27,23 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.ViewPart;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.IntervalCategoryDataset;
+import org.jfree.data.gantt.Task;
+import org.jfree.data.gantt.TaskSeries;
+import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.experimental.chart.swt.ChartComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
+import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 
@@ -36,33 +51,36 @@ public class PatientView extends ViewPart {
 	public PatientView() {
 	}
 
-	public static final String ID = "de.lmu.ifi.dbs.medmon.medic.ui.PatientView"; //$NON-NLS-1$
-	private static final String PATIENT_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
-	private static final String THERAPY_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv"; // Refractor
-																																// ?!?!?
-	private static final String DATA_TOOLBAR_CONTRIBUTIONS = "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
+	public static final String			ID								= "de.lmu.ifi.dbs.medmon.medic.ui.PatientView";				//$NON-NLS-1$
+	private static final String			PATIENT_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Patient";
+	private static final String			THERAPY_TOOLBAR_CONTRIBUTIONS	= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Archiv";	// Refractor
+																																		// ?!?!?
+	private static final String			DATA_TOOLBAR_CONTRIBUTIONS		= "toolbar:de.lmu.ifi.dbs.medmon.medic.ui.PatientView.Data";
 
-	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	private TabFolder tabFolder;
+	private static final Logger			log								= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private TabFolder					tabFolder;
 
 	/* Personal Data */
-	private Text tLastname, tFirstname, tGender, tComment;
-	private CDateTime dBirth;
-	private Table therapyTable;
-	private TableViewer therapyViewer;
-	private TabItem tabCluster;
+	private Text						tLastname, tFirstname, tGender, tComment;
+	private CDateTime					dBirth;
+	private Table						therapyTable;
+	private TableViewer					therapyViewer;
+	private TabItem						tabCluster;
 
-	private FormToolkit toolkit;
-	private TableViewer dataTableViewer;
-	private Text textLastName;
-	private Text textFirstname;
-	private Text textInsuranceId;
-	private Button btnMale;
-	private Button btnFemale;
-	private CDateTime dateBirth;
+	private FormToolkit					toolkit;
+	private TableViewer					dataTableViewer;
+	private Text						textLastName;
+	private Text						textFirstname;
+	private Text						textInsuranceId;
+	private Button						btnMale;
+	private Button						btnFemale;
+	private CDateTime					dateBirth;
 
-	private PatientFileDetailBlock patientFileDetailBlock;
-	private Text text;
+	private PatientFileDetailBlock		patientFileDetailBlock;
+	private Text						text;
+
+	private IGlobalSelectionProvider	selectionProvider;
+	private EntityManager				entityManager;
 
 	/**
 	 * @wbp.nonvisual location=82,149
@@ -75,6 +93,9 @@ public class PatientView extends ViewPart {
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
+		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+		entityManager = JPAUtil.createEntityManager();
+
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -97,6 +118,7 @@ public class PatientView extends ViewPart {
 	 * 
 	 */
 	private void createPersonalTab() {
+
 		TabItem tPersonalData = new TabItem(tabFolder, SWT.NONE);
 		tPersonalData.setText("Persoenliche Daten");
 		tPersonalData.setImage(getImageDescriptor(ISharedImages.IMG_PATIENTS_16).createImage());
@@ -161,7 +183,7 @@ public class PatientView extends ViewPart {
 		textInsuranceId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(textInsuranceId, true, true);
 
-		IGlobalSelectionListener<Patient> selectionListener = new IGlobalSelectionListener<Patient>() {
+		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 
 			@Override
 			public void selectionChanged(Patient selection) {
@@ -184,16 +206,14 @@ public class PatientView extends ViewPart {
 			@Override
 			public void selectionUpdated() {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public Class<Patient> getType() {
 				return Patient.class;
 			}
-		};
-
-		Activator.getBundleContext().registerService(IGlobalSelectionListener.class, selectionListener, null);
+		});
 
 		/*
 		 * dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT); data =
@@ -244,10 +264,58 @@ public class PatientView extends ViewPart {
 		formData.setText("Daten");
 		formData.getBody().setLayout(new GridLayout(1, false));
 
+		/*
+		 * create the chart
+		 */
+		final TaskSeriesCollection dataset = new TaskSeriesCollection();
+		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, true, true, false);
+		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
+
+		/*
+		 * fill the chart
+		 */
+		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
+
+			@Override
+			public void selectionChanged(Patient selection) {
+				if (selection == null)
+					return;
+
+				entityManager.getTransaction().begin();
+				Patient mPatient = entityManager.merge(selection);
+				entityManager.getTransaction().commit();
+
+				final TaskSeries series = new TaskSeries("Aufzeichnungs-Interval");
+
+				for (Data data : selection.getData()) {
+					series.add(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+				}
+
+				series.add(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
+				series.add(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
+
+				dataset.removeAll();
+				dataset.add(series);
+			}
+
+			@Override
+			public void selectionUpdated() {
+			}
+
+			@Override
+			public Class<Patient> getType() {
+				return Patient.class;
+			}
+		});
+
+		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
+		toolkit.adapt(chartComposite);
+		toolkit.paintBordersFor(chartComposite);
+
 		Composite cTimeline = toolkit.createComposite(formData.getBody(), SWT.NONE);
 		toolkit.paintBordersFor(cTimeline);
 		cTimeline.setLayout(new FillLayout(SWT.HORIZONTAL));
-		
+
 		text = new Text(formData.getBody(), SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(text, true, true);
@@ -277,5 +345,12 @@ public class PatientView extends ViewPart {
 	@Override
 	public void setFocus() {
 
+	}
+
+	@Override
+	public void dispose() {
+		selectionProvider.unregister();
+		entityManager.close();
+		super.dispose();
 	}
 }
