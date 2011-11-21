@@ -6,8 +6,6 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
-import de.lmu.ifi.dbs.medmon.medic.core.Activator;
-
 public class GlobalSelectionProvider implements IGlobalSelectionProvider {
 
 	private BundleContext																	bundleContext	= null;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.1.ALPHA1" useFeatures="true" includeLaunchers="true">
+<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.1.ALPHA2" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/de.lmu.ifi.dbs.medmon.medic.rcp/medmon.trans.png"/>
@@ -19,7 +19,8 @@
 -XX:MaxPermSize=256m
 -Xms256m
 -Xmx1024m
--DREFRESH_BUNDLES=false</vmArgs>
+-DREFRESH_BUNDLES=false
+-Dderby.system.home=${system_property:user.home}${system_property:file.separator}&quot;.derby&quot;</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -40,7 +41,6 @@
 
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="com.ibm.icu"/>
