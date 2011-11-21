@@ -1,8 +1,17 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 
+/**
+ * <p>Represents a real sensor</p>
+ * 
+ * @author Nepomuk Seiler, Stephan Picker
+ * @version 1.0
+ * @since 2011-11-15
+ *
+ */
 public interface ISensor {
 
 	/**
@@ -36,18 +45,20 @@ public interface ISensor {
 	public String getFilePrefix();
 	
 	/**
-	 * states weather the inputStream is convertible.
+	 * states whether the inputStream is convertible.
 	 * if true, a Converter can be created with newConverter().
 	 * @param inputStream
 	 * @return
+	 * @throws IOException 
 	 */
-	public boolean isConvertable(InputStream inputStream);
+	public boolean isConvertable(InputStream inputStream) throws IOException;
 	
 	/**
 	 * returns an instance of IConverter which provides access to the data of the sensor
 	 * @param inputStream
 	 * @return
+	 * @throws IOException 
 	 */
-	public IConverter newConverter(InputStream inputStream);
+	public IConverter newConverter(InputStream inputStream) throws IOException;
 	
 }

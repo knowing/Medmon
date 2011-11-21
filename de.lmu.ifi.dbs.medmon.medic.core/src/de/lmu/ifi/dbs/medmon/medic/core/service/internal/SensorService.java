@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,13 +42,7 @@ public class SensorService implements ISensorService {
 
 	@Override
 	public ISensor loadSensorEntity(Sensor sensor) {
-
-		// something like
-		// switch(type)
-		// ...
-		// return new FooSensor();
-
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	@Override
@@ -91,10 +86,17 @@ public class SensorService implements ISensorService {
 			return null;
 		}
 
-		if (sSensor.isConvertable(inputStream))
-			return null;
+		try {
+			if (sSensor.isConvertable(inputStream))
+				return null;
 
-		return sSensor.newConverter(inputStream);
+			return sSensor.newConverter(inputStream);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -131,10 +133,16 @@ public class SensorService implements ISensorService {
 			return null;
 		}
 
-		if (sSensor.isConvertable(inputStream))
-			return null;
+		try {
+			if (!sSensor.isConvertable(inputStream))
+				return null;
 
-		return sSensor.newConverter(inputStream);
+			return sSensor.newConverter(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 	/**

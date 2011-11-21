@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DataProcessingUnit name="de.sendsor.3d.SensorPreview">
     <nodes>
-        <node id="SDRLoader" type="loader" factoryId="de.sendsor.accelerationSensor.converter.SDRLoader">
+        <node id="SDRLoader" type="loader" factoryId="de.sendsor.accelerationSensor.SDRLoader">
             <properties>
                 <property key="file" value="input.sdr"></property>
                 <property key="unit" value="second"></property>

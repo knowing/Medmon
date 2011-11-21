@@ -4,8 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.container.ContainerType;
-
 public class TimeUtil {
 
 	public static int getCalendarConstant(Date firstTimestamp, Date lastTimestamp) {
@@ -29,36 +27,5 @@ public class TimeUtil {
 				calendarConstant = Calendar.HOUR_OF_DAY;
 		}
 		return calendarConstant;
-	}
-
-	public static int getCalendarConstant(ContainerType type) {
-		switch (type) {
-		case HOUR:
-			return Calendar.HOUR_OF_DAY;
-		case DAY:
-			return Calendar.DAY_OF_YEAR;
-		case WEEK:
-			return Calendar.WEEK_OF_YEAR;
-		case MONTH:
-			return Calendar.MONTH;
-		case YEAR:
-			return Calendar.YEAR;
-		default:
-			return -1;
-		}
-	}
-	
-	public static ContainerType getNext(ContainerType type) {
-		switch(type) {
-		case HOUR:
-			return ContainerType.DAY;
-		case DAY:
-			return ContainerType.WEEK;
-		case WEEK: 
-			return ContainerType.MONTH;
-		case MONTH:
-			return ContainerType.YEAR;
-		default: return ContainerType.YEAR;
-		}
 	}
 }

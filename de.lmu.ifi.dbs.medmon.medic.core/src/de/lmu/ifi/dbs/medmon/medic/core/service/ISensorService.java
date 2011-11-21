@@ -4,6 +4,19 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
+/**
+ * <p>This OSGi service serve three purposes
+ * <li>ISensor directory</li>
+ * <li>SensorUtil to easy create IConverter</li>
+ * <li>later: WatchService to react on plugged sensors</li>
+ * 
+ * </p>
+ * 
+ * @author Nepomuk Seiler, Stephan Picker
+ * @version 1.0
+ * @since 2011-11-15
+ *
+ */
 public interface ISensorService {
 
 	/**

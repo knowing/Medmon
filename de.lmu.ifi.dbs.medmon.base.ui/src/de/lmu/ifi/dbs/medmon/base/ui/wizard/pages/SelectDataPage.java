@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -14,7 +13,6 @@ import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
@@ -56,7 +54,6 @@ import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
 
 /**
  * @author Nepomuk Seiler
@@ -76,7 +73,6 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	private Text tDatePreview;
 
 	private Patient patient;
-	private IBlock block;
 	private final boolean validate;
 
 	//private SensorAdapter sensor;
@@ -353,21 +349,21 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	}
 
 	private void updateDateTimes() {
-		if (block == null)
-			return;
-		// Set default cdate values
-		dateTimeFrom.setSelection(block.getFrom());
-		dateTimeTo.setSelection(block.getTo());
-		// Set Sensor-Information
-		DateFormat df = DateFormat.getDateTimeInstance();
-		lBlockFromVal.setText(df.format(block.getFrom()));
-		lBlockToVal.setText(df.format(block.getTo()));
-		double size = block.getEnd() - block.getBegin();
-		size = size / (1024.0 * 1024.0);
-		String sizeString = String.valueOf(size);
-		if (sizeString.length() > 4)
-			sizeString = String.valueOf(size).substring(0, 4);
-		lDataSizeVal.setText(sizeString + " MByte");
+//		if (block == null)
+//			return;
+//		// Set default cdate values
+//		dateTimeFrom.setSelection(block.getFrom());
+//		dateTimeTo.setSelection(block.getTo());
+//		// Set Sensor-Information
+//		DateFormat df = DateFormat.getDateTimeInstance();
+//		lBlockFromVal.setText(df.format(block.getFrom()));
+//		lBlockToVal.setText(df.format(block.getTo()));
+//		double size = block.getEnd() - block.getBegin();
+//		size = size / (1024.0 * 1024.0);
+//		String sizeString = String.valueOf(size);
+//		if (sizeString.length() > 4)
+//			sizeString = String.valueOf(size).substring(0, 4);
+//		lDataSizeVal.setText(sizeString + " MByte");
 	}
 
 	private Date eraseMilliSeconds(Date date) {

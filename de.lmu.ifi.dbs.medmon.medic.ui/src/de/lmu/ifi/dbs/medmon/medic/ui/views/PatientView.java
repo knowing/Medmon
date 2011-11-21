@@ -300,6 +300,9 @@ public class PatientView extends ViewPart {
 
 				dataset.removeAll();
 				dataset.add(series);
+				
+				
+				System.out.println("load");
 			}
 
 			@Override
