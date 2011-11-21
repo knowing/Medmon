@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 public interface ISensorService {
 
