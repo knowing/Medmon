@@ -34,8 +34,8 @@ class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](cl
 
   //Possible property values. Editor should show these
   override def createPropertyValues: Map[String, Array[_ <: Any]] = {
-    Map(DEBUG -> boolean_property)
-    Map(DIMREDUCTION -> boolean_property)
+    Map(DEBUG -> BOOLEAN_PROPERTY)
+    Map(DIMREDUCTION -> BOOLEAN_PROPERTY)
   }
 
   //Property description
