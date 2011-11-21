@@ -11,8 +11,8 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.Activator;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.internal.Activator;
 
 /**
  * 

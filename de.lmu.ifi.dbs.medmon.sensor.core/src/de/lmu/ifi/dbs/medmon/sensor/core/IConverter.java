@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.sensor.core.converter;
+package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.InputStream;
 

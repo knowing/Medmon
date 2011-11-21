@@ -20,9 +20,9 @@ import weka.core.Instances;
 import weka.core.converters.AbstractFileLoader;
 import weka.core.converters.ArffSaver;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
+import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 /**
  * <p>

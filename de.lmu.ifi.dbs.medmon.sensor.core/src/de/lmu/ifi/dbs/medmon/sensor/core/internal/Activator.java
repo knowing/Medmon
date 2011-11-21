@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.sensor.core;
+package de.lmu.ifi.dbs.medmon.sensor.core.internal;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

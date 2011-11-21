@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import weka.core.Instances;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
+import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.sendsor.accelerationSensor.converter.SDRConverter;
 
 public class Sensor3D { //extends Sensor {

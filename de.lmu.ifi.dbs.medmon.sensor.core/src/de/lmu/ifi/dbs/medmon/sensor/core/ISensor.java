@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.InputStream;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 public interface ISensor {
 
