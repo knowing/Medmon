@@ -5,7 +5,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -20,10 +19,9 @@ public class OpenPatientHandler extends AbstractHandler implements IHandler {
 		if (patient == null) {
 			return null;
 		}
-		GlobalSelectionProvider selectionProvider = new GlobalSelectionProvider();
-		ServiceRegistration<IGlobalSelectionProvider> registerService = Activator.getBundleContext().registerService(IGlobalSelectionProvider.class, selectionProvider, null);
+		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		selectionProvider.setSelection(Patient.class, patient);
-		registerService.unregister();
+		selectionProvider.unregister();
 		return null;
 	}
 }

@@ -22,4 +22,9 @@ public interface IGlobalSelectionService {
 	 * @return old selection
 	 */
 	<T> T setSelection(Class<T> clazz, T selection);
+	
+	/**
+	 * @param clazz
+	 */
+	<T> void updateSelection(Class<T> clazz);
 }

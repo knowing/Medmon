@@ -3,6 +3,8 @@ package de.lmu.ifi.dbs.medmon.database.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,15 +58,19 @@ public class Patient implements Serializable {
 
 	// bi-directional many-to-one association to Appointment
 	@OneToMany(mappedBy = "patient")
-	private Set<Appointment> appointments;
+	private Set<Appointment> appointments = new HashSet<Appointment>();
 
 	// bi-directional many-to-one association to Data
 	@OneToMany(mappedBy = "patient")
-	private Set<Data> data;
+	private Set<Data> data = new HashSet<Data>();
 
 	// bi-directional many-to-one association to Archives
 	@OneToMany(mappedBy = "patient")
-	private Set<Archiv> archives;
+	private Set<Archiv> archives = new HashSet<Archiv>();
+
+	// bi-directional many-to-one association to Therapy
+	@OneToMany(mappedBy = "patient", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
 	}
@@ -171,9 +177,39 @@ public class Patient implements Serializable {
 		this.archives = archives;
 	}
 
+	public void setTherapies(Set<Therapy> therapies) {
+		this.therapies = therapies;
+	}
+
+	public Set<Therapy> getTherapies() {
+		return therapies;
+	}
+
 	@Override
 	public String toString() {
 		return firstname + " " + lastname;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Patient other = (Patient) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 }

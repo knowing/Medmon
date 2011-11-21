@@ -176,7 +176,6 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 
 			subset.add(i, si);
 		}
-
 		log.statusChanged(new Progress("Calculate groupMean", 2, 8));
 		// calculate group mean
 		double[][] groupMean = new double[subset.size()][inDimensions];
@@ -185,14 +184,12 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 				groupMean[i][j] = getGroupMean(j, subset.get(i));
 			}
 		}
-
 		log.statusChanged(new Progress("Calculate totalMean", 3, 8));
 		// calculate total mean
 		double[] totalMean = new double[inDimensions];
 		for (int i = 0; i < totalMean.length; i++) {
 			totalMean[i] = getTotalMean(i, inst);
 		}
-
 		log.statusChanged(new Progress("Calculate covariance matrices", 2, 8));
 		// calculate covariance matrices
 		double[][][] covariance = new double[subset.size()][inDimensions][inDimensions];
@@ -209,7 +206,6 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 				throw new Exception("matrix got singular...");
 			}
 		}
-
 		log.statusChanged(new Progress("Calculate within-class scatter", 5, 8));
 		// calculate the within-class scatter matrix
 		double[][] sw = new double[inDimensions][inDimensions];

@@ -36,6 +36,8 @@ import org.jfree.chart.event.ChartProgressEvent;
 import org.jfree.chart.event.ChartProgressListener;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import akka.actor.ActorRef;
 import akka.actor.TypedActor;
@@ -53,7 +55,6 @@ import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
 
@@ -78,10 +79,11 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 	private IBlock block;
 	private final boolean validate;
 
-	private SensorAdapter sensor;
+	//private SensorAdapter sensor;
 
 	private ActorRef loaderActor,presenterActor;
 
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	/**
 	 * Create the wizard.
@@ -266,7 +268,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				});
 				// Configure dpu!
 				//Loader
-				File dir = new File(sensor.getDefaultPath());
+				log.debug("File dir = new File(sensor.getDefaultPath());");
+				File dir =  null;
 				String[] sdrFiles = dir.list(new FilenameFilter() {
 					@Override
 					public boolean accept(File dir, String name) {
@@ -278,7 +281,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 					if(node.getType().getContent().equals(NodeType.LOADER)) {
 						Properties properties = DPUUtil.nodeProperties(node);
 						String sep = System.getProperty("file.separator");
-						String path = sensor.getDefaultPath() + sep + sdrFiles[0];
+						//String path = sensor.getDefaultPath() + sep + sdrFiles[0];
+						String path = null;
+						log.debug("String path = sensor.getDefaultPath() + sep + sdrFiles[0];");
 						properties.setProperty("file", path);
 						properties.setProperty("absolute-path", "true");
 						DPUUtil.setNodeProperties(node, properties);
@@ -331,7 +336,9 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 		this.patient = patient;
 	}
 
-	public void setSensor(SensorAdapter sensor) {
+	public void setSensor(Object sensor) {
+		log.debug("SelectDataPage::setSensor()");
+		/*
 		if (sensor == null)
 			return;
 		this.sensor = sensor;
@@ -342,7 +349,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 			MessageDialog.openError(getShell(), "Fehler beim konvertieren der Sensordaten", e.getMessage());
 			e.printStackTrace();
 		}
-
+*/
 	}
 
 	private void updateDateTimes() {

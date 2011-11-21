@@ -5,12 +5,15 @@ import javax.persistence.EntityManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class SensorPathEditingSupport extends EditingSupport {
 
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	public SensorPathEditingSupport(TableViewer viewer) {
 		super(viewer);
@@ -28,14 +31,20 @@ public class SensorPathEditingSupport extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
+		log.debug("SensorPathEditingSupport::getValue()");
+		return null;
+		/*
 		String defaultPath = ((SensorAdapter)element).getDefaultPath();
 		if(defaultPath == null)
 			return "";
 		return defaultPath;
+		*/
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
+		log.debug("SensorPathEditingSupport::setValue()");
+		/*
 		SensorAdapter adapter = (SensorAdapter)element;
 		adapter.setDefaultPath((String) value);
 		EntityManager em = JPAUtil.createEntityManager();
@@ -45,6 +54,7 @@ public class SensorPathEditingSupport extends EditingSupport {
 		em.close();
 		getViewer().refresh();
 		//TODO something changed!
+		 */
 	}
 
 }

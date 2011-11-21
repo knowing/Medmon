@@ -11,6 +11,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
@@ -21,7 +23,8 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 
 	private static final String[] columns = new String[] { "Name", "Version", "Typ", "Pfad", "Status" };
 	private static final int[] width = new int[] { 120, 70, 60, 150, 80 };
-
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	public SensorTableViewer(Composite parent, int style) {
 		super(parent, style);
 		init();
@@ -69,11 +72,14 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 	}
 
 	private void initInput() {
+		log.debug("SensorTableViewer::initInput()");
+		/*
 		ISensorService sensorService = Activator.getSensorService();
 		if(sensorService == null)
 			return;
 		sensorService.addPropertyChangeListener(this);
 		setInput(sensorService.getSensorAdapters().values());
+		*/
 	}
 
 	@Override

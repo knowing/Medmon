@@ -14,12 +14,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
-import de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter;
 
 /**
  * @author Nepomuk Seiler
@@ -32,9 +34,11 @@ public class SelectDPUPage extends WizardPage {
 	private Text tSearch;
 	private DPUTableViewer dpuViewer;
 
-	private SensorAdapter sensor;
+	//private SensorAdapter sensor;
 	private DPUFilter dpuFilter;
 	private DPUInputFilter dpuInputFilter;
+	
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	/**
 	 * Create the wizard.
@@ -112,17 +116,23 @@ public class SelectDPUPage extends WizardPage {
 	 * @param sensor
 	 *            the sensor to set
 	 */
-	public void setSensor(SensorAdapter sensor) {
+	public void setSensor(Object sensor) {
+		log.debug("SelectDPUPage::setSensor()");
+		/*
 		this.sensor = sensor;
 		updateFilter();
+		*/
 	}
 	
 	private void updateFilter() {
+		log.debug("SelectDPUPage::updateFilter()");
+		/*
 		if(sensor == null)
 			return;
 		String id = sensor.getSensorExtension().getConverter().getId();
 		dpuInputFilter.setLoaderIds(new String[] { id });
 		dpuViewer.refresh();
+		*/
 	}
 
 }

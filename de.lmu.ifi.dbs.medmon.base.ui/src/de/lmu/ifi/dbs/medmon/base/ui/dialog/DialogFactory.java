@@ -24,9 +24,13 @@ public class DialogFactory {
 	
 	private static Patient[] loadPatients() {
 		EntityManager em = JPAUtil.createEntityManager();
+
 		Query allPatients = em.createNamedQuery("Patient.findAll");
 		List<Patient> patients = allPatients.getResultList();
+		
+		
 		em.close();
+		
 		return patients.toArray(new Patient[patients.size()]);
 	}
 }

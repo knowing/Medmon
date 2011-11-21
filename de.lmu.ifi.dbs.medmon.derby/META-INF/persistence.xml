@@ -9,6 +9,8 @@
 		<class>de.lmu.ifi.dbs.medmon.database.model.Archiv</class>
 		<class>de.lmu.ifi.dbs.medmon.database.model.Sensor</class>
 		<class>de.lmu.ifi.dbs.medmon.database.model.Data</class>
+		<class>de.lmu.ifi.dbs.medmon.database.model.Therapy</class>
+		<class>de.lmu.ifi.dbs.medmon.database.model.TherapyResult</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 
 		<properties>

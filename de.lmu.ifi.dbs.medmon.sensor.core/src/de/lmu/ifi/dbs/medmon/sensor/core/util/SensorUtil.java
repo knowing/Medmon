@@ -8,8 +8,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.Activator;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 /**
  * 
@@ -20,6 +23,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.sensor.ISensor;
  */
 public class SensorUtil {
 
+	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	
 	/**
 	 * Provides all registered ISensorDataAlgorithm Extensions. No TypeCast
 	 * check is made!
@@ -39,7 +44,8 @@ public class SensorUtil {
 	 */
 	public static List<ISensor> evaluateExtensionsAsList() {
 		//   public <T> T find(Class<T> entityClass, Object primaryKey); for instanceof check
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISensor.SENSOR_ID);
+		
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("ISensor.SENSOR_ID");
 		final LinkedList<ISensor> extensions = new LinkedList<ISensor>();
 		try {
 			for (IConfigurationElement e : config) {

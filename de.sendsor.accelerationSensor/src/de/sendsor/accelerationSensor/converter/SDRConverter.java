@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
  * @since 01.04.2011
  * 
  */
-public class SDRConverter extends AbstractFileLoader implements IConverter {
+public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 
 	private static final long serialVersionUID = 7663052852394853876L;
 	
@@ -99,7 +99,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		// super.setSource(input);
 	}
 
-	@Override
+	//@Override
 	public void setDirectory(String path) throws IOException {
 		File dir = new File(path);
 		File[] files = dir.listFiles(new FilenameFilter() {
@@ -127,13 +127,13 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 	}
 
 
-	@Override
+	//@Override
 	public void copy(OutputStream out) throws IOException {
 		// Assuming the sensor can't record future data
 		copy(out, new Date(0), new Date());
 	}
 
-	@Override
+	//@Override
 	public void copy(OutputStream out, Date from, Date to) throws IOException {
 		if (m_sourceFile == null)
 			throw new IOException("No source file!");
@@ -175,7 +175,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		in.close();
 	}
 
-	@Override
+	//@Override
 	public IBlock convert() throws IOException {
 		if (m_sourceFile == null)
 			throw new IOException("No source file!");
@@ -445,7 +445,7 @@ public class SDRConverter extends AbstractFileLoader implements IConverter {
 		return "Sendsor - Acceleration Input Format";
 	}
 
-	@Override
+	//@Override
 	public String getId() {
 		return ID;
 	}
