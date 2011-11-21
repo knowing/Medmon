@@ -3,17 +3,15 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Medmon Sensors Core
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.sensor.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: de.lmu.ifi.dbs.medmon.sensor.core.Activator
+Bundle-Activator: de.lmu.ifi.dbs.medmon.sensor.core.internal.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  javax.persistence;bundle-version="2.0.0",
  nz.ac.waikato.cs.weka;bundle-version="3.7.3"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.lmu.ifi.dbs.medmon.sensor.core,
  de.lmu.ifi.dbs.medmon.sensor.core.annotations,
- de.lmu.ifi.dbs.medmon.sensor.core.container,
- de.lmu.ifi.dbs.medmon.sensor.core.converter,
  de.lmu.ifi.dbs.medmon.sensor.core.util
 Bundle-Vendor: LMU Munich - Database Systems Group
 Import-Package: org.joda.time,

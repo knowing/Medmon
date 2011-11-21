@@ -1,28 +1,23 @@
-package de.sendsor.accelerationSensor.converter;
+package de.sendsor.accelerationSensor;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.joda.time.Interval;
+
 import weka.core.Attribute;
 import weka.core.DenseInstance;
-import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.AbstractFileLoader;
 import weka.core.converters.ArffSaver;
+import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.Block;
-import de.lmu.ifi.dbs.medmon.sensor.core.container.IBlock;
-import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
 
 /**
  * <p>
@@ -35,16 +30,18 @@ import de.lmu.ifi.dbs.medmon.sensor.core.converter.IConverter;
  * @since 01.04.2011
  * 
  */
-public class SDRConverter extends AbstractFileLoader { //implements IConverter {
+public class SDRConverter extends FileConverter {
 
 	private static final long serialVersionUID = 7663052852394853876L;
-	
+
 	/* ==== Factory ==== */
 	public static final String ID = SDRLoader.class.getName();
 	public static final String URL = "url";
 	public static final String FILE = "file";
 
 	/* ==== Loader ==== */
+	private Instances header;
+
 	public static String FILE_EXTENSION = ".sdr";
 
 	private final static int BLOCKSIZE = 512;
@@ -55,9 +52,7 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 	/** 1 / 25Hz = 40ms */
 	private final static long SAMPLE_DISTANCE = 40;
 
-	private Instances dataset;
-
-	private final Attribute timeAttribute;
+	private Attribute timeAttribute;
 	private Attribute xAttribute;
 	private Attribute yAttribute;
 	private Attribute zAttribute;
@@ -72,14 +67,28 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 	/* */
 	private boolean firstRun = true;
 
-	public SDRConverter() {
-		m_structure = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
-		dataset = new Instances(m_structure);
+	public SDRConverter(URL url) throws IOException {
+		super(url);
+		init();
+	}
 
-		timeAttribute = dataset.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
+	public SDRConverter(String file) throws IOException {
+		super(file);
+		init();
+	}
+	
+	public SDRConverter(InputStream input) {
+		super(input);
+		init();
+	}
+
+	private void init() {
+		header = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
+
+		timeAttribute = header.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes
 		// TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
-		List<Attribute> valueAttributes = ResultsUtil.findValueAttributes(dataset);
+		List<Attribute> valueAttributes = ResultsUtil.findValueAttributes(header);
 		for (Attribute attribute : valueAttributes) {
 			String name = attribute.getMetadata().getProperty(ResultsUtil.META_ATTRIBUTE_NAME());
 			if (name.equals("x"))
@@ -92,135 +101,15 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 	}
 
 	@Override
-	public void setSource(InputStream input) throws IOException {
-		if (!(input instanceof FileInputStream))
-			return;
-		// TODO SDRConverter -> implement setSource
-		// super.setSource(input);
-	}
-
-	//@Override
-	public void setDirectory(String path) throws IOException {
-		File dir = new File(path);
-		File[] files = dir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(FILE_EXTENSION);
-			}
-		});
-		if (files.length == 0)
-			throw new IOException("No files found in this directory");
-		// TODO SDRLoader - setDirectory warning if more than one file found
-		// Setting the first file found
-		setFile(files[0]);
+	public Instances getHeader() {
+		return header;
 	}
 
 	@Override
-	public Instances getStructure() throws IOException {
-		return m_structure;
-	}
-	
-	@Override
-	public void reset() throws IOException {
-		super.reset();
-		dataset = new Instances(m_structure);
-	}
-
-
-	//@Override
-	public void copy(OutputStream out) throws IOException {
-		// Assuming the sensor can't record future data
-		copy(out, new Date(0), new Date());
-	}
-
-	//@Override
-	public void copy(OutputStream out, Date from, Date to) throws IOException {
-		if (m_sourceFile == null)
-			throw new IOException("No source file!");
-		if (out == null)
-			throw new IOException("No output!");
-
-		// Initialize data
-		byte[] data = new byte[BLOCKSIZE];
-
-		// Initialize time handling
-		Calendar date = new GregorianCalendar();
-		Calendar last = new GregorianCalendar();
-		boolean init = false;
-
-		FileInputStream in = new FileInputStream(m_sourceFile);
-		int read = in.read(data);
-		System.out.println("Copy sensor data: " + from + " -> " + to);
-		while (read != -1) {
-			// Create timestamp
-			boolean recordEnd = setTime(date, data);
-			if (!init) {
-				init = true;
-				last.setTimeInMillis(date.getTimeInMillis());
-			}
-			// Write data only "from >= date"
-			if (!date.getTime().before(from) && date.after(last))
-				out.write(data);
-			/*
-			 * Reasons for break 1) record ends when zeros appear 2) record ends
-			 * when new date is before the previous entry 3) given parameter
-			 * `to` is reached
-			 */
-			if (recordEnd || date.before(last) || date.getTime().after(to))
-				break;
-
-			last.setTimeInMillis(date.getTimeInMillis());
-			read = in.read(data);
-		}
-		in.close();
-	}
-
-	//@Override
-	public IBlock convert() throws IOException {
-		if (m_sourceFile == null)
-			throw new IOException("No source file!");
-
-		// Initialize data
-		byte[] data = new byte[BLOCKSIZE];
-
-		// Block timestamps
-		Calendar first = new GregorianCalendar();
-		Calendar last = new GregorianCalendar();
-		// Initialize time handling
-		Calendar date = new GregorianCalendar();
-		boolean init = false;
-
-		FileInputStream in = new FileInputStream(m_sourceFile);
-		int read = in.read(data);
-		long length = 0;
-		while (read != -1) {
-			// Create timestamp
-			boolean recordEnd = setTime(date, data);
-			if (!init) {
-				init = true;
-				last.setTimeInMillis(date.getTimeInMillis());
-				first.setTimeInMillis(date.getTimeInMillis());
-			}
-			// Checks if the recorded data ended or "date < to"
-			if (recordEnd || date.before(last))
-				break;
-
-			last.setTimeInMillis(date.getTimeInMillis());
-			length += read;
-			read = in.read(data);
-		}
-		in.close();
-		Block block = new Block(length, first.getTime(), last.getTime());
-		block.setPath(m_File);
-		return block;
-	}
-
-	@Override
-	public Instances getDataSet() throws IOException {
-		if (!dataset.isEmpty())
-			return dataset;
-		if (m_sourceFile == null)
-			throw new IOException("No source file!");
+	public Instances getData() throws IOException {
+		Instances dataset = new Instances(header);
+		if (input == null)
+			throw new IOException("No source defined - Null InputStream");
 
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];
@@ -232,15 +121,15 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 		Calendar intervalcurrent = new GregorianCalendar();
 		// Initialize data handling
 
-		FileInputStream in = new FileInputStream(m_sourceFile);
-		int read = in.read(data);
+		int read = input.read(data);
 
 		int avg_x = 0;
 		int avg_y = 0;
 		int avg_z = 0;
 		boolean newInterval = true;
 		long interval = getIntervalLength();
-		if (units > 0) 	interval *= units;
+		if (units > 0)
+			interval *= units;
 
 		// Convert each block
 		while (read != -1) {
@@ -271,7 +160,7 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 				// Increase time interval
 				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
 				if (aggregate.equals("none")) {
-					//Don't aggregate, just take raw values
+					// Don't aggregate, just take raw values
 					DenseInstance instance = new DenseInstance(4);
 					instance.setValue(timeAttribute, time);
 					instance.setValue(xAttribute, x);
@@ -288,8 +177,9 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
 					dataset.add(instance);
-					//Start for new aggregation 
-					//if aggregation < SAMPLE_DISTANCE first sample will be used twice!
+					// Start for new aggregation
+					// if aggregation < SAMPLE_DISTANCE first sample will be
+					// used twice!
 					avg_x = x;
 					avg_y = y;
 					avg_z = z;
@@ -307,10 +197,9 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 			}
 			date.setTimeInMillis(time);
 			// Load Data into data-Buffer
-			read = in.read(data);
+			read = input.read(data);
 
 		}
-		in.close();
 		// Saves to output if option set
 		if (output != null) {
 			File out = new File(output);
@@ -319,8 +208,43 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 			arffSaver.setInstances(dataset);
 			arffSaver.writeBatch();
 		}
+
+		input.close();
 		return dataset;
 	}
+
+	@Override
+	public Interval getInterval() throws IOException {
+		// Initialize time handling
+		Calendar current = new GregorianCalendar();
+
+		// Initialize position handling
+		byte[] data = new byte[BLOCKSIZE];
+		int read = input.read(data);
+		
+		// Initialize date or return zero Interval
+		if(setTime(current, data)) 
+			return new Interval(0, 0);
+		
+		long start = current.getTimeInMillis();
+		
+		// Convert each block
+		while (read != -1) {
+			// Create timestamp
+			boolean recordEnd = setTime(current, data);
+
+			// Checks if the recorded data ended
+			if (recordEnd)
+				break;
+
+			// Load Data into data-Buffer
+			read = input.read(data);
+		}
+		
+		input.close();
+		return new Interval(start, current.getTimeInMillis());
+	}
+
 
 	/**
 	 * Calculate the complete year from the incomplete data of file
@@ -369,7 +293,7 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 			calendar.setTimeInMillis(time);
 			firstRun = false;
 		} else {
-			System.out.println("relative timestamp: " + calendar.getTime());
+//			System.out.println("relative timestamp: " + calendar.getTime());
 			calendar.setTimeInMillis(calendar.getTimeInMillis() + SAMPLE_DISTANCE);
 		}
 		return recordEnd(day, hour);
@@ -405,11 +329,6 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 			return TimeUnit.SECONDS.toMillis(1);
 	}
 
-	@Override
-	public Instance getNextInstance(Instances structure) throws IOException {
-		return null;
-	}
-
 	public void setInterval(String interval) {
 		this.interval = interval;
 	}
@@ -428,31 +347,6 @@ public class SDRConverter extends AbstractFileLoader { //implements IConverter {
 
 	public void setOutput(String output) {
 		this.output = output;
-	}
-
-	@Override
-	public String getFileExtension() {
-		return FILE_EXTENSION;
-	}
-
-	@Override
-	public String[] getFileExtensions() {
-		return new String[] { FILE_EXTENSION };
-	}
-
-	@Override
-	public String getFileDescription() {
-		return "Sendsor - Acceleration Input Format";
-	}
-
-	//@Override
-	public String getId() {
-		return ID;
-	}
-
-	@Override
-	public String getRevision() {
-		return "";
 	}
 
 }

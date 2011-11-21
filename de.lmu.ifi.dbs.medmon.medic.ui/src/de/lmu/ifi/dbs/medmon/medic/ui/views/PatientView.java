@@ -265,7 +265,7 @@ public class PatientView extends ViewPart {
 		 * create the chart
 		 */
 		final TaskSeriesCollection dataset = new TaskSeriesCollection();
-		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, true, true, false);
+		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
 
 		/*
@@ -282,17 +282,24 @@ public class PatientView extends ViewPart {
 				Patient mPatient = entityManager.merge(selection);
 				entityManager.getTransaction().commit();
 
-				final TaskSeries series = new TaskSeries("Aufzeichnungs-Interval");
+				final TaskSeries series = new TaskSeries("");
+
+				//should look up therapy start and end
+				Task mainTask = new Task("", new Date(2000, 1, 1), new Date(2000, 1, 10));
 
 				for (Data data : selection.getData()) {
-					series.add(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+					mainTask.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
 				}
 
-				series.add(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
-				series.add(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
+				mainTask.addSubtask(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
+				mainTask.addSubtask(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
+				series.add(mainTask);
 
 				dataset.removeAll();
 				dataset.add(series);
+				
+				
+				System.out.println("load");
 			}
 
 			@Override

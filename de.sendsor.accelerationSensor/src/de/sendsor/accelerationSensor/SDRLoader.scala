@@ -1,4 +1,4 @@
-package de.sendsor.accelerationSensor.converter
+package de.sendsor.accelerationSensor
 
 import akka.actor.ActorRef
 import akka.actor.Actors.actorOf
@@ -7,10 +7,10 @@ import scala.collection.immutable.Map
 import java.util.Properties
 import java.io.File
 
-import de.lmu.ifi.dbs.knowing.core.factory.TFactory
+import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TLoader
 import de.lmu.ifi.dbs.knowing.core.processing.TLoader._
-import de.sendsor.accelerationSensor.converter.SDRLoaderFactory._
+import de.sendsor.accelerationSensor.SDRLoaderFactory._
 
 import weka.core.Instances
 
@@ -22,13 +22,13 @@ import weka.core.Instances
  */
 class SDRLoader extends TLoader {
 
-  val converter = new SDRConverter
+  var converter: SDRConverter = _
 
-  def getDataSet(): Instances = converter.getDataSet
+  def getDataSet(): Instances = converter.getData
 
   def configure(properties: Properties) = {
     val path = TLoader.getFilePath(properties)
-    converter.setFile(new File(path));
+    converter = new SDRConverter(path)
     
     val average = properties.getProperty(AGGREGATE, AGGREGATE_AVERAGE)
     if(AGGREGATE_PROPERTIES contains(average)) {
@@ -52,17 +52,12 @@ class SDRLoader extends TLoader {
     
   }
 
-  def reset = converter.reset
+  def reset = converter.reset()
 }
 
-class SDRLoaderFactory extends TFactory {
+class SDRLoaderFactory extends ProcessorFactory(classOf[SDRLoader]) {
 
-  val name: String = SDRLoaderFactory.name
-  val id: String = SDRLoaderFactory.id
-
-  def getInstance(): ActorRef = actorOf(classOf[SDRLoader])
-
-  def createDefaultProperties(): Properties = {
+  override def createDefaultProperties(): Properties = {
     val props = new Properties
     props.setProperty(FILE, "")
     props.setProperty(URL, "")
@@ -73,13 +68,13 @@ class SDRLoaderFactory extends TFactory {
     props
   }
 
-  def createPropertyValues(): Map[String, Array[Any]] = {
+  override def createPropertyValues(): Map[String, Array[Any]] = {
     Map(AGGREGATE -> AGGREGATE_PROPERTIES.toArray ,
         INTERVAL -> INTERVAL_PROPERTIES.toArray ,
         RELATIVE_TIMESTAMP -> Array( RELATIVE_TIMESTAMP_RELATIVE,  RELATIVE_TIMESTAMP_ABSOLUTE))
   }
 
-  def createPropertyDescription(): Map[String, String] = {
+  override def createPropertyDescription(): Map[String, String] = {
     Map(AGGREGATE -> "Aggregate: none|average|interval_first|interval_last .",
         INTERVAL -> "In which interval should the data be aggregated: second|minute|hour|day",
         UNITS -> "Must be greater than 0. Determines the interval size (units*interval). E.g 15 minutes",
@@ -89,8 +84,6 @@ class SDRLoaderFactory extends TFactory {
 }
 
 object SDRLoaderFactory {
-  val name: String = "SDR Loader"
-  val id: String = classOf[SDRLoader].getName
 
   val AGGREGATE = "aggregate"
   val INTERVAL = "interval"
