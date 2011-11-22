@@ -38,6 +38,7 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	private double[] eigenValues;
 
 	private Instances output;
+	private boolean resetOutputFormat = true;
 
 	private LoggableProcessor log;
 
@@ -50,6 +51,9 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 
 	@Override
 	protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
+		if(!resetOutputFormat && output != null ) 
+			return output;
+		
 		// determine the amount of numeric input dimensions
 		determineInputDimensions(inputFormat);
 
@@ -569,6 +573,14 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 		this.output = output;
 	}
 
+	public boolean isResetOutputFormat() {
+		return resetOutputFormat;
+	}
+
+	public void setResetOutputFormat(boolean resetOutputFormat) {
+		this.resetOutputFormat = resetOutputFormat;
+	}
+	
 	/**
 	 * Used for communication with the akka-actor-framework Especially for
 	 * logging and status updates.
@@ -580,5 +592,6 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	public void setProcessor(TProcessor processor) {
 		log = new LoggableProcessor(processor);
 	}
+
 
 }
