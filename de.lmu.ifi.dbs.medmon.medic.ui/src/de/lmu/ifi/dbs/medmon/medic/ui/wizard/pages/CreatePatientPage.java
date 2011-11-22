@@ -163,15 +163,12 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 
 	}
 
-	public Patient getPatient() {
-		if (patient == null)
-			patient = new Patient();
+	public void initializePatient(Patient patient) {
 		patient.setFirstname(tFirstname.getText());
 		patient.setLastname(tLastname.getText());
 		patient.setBirth(dBirth.getSelection());
 		patient.setGender(getGender());
 		patient.setInsuranceId(tInsuranceId.getText());
-		return patient;
 	}
 
 	private short getGender() {

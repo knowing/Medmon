@@ -12,6 +12,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -46,6 +48,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
+import org.eclipse.swt.widgets.Link;
 
 public class PatientView extends ViewPart {
 	public PatientView() {
@@ -132,7 +135,6 @@ public class PatientView extends ViewPart {
 		lblLastName.setText("Name:");
 
 		textLastName = new Text(cPatient, SWT.BORDER);
-		textLastName.setEditable(false);
 		textLastName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(textLastName, true, true);
 
@@ -141,7 +143,6 @@ public class PatientView extends ViewPart {
 		lblFirstname.setText("Vorname:");
 
 		textFirstname = new Text(cPatient, SWT.BORDER);
-		textFirstname.setEditable(false);
 		textFirstname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(textFirstname, true, true);
 
@@ -155,7 +156,9 @@ public class PatientView extends ViewPart {
 		dateBirth.setLayoutData(gd_dateBirth);
 		toolkit.adapt(dateBirth);
 		toolkit.paintBordersFor(dateBirth);
-		new Label(cPatient, SWT.NONE);
+
+		Label lblPlaceholder1 = toolkit.createLabel(cPatient, "", SWT.NONE);
+		lblPlaceholder1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 2));
 
 		Label lblGender = new Label(cPatient, SWT.NONE);
 		toolkit.adapt(lblGender, true, true);
@@ -171,17 +174,65 @@ public class PatientView extends ViewPart {
 		gd_btnMale.heightHint = 20;
 		btnMale.setLayoutData(gd_btnMale);
 
-		Label lblNewLabel = toolkit.createLabel(cPatient, "", SWT.NONE);
-		lblNewLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
 		Label lblInsuranceId = new Label(cPatient, SWT.NONE);
 		toolkit.adapt(lblInsuranceId, true, true);
 		lblInsuranceId.setText("Versicherungsnummer:");
 
 		textInsuranceId = new Text(cPatient, SWT.BORDER);
-		textInsuranceId.setEditable(false);
 		textInsuranceId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(textInsuranceId, true, true);
+
+		Label lblPlaceholder2 = new Label(cPatient, SWT.NONE);
+		lblPlaceholder2.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 4, 1));
+		toolkit.adapt(lblPlaceholder2, true, true);
+
+		Composite composite = new Composite(cPatient, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
+		toolkit.adapt(composite);
+		toolkit.paintBordersFor(composite);
+
+		Label lblPlaceholder3 = new Label(composite, SWT.NONE);
+		lblPlaceholder3.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(lblPlaceholder3, true, true);
+
+		Link linkSave = new Link(composite, SWT.NONE);
+		toolkit.adapt(linkSave, true, true);
+		linkSave.setText("<a>speichern</a>");
+		linkSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Patient selection = selectionProvider.getSelection(Patient.class);
+
+				if (selection == null)
+					return;
+
+				/************************************************************
+				 * Database Access Begin
+				 ************************************************************/
+
+				entityManager.getTransaction().begin();
+				Patient mPatient = entityManager.merge(selection);
+
+				mPatient.setFirstname(textFirstname.getText());
+				mPatient.setLastname(textLastName.getText());
+				mPatient.setBirth(dateBirth.getSelection());
+
+				if (btnMale.getSelection())
+					mPatient.setGender((short) 0);
+				else
+					mPatient.setGender((short) 1);
+
+				entityManager.getTransaction().commit();
+				entityManager.detach(mPatient);
+
+				/************************************************************
+				 * Database Access End
+				 ************************************************************/
+				
+				getViewSite().getActionBars().getStatusLineManager().setMessage("Patientendaten wurde gespeichert");
+			}
+		});
 
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 
@@ -281,13 +332,17 @@ public class PatientView extends ViewPart {
 				if (selection == null)
 					return;
 
+				/************************************************************
+				 * JFreechart Begin
+				 ************************************************************/
+
 				entityManager.getTransaction().begin();
 				Patient mPatient = entityManager.merge(selection);
 				entityManager.getTransaction().commit();
 
 				final TaskSeries series = new TaskSeries("");
 
-				//should look up therapy start and end
+				// should look up therapy start and end
 				Task mainTask = new Task("", new Date(2000, 1, 1), new Date(2000, 1, 10));
 
 				for (Data data : selection.getData()) {
@@ -300,9 +355,10 @@ public class PatientView extends ViewPart {
 
 				dataset.removeAll();
 				dataset.add(series);
-				
-				
-				System.out.println("load");
+
+				/************************************************************
+				 * JFreechart End
+				 ************************************************************/
 			}
 
 			@Override

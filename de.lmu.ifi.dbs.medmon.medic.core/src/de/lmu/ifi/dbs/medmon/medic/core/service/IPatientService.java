@@ -9,6 +9,7 @@ import java.util.Date;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 /**
  * 
@@ -129,5 +130,14 @@ public interface IPatientService {
 	 * @throws IOException
 	 */
 	public void remove(Data d) throws IOException;
+	
+	
+	/**
+	 * <p>stores the data located on a sensor into the database</p>
+	 * @param patient - the patient to which the data belongs
+	 * @param sensorService - a sensor-service
+	 * @param type - the type of the data to be stored
+	 */
+	public void store(Patient patient, ISensor sensorService, String type);
 
 }

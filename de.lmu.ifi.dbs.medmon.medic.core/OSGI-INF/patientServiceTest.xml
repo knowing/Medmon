@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="de.lmu.ifi.dbs.medmon.medic.core.patientServiceTest">
-   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.PatientServiceTest"/>
-   <reference bind="bindPatientService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService" name="IPatientService" policy="dynamic" unbind="unbindPatientService"/>
-   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
-</scr:component>

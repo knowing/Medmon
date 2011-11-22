@@ -3,14 +3,20 @@ package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.osgi.service.component.ComponentContext;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
@@ -22,95 +28,53 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class SensorService implements ISensorService {
 
-	private List<ISensor>			sensors					= new LinkedList<ISensor>();
+	private Map<String, ISensor>	sensorMap				= new HashMap<String, ISensor>();
+	private List<ISensor>			sensorList				= new ArrayList<ISensor>();
 	private List<ISensorObserver>	observers				= new LinkedList<ISensorObserver>();
 	private IEntityManagerService	entityManagerService	= null;
 
 	@Override
 	public ISensor[] getSensors() {
-		return (ISensor[]) sensors.toArray();
+		return (ISensor[]) sensorList.toArray();
 	}
 
 	@Override
 	public ISensor getSensor(String id) {
-		for (ISensor sensor : sensors) {
-			if (sensor.getId().equals(id))
-				return sensor;
-		}
-		return null;
+		return sensorMap.get(id);
 	}
 
 	@Override
-	public ISensor loadSensorEntity(Sensor sensor) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public IConverter createConverter(ISensor sSensor) {
-
-		EntityManager entityManager = JPAUtil.createEntityManager();
-		Query allSensors = entityManager.createNamedQuery("Sensor.findAll");
-		List<Sensor> resultList = allSensors.getResultList();
-		Sensor mSensor = null;
-
-		for (Sensor sensor : resultList) {
-			if (sensor.getId().equals(sSensor.getId()))
-				mSensor = sensor;
-		}
-
-		if (mSensor == null)
-			return null;
-
-		Path defaultPath = Paths.get(mSensor.getDefaultpath());
-		Path fittingFile = null;
-		try {
-			for (Path file : Files.newDirectoryStream(defaultPath)) {
-				if (file.toString().endsWith(mSensor.getFilePrefix())) {
-					fittingFile = file;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		if (fittingFile == null)
-			return null;
-
-		InputStream inputStream;
-
-		try {
-			inputStream = new FileInputStream(fittingFile.toFile());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		try {
-			if (sSensor.isConvertable(inputStream))
-				return null;
-
-			return sSensor.newConverter(inputStream);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public Sensor loadSensorEntity(ISensor sensor) {
 		
-		return null;
+		EntityManager entityManager = entityManagerService.getEntityManager();
+		List<Sensor> results = entityManager.createNamedQuery("Sensor.findBySensorId")
+		.setParameter("sensorId", sensor.getId())
+		.getResultList();
+
+		if(results.isEmpty())
+			return null;
+		
+		return results.get(0);
+	}
+
+	@Override
+	public IConverter createConverter(ISensor sensorService) {
+		
+		Sensor sensor = loadSensorEntity(sensorService);
+		return createConverter(sensor);
+		
 	}
 
 	@Override
 	public IConverter createConverter(Sensor sensor) {
-		EntityManager entityManager = JPAUtil.createEntityManager();
+		
+		if (sensor == null)
+			return null;
 
-		entityManager.getTransaction().begin();
-		Sensor mSensor = entityManager.merge(sensor);
-		entityManager.getTransaction().commit();
-
-		Path defaultPath = Paths.get(mSensor.getDefaultpath());
+		Path defaultPath = Paths.get(sensor.getDefaultpath());
 		Path fittingFile = null;
-		try {
-			for (Path file : Files.newDirectoryStream(defaultPath)) {
+		try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(defaultPath)) {
+			for (Path file : directoyStream) {
 				if (file.toString().endsWith(sensor.getFilePrefix())) {
 					fittingFile = file;
 					break;
@@ -123,51 +87,67 @@ public class SensorService implements ISensorService {
 		if (fittingFile == null)
 			return null;
 
-		ISensor sSensor = loadSensorEntity(mSensor);
 		InputStream inputStream;
 
-		try {
-			inputStream = new FileInputStream(fittingFile.toFile());
+		try(InputStream newInputStream = new FileInputStream(fittingFile.toFile())) {
+			inputStream = newInputStream;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 
+		ISensor sensorService = sensorMap.get(sensor.getSensorId());
+		
 		try {
-			if (!sSensor.isConvertable(inputStream))
+			if (sensorService.isConvertable(inputStream))
 				return null;
 
-			return sSensor.newConverter(inputStream);
-		} catch (IOException e) {
+			return sensorService.newConverter(inputStream);
+
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
 		}
 
-	}
+		return null;
+		
+		/*
+		EntityManager entityManager = JPAUtil.createEntityManager();
 
+		entityManager.getTransaction().begin();
+		Sensor mSensor = entityManager.merge(sensor);
+		entityManager.getTransaction().commit();
+
+		ISensor sSensor = null; //loadSensorEntity(mSensor);
+		return createConverter(sSensor);
+		*/
+	}
+	
 	/**
 	 * Service bindings and unbindings
 	 */
 	protected void bindSensor(ISensor service) {
-		sensors.add(service);
+		sensorList.add(service);
+		sensorMap.put(service.getId(), service);
 		for (ISensorObserver observer : observers) {
 			observer.sensorAdded(service);
 		}
 	}
 
 	protected void unbindSensor(ISensor service) {
-		sensors.remove(service);
+		sensorList.add(service);
+		sensorMap.remove(service);
 		for (ISensorObserver observer : observers) {
 			observer.sensorRemoved(service);
 		}
 	}
 
-	protected void bindSensorProvider(ISensorObserver service) {
-		service.init(sensors);
+	protected void bindSensorObserver(ISensorObserver service) {
+		observers.add(service);
+		service.init(sensorList);
 	}
 
-	protected void unbindSensorProvider(ISensorObserver service) {
-
+	protected void unbindSensorObserver(ISensorObserver service) {
+		observers.remove(service);
 	}
 
 	protected void bindEntityManagerService(IEntityManagerService service) {

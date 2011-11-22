@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
+import java.io.IOException;
+
 import javax.persistence.EntityManager;
 
 import org.eclipse.core.runtime.CoreException;
@@ -14,6 +16,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.CreatePatientPage;
 
 public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IExecutableExtension {
@@ -35,8 +38,21 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 
 	@Override
 	public boolean performFinish() {
-		Patient patient = patientpage.getPatient();
-		savePatient(patient);
+		Patient patient = null;
+		try {
+			patient = Activator.getPatientService().createPatient();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+		
+		EntityManager entityManager = JPAUtil.createEntityManager();
+		entityManager.getTransaction().begin();
+		patient = entityManager.merge(patient);
+		patientpage.initializePatient(patient);
+		entityManager.getTransaction().commit();
+		entityManager.detach(patient);
+			
 		if(finalPerspectiveId != null && !finalPerspectiveId.isEmpty()) {
 			try {
 				PlatformUI.getWorkbench().showPerspective(finalPerspectiveId, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
@@ -45,14 +61,6 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 			}
 		}
 		return true;
-	}
-	
-	private void savePatient(Patient patient) {
-		EntityManager entityManager = JPAUtil.createEntityManager();
-		entityManager.getTransaction().begin();
-		entityManager.persist(patient);
-		entityManager.getTransaction().commit();
-		entityManager.close();
 	}
 	
 	@Override

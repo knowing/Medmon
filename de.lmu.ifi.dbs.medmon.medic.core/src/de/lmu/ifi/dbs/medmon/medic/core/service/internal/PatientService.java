@@ -8,6 +8,7 @@ import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.READ;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class PatientService implements IPatientService {
 
@@ -48,7 +50,7 @@ public class PatientService implements IPatientService {
 	
 	private IEntityManagerService entityManagerService = null;
 	private ISensorService sensorService = null;
-
+		
 	@Override
 	public Path locateDirectory(Patient p, String type) {
 		switch (type) {
@@ -225,8 +227,13 @@ public class PatientService implements IPatientService {
 		}
 	}
 	
+	@Override
+	public void store(Patient patient, ISensor sensorService, String type) {
+		
+	}
+	
 	protected void activate(ComponentContext context) {
-		log.info("PatientService started successfully");
+		System.out.println("PatientService started successfully");
 	}
 
 	protected void bindEntityManager(IEntityManagerService service) {
@@ -244,5 +251,7 @@ public class PatientService implements IPatientService {
 	protected void unbindSensorService(ISensorService service) {
 		sensorService = null;
 	}
+
+
 
 }

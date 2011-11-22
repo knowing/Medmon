@@ -66,7 +66,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		//
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
-		section.setText("Empty Master Section");
+		section.setText("Patientenakte");
 		//
 		Composite composite = toolkit.createComposite(section, SWT.NONE);
 		toolkit.paintBordersFor(composite);

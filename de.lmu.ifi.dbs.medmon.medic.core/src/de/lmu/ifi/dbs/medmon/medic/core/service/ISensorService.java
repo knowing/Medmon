@@ -38,7 +38,7 @@ public interface ISensorService {
 	 * @param sensor
 	 * @return
 	 */
-	public ISensor loadSensorEntity(Sensor sensor);
+	public Sensor loadSensorEntity(ISensor sensor);
 	
 	/**
 	 * creates a IConverter for the passed sensor service.
