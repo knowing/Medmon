@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.sendsor.accelerationSensor.internal.Activator
 Require-Bundle: javax.persistence;bundle-version="2.0.0",
  de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.knowing.core.swt.charts;bundle-version="1.0.0"
+ de.lmu.ifi.dbs.knowing.core.swt.charts
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: Jama,
