@@ -84,6 +84,8 @@ public class PatientView extends ViewPart {
 
 	private IGlobalSelectionProvider	selectionProvider;
 	private EntityManager				entityManager;
+	private TaskSeriesCollection		dataset;
+	private JFreeChart					chart;
 
 	/**
 	 * @wbp.nonvisual location=82,149
@@ -229,29 +231,83 @@ public class PatientView extends ViewPart {
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
-				
+
 				getViewSite().getActionBars().getStatusLineManager().setMessage("Patientendaten wurde gespeichert");
 			}
 		});
 
+		/************************************************************
+		 * Listener for Patient.class
+		 ************************************************************/
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 
 			@Override
 			public void selectionChanged(Patient selection) {
-				textLastName.setText(selection.getLastname());
-				textFirstname.setText(selection.getFirstname());
-				dateBirth.setSelection(selection.getBirth());
-				switch (selection.getGender()) {
-				case 0:
+
+				/************************************************************
+				 * selection != null
+				 ************************************************************/
+				if (selection != null) {
+
+					/************************************************************
+					 * Fill the UI components
+					 ************************************************************/
+
+					textLastName.setText(selection.getLastname());
+					textFirstname.setText(selection.getFirstname());
+					dateBirth.setSelection(selection.getBirth());
+					switch (selection.getGender()) {
+					case 0:
+						btnFemale.setSelection(false);
+						btnMale.setSelection(true);
+						break;
+					case 1:
+						btnFemale.setSelection(true);
+						btnMale.setSelection(false);
+						break;
+					}
+					textInsuranceId.setText(selection.getInsuranceId());
+
+					/************************************************************
+					 * fill JFreechart
+					 ************************************************************/
+
+					entityManager.getTransaction().begin();
+					Patient mPatient = entityManager.merge(selection);
+					entityManager.getTransaction().commit();
+
+					final TaskSeries series = new TaskSeries("");
+
+					// should look up therapy start and end
+					Task mainTask = new Task("", new Date(2000, 1, 1), new Date(2000, 1, 10));
+
+					for (Data data : selection.getData()) {
+						mainTask.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+					}
+
+					mainTask.addSubtask(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
+					mainTask.addSubtask(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
+					series.add(mainTask);
+
+					dataset.removeAll();
+					dataset.add(series);
+
+				}
+				/************************************************************
+				 * selection == null
+				 ************************************************************/
+				else {
+					/************************************************************
+					 * fill all UI components with blank strings
+					 ************************************************************/
+					textLastName.setText("");
+					textFirstname.setText("");
+					dateBirth.setSelection(new Date());
 					btnFemale.setSelection(false);
 					btnMale.setSelection(true);
-					break;
-				case 1:
-					btnFemale.setSelection(true);
-					btnMale.setSelection(false);
-					break;
+					textInsuranceId.setText("");
 				}
-				textInsuranceId.setText(selection.getInsuranceId());
+
 			}
 
 			@Override
@@ -265,6 +321,9 @@ public class PatientView extends ViewPart {
 				return Patient.class;
 			}
 		});
+		/************************************************************
+		 * Listener END
+		 ************************************************************/
 
 		/*
 		 * dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT); data =
@@ -315,61 +374,9 @@ public class PatientView extends ViewPart {
 		formData.setText("Daten");
 		formData.getBody().setLayout(new GridLayout(1, false));
 
-		/*
-		 * create the chart
-		 */
-		final TaskSeriesCollection dataset = new TaskSeriesCollection();
-		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
+		dataset = new TaskSeriesCollection();
+		chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
-
-		/*
-		 * fill the chart
-		 */
-		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
-
-			@Override
-			public void selectionChanged(Patient selection) {
-				if (selection == null)
-					return;
-
-				/************************************************************
-				 * JFreechart Begin
-				 ************************************************************/
-
-				entityManager.getTransaction().begin();
-				Patient mPatient = entityManager.merge(selection);
-				entityManager.getTransaction().commit();
-
-				final TaskSeries series = new TaskSeries("");
-
-				// should look up therapy start and end
-				Task mainTask = new Task("", new Date(2000, 1, 1), new Date(2000, 1, 10));
-
-				for (Data data : selection.getData()) {
-					mainTask.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
-				}
-
-				mainTask.addSubtask(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
-				mainTask.addSubtask(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
-				series.add(mainTask);
-
-				dataset.removeAll();
-				dataset.add(series);
-
-				/************************************************************
-				 * JFreechart End
-				 ************************************************************/
-			}
-
-			@Override
-			public void selectionUpdated() {
-			}
-
-			@Override
-			public Class<Patient> getType() {
-				return Patient.class;
-			}
-		});
 
 		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
 		toolkit.adapt(chartComposite);
