@@ -12,6 +12,8 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,30 +35,31 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
+import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class PatientService implements IPatientService {
 
-	private final Logger log = LoggerFactory.getLogger(IGlobalSelectionService.class);
-	
+	private final Logger			log						= LoggerFactory.getLogger(IGlobalSelectionService.class);
+
 	/** Static application directory in {user.home}/.medmon */
-	private final Path medmon = Paths.get(System.getProperty("user.home"), ".medmon", "patients");
-	
+	private final Path				medmon					= Paths.get(System.getProperty("user.home"), ".medmon", "patients");
+
 	/** Format patient-id to 12 digits */
-	private final DecimalFormat decimalF = new DecimalFormat("000000000000");  
-	
-	/** Format dates with DateFormat.SHORT */ 
-	private final DateFormat dateF = DateFormat.getDateInstance(DateFormat.SHORT);
-	
-	private IEntityManagerService entityManagerService = null;
-	private ISensorService sensorService = null;
-		
+	private final DecimalFormat		decimalF				= new DecimalFormat("000000000000");
+
+	/** Format dates with DateFormat.SHORT */
+	private final DateFormat		dateF					= DateFormat.getDateInstance(DateFormat.SHORT);
+
+	private IEntityManagerService	entityManagerService	= null;
+	private ISensorService			sensorService			= null;
+
 	@Override
 	public Path locateDirectory(Patient p, String type) {
 		switch (type) {
 		case ROOT:
 			return medmon.resolve(Paths.get(decimalF.format(p.getId())));
-		default: 
+		default:
 			return medmon.resolve(Paths.get(decimalF.format(p.getId()), type));
 		}
 	}
@@ -76,16 +79,19 @@ public class PatientService implements IPatientService {
 		Path path = locateFile(d);
 		switch (relativeToType) {
 		case ROOT:
-			//Climb two steps in the hierarchy to be in the ROOT folder
+			// Climb two steps in the hierarchy to be in the ROOT folder
 			return path.getParent().getParent().relativize(path);
 		default:
 			return path.getFileName();
 		}
 	}
-	
+
 	/**
-	 * <p>Create root directory with three subdirectories TRAIN/RESULT/RAW</p>
-	 * @return Patient 
+	 * <p>
+	 * Create root directory with three subdirectories TRAIN/RESULT/RAW
+	 * </p>
+	 * 
+	 * @return Patient
 	 * @throws IOException
 	 */
 	@Override
@@ -104,7 +110,10 @@ public class PatientService implements IPatientService {
 	}
 
 	/**
-	 * <p>Deletes first the source and then the db entities</p>
+	 * <p>
+	 * Deletes first the source and then the db entities
+	 * </p>
+	 * 
 	 * @param - Patient to delete
 	 * @throws IOException
 	 */
@@ -119,14 +128,21 @@ public class PatientService implements IPatientService {
 	}
 
 	/**
-	 * <p>Creates a new file and {@link Data} instance
-	 * and returns the corresponding OutputStream.</p>
+	 * <p>
+	 * Creates a new file and {@link Data} instance and returns the
+	 * corresponding OutputStream.
+	 * </p>
 	 * 
-	 * @param p - 
-	 * @param s -
-	 * @param type -
-	 * @param from -
-	 * @param to -
+	 * @param p
+	 *            -
+	 * @param s
+	 *            -
+	 * @param type
+	 *            -
+	 * @param from
+	 *            -
+	 * @param to
+	 *            -
 	 * @return Ready to write OutputStream
 	 * @throws IOException
 	 */
@@ -136,7 +152,7 @@ public class PatientService implements IPatientService {
 		em.getTransaction().begin();
 		Patient patient = em.merge(p);
 		Sensor sensor = em.merge(s);
-		Data data = new Data(patient,sensor,type, from, to);
+		Data data = new Data(patient, sensor, type, from, to);
 		Path file = locateDirectory(patient, type).resolve(generateFilename(sensor, type, from, to));
 		data.setFile(file.toString());
 		em.persist(data);
@@ -146,8 +162,62 @@ public class PatientService implements IPatientService {
 	}
 
 	/**
-	 * <p>Locates the corresponding file</p>
-	 * @param d - detached {@link Data} object
+	 * 
+	 */
+	@Override
+	public void store(Patient p, ISensor s, String type) {
+
+		DirectoryStream<Path> directoyStream = null;
+		try (DirectoryStream<Path> newDirectoyStream = Files.newDirectoryStream(locateDirectory(p, type))) {
+			directoyStream = newDirectoyStream;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (directoyStream == null || !directoyStream.iterator().hasNext())
+			return;
+
+		IConverter converter = null;
+		try {
+			converter = s.newConverter(newInputStream(directoyStream.iterator().next()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (converter == null)
+			return;
+
+		Sensor entity = sensorService.loadSensorEntity(s);
+		OutputStream os = null;
+		try {
+			os = store(p, entity, type, converter.getInterval().getStart().toDate(), converter.getInterval().getEnd().toDate());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		if (os == null)
+			return;
+
+		InputStream is = converter.getInputStream();
+
+		byte[] buffer = new byte[4096];
+		int bytesRead = 0;
+		try {
+			while ((bytesRead = is.read(buffer)) != -1) {
+				os.write(buffer, 0, bytesRead);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * <p>
+	 * Locates the corresponding file
+	 * </p>
+	 * 
+	 * @param d
+	 *            - detached {@link Data} object
 	 * @return Ready to write InputStream
 	 * @throws IOException
 	 */
@@ -158,25 +228,29 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public OutputStream merge(Data d1, Data d2) throws IOException {
-		if(!d1.getType().equals(d2.getType())) 
+		if (!d1.getType().equals(d2.getType()))
 			throw new IOException("Data.type doesn't match: " + d1.getType() + " != " + d2.getType());
-		
+
 		Date from, to = null;
-		if(d1.getFrom().before(d2.getFrom()))
+		if (d1.getFrom().before(d2.getFrom()))
 			from = d1.getFrom();
 		else
 			from = d2.getFrom();
-		if(d1.getTo().after(d2.getTo()))
+		if (d1.getTo().after(d2.getTo()))
 			to = d1.getTo();
 		else
 			to = d2.getTo();
-		
-		return store(d1.getPatient(),d1.getSensor(), d1.getType(),from, to);
+
+		return store(d1.getPatient(), d1.getSensor(), d1.getType(), from, to);
 	}
 
 	/**
-	 * <p>Deletes the source and then the db entity</p>
-	 * @param d - detached {@link Data} object
+	 * <p>
+	 * Deletes the source and then the db entity
+	 * </p>
+	 * 
+	 * @param d
+	 *            - detached {@link Data} object
 	 * @throws IOException
 	 */
 	@Override
@@ -191,47 +265,44 @@ public class PatientService implements IPatientService {
 	}
 
 	/**
-	 * <p>Generates a filename with the given parameters like this</p>
+	 * <p>
+	 * Generates a filename with the given parameters like this
+	 * </p>
 	 * 
 	 * <p>
 	 * <li>RAW: [from]_to_[to].[sensor.id].[sensor.filePrefix]</li>
 	 * <li>TRAIN: [from]_to_[to].arff</li>
 	 * <li>RESULT: [from]_to_[to].arff</li>
 	 * </p>
-	 * <p>For date formatting {@link DateFormat.SHORT} is used.</p>
+	 * <p>
+	 * For date formatting {@link DateFormat.SHORT} is used.
+	 * </p>
 	 * 
-	 * @param s - Sensor
-	 * @param type - RAW, TRAIN or RESULT
-	 * @param from - Data recording start
-	 * @param to - Data recording end
+	 * @param s
+	 *            - Sensor
+	 * @param type
+	 *            - RAW, TRAIN or RESULT
+	 * @param from
+	 *            - Data recording start
+	 * @param to
+	 *            - Data recording end
 	 * @return
 	 */
 	private String generateFilename(Sensor s, String type, Date from, Date to) {
 		StringBuilder sb = new StringBuilder(32);
-		sb.append(dateF.format(from))
-			.append("_to_")
-			.append(dateF.format(to))
-			.append(".");
+		sb.append(dateF.format(from)).append("_to_").append(dateF.format(to)).append(".");
 		switch (type) {
-		case RAW: 
-			return sb.append(s.getId())
-					.append(".")
-					.append("filePrefix")
-					.toString();
+		case RAW:
+			return sb.append(s.getId()).append(".").append("filePrefix").toString();
 		case TRAIN:
 			return sb.append("arff").toString();
 		case RESULT:
 			return sb.append("arff").toString();
-		default: 
+		default:
 			return sb.append("unkown").toString();
 		}
 	}
-	
-	@Override
-	public void store(Patient patient, ISensor sensorService, String type) {
-		
-	}
-	
+
 	protected void activate(ComponentContext context) {
 		System.out.println("PatientService started successfully");
 	}
@@ -251,7 +322,5 @@ public class PatientService implements IPatientService {
 	protected void unbindSensorService(ISensorService service) {
 		sensorService = null;
 	}
-
-
 
 }
