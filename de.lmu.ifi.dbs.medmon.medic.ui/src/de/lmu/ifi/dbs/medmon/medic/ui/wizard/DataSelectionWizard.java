@@ -1,13 +1,9 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +17,6 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-import de.lmu.ifi.dbs.medmon.sensor.core.util.SensorUtil;
 
 public class DataSelectionWizard extends Wizard {
 
@@ -52,16 +47,16 @@ public class DataSelectionWizard extends Wizard {
 		}
 
 		Sensor dbsensor = results.get(0).getSensor();
-		List<ISensor> sensors = SensorUtil.evaluateExtensionsAsList();
+//		List<ISensor> sensors = SensorUtil.evaluateExtensionsAsList();
 		ISensor sensor = null;
-		for (Object o : sensors) {
+/*		for (Object o : sensors) {
 			ISensor s = (ISensor) o;
 			String id = Sensor.parseId(s.getName(), s.getVersion());
 			if (id.equals(dbsensor.getId())) {
 				sensor = s;
 				break;
 			}
-		}
+		}*/
 		if (sensor == null) {
 			page.setErrorMessage("Der Sensor " + dbsensor.getName() + " ist nicht installiert");
 			return false;

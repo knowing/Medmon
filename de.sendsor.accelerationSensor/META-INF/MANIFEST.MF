@@ -4,13 +4,13 @@ Bundle-Name: Sendsor AccelerationSensor
 Bundle-SymbolicName: de.sendsor.accelerationSensor;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.sendsor.accelerationSensor.internal.Activator
-Require-Bundle: javax.persistence;bundle-version="2.0.0",
- de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.knowing.core.swt.charts
+Require-Bundle: de.lmu.ifi.dbs.knowing.core;bundle-version="0.1.0",
+ de.lmu.ifi.dbs.knowing.core.common;bundle-version="0.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: Jama,
  Jama.util,
+ de.lmu.ifi.dbs.medmon.sensor.core,
  org.joda.time,
  org.joda.time.base,
  org.joda.time.chrono,
