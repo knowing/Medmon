@@ -321,7 +321,7 @@ public class PatientView extends ViewPart {
 		/************************************************************
 		 * Listener END
 		 ************************************************************/
-
+		
 		/*
 		 * dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT); data =
 		 * new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -370,9 +370,12 @@ public class PatientView extends ViewPart {
 		toolkit.paintBordersFor(formData);
 		formData.setText("Daten");
 		formData.getBody().setLayout(new GridLayout(1, false));
-
-		dataset = new TaskSeriesCollection();
-		chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
+		
+		/*
+		 * create the chart
+		 */
+		final TaskSeriesCollection dataset = new TaskSeriesCollection();
+		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
 
 		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));

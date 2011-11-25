@@ -580,7 +580,6 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	public void setResetOutputFormat(boolean resetOutputFormat) {
 		this.resetOutputFormat = resetOutputFormat;
 	}
-	
 	/**
 	 * Used for communication with the akka-actor-framework Especially for
 	 * logging and status updates.
@@ -592,6 +591,4 @@ public class LDAFilter extends SimpleBatchFilter implements ILoggableProcessor {
 	public void setProcessor(TProcessor processor) {
 		log = new LoggableProcessor(processor);
 	}
-
-
 }
