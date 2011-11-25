@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
-import org.osgi.framework.BundleContext;
-
-
-
 /**
  * <p>Used by UI components to propagate selection changes
  * to the @IGlobalSelectionService </p>

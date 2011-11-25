@@ -17,6 +17,7 @@ import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
+import de.sendsor.accelerationSensor.algorithm.presentation.BarChartFilterFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -54,6 +55,7 @@ public class Activator implements BundleActivator {
 		util.registerProcessor(new SourceToClassConverterFactory());
 		util.registerProcessor(new ResultMergeProcessorFactory());
 		util.registerProcessor(new ReClassificationFactory());
+		util.registerProcessor(new BarChartFilterFactory());
 		dpuService = context.registerService(IDPUProvider.class, BundleDPUProvider.newInstance(context.getBundle()), null);
 	}
 

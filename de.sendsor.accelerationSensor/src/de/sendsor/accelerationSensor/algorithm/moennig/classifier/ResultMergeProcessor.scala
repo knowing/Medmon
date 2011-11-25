@@ -158,6 +158,14 @@ class ResultMergeProcessor extends TProcessor {
         ri += 1
       }
     }
+    
+    //Set class labels for output
+    guessAndSetClassLabel(output)
+    for(i <- 0 until output.numInstances)  ResultsUtil.highestProbability(output(i))._2 match {
+      case ResultsUtil.NOT_CLASSIFIED => output(i).setClassMissing
+      case clazz =>  output(i).setClassValue(clazz)
+    }
+    	
     sendResults(output)
 
     //Clean up

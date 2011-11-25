@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
+	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -33,9 +33,6 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	
-	//only to test
-	public static EntityManager entityManager = JPAUtil.createEntityManager();
 
 	/**
 	 * The constructor
@@ -70,8 +67,6 @@ public class Activator extends AbstractUIPlugin {
 	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
-		entityManager.close();
-		
 		plugin = null;
 
 		sensorServiceTracker.close();
@@ -88,8 +83,7 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
-
-	public static BundleContext getBundleContext() {
+	public static BundleContext getBundleContext(){
 		return Activator.plugin.getBundle().getBundleContext();
 	}
 

@@ -28,14 +28,15 @@ class LDAFilterFactory extends WekaFilterFactory[LDAFilterWrapper, LDAFilter](cl
     val returns = new Properties
     returns.setProperty(DEBUG, "false")
     returns.setProperty(DIMREDUCTION, "false")
-    returns.setProperty(ATTRIBUTE_NAME_PREFIX, "FV_");
+    returns.setProperty(ATTRIBUTE_NAME_PREFIX, "FV_")
+    returns.setProperty(RESET_OUTPUTFORMAT, "true")
     returns
   }
 
   //Possible property values. Editor should show these
   override def createPropertyValues: Map[String, Array[_ <: Any]] = {
-    Map(DEBUG -> boolean_property)
-    Map(DIMREDUCTION -> boolean_property)
+    Map(DEBUG -> BOOLEAN_PROPERTY)
+    Map(DIMREDUCTION -> BOOLEAN_PROPERTY)
   }
 
   //Property description
@@ -50,6 +51,7 @@ object LDAFilterFactory {
   val DIMREDUCTION = "dimensionreduction"
   val OUTDIMENSIONS = "outputdimensions"
   val ATTRIBUTE_NAME_PREFIX = "attributeNamePrefix"
+  val RESET_OUTPUTFORMAT = "resetOutputFormat"
 
   //Model sections
   val OUTPUT_FORMAT = "output_format"
@@ -166,5 +168,6 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
       lda.setOutDimensions(outdimensions.toInt)
     }
     lda.setAttributeNamePrefix(attNamePrefix)
+    lda.setResetOutputFormat(properties.getProperty(RESET_OUTPUTFORMAT, "true").toBoolean)
   }
 }

@@ -1,48 +1,64 @@
 package de.sendsor.accelerationSensor.algorithm.presentation
 
 import java.util.Properties
+import akka.event.EventHandler.{ debug, info, warning, error }
 import weka.core.{ Instance, Instances, DenseInstance }
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
+import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.{ ATTRIBUTE_FROM, ATTRIBUTE_TO }
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.{ ATTRIBUTE_FROM, ATTRIBUTE_TO, ATTRIBUTE_CLASS, ATTRIBUTE_TIMESTAMP }
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
+/**
+ * <p>Filters the input Instances and returns a ResultsUtil.timeIntervalResult.<br>
+ * Input instances must have:
+ * <li>ResultsUtil.ATTRIBUTE_TIMESTAMP</li>
+ * <li>ClassAttribute or ResultsUtil.ATTRIBUTE_CLASS</li>
+ * </p>
+ * 
+ * @author Nepomuk Seiler
+ * @version 1.0
+ * @since 2011-11-17
+ */
 class BarChartFilter extends TFilter {
 
   override def filter(instances: Instances): Instances = guessAndSetClassLabel(instances) match {
     case -1 => instances
     case i =>
       val classAttr = instances.classAttribute
+      val timeAttr = instances.attribute(ATTRIBUTE_TIMESTAMP)
       val classList = classAttr.enumerateValues.toList.asInstanceOf[List[String]]
 
-      val start = (ListBuffer[Instances](), classList(0))
-
+      //Create timeIntervalResult Instances and get attribute indices
       val intervalInst = ResultsUtil.timeIntervalResult(classList)
       val fromIndex = intervalInst.attribute(ATTRIBUTE_FROM).index
       val toIndex = intervalInst.attribute(ATTRIBUTE_TO).index
+      val classIndex = intervalInst.attribute(ATTRIBUTE_CLASS).index
 
-      val ret = instances.foldLeft(start) { (instList, inst) =>
+      debug(this, "Create TimeIntervalInstances")
+      var currentClass = ""
+      for (i <- 0 until instances.numInstances) {
+        val inst = instances(i)
         classAttr.value(inst.value(classAttr).toInt) match {
-          //same class, increase timeInterval
-          case instList._2 =>
-            val interval = instList._1.head.get(0)
-            interval.setValue(fromIndex, inst.value(fromIndex))
-            instList
-          //new class, create new timeInterval
-          case clazz =>
-            instList._1 + ResultsUtil.timeIntervalResult(classList)
-            val instances = instList._1.head
-            val interval = new DenseInstance(instances.numAttributes)
-            instances.add(interval)
-            interval.setValue(toIndex, inst.value(toIndex))
-            interval.setValue(fromIndex, inst.value(fromIndex))
-            (instList._1, clazz)
+
+          //alter the end date of the interval
+          case c if c.equals(currentClass) =>
+            val interval = intervalInst.lastInstance
+            interval.setValue(toIndex, inst.value(timeAttr))
+
+          //Create a new interval
+          case c =>
+            intervalInst.add(new DenseInstance(intervalInst.numAttributes))
+            val interval = intervalInst.lastInstance
+            interval.setValue(toIndex, inst.value(timeAttr))
+            interval.setValue(fromIndex, inst.value(timeAttr))
+            interval.setClassValue(c)
+            currentClass = c
         }
       }
-      //      val splitInst = ResultsUtil.splitInstanceByAttribute(instances, classAttr.name)
 
-      instances
+      intervalInst
   }
 
   def query(query: Instance): Instances = null
@@ -52,3 +68,5 @@ class BarChartFilter extends TFilter {
   def configure(properties: Properties) {}
 
 }
+
+class BarChartFilterFactory extends ProcessorFactory(classOf[BarChartFilter])

@@ -9,8 +9,14 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 public interface IGlobalSelectionListener<T> {
 
 	/**
+<<<<<<< HEAD
+	 * Callback for UI components
+	 * @param clazz
+	 * @param selection
+=======
 	 * notifies the listener on selection changes
 	 * @param selection - selected object
+>>>>>>> refs/heads/SEP
 	 */
 	void selectionChanged(T selection);
 	

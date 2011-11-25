@@ -2,16 +2,13 @@ package de.sendsor.accelerationSensor.algorithm.moennig.classifier
 
 import java.io.{InputStream, OutputStream}
 import java.util.{ArrayList,Properties}
-import akka.actor.ActorRef
-import akka.actor.Actor.actorOf
 import akka.event.EventHandler.{debug,info, warning, error}
 import weka.core.{Attribute,Instances, Instance, DenseInstance}
 import weka.classifiers.Classifier
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
 import de.lmu.ifi.dbs.knowing.core.weka.{WekaClassifier,WekaClassifierFactory}
 import MyNaiveBayesFactory._
-import java.io.ObjectOutputStream
-import java.io.ObjectInputStream
+import java.io.{ObjectInputStream,ObjectOutputStream}
 
 
 class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
@@ -28,10 +25,12 @@ class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
     classifier = oin.readObject.asInstanceOf[MyNaiveBayesImpl]
     val c = classifier.asInstanceOf[MyNaiveBayesImpl]
     guessAndCreateClassLabels(c.inputFormat)
+    configure(properties)
     debug(this,"MyNaiveBayes model loaded")
   }
   
   override def configure(properties:Properties) = {
+    super.configure(properties)
     val bayes = classifier.asInstanceOf[MyNaiveBayesImpl]
     
     val kernel = properties.getProperty(KERNEL_ESTIMATOR, "false")
@@ -41,8 +40,10 @@ class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
     val supervised = properties.getProperty(SUPERVISED_DISCRETIZATION, "false")
     bayes.setUseSupervisedDiscretization(supervised.toBoolean)
     
-    val debug = properties.getProperty(DEBUG, "false")
-    bayes.setDebug(debug.toBoolean)
+    val debugOption = properties.getProperty(DEBUG, "false")
+    bayes.setDebug(debugOption.toBoolean)
+    
+    bayes.setClass = setClass
   }
 }
 

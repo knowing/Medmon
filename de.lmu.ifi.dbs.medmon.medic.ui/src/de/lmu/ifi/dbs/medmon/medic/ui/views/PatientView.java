@@ -31,7 +31,6 @@ import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.part.ViewPart;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.IntervalCategoryDataset;
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
@@ -81,7 +80,6 @@ public class PatientView extends ViewPart {
 
 	private PatientFileDetailBlock		patientFileDetailBlock;
 	private Text						text;
-
 	private IGlobalSelectionProvider	selectionProvider;
 	private EntityManager				entityManager;
 	private TaskSeriesCollection		dataset;
@@ -123,7 +121,6 @@ public class PatientView extends ViewPart {
 	 * 
 	 */
 	private void createPersonalTab() {
-
 		TabItem tPersonalData = new TabItem(tabFolder, SWT.NONE);
 		tPersonalData.setText("Persoenliche Daten");
 		tPersonalData.setImage(getImageDescriptor(ISharedImages.IMG_PATIENTS_16).createImage());
