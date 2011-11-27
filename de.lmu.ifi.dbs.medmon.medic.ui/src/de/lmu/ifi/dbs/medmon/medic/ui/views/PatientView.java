@@ -288,6 +288,7 @@ public class PatientView extends ViewPart {
 
 					dataset.removeAll();
 					dataset.add(series);
+					entityManager.detach(mPatient);
 
 				}
 				/************************************************************

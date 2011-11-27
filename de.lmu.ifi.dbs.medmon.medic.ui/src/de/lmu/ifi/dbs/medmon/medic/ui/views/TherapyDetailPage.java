@@ -239,6 +239,8 @@ public class TherapyDetailPage implements IDetailsPage {
 				entityManager.getTransaction().begin();
 				entityManager.persist(mTherapyResult);
 				entityManager.getTransaction().commit();
+				
+				entityManager.detach(mTherapy);
 
 				/************************************************************
 				 * Database Access End

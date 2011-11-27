@@ -1,8 +1,11 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,20 +17,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
-import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
-public class SensorService implements ISensorService {
+public class SensorManagerService implements ISensorManagerService {
 
+	private static Logger			log						= LoggerFactory.getLogger(SensorManagerService.class);
 	private Map<String, ISensor>	sensorMap				= new HashMap<String, ISensor>();
 	private List<ISensor>			sensorList				= new ArrayList<ISensor>();
 	private List<ISensorObserver>	observers				= new LinkedList<ISensorObserver>();
@@ -45,83 +48,92 @@ public class SensorService implements ISensorService {
 
 	@Override
 	public Sensor loadSensorEntity(ISensor sensor) {
-		
-		EntityManager entityManager = entityManagerService.getEntityManager();
-		List<Sensor> results = entityManager.createNamedQuery("Sensor.findBySensorId")
-		.setParameter("sensorId", sensor.getId())
-		.getResultList();
 
-		if(results.isEmpty())
+		EntityManager entityManager = entityManagerService.getEntityManager();
+		@SuppressWarnings("unchecked")
+		List<Sensor> results = entityManager.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId())
+				.getResultList();
+
+		if (results.isEmpty())
 			return null;
-		
+
 		return results.get(0);
 	}
 
 	@Override
-	public IConverter createConverter(ISensor sensorService) {
-		
-		Sensor sensor = loadSensorEntity(sensorService);
-		return createConverter(sensor);
-		
+	public ISensor loadSensorService(Sensor sensor) {
+		return sensorMap.get(sensor.getSensorId());
 	}
 
 	@Override
-	public IConverter createConverter(Sensor sensor) {
-		
-		if (sensor == null)
+	public IConverter createConverter(ISensor sensorService) {
+
+		if (sensorService == null)
 			return null;
 
-		Path defaultPath = Paths.get(sensor.getDefaultpath());
-		Path fittingFile = null;
+		InputStream inputStream = createInput(sensorService, 0);
+
+		if (inputStream == null)
+			return null;
+
+		try {
+			return sensorService.newConverter(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public URI[] availableInputs(ISensor sensor) {
+		Sensor sensorEntity = loadSensorEntity(sensor);
+		Path defaultPath = Paths.get(sensorEntity.getDefaultpath());
+		List<URI> uriList = new ArrayList<URI>();
+
 		try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(defaultPath)) {
 			for (Path file : directoyStream) {
-				if (file.toString().endsWith(sensor.getFilePrefix())) {
-					fittingFile = file;
-					break;
-				}
+				if (file.toString().endsWith(sensor.getFilePrefix()))
+					uriList.add(file.toUri());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return (URI[]) uriList.toArray(new URI[uriList.size()]);
+	}
 
-		if (fittingFile == null)
+	@Override
+	public InputStream createInput(ISensor sensor, int inputIndex) {
+		URI[] availableURL = availableInputs(sensor);
+
+		if (availableURL.length == 0)
 			return null;
 
 		InputStream inputStream;
 
-		try(InputStream newInputStream = new FileInputStream(fittingFile.toFile())) {
+		try (InputStream newInputStream = new FileInputStream(new File(availableURL[inputIndex]))) {
 			inputStream = newInputStream;
 		} catch (Exception e) {
+			log.error("createInput() -> couldn't create InputStream");
 			e.printStackTrace();
 			return null;
 		}
 
-		ISensor sensorService = sensorMap.get(sensor.getSensorId());
-		
 		try {
-			if (sensorService.isConvertable(inputStream))
+			if (sensor.isConvertable(inputStream))
 				return null;
-
-			return sensorService.newConverter(inputStream);
-
 		} catch (Exception e) {
+			log.error("createInput() -> InputStream not convertable");
 			e.printStackTrace();
 		}
 
-		return null;
-		
-		/*
-		EntityManager entityManager = JPAUtil.createEntityManager();
-
-		entityManager.getTransaction().begin();
-		Sensor mSensor = entityManager.merge(sensor);
-		entityManager.getTransaction().commit();
-
-		ISensor sSensor = null; //loadSensorEntity(mSensor);
-		return createConverter(sSensor);
-		*/
+		return inputStream;
 	}
-	
+
+	@Override
+	public InputStream createInputs(ISensor sensor) {
+		return createInput(sensor, 0);
+	}
+
 	/**
 	 * Service bindings and unbindings
 	 */

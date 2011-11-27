@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  de.lmu.ifi.dbs.knowing.core;visibility:=reexport,
  de.lmu.ifi.dbs.medmon.derby;bundle-version="1.0.0";visibility:=reexport,
  javax.persistence;bundle-version="2.0.3"
-Service-Component: OSGI-INF/sensorService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml
+Service-Component: OSGI-INF/sensorManagerService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.persistence.config;version="2.3.0",

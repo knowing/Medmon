@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="de.lmu.ifi.dbs.medmon.medic.core.SensorService">
-   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.SensorService"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="de.lmu.ifi.dbs.medmon.medic.core.SensorManagerService">
+   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.SensorManagerService"/>
    <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="static" unbind="unbindEntityManagerService"/>
    <reference bind="bindSensorObserver" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver" name="ISensorObserver" policy="dynamic" unbind="unbindSensorObserver"/>
    <reference bind="bindSensor" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.sensor.core.ISensor" name="ISensor" policy="dynamic" unbind="unbindSensor"/>
    <service>
-      <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService"/>
+      <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService"/>
    </service>
 </scr:component>

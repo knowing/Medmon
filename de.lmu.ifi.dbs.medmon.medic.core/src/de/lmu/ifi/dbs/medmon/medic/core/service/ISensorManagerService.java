@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
+import java.io.InputStream;
+import java.net.URI;
+
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -17,7 +20,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
  * @since 2011-11-15
  *
  */
-public interface ISensorService {
+public interface ISensorManagerService {
 
 	/**
 	 * returns all registered ISensor services
@@ -41,17 +44,49 @@ public interface ISensorService {
 	public Sensor loadSensorEntity(ISensor sensor);
 	
 	/**
+	 * return the SensorService belonging to the entity
+	 * @param sensor
+	 * @return
+	 */
+	public ISensor loadSensorService(Sensor sensor);
+	
+	/**
 	 * creates a IConverter for the passed sensor service.
 	 * @param sensor
 	 * @return
 	 */
-	public IConverter createConverter(ISensor sensor);
 	
+	public IConverter createConverter(ISensor sensor);
+		
 	/**
-	 * creates a IConverter to read the data of the sensor represented by the passed sensor database object.
+	 * This method is used to copy from a sensor to another location.
+	 * of _ISensor_ as a parameter.
 	 * @param sensor
 	 * @return
 	 */
-	public IConverter createConverter(Sensor sensor);
+	//public InputStream createInputStream(ISensor sensor);
 	
+	/**
+	 * This method is used if a sensor has more than one inputStream (serveral files, a folder of raw data, etc).
+	 *  The array contains an URL to every resource that is a valid sensor data.
+	 * @return
+	 */
+	public URI[] availableInputs(ISensor sensor);
+		
+	/**
+	 * Create an InputStream/IConverter based on the index of the array created by _availableInputs_. 
+	 * @param sensor
+	 * @param inputIndex
+	 * @return
+	 */
+	public InputStream createInput(ISensor sensor, int inputIndex);
+	
+
+	/**
+	 * Create InputStreams/IConverters for all valid resources at the sensor location.
+	 * @param sensor
+	 * @return
+	 */
+	public InputStream createInputs(ISensor sensor);
+
 }

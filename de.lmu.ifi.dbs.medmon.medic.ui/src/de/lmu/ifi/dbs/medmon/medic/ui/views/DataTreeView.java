@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.widgets.SensorSourceWidget;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import org.eclipse.swt.widgets.Label;
 
 public class DataTreeView extends ViewPart implements PropertyChangeListener, IPropertyChangeListener {
 

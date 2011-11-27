@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -23,22 +24,19 @@ public class DeletePatientHandler extends AbstractHandler {
 
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selection = selectionProvider.getSelection(Patient.class);
-
+		Shell shell = HandlerUtil.getActiveWorkbenchWindow(event).getShell();
+		
 		if (selection == null) {
-			MessageBox messageBox = new MessageBox(new Shell(), SWT.ICON_INFORMATION | SWT.OK);
-			messageBox.setText("Information");
-			messageBox.setMessage("Bitte wählen sie zuerst einen Patienten aus!");
-			messageBox.open();
-
+			
+			MessageDialog.openInformation(shell, "Information", "Bitte wählen sie zuerst einen Patienten aus!");
+			
 			selection = DialogFactory.openPatientSelectionDialog(HandlerUtil.getActiveShell(event));
 
 			if (selection != null) {
-				messageBox = new MessageBox(new Shell(), SWT.ICON_WARNING | SWT.YES | SWT.NO);
-				messageBox.setText("Patienten löschen?");
-				messageBox.setMessage("Sind sie sicher, dass sie den ausgewählten Patienten löschen wollen ?!");
-				int option = messageBox.open();
+							
+				boolean option = MessageDialog.openConfirm(shell, "Patienten löschen?", "Sind sie sicher, dass sie den ausgewählten Patienten löschen wollen ?!");
 
-				if (option == SWT.YES) {
+				if (option) {
 					try {
 						Activator.getPatientService().deletePatient(selection);
 					} catch (IOException e) {
@@ -48,12 +46,9 @@ public class DeletePatientHandler extends AbstractHandler {
 			}
 
 		} else {
-			MessageBox messageBox = new MessageBox(new Shell(), SWT.ICON_WARNING | SWT.YES | SWT.NO);
-			messageBox.setText("Patienten löschen?");
-			messageBox.setMessage("Sind sie sicher, dass sie den ausgewählten Patienten löschen wollen ?!");
-			int option = messageBox.open();
+			boolean option = MessageDialog.openConfirm(shell, "Patienten löschen?", "Sind sie sicher, dass sie den ausgewählten Patienten löschen wollen ?!");
 
-			if (option == SWT.YES) {
+			if (option) {
 				try {
 					Activator.getPatientService().deletePatient(selection);
 					selectionProvider.setSelection(Patient.class, null);

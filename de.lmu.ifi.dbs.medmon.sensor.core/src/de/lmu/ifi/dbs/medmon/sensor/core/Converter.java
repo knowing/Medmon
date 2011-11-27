@@ -16,9 +16,4 @@ public abstract class Converter implements IConverter {
 		this.input = input;
 	}
 
-	@Override
-	public InputStream getInputStream() {
-		return input;
-	}
-
 }

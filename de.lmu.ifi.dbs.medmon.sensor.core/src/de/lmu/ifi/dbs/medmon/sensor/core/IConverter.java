@@ -40,9 +40,4 @@ public interface IConverter {
 	 */
 	public Interval getInterval() throws IOException;
 	
-	/**
-	 * get the input stream
-	 */
-	public InputStream getInputStream();
-	
 }

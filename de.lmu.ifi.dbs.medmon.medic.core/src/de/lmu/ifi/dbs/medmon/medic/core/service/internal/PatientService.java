@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -52,7 +52,7 @@ public class PatientService implements IPatientService {
 	private final DateFormat		dateF					= DateFormat.getDateInstance(DateFormat.SHORT);
 
 	private IEntityManagerService	entityManagerService	= null;
-	private ISensorService			sensorService			= null;
+	private ISensorManagerService	sensorManagerService	= null;
 
 	@Override
 	public Path locateDirectory(Patient p, String type) {
@@ -187,7 +187,7 @@ public class PatientService implements IPatientService {
 		if (converter == null)
 			return;
 
-		Sensor entity = sensorService.loadSensorEntity(s);
+		Sensor entity = sensorManagerService.loadSensorEntity(s);
 		OutputStream os = null;
 		try {
 			os = store(p, entity, type, converter.getInterval().getStart().toDate(), converter.getInterval().getEnd().toDate());
@@ -198,7 +198,9 @@ public class PatientService implements IPatientService {
 		if (os == null)
 			return;
 
-		InputStream is = converter.getInputStream();
+		// TODO XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+		// InputStream is = converter.getInputStream();
+		InputStream is = null;
 
 		byte[] buffer = new byte[4096];
 		int bytesRead = 0;
@@ -315,12 +317,12 @@ public class PatientService implements IPatientService {
 		entityManagerService = null;
 	}
 
-	protected void bindSensorService(ISensorService service) {
-		sensorService = service;
+	protected void bindSensorService(ISensorManagerService service) {
+		sensorManagerService = service;
 	}
 
-	protected void unbindSensorService(ISensorService service) {
-		sensorService = null;
+	protected void unbindSensorService(ISensorManagerService service) {
+		sensorManagerService = null;
 	}
 
 }

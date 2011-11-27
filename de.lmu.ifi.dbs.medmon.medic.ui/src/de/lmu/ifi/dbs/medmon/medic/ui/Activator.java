@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 /**
@@ -29,7 +29,7 @@ public class Activator extends AbstractUIPlugin {
 
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
-	private static ServiceTracker<ISensorService, ISensorService> sensorServiceTracker;
+	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
@@ -52,7 +52,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		sensorServiceTracker = new ServiceTracker<ISensorService, ISensorService>(context, ISensorService.class, null);
+		sensorServiceTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
 		sensorServiceTracker.open();
 		
 		patientServiceTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
@@ -99,7 +99,7 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	public static ISensorService getSensorService() {
+	public static ISensorManagerService getSensorService() {
 		return sensorServiceTracker.getService();
 	}
 
