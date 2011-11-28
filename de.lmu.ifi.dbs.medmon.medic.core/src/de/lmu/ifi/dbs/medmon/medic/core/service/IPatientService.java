@@ -137,7 +137,8 @@ public interface IPatientService {
 	 * @param patient - the patient to which the data belongs
 	 * @param sensorService - a sensor-service
 	 * @param type - the type of the data to be stored
+	 * @throws IOException 
 	 */
-	public void store(Patient patient, ISensor sensorService, String type);
+	public void store(Patient patient, ISensor sensorService, String type) throws IOException;
 
 }
