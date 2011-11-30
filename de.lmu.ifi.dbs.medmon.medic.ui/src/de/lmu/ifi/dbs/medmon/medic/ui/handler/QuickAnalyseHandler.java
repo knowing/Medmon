@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.QuickAnalyseWizard;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
 
 public class QuickAnalyseHandler extends AbstractHandler {
 
@@ -14,7 +14,7 @@ public class QuickAnalyseHandler extends AbstractHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		QuickAnalyseWizard wizard = new QuickAnalyseWizard();
+		TherapyResultWizard wizard = new TherapyResultWizard();
 		WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 		dialog.open();
 		return null;

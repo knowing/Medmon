@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 	private FormToolkit					toolkit;
-	private Calendar					calendar	= Calendar.getInstance();
 	private IGlobalSelectionProvider	selectionProvider;
 	private TreeViewer					therapiesViewer;
 	private EntityManager				entityManager;

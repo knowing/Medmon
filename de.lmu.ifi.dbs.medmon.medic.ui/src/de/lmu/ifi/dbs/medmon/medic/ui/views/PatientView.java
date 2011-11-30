@@ -98,6 +98,7 @@ public class PatientView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		entityManager = JPAUtil.createEntityManager();
+		dataset = new TaskSeriesCollection();
 
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
@@ -322,7 +323,7 @@ public class PatientView extends ViewPart {
 		/************************************************************
 		 * Listener END
 		 ************************************************************/
-		
+
 		/*
 		 * dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT); data =
 		 * new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -371,7 +372,7 @@ public class PatientView extends ViewPart {
 		toolkit.paintBordersFor(formData);
 		formData.setText("Daten");
 		formData.getBody().setLayout(new GridLayout(1, false));
-		
+
 		/*
 		 * create the chart
 		 */

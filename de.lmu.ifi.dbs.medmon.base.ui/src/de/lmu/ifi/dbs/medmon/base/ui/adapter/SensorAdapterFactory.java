@@ -14,13 +14,10 @@ public class SensorAdapterFactory implements IAdapterFactory {
 	
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		log.debug("if(!(adaptableObject instanceof SensorAdapter))");
-		log.debug("    return null;");
-		
 		if(adapterType.equals(IWorkbenchColumnAdapter.class)) 
-			return new SensorColumnAdapter();
+			return new SensorWorkbenchAdapter();
 		else if(adapterType.equals(IWorkbenchAdapter.class)) 
-			return new SensorColumnAdapter();
+			return new SensorWorkbenchAdapter();
 		
 		return null;
 	}

@@ -71,7 +71,7 @@ public class SensorManagerService implements ISensorManagerService {
 		if (sensorService == null)
 			return null;
 
-		InputStream inputStream = createInput(sensorService, 0);
+		InputStream inputStream = createInputs(sensorService);
 
 		if (inputStream == null)
 			return null;
@@ -102,15 +102,9 @@ public class SensorManagerService implements ISensorManagerService {
 	}
 
 	@Override
-	public InputStream createInput(ISensor sensor, int inputIndex) {
-		URI[] availableURL = availableInputs(sensor);
-
-		if (availableURL.length == 0)
-			return null;
-
+	public InputStream createInput(ISensor sensor, URI uri) {
 		InputStream inputStream;
-
-		try (InputStream newInputStream = new FileInputStream(new File(availableURL[inputIndex]))) {
+		try (InputStream newInputStream = new FileInputStream(new File(uri))) {
 			inputStream = newInputStream;
 		} catch (Exception e) {
 			log.error("createInput() -> couldn't create InputStream");
@@ -131,7 +125,10 @@ public class SensorManagerService implements ISensorManagerService {
 
 	@Override
 	public InputStream createInputs(ISensor sensor) {
-		return createInput(sensor, 0);
+		URI[] availableURIs = availableInputs(sensor);
+		if(availableURIs.length == 0)
+			return null;
+		return createInput(sensor, availableURIs[0]);
 	}
 
 	/**
@@ -140,6 +137,22 @@ public class SensorManagerService implements ISensorManagerService {
 	protected void bindSensor(ISensor service) {
 		sensorList.add(service);
 		sensorMap.put(service.getId(), service);
+
+		if (loadSensorEntity(service) == null) {
+			EntityManager entityManager = entityManagerService.getEntityManager();
+
+			Sensor mSensor = new Sensor(service.getName(), service.getId(), service.getVersion());
+			mSensor.setDefaultpath(System.getProperty("user.home"));
+			mSensor.setFilePrefix(service.getFilePrefix());
+
+			entityManager.getTransaction().begin();
+			entityManager.persist(mSensor);
+			entityManager.getTransaction().commit();
+			entityManager.detach(mSensor);
+			
+			log.info("Sensor " + service.getName() + " " + service.getVersion() + " registered and DB entry created");
+		}
+
 		for (ISensorObserver observer : observers) {
 			observer.sensorAdded(service);
 		}

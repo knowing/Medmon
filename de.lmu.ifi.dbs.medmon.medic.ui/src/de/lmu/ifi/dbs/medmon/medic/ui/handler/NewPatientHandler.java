@@ -16,7 +16,7 @@ public class NewPatientHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {		
 		CreatePatientWizard wizard = new CreatePatientWizard();
 		WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
-		dialog.open();
+		dialog.open();		
 		return null;
 	}
 

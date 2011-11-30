@@ -12,6 +12,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
@@ -29,6 +30,7 @@ public class Activator extends AbstractUIPlugin {
 
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
+	private static ServiceTracker<IEntityManagerService, IEntityManagerService> entityServiceTracker;
 	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	
@@ -57,6 +59,10 @@ public class Activator extends AbstractUIPlugin {
 		
 		patientServiceTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
 		patientServiceTracker.open();
+		
+		entityServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
+		entityServiceTracker.open();
+		
 	}
 
 	/*
@@ -105,5 +111,9 @@ public class Activator extends AbstractUIPlugin {
 
 	public static IPatientService getPatientService() {
 		return patientServiceTracker.getService();
+	}
+	
+	public static IEntityManagerService getEntityManagerService() {
+		return entityServiceTracker.getService();
 	}
 }

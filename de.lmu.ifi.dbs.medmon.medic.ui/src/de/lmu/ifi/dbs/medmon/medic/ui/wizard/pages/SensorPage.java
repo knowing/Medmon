@@ -32,16 +32,16 @@ import de.lmu.ifi.dbs.medmon.medic.ui.provider.TextContentAdapter2;
 
 public class SensorPage extends WizardPage {
 
-	private Button bPatient;
-	private Text tPatient;
-	private TableViewer sensorViewer;
+	private Button					bPatient;
+	private Text					tPatient;
+	private TableViewer				sensorViewer;
 
-	private IStructuredSelection initialSelection;
-	private String initialPatient;
+	private IStructuredSelection	initialSelection;
+	private String					initialPatient;
 
-	private boolean flip = false;
-	
-	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private boolean					flip	= false;
+
+	private static final Logger		log		= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	/**
 	 * Create the wizard.
@@ -51,17 +51,16 @@ public class SensorPage extends WizardPage {
 		setTitle("Daten");
 		setDescription("Daten auswaehlen");
 	}
-	
-/*
-	public SensorPage(Patient patient, Object sensor) {
-		log.debug("SensorPage::SensorPage()");
-		
-		this();
-		initialPatient = PatientProposalProvider.parseString(patient);
-		initialSelection = new StructuredSelection(sensor);
-		
-	}
-*/
+
+	/*
+	 * public SensorPage(Patient patient, Object sensor) {
+	 * log.debug("SensorPage::SensorPage()");
+	 * 
+	 * this(); initialPatient = PatientProposalProvider.parseString(patient);
+	 * initialSelection = new StructuredSelection(sensor);
+	 * 
+	 * }
+	 */
 	/**
 	 * Create contents of the wizard.
 	 * 
@@ -86,7 +85,7 @@ public class SensorPage extends WizardPage {
 		bPatient.setText("Patient auswaehlen");
 		bPatient.addListener(SWT.Selection, controller);
 
-		sensorViewer = new SensorTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION, initialSelection);
+		sensorViewer = new SensorTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		Table table = sensorViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		table.addListener(SWT.Selection, controller);
@@ -102,8 +101,7 @@ public class SensorPage extends WizardPage {
 	private void createContentAssistent(Text text) {
 		ControlDecoration deco = new ControlDecoration(text, SWT.LEFT);
 		deco.setDescriptionText("Use CNTL + SPACE to see possible values");
-		deco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
-				.getImage());
+		deco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage());
 		deco.setShowOnlyOnFocus(false);
 		// Help the user with the possible inputs
 		// "." and "#" will also activate the content proposals
@@ -113,44 +111,34 @@ public class SensorPage extends WizardPage {
 			//
 			keyStroke = KeyStroke.getInstance("Ctrl+Space");
 			// assume that myTextControl has already been created in some way
-			ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter2(),
-					new PatientProposalProvider(), keyStroke, autoActivationCharacters);
+			ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter2(), new PatientProposalProvider(),
+					keyStroke, autoActivationCharacters);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*public ISensorDataContainer importData() {
-		// Use Sample begin and end
-		try {
-			getContainer().run(false, false, new IRunnableWithProgress() {
-
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					monitor.beginTask("Daten laden", 0);
-					try {
-						data = getSensor().getData();
-					} catch (IOException e) {
-						e.printStackTrace();
-						MessageDialog.openError(getShell(), "Fehler beim Import", e.getMessage());
-					}
-				}
-			});
-
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return data;
-	}*/
+	/*
+	 * public ISensorDataContainer importData() { // Use Sample begin and end
+	 * try { getContainer().run(false, false, new IRunnableWithProgress() {
+	 * 
+	 * @Override public void run(IProgressMonitor monitor) throws
+	 * InvocationTargetException, InterruptedException {
+	 * monitor.beginTask("Daten laden", 0); try { data = getSensor().getData();
+	 * } catch (IOException e) { e.printStackTrace();
+	 * MessageDialog.openError(getShell(), "Fehler beim Import",
+	 * e.getMessage()); } } });
+	 * 
+	 * } catch (InvocationTargetException e) { e.printStackTrace(); } catch
+	 * (InterruptedException e) { e.printStackTrace(); } return data; }
+	 */
 
 	private void done() {
 		log.debug("SensorPage::done()");
 		/*
-		flip = (getPatient() != null) && (getSensor() != null);
-		setPageComplete(flip);
-		*/
+		 * flip = (getPatient() != null) && (getSensor() != null);
+		 * setPageComplete(flip);
+		 */
 	}
 
 	public Patient getPatient() {
@@ -160,11 +148,10 @@ public class SensorPage extends WizardPage {
 	public Object getSensor() {
 		log.debug("SensorPage::getSensor()");
 		/*
-		IStructuredSelection selection = (IStructuredSelection) sensorViewer.getSelection();
-		if (selection.isEmpty())
-			return null;
-		return (SensorAdapter) selection.getFirstElement();
-		*/
+		 * IStructuredSelection selection = (IStructuredSelection)
+		 * sensorViewer.getSelection(); if (selection.isEmpty()) return null;
+		 * return (SensorAdapter) selection.getFirstElement();
+		 */
 		return null;
 	}
 

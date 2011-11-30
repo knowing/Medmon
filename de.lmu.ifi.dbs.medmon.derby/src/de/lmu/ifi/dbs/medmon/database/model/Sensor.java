@@ -16,45 +16,39 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SENSOR")
-@NamedQueries({
-	@NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s"),
-	@NamedQuery(name = "Sensor.findBySensorId", query = "SELECT s FROM Sensor s WHERE s.sensorId = :sensorId")
-})
+@NamedQueries({ @NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s"),
+		@NamedQuery(name = "Sensor.findBySensorId", query = "SELECT s FROM Sensor s WHERE s.sensorId = :sensorId") })
 public class Sensor {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String id;
-	
+	private String		id;
+
 	@Column(unique = true)
-	private String sensorId;
-	
+	private String		sensorId;
+
 	@Column
-	private String name;
-	
+	private String		name;
+
 	@Column
-	private String version;
-	
+	private String		version;
+
 	@Column
-	private int type;
-	
+	private String		defaultpath;
+
 	@Column
-	private String defaultpath;
-	
-	@Column
-	private String filePrefix;
-	
-	@OneToMany(mappedBy="sensor")
-	private Set<Data> data = new HashSet<Data>();
-	
+	private String		filePrefix;
+
+	@OneToMany(mappedBy = "sensor")
+	private Set<Data>	data	= new HashSet<Data>();
+
 	protected Sensor() {
 	}
-	
-	public Sensor(String name, String version, int type) {
-		this.id = parseId(name, version);
+
+	public Sensor(String name, String sensorId, String version) {
+		this.sensorId = sensorId;
 		this.name = name;
 		this.version = version;
-		this.type = type;
 	}
 
 	public String getId() {
@@ -64,7 +58,7 @@ public class Sensor {
 	public String getSensorId() {
 		return sensorId;
 	}
-	
+
 	public void setSensorId(String sensorId) {
 		this.sensorId = sensorId;
 	}
@@ -85,14 +79,6 @@ public class Sensor {
 		this.version = version;
 	}
 
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-	
 	public String getDefaultpath() {
 		return defaultpath;
 	}
@@ -108,25 +94,13 @@ public class Sensor {
 	public void setData(Set<Data> data) {
 		this.data = data;
 	}
-	
+
 	public String getFilePrefix() {
 		return filePrefix;
 	}
-	
+
 	public void setFilePrefix(String filePrefix) {
 		this.filePrefix = filePrefix;
-	}
-	
-	/**
-	 * Build an 'unique' identifier for each sensor, if the
-	 * version number is unique for each model.
-	 * 
-	 * @param name
-	 * @param version
-	 * @return name:version
-	 */
-	public static String parseId(String name, String version) {
-		return name + ":" + version;
 	}
 
 	@Override

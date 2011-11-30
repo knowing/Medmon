@@ -104,7 +104,7 @@ public class CreateTherapyResultPage extends WizardPage {
 			}
 		});
 		
-		SensorTableViewer sensorTableViewer = new SensorTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION, (IStructuredSelection) null);
+		SensorTableViewer sensorTableViewer = new SensorTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		tableData = sensorTableViewer.getTable();
 		tableData.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 4, 1));
 		tableData.setEnabled(false);

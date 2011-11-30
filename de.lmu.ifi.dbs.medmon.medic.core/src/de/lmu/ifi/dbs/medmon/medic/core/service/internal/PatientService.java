@@ -177,12 +177,16 @@ public class PatientService implements IPatientService {
 		if (directoyStream == null || !directoyStream.iterator().hasNext())
 			return;
 
+		/* FORMER:
 		IConverter converter = null;
 		try {
 			converter = s.newConverter(newInputStream(directoyStream.iterator().next()));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
+		IConverter converter = sensorManagerService.createConverter(s);
 
 		if (converter == null)
 			return;
@@ -198,9 +202,8 @@ public class PatientService implements IPatientService {
 		if (os == null)
 			return;
 
-		// TODO XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		// InputStream is = converter.getInputStream();
-		InputStream is = null;
+		// FORMER: InputStream is = converter.getInputStream();
+		InputStream is = sensorManagerService.createInputs(s);
 
 		byte[] buffer = new byte[4096];
 		int bytesRead = 0;
@@ -317,11 +320,11 @@ public class PatientService implements IPatientService {
 		entityManagerService = null;
 	}
 
-	protected void bindSensorService(ISensorManagerService service) {
+	protected void bindSensorManagerService(ISensorManagerService service) {
 		sensorManagerService = service;
 	}
 
-	protected void unbindSensorService(ISensorManagerService service) {
+	protected void unbindSensorManagerService(ISensorManagerService service) {
 		sensorManagerService = null;
 	}
 

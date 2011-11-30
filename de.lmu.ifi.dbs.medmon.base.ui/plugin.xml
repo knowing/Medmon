@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.medic.core.sensor.SensorAdapter"
+            adaptableType="de.lmu.ifi.dbs.medmon.sensor.core.ISensor"
             class="de.lmu.ifi.dbs.medmon.base.ui.adapter.SensorAdapterFactory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">

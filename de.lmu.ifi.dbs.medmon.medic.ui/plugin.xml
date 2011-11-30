@@ -389,7 +389,7 @@
       </category>
       <wizard
             category="de.lmu.ifi.dbs.medmon.medic.ui.medic"
-            class="de.lmu.ifi.dbs.medmon.medic.ui.wizard.QuickAnalyseWizard"
+            class="de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard"
             icon="icons/visualize_16.png"
             id="de.lmu.ifi.dbs.medmon.medic.ui.qickanalyseWizard"
             name="Schnellanalyse">

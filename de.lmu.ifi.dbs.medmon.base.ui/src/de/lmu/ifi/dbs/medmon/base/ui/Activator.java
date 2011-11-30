@@ -6,7 +6,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.knowing.core.service.*;
 
 /**
@@ -20,12 +20,15 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
-	private static ServiceTracker<ISensorService, ISensorService> sensorTracker;
+	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorTracker;
 	private static ServiceTracker<IEvaluateService, IEvaluateService> evaluationService;
 	private static ServiceTracker<IDPUDirectory, IDPUDirectory> dpuDirectoryTracker;
-
+	
 	private ServiceRegistration<IDPUProvider> provider;
 	
+	public static BundleContext getBundleContext(){
+		return Activator.plugin.getBundle().getBundleContext();
+	}
 	
 	/*
 	 * (non-Javadoc)
@@ -34,7 +37,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		sensorTracker = new ServiceTracker<ISensorService, ISensorService>(context, ISensorService.class, null);
+		sensorTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
 		sensorTracker.open();
 		
 		evaluationService = new ServiceTracker<IEvaluateService, IEvaluateService>(context, IEvaluateService.class, null);
@@ -79,7 +82,7 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
-	public static ISensorService getSensorService() {
+	public static ISensorManagerService getSensorManagerService() {
 		return sensorTracker.getService();
 	}
 	

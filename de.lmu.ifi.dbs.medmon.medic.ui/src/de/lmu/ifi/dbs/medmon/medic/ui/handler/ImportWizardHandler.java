@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizard;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportDataWizard;
 
 public class ImportWizardHandler extends AbstractHandler {
 	
@@ -14,11 +14,10 @@ public class ImportWizardHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		ImportWizard wizard = new ImportWizard();
+		ImportDataWizard wizard = new ImportDataWizard();
 		WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 		dialog.open();
-
 		return null;
 	}
-
+	
 }

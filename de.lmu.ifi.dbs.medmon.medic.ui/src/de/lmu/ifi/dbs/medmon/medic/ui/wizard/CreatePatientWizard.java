@@ -15,6 +15,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.CreatePatientPage;
@@ -22,19 +24,18 @@ import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.CreatePatientPage;
 public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IExecutableExtension {
 
 	/* Pages */
-	private CreatePatientPage patientpage;
-		
-	private String finalPerspectiveId;
+	private CreatePatientPage	patientpage;
+
+	private String				finalPerspectiveId;
 
 	public CreatePatientWizard() {
-		setWindowTitle("Patient erstellen");		
+		setWindowTitle("Patient erstellen");
 	}
 
 	@Override
 	public void addPages() {
 		addPage(patientpage = new CreatePatientPage());
 	}
-	
 
 	@Override
 	public boolean performFinish() {
@@ -45,15 +46,19 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 			e1.printStackTrace();
 			return false;
 		}
-		
+
 		EntityManager entityManager = JPAUtil.createEntityManager();
 		entityManager.getTransaction().begin();
 		patient = entityManager.merge(patient);
 		patientpage.initializePatient(patient);
 		entityManager.getTransaction().commit();
 		entityManager.detach(patient);
-			
-		if(finalPerspectiveId != null && !finalPerspectiveId.isEmpty()) {
+
+		IGlobalSelectionProvider SelectionProvider  = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+		SelectionProvider.setSelection(Patient.class, patient);
+		SelectionProvider.unregister();
+
+		if (finalPerspectiveId != null && !finalPerspectiveId.isEmpty()) {
 			try {
 				PlatformUI.getWorkbench().showPerspective(finalPerspectiveId, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
 			} catch (WorkbenchException e) {
@@ -62,15 +67,14 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 
 	}
 
 	@Override
-	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-			throws CoreException {
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 		finalPerspectiveId = config.getAttribute("finalPerspective"); //$NON-NLS-1$		
 	}
 

@@ -79,7 +79,7 @@ public interface ISensorManagerService {
 	 * @param inputIndex
 	 * @return
 	 */
-	public InputStream createInput(ISensor sensor, int inputIndex);
+	public InputStream createInput(ISensor sensor, URI uri);
 	
 
 	/**

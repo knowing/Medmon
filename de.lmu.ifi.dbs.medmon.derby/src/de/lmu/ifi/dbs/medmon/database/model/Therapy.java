@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "THERAPY")
+@NamedQueries( {@NamedQuery(name = "Therapy.findByPatientId", query = "SELECT t FROM Therapy t WHERE t.patient = :patientId") })
 public class Therapy implements Serializable {
 	private static final long serialVersionUID = 1L;
 

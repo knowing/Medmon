@@ -1,69 +1,103 @@
 package de.lmu.ifi.dbs.medmon.base.ui.viewer;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
-import de.lmu.ifi.dbs.medmon.base.ui.viewer.editing.SensorPathEditingSupport;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorService;
+import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
-public class SensorTableViewer extends TableViewer implements PropertyChangeListener {
+public class SensorTableViewer extends TableViewer {
 
-	private static final String[] columns = new String[] { "Name", "Version", "Typ", "Pfad", "Status" };
-	private static final int[] width = new int[] { 120, 70, 60, 150, 80 };
-	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	
+	private static final Logger						log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private ServiceRegistration<ISensorObserver>	serviceRegistration;
+	Menu											popUpMenu;
+	Shell											shell;
+	List<ISensor>									localSensorList = new LinkedList<ISensor>();
+
 	public SensorTableViewer(Composite parent, int style) {
 		super(parent, style);
-		init();
-	}
-
-	public SensorTableViewer(Composite parent, int style, IStructuredSelection initialSelection) {
-		super(parent, style);
-		init();
-		if (initialSelection != null && !initialSelection.isEmpty())
-			setSelection(initialSelection);
-	}
-
-	public SensorTableViewer(Table table) {
-		super(table);
+		shell = getTable().getShell();
 		init();
 	}
 
 	private void init() {
+		initMenu();
 		initColumns();
 		initProvider();
 		initInput();
 	}
 
+	public void initMenu() {
+		popUpMenu = new Menu(shell, SWT.POP_UP);
+		MenuItem itemSetDefaultPath = new MenuItem(popUpMenu, SWT.PUSH);
+		itemSetDefaultPath.setText("setze Standard-Pfad");
+		itemSetDefaultPath.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent event) {
+				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+				ISensor selection = selectionProvider.getSelection(ISensor.class);
+				selectionProvider.unregister();
+
+				if (selection == null)
+					return;
+
+				DirectoryDialog dlg = new DirectoryDialog(shell);
+				dlg.setText("Standard-Pfad");
+				dlg.setMessage("wählen sie den neuen Standard-Pfad für diesen Sensor aus!");
+				String dir = dlg.open();
+				if (dir != null) {
+					Sensor entity = Activator.getSensorManagerService().loadSensorEntity(selection);
+					if (entity == null)
+						return;
+					entity.setDefaultpath(dir);
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
+
+		MenuItem itemImport = new MenuItem(popUpMenu, SWT.PUSH);
+		itemImport.setText("importieren");
+
+		getTable().setMenu(popUpMenu);
+	}
+
 	private void initColumns() {
 		getTable().setHeaderVisible(true);
 		getTable().setLinesVisible(true);
-		for (int i = 0; i < columns.length; i++) {
-			TableViewerColumn viewerColumn = new TableViewerColumn(this, SWT.LEAD);
-			// Kopfzeile und Breite der jeweiligen Spalten festlegen
-			viewerColumn.getColumn().setText(columns[i]);
-			viewerColumn.getColumn().setWidth(width[i]);
-			// Spaltengroesse laesst sich zur Laufzeit aendern
-			viewerColumn.getColumn().setResizable(true);
-			// Spalten lassen sich untereinander verschieben
-			viewerColumn.getColumn().setMoveable(true);
-			if (i == 3) {
-				viewerColumn.setEditingSupport(new SensorPathEditingSupport(this));
-			}
-		}
+
+		TableViewerColumn viewerColumnName = new TableViewerColumn(this, SWT.LEAD);
+		viewerColumnName.getColumn().setText("Name");
+		viewerColumnName.getColumn().setWidth(150);
+		viewerColumnName.getColumn().setResizable(true);
+		viewerColumnName.getColumn().setMoveable(true);
+		TableViewerColumn viewerColumnVersion = new TableViewerColumn(this, SWT.LEAD);
+		viewerColumnVersion.getColumn().setText("Version");
+		viewerColumnVersion.getColumn().setWidth(150);
+		viewerColumnVersion.getColumn().setResizable(true);
+		viewerColumnVersion.getColumn().setMoveable(true);
 	}
 
 	private void initProvider() {
@@ -72,26 +106,35 @@ public class SensorTableViewer extends TableViewer implements PropertyChangeList
 	}
 
 	private void initInput() {
-		log.debug("SensorTableViewer::initInput()");
-		/*
-		ISensorService sensorService = Activator.getSensorService();
-		if(sensorService == null)
-			return;
-		sensorService.addPropertyChangeListener(this);
-		setInput(sensorService.getSensorAdapters().values());
-		*/
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		Display.getDefault().asyncExec(new Runnable() {
+		ISensorObserver sensorObserver = new ISensorObserver() {
+			@Override
+			public void init(List<ISensor> sensors) {
+				localSensorList = new LinkedList<ISensor>(sensors);
+				setInput(localSensorList);
+			}
 
 			@Override
-			public void run() {
-				if (!getTable().isDisposed())
-					refresh();
+			public void sensorAdded(ISensor service) {
+				localSensorList.add(service);
+				refresh();
 			}
-		});
+
+			@Override
+			public void sensorRemoved(ISensor service) {
+				localSensorList.remove(service);
+				refresh();
+			}
+
+			@Override
+			public void sensorUpdated(ISensor service) {
+				refresh();
+			}
+		};
+		serviceRegistration = Activator.getBundleContext().registerService(ISensorObserver.class, sensorObserver, null);
+	}
+
+	public void dispose() {
+		serviceRegistration.unregister();
 	}
 
 }
