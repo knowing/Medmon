@@ -3,8 +3,14 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -41,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
@@ -98,7 +105,6 @@ public class PatientView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		entityManager = JPAUtil.createEntityManager();
-		dataset = new TaskSeriesCollection();
 
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
@@ -239,6 +245,7 @@ public class PatientView extends ViewPart {
 		 ************************************************************/
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void selectionChanged(Patient selection) {
 
@@ -274,18 +281,29 @@ public class PatientView extends ViewPart {
 					Patient mPatient = entityManager.merge(selection);
 					entityManager.getTransaction().commit();
 
-					final TaskSeries series = new TaskSeries("");
+					TaskSeries series = new TaskSeries(new String());
 
-					// should look up therapy start and end
-					Task mainTask = new Task("", new Date(2000, 1, 1), new Date(2000, 1, 10));
+					Query leftBoundsQuery = entityManager.createNamedQuery("Data.findEarliestOfPatient");
+					Query rightBoundsQuery = entityManager.createNamedQuery("Data.findLatestOfPatient");
+					Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
+							.getResultList().get(0);
+					Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
+							.getResultList().get(0);
+					
+					Query allSensorsQuery = entityManager.createNamedQuery("Sensor.findByPatient");
+					List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
+							.getResultList();
 
-					for (Data data : selection.getData()) {
-						mainTask.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+					for (Sensor sensor : allSensors) {
+						Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
+						Query dataFromSensorQuery = entityManager.createNamedQuery("Data.findByPatientAndSensor");
+						List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient).setParameter("sensor", sensor)
+								.getResultList();
+						for(Data data : dataFromSensor){
+							task.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+						}
+						series.add(task);
 					}
-
-					mainTask.addSubtask(new Task("test1", new Date(2000, 1, 1), new Date(2000, 1, 2)));
-					mainTask.addSubtask(new Task("test2", new Date(2000, 1, 3), new Date(2000, 1, 5)));
-					series.add(mainTask);
 
 					dataset.removeAll();
 					dataset.add(series);
@@ -376,8 +394,8 @@ public class PatientView extends ViewPart {
 		/*
 		 * create the chart
 		 */
-		final TaskSeriesCollection dataset = new TaskSeriesCollection();
-		final JFreeChart chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
+		dataset = new TaskSeriesCollection();
+		chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
 
 		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));

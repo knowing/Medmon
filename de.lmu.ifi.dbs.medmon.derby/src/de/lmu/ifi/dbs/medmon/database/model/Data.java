@@ -16,63 +16,64 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-
 /**
  * The persistent class for the DATA database table.
  * 
  */
 @Entity
-@Table(name="DATA")
+@Table(name = "DATA")
 @NamedQueries({
-    @NamedQuery(name = "Data.findAll", query = "SELECT d FROM Data d"),
-    @NamedQuery(name = "Data.findByPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient"),
-    @NamedQuery(name = "Data.findByPatientAndDate", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from = :from AND d.to = :to"),
-    @NamedQuery(name = "Data.findByPatientAndAfterTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to < :date"),
-    @NamedQuery(name = "Data.findByPatientAndBeforeTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to > :date"),
-    @NamedQuery(name = "Data.findByPatientAndAfterFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from < :date"),
-    @NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date"),
-    @NamedQuery(name = "Data.findByPatientAndSensor", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.sensor = :sensor")})
+		@NamedQuery(name = "Data.findAll", query = "SELECT d FROM Data d"),
+		@NamedQuery(name = "Data.findByPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient"),
+		@NamedQuery(name = "Data.findByPatientAndDate", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from = :from AND d.to = :to"),
+		@NamedQuery(name = "Data.findByPatientAndAfterTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to < :date"),
+		@NamedQuery(name = "Data.findByPatientAndBeforeTo", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.to > :date"),
+		@NamedQuery(name = "Data.findByPatientAndAfterFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from < :date"),
+		@NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date"),
+		@NamedQuery(name = "Data.findByPatientAndSensor", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.sensor = :sensor"),
+		@NamedQuery(name = "Data.findEarliestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.from < d.from))"),
+		@NamedQuery(name = "Data.findLatestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.to > d.to))")})
 public class Data implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long	serialVersionUID	= 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private int					id;
 
-	@Column(name = "BEGIN_DATE", nullable=false, updatable = false)
+	@Column(name = "BEGIN_DATE", nullable = false, updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date from;
-	
-	@Column(name = "END_DATE", nullable=false, updatable = false)
+	private Date				from;
+
+	@Column(name = "END_DATE", nullable = false, updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date to;
-	
+	private Date				to;
+
 	@Column(name = "FILE")
-	private String file;
-	
+	private String				file;
+
 	@Column
-	//private String originalFile;
-	private String type;
-	
+	// private String originalFile;
+	private String				type;
+
 	@ManyToOne
-	@JoinColumn(name="SENSOR_ID", nullable=false)
-	private Sensor sensor;
+	@JoinColumn(name = "SENSOR_ID", nullable = false)
+	private Sensor				sensor;
 
-	//bi-directional many-to-one association to Comment
-    @ManyToOne
-    @JoinColumn(name="ARCHIV_ID")
-	private Archiv archiv;
+	// bi-directional many-to-one association to Comment
+	@ManyToOne
+	@JoinColumn(name = "ARCHIV_ID")
+	private Archiv				archiv;
 
-	//bi-directional many-to-one association to Patient
-    //
-    @ManyToOne
-	@JoinColumn(name="PATIENT_ID", nullable=false, updatable=false)
-	private Patient patient;
+	// bi-directional many-to-one association to Patient
+	//
+	@ManyToOne
+	@JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false)
+	private Patient				patient;
 
-    public Data() {  }
-    
+	public Data() {
+	}
 
-	public Data(Patient patient,Sensor sensor, String type, Date from, Date to ) {
+	public Data(Patient patient, Sensor sensor, String type, Date from, Date to) {
 		this.from = from;
 		this.to = to;
 		this.type = type;
@@ -87,7 +88,7 @@ public class Data implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
-		
+
 	public Date getFrom() {
 		return from;
 	}
@@ -103,31 +104,31 @@ public class Data implements Serializable {
 	public void setTo(Date to) {
 		this.to = to;
 	}
-	
+
 	public String getFile() {
 		return file;
 	}
-	
+
 	public void setFile(String file) {
 		this.file = file;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public Archiv getArchiv() {
 		return archiv;
 	}
-	
+
 	public void setArchiv(Archiv archiv) {
 		this.archiv = archiv;
 	}
-	
+
 	public Patient getPatient() {
 		return this.patient;
 	}
@@ -135,11 +136,11 @@ public class Data implements Serializable {
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
-	
+
 	public Sensor getSensor() {
 		return sensor;
 	}
-	
+
 	public void setSensor(Sensor sensor) {
 		this.sensor = sensor;
 	}

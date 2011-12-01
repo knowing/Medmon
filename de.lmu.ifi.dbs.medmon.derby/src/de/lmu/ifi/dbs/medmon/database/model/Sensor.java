@@ -16,8 +16,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SENSOR")
-@NamedQueries({ @NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s"),
-		@NamedQuery(name = "Sensor.findBySensorId", query = "SELECT s FROM Sensor s WHERE s.sensorId = :sensorId") })
+@NamedQueries({
+		@NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s"),
+		@NamedQuery(name = "Sensor.findBySensorId", query = "SELECT s FROM Sensor s WHERE s.sensorId = :sensorId"),
+		@NamedQuery(name = "Sensor.findByPatient", query = "SELECT s FROM Sensor s WHERE EXISTS( SELECT d FROM Data d WHERE d.sensor = s AND d.patient = :patient)") })
 public class Sensor {
 
 	@Id
