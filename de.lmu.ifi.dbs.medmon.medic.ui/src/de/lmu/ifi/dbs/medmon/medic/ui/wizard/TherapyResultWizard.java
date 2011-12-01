@@ -53,6 +53,7 @@ public class TherapyResultWizard extends Wizard{
 		addPage(selectDataPage);
 	}
 	
+	/*
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		System.out.println("hjhjhj");
@@ -66,7 +67,7 @@ public class TherapyResultWizard extends Wizard{
 			return null;
 		
 		return null;
-	}
+	}*/
 
 	@Override
 	public boolean performFinish() {

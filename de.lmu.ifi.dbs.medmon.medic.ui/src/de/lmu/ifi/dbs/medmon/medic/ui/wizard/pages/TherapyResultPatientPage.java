@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.Group;
 
 import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
 
 public class TherapyResultPatientPage extends WizardPage {
@@ -43,6 +46,12 @@ public class TherapyResultPatientPage extends WizardPage {
 			wizard.setSelectedPatient(patient);
 			setPageComplete(true);
 		}
+	}
+
+	private void initialize() {
+		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
+		selectPatient(selectedPatient);
 	}
 
 	/**
@@ -81,5 +90,6 @@ public class TherapyResultPatientPage extends WizardPage {
 		});
 
 		selectPatient(null);
+		initialize();
 	}
 }

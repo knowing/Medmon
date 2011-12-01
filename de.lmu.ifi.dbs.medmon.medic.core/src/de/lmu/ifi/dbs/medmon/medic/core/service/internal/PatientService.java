@@ -173,7 +173,7 @@ public class PatientService implements IPatientService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		if (directoyStream == null || !directoyStream.iterator().hasNext())
 			return;
 
