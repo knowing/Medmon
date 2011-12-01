@@ -22,15 +22,15 @@ public class ImportDataWizard extends Wizard {
 
 	private Patient							selectedPatient;
 	private ISensor							selectedSensor;
-	
+
 	public void setSelectedPatient(Patient selectedPatient) {
 		this.selectedPatient = selectedPatient;
 	}
-	
+
 	public void setSelectedSensor(ISensor selectedSensor) {
 		this.selectedSensor = selectedSensor;
 	}
-	
+
 	public ImportDataWizard() {
 		setWindowTitle("New Wizard");
 	}
@@ -44,10 +44,12 @@ public class ImportDataWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
+		options = patientAndTypePage.getOption();
 		IPatientService patientService = Activator.getPatientService();
-
-		if ((options & SOURCE_SENSOR & IMPORT_RAW) != 0) {
+		if ((options & (SOURCE_SENSOR | IMPORT_RAW)) != 0) {
+			System.out.println("perform");
 			patientService.store(selectedPatient, selectedSensor, "RAW");
+			return true;
 		}
 
 		return false;

@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultPatientPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultTherapyPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
-public class TherapyResultWizard extends Wizard {
+public class TherapyResultWizard extends Wizard{
 
 	private TherapyResultPatientPage	selectPatientPage	= new TherapyResultPatientPage();
 	private TherapyResultTherapyPage	selectTherapyPage	= new TherapyResultTherapyPage();

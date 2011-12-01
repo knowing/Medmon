@@ -27,14 +27,14 @@ import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.*;
 public class ImportDataPatientAndTypePage extends WizardPage {
 	private Text	textLastname;
 	private Text	textFirstname;
-	private int		option	= 0;
+	private int		options	= 0;
 
 	private Button	btnRawData;
 	private Button	btnSensor;
 	private Button	btnFile;
-	private Button	btnTrainingData;
-	private Button	btnCSV;
-	private Button	btnARFF;
+	private Button	btnTraining;
+
+	private Patient	selectedPatient = null;
 
 	/**
 	 * Create the wizard.
@@ -46,23 +46,29 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 	}
 
 	public int getOption() {
-		return option;
+		return options;
 	}
 
 	private void refreshOption() {
-		option = NO_OPTION;
+		options = NO_OPTION;
+		
+		//Acquire Flags
 		if (btnRawData.getSelection())
-			option = option | IMPORT_RAW;
-		if (btnTrainingData.getSelection())
-			option = option | IMPORT_TRAINING;
+			options = options | IMPORT_RAW;
+		if (btnTraining.getSelection())
+			options = options | IMPORT_TRAINING;
 		if (btnSensor.getSelection())
-			option = option | SOURCE_SENSOR;
+			options = options | SOURCE_SENSOR;
 		if (btnFile.getSelection())
-			option = option | SOURCE_SENSOR;
-		if (btnCSV.getSelection())
-			option = option | TYPE_CSV;
-		if (btnARFF.getSelection())
-			option = option | TYPE_ARFF;
+			options = options | SOURCE_SENSOR;
+		if(selectedPatient != null)
+			options = options | PATIENT_SELECTED;
+		
+		//Test PageComplete Flags
+		if((options & PATIENT_SELECTED) != 0)
+			setPageComplete(true);
+		else
+			setPageComplete(false);
 	}
 
 	private void initialize() {
@@ -72,18 +78,12 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
-
-		if (selectedPatient == null) {
-			MessageDialog.openInformation(getShell(), "Information", "Bitte wählen sie zuerst einen Patienten aus!");
-			selectPatient(DialogFactory.openPatientSelectionDialog(getShell()));
-		} else {
-			selectPatient(selectedPatient);
-		}
+		selectPatient(selectedPatient);
 	}
 
 	private void selectPatient(Patient patient) {
+		selectedPatient = patient;
 		if (patient == null) {
-			setPageComplete(false);
 			textFirstname.setText("");
 			textLastname.setText("");
 		} else {
@@ -91,8 +91,8 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 			textLastname.setText(patient.getLastname());
 			ImportDataWizard wizard = (ImportDataWizard) getWizard();
 			wizard.setSelectedPatient(patient);
-			setPageComplete(true);
 		}
+		refreshOption();
 	}
 
 	/**
@@ -136,20 +136,6 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		grpDataType.setLayout(new GridLayout(1, false));
 		grpDataType.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
 
-		btnRawData = new Button(grpDataType, SWT.RADIO);
-		btnRawData.setSelection(true);
-		btnRawData.setText("Rohdaten");
-		btnRawData.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				btnSensor.setEnabled(true);
-				btnFile.setEnabled(true);
-				btnCSV.setEnabled(false);
-				btnARFF.setEnabled(false);
-				refreshOption();
-			}
-		});
-
 		Group grpSource = new Group(grpDataType, SWT.NONE);
 		grpSource.setText("Quelle:");
 		grpSource.setLayout(new GridLayout(1, false));
@@ -157,20 +143,18 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		btnSensor = new Button(grpSource, SWT.RADIO);
 		btnSensor.setSelection(true);
 		btnSensor.setText("Sensor - importiert Daten von einem angeschlossenem Sensor");
-
-		btnFile = new Button(grpSource, SWT.RADIO);
-		btnFile.setEnabled(false);
-		btnFile.setText("Datei - importiert die Daten aus einer Datei auf diesem Computer");
-
-		btnTrainingData = new Button(grpDataType, SWT.RADIO);
-		btnTrainingData.setText("Trainingsdaten");
-		btnTrainingData.addSelectionListener(new SelectionAdapter() {
+		btnSensor.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				btnSensor.setEnabled(false);
-				btnFile.setEnabled(false);
-				btnCSV.setEnabled(true);
-				btnARFF.setEnabled(true);
+				refreshOption();
+			}
+		});
+
+		btnFile = new Button(grpSource, SWT.RADIO);
+		btnFile.setText("Datei - importiert die Daten aus einer Datei auf diesem Computer");
+		btnFile.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
 				refreshOption();
 			}
 		});
@@ -179,14 +163,24 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		grpType.setText("Typ:");
 		grpType.setLayout(new GridLayout(1, false));
 
-		btnCSV = new Button(grpType, SWT.RADIO);
-		btnCSV.setEnabled(false);
-		btnCSV.setSelection(true);
-		btnCSV.setText("CSV - importiert die Daten aus einer CSV datei");
+		btnRawData = new Button(grpType, SWT.RADIO);
+		btnRawData.setSelection(true);
+		btnRawData.setText("Rohdaten");
+		btnRawData.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				refreshOption();
+			}
+		});
 
-		btnARFF = new Button(grpType, SWT.RADIO);
-		btnARFF.setEnabled(false);
-		btnARFF.setText("ARFF - importiert die Daten aus einer ARFF datei");
+		btnTraining = new Button(grpType, SWT.RADIO);
+		btnTraining.setText("Training");
+		btnTraining.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				refreshOption();
+			}
+		});
 
 		initialize();
 	}
