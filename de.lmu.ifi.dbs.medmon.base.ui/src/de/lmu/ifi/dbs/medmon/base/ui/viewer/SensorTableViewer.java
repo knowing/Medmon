@@ -3,8 +3,12 @@ package de.lmu.ifi.dbs.medmon.base.ui.viewer;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -26,15 +30,16 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class SensorTableViewer extends TableViewer {
 
-	private static final Logger						log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private static final Logger						log				= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 	private ServiceRegistration<ISensorObserver>	serviceRegistration;
 	Menu											popUpMenu;
 	Shell											shell;
-	List<ISensor>									localSensorList = new LinkedList<ISensor>();
+	List<ISensor>									localSensorList	= new LinkedList<ISensor>();
 
 	public SensorTableViewer(Composite parent, int style) {
 		super(parent, style);
@@ -70,7 +75,21 @@ public class SensorTableViewer extends TableViewer {
 					Sensor entity = Activator.getSensorManagerService().loadSensorEntity(selection);
 					if (entity == null)
 						return;
+
+					EntityManager entityManager = JPAUtil.createEntityManager();
+					entity = entityManager.merge(entity);
+
+					entityManager.getTransaction().begin();
 					entity.setDefaultpath(dir);
+					entityManager.getTransaction().commit();
+
+					entityManager.close();
+
+					entityManager = JPAUtil.createEntityManager();
+					Sensor sensor = entityManager.find(Sensor.class, entity.getId());
+					System.out.println(sensor.getDefaultpath());
+					entityManager.close();
+
 				}
 			}
 
@@ -106,6 +125,19 @@ public class SensorTableViewer extends TableViewer {
 	}
 
 	private void initInput() {
+		addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				if (selection.isEmpty())
+					return;
+
+				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+				selectionProvider.setSelection(ISensor.class, (ISensor) selection.getFirstElement());
+				selectionProvider.unregister();
+			}
+		});
+
 		ISensorObserver sensorObserver = new ISensorObserver() {
 			@Override
 			public void init(List<ISensor> sensors) {

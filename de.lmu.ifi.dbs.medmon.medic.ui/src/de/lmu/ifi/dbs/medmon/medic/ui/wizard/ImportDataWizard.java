@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
+import java.io.IOException;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -48,7 +50,11 @@ public class ImportDataWizard extends Wizard {
 		IPatientService patientService = Activator.getPatientService();
 		if ((options & (SOURCE_SENSOR | IMPORT_RAW)) != 0) {
 			System.out.println("perform");
-			patientService.store(selectedPatient, selectedSensor, "RAW");
+			try {
+				patientService.store(selectedPatient, selectedSensor, IPatientService.RAW);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return true;
 		}
 

@@ -66,12 +66,12 @@ public class SensorManagerService implements ISensorManagerService {
 	}
 
 	@Override
-	public IConverter createConverter(ISensor sensorService) {
+	public IConverter createConverter(ISensor sensorService) throws IOException {
 
 		if (sensorService == null)
 			return null;
 
-		InputStream inputStream = createInputs(sensorService);
+		InputStream inputStream = createDefaultInput(sensorService);
 
 		if (inputStream == null)
 			return null;
@@ -102,33 +102,30 @@ public class SensorManagerService implements ISensorManagerService {
 	}
 
 	@Override
-	public InputStream createInput(ISensor sensor, URI uri) {
-		InputStream inputStream;
-		try (InputStream newInputStream = new FileInputStream(new File(uri))) {
-			inputStream = newInputStream;
-		} catch (Exception e) {
-			log.error("createInput() -> couldn't create InputStream");
-			e.printStackTrace();
-			return null;
-		}
+	public InputStream createDefaultInput(ISensor sensor) throws IOException {
+		return createInput(sensor, availableInputs(sensor)[0]);
+	}
 
-		try {
-			if (sensor.isConvertable(inputStream))
+	@Override
+	public InputStream createInput(ISensor sensor, URI uri) throws IOException {
+		try (InputStream newInputStream = new FileInputStream(new File(uri))) {
+			if (!sensor.isConvertable(newInputStream))
 				return null;
 		} catch (Exception e) {
 			log.error("createInput() -> InputStream not convertable");
 			e.printStackTrace();
 		}
-
-		return inputStream;
+		return Files.newInputStream(Paths.get(uri));
 	}
 
 	@Override
-	public InputStream createInputs(ISensor sensor) {
+	public InputStream[] createInputs(ISensor sensor) throws IOException {
 		URI[] availableURIs = availableInputs(sensor);
-		if(availableURIs.length == 0)
-			return null;
-		return createInput(sensor, availableURIs[0]);
+		InputStream[] inputStreams = new InputStream[availableURIs.length];
+		for (int index = 0; index < availableURIs.length; index++) {
+			inputStreams[index] = createInput(sensor, availableURIs[index]);
+		}
+		return inputStreams;
 	}
 
 	/**
@@ -149,7 +146,7 @@ public class SensorManagerService implements ISensorManagerService {
 			entityManager.persist(mSensor);
 			entityManager.getTransaction().commit();
 			entityManager.detach(mSensor);
-			
+
 			log.info("Sensor " + service.getName() + " " + service.getVersion() + " registered and DB entry created");
 		}
 

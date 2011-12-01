@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -54,9 +55,10 @@ public interface ISensorManagerService {
 	 * creates a IConverter for the passed sensor service.
 	 * @param sensor
 	 * @return
+	 * @throws IOException 
 	 */
 	
-	public IConverter createConverter(ISensor sensor);
+	public IConverter createConverter(ISensor sensor) throws IOException;
 		
 	/**
 	 * This method is used to copy from a sensor to another location.
@@ -74,19 +76,29 @@ public interface ISensorManagerService {
 	public URI[] availableInputs(ISensor sensor);
 		
 	/**
-	 * Create an InputStream/IConverter based on the index of the array created by _availableInputs_. 
+	 * Create an InputStream/IConverter based on the URI. 
 	 * @param sensor
 	 * @param inputIndex
 	 * @return
+	 * @throws IOException 
 	 */
-	public InputStream createInput(ISensor sensor, URI uri);
+	public InputStream createInput(ISensor sensor, URI uri) throws IOException;
 	
 
 	/**
 	 * Create InputStreams/IConverters for all valid resources at the sensor location.
 	 * @param sensor
 	 * @return
+	 * @throws IOException 
 	 */
-	public InputStream createInputs(ISensor sensor);
+	public InputStream[] createInputs(ISensor sensor) throws IOException;
+	
+	/**
+	 *  Create the Default InputStream/IConverter
+	 * @param sensor
+	 * @return
+	 * @throws IOException 
+	 */
+	public InputStream createDefaultInput(ISensor sensor) throws IOException;
 
 }

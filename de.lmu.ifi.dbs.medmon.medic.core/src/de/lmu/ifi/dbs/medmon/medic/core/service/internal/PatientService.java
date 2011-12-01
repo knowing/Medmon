@@ -8,11 +8,9 @@ import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.READ;
 
-import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +21,7 @@ import java.util.Date;
 
 import javax.persistence.EntityManager;
 
+import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,6 @@ import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class PatientService implements IPatientService {
 
-	private final Logger			log						= LoggerFactory.getLogger(IGlobalSelectionService.class);
+	private final Logger			log						= LoggerFactory.getLogger(IPatientService.class);
 
 	/** Static application directory in {user.home}/.medmon */
 	private final Path				medmon					= Paths.get(System.getProperty("user.home"), ".medmon", "patients");
@@ -125,6 +123,7 @@ public class PatientService implements IPatientService {
 		Patient patient = em.merge(p);
 		em.remove(patient);
 		em.getTransaction().commit();
+		em.close();
 	}
 
 	/**
@@ -134,15 +133,10 @@ public class PatientService implements IPatientService {
 	 * </p>
 	 * 
 	 * @param p
-	 *            -
 	 * @param s
-	 *            -
 	 * @param type
-	 *            -
 	 * @param from
-	 *            -
 	 * @param to
-	 *            -
 	 * @return Ready to write OutputStream
 	 * @throws IOException
 	 */
@@ -165,55 +159,30 @@ public class PatientService implements IPatientService {
 	 * 
 	 */
 	@Override
-	public void store(Patient p, ISensor s, String type) {
+	public void store(Patient p, ISensor s, String type) throws IOException {
 
-		DirectoryStream<Path> directoyStream = null;
-		try (DirectoryStream<Path> newDirectoyStream = Files.newDirectoryStream(locateDirectory(p, type))) {
-			directoyStream = newDirectoyStream;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (directoyStream == null || !directoyStream.iterator().hasNext())
-			return;
-
-		/* FORMER:
-		IConverter converter = null;
-		try {
-			converter = s.newConverter(newInputStream(directoyStream.iterator().next()));
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
 		IConverter converter = sensorManagerService.createConverter(s);
 
 		if (converter == null)
 			return;
 
 		Sensor entity = sensorManagerService.loadSensorEntity(s);
-		OutputStream os = null;
-		try {
-			os = store(p, entity, type, converter.getInterval().getStart().toDate(), converter.getInterval().getEnd().toDate());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Interval interval = converter.getInterval();
 
-		if (os == null)
-			return;
+		try (OutputStream os = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+				InputStream in = sensorManagerService.createDefaultInput(s)) {
 
-		// FORMER: InputStream is = converter.getInputStream();
-		InputStream is = sensorManagerService.createInputs(s);
-
-		byte[] buffer = new byte[4096];
-		int bytesRead = 0;
-		try {
-			while ((bytesRead = is.read(buffer)) != -1) {
+			byte[] buffer = new byte[4096];
+			int bytesRead = 0;
+			while ((bytesRead = in.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			// Log error and forward to caller
+			log.error("Error read from InputStream or writing to OutputStream.", e);
+			throw e;
 		}
+
 	}
 
 	/**
@@ -309,7 +278,7 @@ public class PatientService implements IPatientService {
 	}
 
 	protected void activate(ComponentContext context) {
-		System.out.println("PatientService started successfully");
+		log.debug("PatientService activated. Properties: " + context.getProperties());
 	}
 
 	protected void bindEntityManager(IEntityManagerService service) {
