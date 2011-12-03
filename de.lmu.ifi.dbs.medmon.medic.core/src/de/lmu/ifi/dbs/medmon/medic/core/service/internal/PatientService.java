@@ -47,7 +47,7 @@ public class PatientService implements IPatientService {
 	private final DecimalFormat		decimalF				= new DecimalFormat("000000000000");
 
 	/** Format dates with DateFormat.SHORT */
-	private final DateFormat		dateF					= DateFormat.getDateInstance(DateFormat.SHORT);
+	private final DateFormat		dateF					= DateFormat.getDateInstance(DateFormat.MEDIUM);
 
 	private IEntityManagerService	entityManagerService	= null;
 	private ISensorManagerService	sensorManagerService	= null;
@@ -248,11 +248,11 @@ public class PatientService implements IPatientService {
 	 * <li>RESULT: [from]_to_[to].arff</li>
 	 * </p>
 	 * <p>
-	 * For date formatting {@link DateFormat.SHORT} is used.
+	 * For date formatting {@link DateFormat.MEDIUM} is used.
 	 * </p>
 	 * 
 	 * @param s
-	 *            - Sensor
+	 *            Sensor
 	 * @param type
 	 *            - RAW, TRAIN or RESULT
 	 * @param from
@@ -266,7 +266,7 @@ public class PatientService implements IPatientService {
 		sb.append(dateF.format(from)).append("_to_").append(dateF.format(to)).append(".");
 		switch (type) {
 		case RAW:
-			return sb.append(s.getId()).append(".").append("filePrefix").toString();
+			return sb.append(s.getId()).append(".").append(s.getFilePrefix()).toString();
 		case TRAIN:
 			return sb.append("arff").toString();
 		case RESULT:
