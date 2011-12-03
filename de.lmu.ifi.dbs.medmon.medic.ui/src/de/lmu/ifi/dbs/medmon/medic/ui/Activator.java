@@ -77,6 +77,12 @@ public class Activator extends AbstractUIPlugin {
 
 		sensorServiceTracker.close();
 		sensorServiceTracker = null;
+		
+		patientServiceTracker.close();
+		patientServiceTracker = null;
+		
+		entityServiceTracker.close();
+		entityServiceTracker = null;
 
 		super.stop(context);
 	}

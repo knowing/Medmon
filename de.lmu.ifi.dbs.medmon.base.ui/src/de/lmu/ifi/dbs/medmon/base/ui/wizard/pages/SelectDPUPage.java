@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
-import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
+import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
 
@@ -35,7 +35,7 @@ public class SelectDPUPage extends WizardPage {
 	private DPUTableViewer dpuViewer;
 
 	//private SensorAdapter sensor;
-	private DPUFilter dpuFilter;
+	private DPUSearchFilter dpuFilter;
 	private DPUInputFilter dpuInputFilter;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
@@ -78,7 +78,7 @@ public class SelectDPUPage extends WizardPage {
 		dpuViewer = new DPUTableViewer(container, SWT.BORDER | SWT.SINGLE);
 		Table table = dpuViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 4));
-		dpuViewer.addFilter(dpuFilter = new DPUFilter());
+		dpuViewer.addFilter(dpuFilter = new DPUSearchFilter());
 		dpuViewer.addFilter(dpuInputFilter = new DPUInputFilter());
 
 		Button bImport = new Button(container, SWT.NONE);

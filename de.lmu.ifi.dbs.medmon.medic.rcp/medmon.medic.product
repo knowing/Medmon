@@ -73,13 +73,8 @@
    <features>
       <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.R37x_v20110906-782EpBqNKGUkZQpuT8hAlWlFbUeo"/>
       <feature id="org.eclipse.rcp" version="3.7.1.r37x_v20110729-9DB5FmNFnFLSFCtLxnRfMqt15A4A"/>
-<<<<<<< HEAD
-      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.0.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.0.qualifier"/>
-=======
-      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="1.0.0.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="1.0.0.qualifier"/>
->>>>>>> 6f758c744efec9bbeb07e8f5acfab2d18b0932f4
+      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.1.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.core.feature" version="1.0.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.0.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
@@ -96,10 +91,7 @@
       <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="true" startLevel="4" />
       <plugin id="de.lmu.ifi.dbs.medmon.medic.ui" autoStart="false" startLevel="5" />
       <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="4" />
-<<<<<<< HEAD
-      <plugin id="de.sendsor.accelerationSensor" autoStart="true" startLevel="5" />
-=======
->>>>>>> 6f758c744efec9bbeb07e8f5acfab2d18b0932f4
+      <plugin id="de.sendsor.accelerationSensor" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />

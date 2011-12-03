@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.knowing.core.model.INode;
 
 /**
  * @author Nepomuk Seiler
- * @version 0.1
+ * @version 0.2
  * @since 08.05.2011
  *
  */
@@ -38,8 +38,8 @@ public class DPUInputFilter extends ViewerFilter {
 		for(String id : loaderIds) 
 			dpuLoader.remove(id);
 			
-		
-		return dpuLoader.isEmpty();
+		//TODO DPUInputFilter -> "!" is wrong. This is just to show all DPUs WITH loaders 
+		return !dpuLoader.isEmpty();
 	}
 	
 	/**

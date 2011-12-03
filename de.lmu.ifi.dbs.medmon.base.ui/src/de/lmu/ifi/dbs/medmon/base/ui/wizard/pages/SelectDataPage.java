@@ -288,7 +288,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				//Evalute
 				try {
 					ActorRef supervisor = eval.evaluate(dpu, uiFactory, url.toURI());
-					supervisor.sendOneWay(new ChartProgressListenerRegister(new ChartProgressListener() {
+					supervisor.tell(new ChartProgressListenerRegister(new ChartProgressListener() {
 						@Override
 						public void chartProgress(ChartProgressEvent event) {
 							if (event.getType() != ChartProgressEvent.DRAWING_FINISHED)

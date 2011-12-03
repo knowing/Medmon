@@ -2,17 +2,19 @@ package de.lmu.ifi.dbs.medmon.base.ui;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
+import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.knowing.core.service.*;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin  {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "de.lmu.ifi.dbs.medmon.base.ui"; //$NON-NLS-1$
@@ -21,6 +23,7 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	
 	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorTracker;
+	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IEvaluateService, IEvaluateService> evaluationService;
 	private static ServiceTracker<IDPUDirectory, IDPUDirectory> dpuDirectoryTracker;
 	
@@ -40,6 +43,9 @@ public class Activator extends AbstractUIPlugin {
 		sensorTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
 		sensorTracker.open();
 		
+		patientServiceTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
+		patientServiceTracker.open();
+		
 		evaluationService = new ServiceTracker<IEvaluateService, IEvaluateService>(context, IEvaluateService.class, null);
 		evaluationService.open();
 		
@@ -57,6 +63,9 @@ public class Activator extends AbstractUIPlugin {
 		plugin = null;
 		sensorTracker.close();
 		sensorTracker = null;
+		
+		patientServiceTracker.close();
+		patientServiceTracker = null;
 		
 		evaluationService.close();
 		evaluationService = null;
@@ -84,6 +93,10 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static ISensorManagerService getSensorManagerService() {
 		return sensorTracker.getService();
+	}
+	
+	public static IPatientService getPatientService() {
+		return patientServiceTracker.getService();
 	}
 	
 	public static IEvaluateService getEvaluationService() {

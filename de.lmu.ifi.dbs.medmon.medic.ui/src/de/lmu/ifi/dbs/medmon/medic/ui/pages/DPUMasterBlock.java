@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
-import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUFilter;
+import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportDPUHandler;
@@ -54,7 +54,7 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 
 	private TreeViewer dpuViewer;
 	// private ClusterDPUFilter clusterFilter;
-	private DPUFilter dpuFilter;
+	private DPUSearchFilter dpuFilter;
 	private DPUDetailsPage dpuDetailsPage;
 
 	/**
@@ -107,7 +107,7 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 			}
 		});
 		// clusterFilter = new ClusterDPUFilter();
-		dpuFilter = new DPUFilter();
+		dpuFilter = new DPUSearchFilter();
 		// dpuViewer.addFilter(clusterFilter);
 		dpuViewer.addFilter(dpuFilter);
 		Tree tree = dpuViewer.getTree();

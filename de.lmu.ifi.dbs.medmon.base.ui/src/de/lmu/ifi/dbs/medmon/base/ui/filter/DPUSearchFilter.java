@@ -5,8 +5,14 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 
-
-public class DPUFilter extends ViewerFilter {
+/**
+ * 
+ * @author Nepomuk Seiler
+ * @version 0.2
+ * @since 08.05.2011
+ *
+ */
+public class DPUSearchFilter extends ViewerFilter {
 
 	private String searchString;
 
@@ -22,9 +28,16 @@ public class DPUFilter extends ViewerFilter {
 		IDataProcessingUnit dpu = (IDataProcessingUnit) element;
 		if(searchString == null || searchString.isEmpty())
 			return true;
-		String[] tags = dpu.getTags().getContent().split(",");
+		
+		//No content means nothing matches
+		String content = dpu.getTags().getContent();
+		if(content == null)
+			return false;
+		
+		//Case-insensitive
+		String[] tags = content.split(",");
 		for (String tag : tags) {
-			if(tag.matches(searchString))
+			if(tag.toLowerCase().matches(searchString.toLowerCase()))
 				return true;
 		}
 		return dpu.getName().getText().matches(searchString);

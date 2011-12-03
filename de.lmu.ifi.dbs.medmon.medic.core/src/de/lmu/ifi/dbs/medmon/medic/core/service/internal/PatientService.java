@@ -160,7 +160,6 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public void store(Patient p, ISensor s, String type) throws IOException {
-
 		IConverter converter = sensorManagerService.createConverter(s);
 
 		if (converter == null)

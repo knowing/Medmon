@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 
@@ -22,8 +23,8 @@ public class DPUTableViewer extends TableViewer {
 
 	private final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 	
-	private static final String[] columns = new String[] { "Name", "Beschreibung", "Tags", "Input" };
-	private static final int[] width = new int[] { 120, 200, 100, 100 };
+	private static final String[] columns = new String[] { "Name", "Beschreibung", "Tags"};
+	private static final int[] width = new int[] { 180, 220, 100 };
 
 	/**
 	 * @param parent
@@ -70,6 +71,7 @@ public class DPUTableViewer extends TableViewer {
 	}
 
 	private void initInput() {
-		log.warn("SET INPUT IN DPUTableViewer!");
+		IDataProcessingUnit[] dpus = Activator.getDPUDirectory().getDPUs();
+		setInput(dpus);
 	}
 }
