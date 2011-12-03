@@ -1,23 +1,24 @@
 package de.sendsor.accelerationSensor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.joda.time.MutableDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
-import weka.core.converters.ArffSaver;
-import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
+import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
 
 /**
  * <p>
@@ -32,40 +33,37 @@ import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
  */
 public class SDRConverter extends FileConverter {
 
-	private static final long serialVersionUID = 7663052852394853876L;
+	private static final long	serialVersionUID		= 7663052852394853876L;
+	private final Logger		log						= LoggerFactory.getLogger(SDRConverter.class);
 
 	/* ==== Factory ==== */
-	public static final String ID = SDRLoader.class.getName();
-	public static final String URL = "url";
-	public static final String FILE = "file";
+	public static final String	ID						= SDRLoader.class.getName();
+	public static final String	URL						= "url";
+	public static final String	FILE					= "file";
 
 	/* ==== Loader ==== */
-	private Instances header;
+	private Instances			header;
 
-	public static String FILE_EXTENSION = ".sdr";
+	public static String		FILE_EXTENSION			= ".sdr";
 
-	private final static int BLOCKSIZE = 512;
-	private final static int CONTENT_BLOCK = 504;
+	private final static int	BLOCKSIZE				= 512;
+	private final static int	CONTENT_BLOCK			= 504;
 
 	/** 168 instances / 25Hz = 6720 ms */
-	private final static long TIME_CORRECTION_BEFORE = 6720;
+	private final static long	TIME_CORRECTION_BEFORE	= 6720;
 	/** 1 / 25Hz = 40ms */
-	private final static long SAMPLE_DISTANCE = 40;
+	private final static long	SAMPLE_DISTANCE			= 40;
 
-	private Attribute timeAttribute;
-	private Attribute xAttribute;
-	private Attribute yAttribute;
-	private Attribute zAttribute;
+	private Attribute			timeAttribute;
+	private Attribute			xAttribute;
+	private Attribute			yAttribute;
+	private Attribute			zAttribute;
 
 	/* == OPTIONS == */
-	private String interval = SDRLoaderFactory.INTERVAL_SECOND();
-	private String aggregate = SDRLoaderFactory.AGGREGATE_AVERAGE();
-	private double units = 1.0;
-	private boolean relativeTimestamp = false;
-	private String output = null;
-
-	/* */
-	private boolean firstRun = true;
+	private String				interval				= SDRLoaderFactory.INTERVAL_SECOND();
+	private String				aggregate				= SDRLoaderFactory.AGGREGATE_AVERAGE();
+	private double				units					= 1.0;
+	private boolean				relativeTimestamp		= false;
 
 	public SDRConverter(URL url) throws IOException {
 		super(url);
@@ -76,7 +74,7 @@ public class SDRConverter extends FileConverter {
 		super(file);
 		init();
 	}
-	
+
 	public SDRConverter(InputStream input) {
 		super(input);
 		init();
@@ -114,33 +112,35 @@ public class SDRConverter extends FileConverter {
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];
 
-		// Initialize time handling
-		Calendar date = new GregorianCalendar();
-
-		Calendar intervalstart = new GregorianCalendar();
-		Calendar intervalcurrent = new GregorianCalendar();
 		// Initialize data handling
-
 		int read = input.read(data);
 
 		int avg_x = 0;
 		int avg_y = 0;
 		int avg_z = 0;
+
+		// Initialize time handling
+		DateTime current = nextDateTimeAbsolute(data);
+		MutableDateTime nextRelative = current.toMutableDateTime();
+
+		Duration duration = new Duration(getDurationLength());
+		Interval interval = new Interval(current, duration);
 		boolean newInterval = true;
-		long interval = getIntervalLength();
-		if (units > 0)
-			interval *= units;
 
 		// Convert each block
 		while (read != -1) {
-			// Create timestamp
-			boolean recordEnd = setTime(date, data);
-			// For relative time handling
-			long time = date.getTimeInMillis();
 
-			// Checks if the recorded data ended
-			if (recordEnd)
+			// Load Data into data-Buffer
+			read = input.read(data);
+
+			// Create timestamp
+			DateTime nextAbsolute = nextDateTimeAbsolute(data);
+			nextDateTimeRelative(nextRelative);
+
+			if (recordEnd(current, nextAbsolute)) {
+				log.info("END OF FILE REACHED. OLD DATA BEGINS: " + nextAbsolute);
 				break;
+			}
 
 			// Fill in the data
 			for (int j = 0; j < CONTENT_BLOCK; j += 3) {
@@ -154,25 +154,21 @@ public class SDRConverter extends FileConverter {
 					avg_y = y;
 					avg_z = z;
 					newInterval = false;
-					intervalstart.setTimeInMillis(time);
-					intervalcurrent.setTimeInMillis(time);
 				}
 				// Increase time interval
-				boolean insideBounds = intervalcurrent.getTimeInMillis() - intervalstart.getTimeInMillis() < interval;
+				boolean insideBounds = isInsideBounds(interval, nextAbsolute, nextRelative);
 				if (aggregate.equals("none")) {
 					// Don't aggregate, just take raw values
 					DenseInstance instance = new DenseInstance(4);
-					instance.setValue(timeAttribute, time);
+					instance.setValue(timeAttribute, nextDateTimeValue(nextAbsolute, nextRelative));
 					instance.setValue(xAttribute, x);
 					instance.setValue(yAttribute, y);
 					instance.setValue(zAttribute, z);
 					dataset.add(instance);
-					intervalstart.setTimeInMillis(time);
-					intervalcurrent.setTimeInMillis(time);
 				} else if (!insideBounds) {
 					// New interval begins, save old one
 					DenseInstance instance = new DenseInstance(4);
-					instance.setValue(timeAttribute, time);
+					instance.setValue(timeAttribute, nextDateTimeValue(nextAbsolute, nextRelative));
 					instance.setValue(xAttribute, avg_x);
 					instance.setValue(yAttribute, avg_y);
 					instance.setValue(zAttribute, avg_z);
@@ -183,30 +179,17 @@ public class SDRConverter extends FileConverter {
 					avg_x = x;
 					avg_y = y;
 					avg_z = z;
-					intervalstart.setTimeInMillis(time);
-					intervalcurrent.setTimeInMillis(time);
+					interval = nextInterval(duration, nextAbsolute, nextRelative);
 				} else if (insideBounds) {
 					// Still in our time interval bounds
 					avg_x = (avg_x + x) / 2;
 					avg_y = (avg_y + y) / 2;
 					avg_z = (avg_z + z) / 2;
-					intervalcurrent.setTimeInMillis(time);
 				}
-				time += SAMPLE_DISTANCE;
-
+				nextRelative.add(SAMPLE_DISTANCE);
 			}
-			date.setTimeInMillis(time);
-			// Load Data into data-Buffer
-			read = input.read(data);
 
-		}
-		// Saves to output if option set
-		if (output != null) {
-			File out = new File(output);
-			ArffSaver arffSaver = new ArffSaver();
-			arffSaver.setFile(out);
-			arffSaver.setInstances(dataset);
-			arffSaver.writeBatch();
+			current = nextAbsolute;
 		}
 
 		input.close();
@@ -215,36 +198,73 @@ public class SDRConverter extends FileConverter {
 
 	@Override
 	public Interval getInterval() throws IOException {
-		// Initialize time handling
-		Calendar current = new GregorianCalendar();
-
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];
 		int read = input.read(data);
-		
-		// Initialize date or return zero Interval
-		if(setTime(current, data)) 
-			return new Interval(0, 0);
-		
-		long start = current.getTimeInMillis();
-		
+
+		DateTime start = nextDateTimeAbsolute(data);
+		DateTime current = nextDateTimeAbsolute(data);
+
+		if (start.getMillis() == 0)
+			throw new IOException("SDR file doesn't contain any data on InputStream [" + input + "]");
+
 		// Convert each block
 		while (read != -1) {
-			// Create timestamp
-			boolean recordEnd = setTime(current, data);
+			// Load Data into data-Buffer
+			read = input.read(data);
+
+			// Set timestamp
+			DateTime next = nextDateTimeAbsolute(data);
+
+			boolean recordEnd = recordEnd(current, next);
 
 			// Checks if the recorded data ended
 			if (recordEnd)
 				break;
 
-			// Load Data into data-Buffer
-			read = input.read(data);
+			current = next;
+
 		}
-		
+
 		input.close();
-		return new Interval(start, current.getTimeInMillis());
+		return new Interval(start, current);
 	}
 
+	/**
+	 * <h4>RelativeTimestamp handling</h4>
+	 * <p>
+	 * If option relativeTimestamp is set, this method does nothing except on
+	 * the<br>
+	 * first run and initially sets the timestamp.
+	 * </p>
+	 * 
+	 * <h4>Checks for file end based on read day/hour field</h4>
+	 * <p>
+	 * Currently a SDR file is a bunch of zeros. Those zeros are placeholders<br>
+	 * and will be overwritten. This method checks if the end of the recorded<br>
+	 * data is reached, however not the end of the file.
+	 * </p>
+	 * 
+	 * @param current
+	 *            - if null -> first run
+	 * @param data
+	 *            - 512 byte array
+	 * @return new DateTime instance
+	 */
+	private DateTime nextDateTimeAbsolute(byte[] data) {
+		int year = calcYear(data[506]);
+		int month = data[507] - 1;
+		int day = data[508];
+		int hour = data[509];
+		int minute = data[510];
+		int second = data[511];
+
+		// Return DateTime(0) to trigger recordEnd method
+		if (day == 48 && hour == 48)
+			return new DateTime(0);
+
+		return new DateTime(year, month, day, hour, minute, second).minus(TIME_CORRECTION_BEFORE);
+	}
 
 	/**
 	 * Calculate the complete year from the incomplete data of file
@@ -263,70 +283,58 @@ public class SDRConverter extends FileConverter {
 	}
 
 	/**
-	 * <p>
-	 * Set the calendar object with the given SDR-Byte array and checks if the
-	 * current timestamp is zero (end of file)
-	 * </p>
 	 * 
-	 * <p>
-	 * If option relativeTimestamp is set this method does nothing except on the
-	 * first run and initially sets the timestamp.
-	 * </p>
-	 * 
-	 * @param calendar
-	 *            - this object will be changed
-	 * @param data
-	 *            - byte array
-	 * @return boolean - end of file reached
+	 * @param current
+	 * @param next
+	 * @return next.isBefore(current)
 	 */
-	private boolean setTime(Calendar calendar, byte[] data) {
-		int year = calcYear(data[506]);
-		int month = data[507] - 1;
-		int day = data[508];
-		int hour = data[509];
-		int minute = data[510];
-		int second = data[511];
-		// Set date only on first run or on absolute timestamps
-		if (firstRun || !relativeTimestamp) {
-			calendar.set(year, month, day, hour, minute, second);
-			long time = calendar.getTimeInMillis() - TIME_CORRECTION_BEFORE;
-			calendar.setTimeInMillis(time);
-			firstRun = false;
-		} else {
-//			System.out.println("relative timestamp: " + calendar.getTime());
-			calendar.setTimeInMillis(calendar.getTimeInMillis() + SAMPLE_DISTANCE);
-		}
-		return recordEnd(day, hour);
-	}
-
-	/**
-	 * Currently a SDR file is a bunch of zeros. Those zeros are placeholders
-	 * and will be overwritten. This method checks if the end of the recorded
-	 * data is reached, however not the end of the file.
-	 * 
-	 * @param day
-	 * @param hour
-	 * @return
-	 */
-	private boolean recordEnd(int day, int hour) {
-		return (day == 48) && (hour == 48);
+	private boolean recordEnd(DateTime current, DateTime next) {
+		return next.isBefore(current);
 	}
 
 	/**
 	 * 
+	 * @param current
 	 * @return
 	 */
-	private long getIntervalLength() {
+	private void nextDateTimeRelative(MutableDateTime current) {
+		current.add(SAMPLE_DISTANCE);
+	}
+
+	private boolean isInsideBounds(Interval interval, DateTime nextAbsolute, MutableDateTime nextRelative) {
+		if (relativeTimestamp)
+			return interval.contains(nextRelative);
+		return interval.contains(nextAbsolute);
+	}
+
+	private Interval nextInterval(Duration duration, DateTime nextAbsolute, MutableDateTime nextRelative) {
+		if (relativeTimestamp)
+			return new Interval(nextRelative, duration);
+		return new Interval(nextAbsolute, duration);
+	}
+
+	private long nextDateTimeValue(DateTime nextAbsolute, MutableDateTime nextRelative) {
+		if (relativeTimestamp)
+			return nextRelative.getMillis();
+		return nextAbsolute.getMillis();
+	}
+
+	/**
+	 * 
+	 * @return TimeUnit.<interval> * units
+	 */
+	private long getDurationLength() {
+		double units = Math.abs(this.units);
 		if (interval.equals(SDRLoaderFactory.INTERVAL_SECOND()))
-			return TimeUnit.SECONDS.toMillis(1);
+			return (long) (TimeUnit.SECONDS.toMillis(1) * units);
 		else if (interval.equals(SDRLoaderFactory.INTERVAL_MINUTE()))
-			return TimeUnit.MINUTES.toMillis(1);
+			return (long) (TimeUnit.MINUTES.toMillis(1) * units);
 		else if (interval.equals(SDRLoaderFactory.INTERVAL_HOUR()))
-			return TimeUnit.HOURS.toMillis(1);
+			return (long) (TimeUnit.HOURS.toMillis(1) * units);
 		else if (interval.equals(SDRLoaderFactory.INTERVAL_DAY()))
-			return TimeUnit.DAYS.toMillis(1);
+			return (long) (TimeUnit.DAYS.toMillis(1) * units);
 		else
-			return TimeUnit.SECONDS.toMillis(1);
+			return (long) (TimeUnit.SECONDS.toMillis(1) * units);
 	}
 
 	public void setInterval(String interval) {
@@ -343,10 +351,6 @@ public class SDRConverter extends FileConverter {
 
 	public void setRelativeTimestamp(boolean relativeTimestamp) {
 		this.relativeTimestamp = relativeTimestamp;
-	}
-
-	public void setOutput(String output) {
-		this.output = output;
 	}
 
 }
