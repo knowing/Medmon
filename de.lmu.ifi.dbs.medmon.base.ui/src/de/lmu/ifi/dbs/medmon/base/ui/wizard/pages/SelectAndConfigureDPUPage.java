@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import static scala.collection.JavaConversions.mapAsScalaMap;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -11,9 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -24,6 +23,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,22 +33,24 @@ import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.model.INode;
 import de.lmu.ifi.dbs.knowing.core.model.IProperty;
 import de.lmu.ifi.dbs.knowing.core.model.NodeType;
-import de.lmu.ifi.dbs.knowing.core.util.DPUUtil;
 import de.lmu.ifi.dbs.knowing.core.processing.INodeProperties;
+import de.lmu.ifi.dbs.knowing.core.service.IEvaluateService;
+import de.lmu.ifi.dbs.knowing.core.swt.view.PresenterView;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
+import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
 public class SelectAndConfigureDPUPage extends WizardPage {
 
 	private final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	
-	private Text			textSearch;
-	private DPUTableViewer	dpuViewer;
-	private Patient			patient;
+
+	private Text textSearch;
+	private DPUTableViewer dpuViewer;
+	private Patient patient;
 
 	/**
 	 * Create the wizard.
@@ -93,14 +97,6 @@ public class SelectAndConfigureDPUPage extends WizardPage {
 		dpuViewer = new DPUTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		dpuViewer.addFilter(dpuSearchFilter);
 		dpuViewer.addFilter(dpuInputFilter);
-		dpuViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				if (patient != null && !event.getSelection().isEmpty())
-					configureAndExecuteDPU(patient);
-			}
-		});
 		Table table = dpuViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 	}
@@ -112,18 +108,18 @@ public class SelectAndConfigureDPUPage extends WizardPage {
 	 * 
 	 * @param patient
 	 * @param data
+	 * @throws IOException
 	 * @return configured DPU or null
 	 */
-	public IDataProcessingUnit configureAndExecuteDPU(Patient patient) {
-		// TODO add Data parameter
+	public IDataProcessingUnit configureAndExecuteDPU(Patient patient, Data data) throws IOException {
 		this.patient = patient;
 		if (dpuViewer.getSelection().isEmpty())
 			return null;
 
-		// TODO Use Eclipse Sapphire 0.4.0 => dpu.clone()
 		IStructuredSelection selection = (IStructuredSelection) dpuViewer.getSelection();
 		IDataProcessingUnit originalDPU = (IDataProcessingUnit) selection.getFirstElement();
-		IDataProcessingUnit dpu = DPUUtil.copy(originalDPU);
+		IDataProcessingUnit dpu = IDataProcessingUnit.TYPE.instantiate();
+		dpu.copy(originalDPU);
 
 		IPatientService patientService = Activator.getPatientService();
 		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
@@ -195,15 +191,24 @@ public class SelectAndConfigureDPUPage extends WizardPage {
 			}
 		}
 
-		// DPUUtil.print(dpu, System.out);
-
-		//TODO Generate OutputStream with IPatientService
+		// TODO data is detached. Will this work?
 		Map<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
+		OutputStream outputStream = patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo());
 
-		// TODO Where's the UIFactory? Must be implemented.
-		// Activator.getEvaluationService().evaluate(dpu, null,
-		// execPath.toUri(), mapAsScalaMap(new HashMap<String, InputStream>()),
-		// mapAsScalaMap(outputMap));
+		// IPatientService.RESULT -> document this somewhere, very important!
+		outputMap.put(IPatientService.RESULT, outputStream);
+
+		try {
+			IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
+			PresenterView pView = (PresenterView) view;
+			pView.clearTabs();
+			// TODO Create own UIFactory!
+			IEvaluateService evalService = Activator.getEvaluationService();
+			evalService.evaluate(dpu, pView.uifactory(), execPath.toUri(), mapAsScalaMap(new HashMap<String, InputStream>()),
+					mapAsScalaMap(outputMap));
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
 
 		return dpu;
 	}
