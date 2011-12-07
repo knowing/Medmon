@@ -423,35 +423,35 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.ui.quickanalyse"
-            icon="icons/run_16.png">
+            icon="icons/run_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.ui.openPatient"
-            icon="icons/open-patient_16.png">
+            icon="icons/open-patient_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.createPatient"
-            icon="icons/add-patient_16.png">
+            icon="icons/add-patient_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.delete"
-            icon="icons/remove-patient_16.png">
+            icon="icons/remove-patient_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.export"
-            icon="icons/export-patient_16.png">
+            icon="icons/export-patient_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.import"
-            icon="icons/import-patient_16.png">
+            icon="icons/import-patient_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.ui.dataImportWizard"
-            icon="icons/import_16.png">
+            icon="icons/import_24.png">
       </image>
       <image
             commandId="de.lmu.ifi.dbs.medmon.medic.ui.loadDataFromDB"
-            icon="icons/database_transfer_16.png">
+            icon="icons/database_transfer_24.png">
       </image>
    </extension>
    <extension

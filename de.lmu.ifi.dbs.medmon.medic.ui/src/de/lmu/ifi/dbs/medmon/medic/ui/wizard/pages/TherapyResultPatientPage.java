@@ -22,6 +22,7 @@ public class TherapyResultPatientPage extends WizardPage {
 
 	private Text	textLastname;
 	private Text	textFirstname;
+	private Patient patient;
 
 	/**
 	 * Create the wizard.
@@ -41,8 +42,7 @@ public class TherapyResultPatientPage extends WizardPage {
 		} else {
 			textFirstname.setText(patient.getFirstname());
 			textLastname.setText(patient.getLastname());
-			TherapyResultWizard wizard = (TherapyResultWizard) getWizard();
-			wizard.setSelectedPatient(patient);
+			this.patient = patient;
 			setPageComplete(true);
 		}
 	}
@@ -90,5 +90,9 @@ public class TherapyResultPatientPage extends WizardPage {
 
 		selectPatient(null);
 		initialize();
+	}
+	
+	public Patient getPatient() {
+		return patient;
 	}
 }
