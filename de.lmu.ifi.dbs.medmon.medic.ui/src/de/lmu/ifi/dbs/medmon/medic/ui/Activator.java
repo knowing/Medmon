@@ -31,7 +31,7 @@ public class Activator extends AbstractUIPlugin {
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> entityServiceTracker;
-	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorServiceTracker;
+	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorManagerServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
@@ -54,8 +54,8 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		sensorServiceTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
-		sensorServiceTracker.open();
+		sensorManagerServiceTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
+		sensorManagerServiceTracker.open();
 		
 		patientServiceTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
 		patientServiceTracker.open();
@@ -75,8 +75,8 @@ public class Activator extends AbstractUIPlugin {
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 
-		sensorServiceTracker.close();
-		sensorServiceTracker = null;
+		sensorManagerServiceTracker.close();
+		sensorManagerServiceTracker = null;
 		
 		patientServiceTracker.close();
 		patientServiceTracker = null;
@@ -111,8 +111,8 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	public static ISensorManagerService getSensorService() {
-		return sensorServiceTracker.getService();
+	public static ISensorManagerService getSensorManagerService() {
+		return sensorManagerServiceTracker.getService();
 	}
 
 	public static IPatientService getPatientService() {

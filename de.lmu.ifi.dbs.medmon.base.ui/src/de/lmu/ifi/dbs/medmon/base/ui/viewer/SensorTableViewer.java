@@ -74,24 +74,20 @@ public class SensorTableViewer extends TableViewer {
 				dlg.setMessage("wählen sie den neuen Standard-Pfad für diesen Sensor aus!");
 				String dir = dlg.open();
 				if (dir != null) {
-					Sensor entity = Activator.getSensorManagerService().loadSensorEntity(selection);
-					if (entity == null)
+					Sensor mSensor = Activator.getSensorManagerService().loadSensorEntity(selection);
+					if (mSensor == null)
 						return;
 
 					EntityManager entityManager = JPAUtil.createEntityManager();
-					entity = entityManager.merge(entity);
 
 					entityManager.getTransaction().begin();
-					entity.setDefaultpath(dir);
+					mSensor = entityManager.merge(mSensor);
+					mSensor.setDefaultpath(dir);
 					entityManager.getTransaction().commit();
 
 					entityManager.close();
 
-					entityManager = JPAUtil.createEntityManager();
-					Sensor sensor = entityManager.find(Sensor.class, entity.getId());
-					System.out.println(sensor.getDefaultpath());
-					entityManager.close();
-
+					Activator.getSensorManagerService().notifySensorObservers(selection);
 				}
 			}
 
@@ -150,13 +146,13 @@ public class SensorTableViewer extends TableViewer {
 			@Override
 			public void sensorAdded(ISensor service) {
 				localSensorList.add(service);
-				refresh();
+				setInput(localSensorList);
 			}
 
 			@Override
 			public void sensorRemoved(ISensor service) {
 				localSensorList.remove(service);
-				refresh();
+				setInput(localSensorList);
 			}
 
 			@Override

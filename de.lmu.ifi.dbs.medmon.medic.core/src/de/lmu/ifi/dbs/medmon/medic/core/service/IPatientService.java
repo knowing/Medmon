@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Date;
 
@@ -98,6 +99,17 @@ public interface IPatientService {
 	 * @throws IOException 
 	 */
 	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
+	
+	/**
+	 * 
+	 * @param patient
+	 * @param sensor
+	 * @param type
+	 * @param inputURL
+	 * @throws IOException
+	 */
+	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
+	
 	
 	/**
 	 * <p>Generates an InputStream to load the
