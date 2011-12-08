@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
@@ -49,13 +50,12 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
-public class SelectAndConfigureDPUPage extends WizardPage {
+public class SelectAndConfigureDPUPage extends WizardPage implements IValidationPage {
 
 	private final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
 	private Text			textSearch;
 	private DPUTableViewer	dpuViewer;
-	private Patient			patient;
 
 	/**
 	 * Create the wizard.
@@ -178,7 +178,6 @@ public class SelectAndConfigureDPUPage extends WizardPage {
 	 * @return configured DPU or null
 	 */
 	private IDataProcessingUnit configureDPU(Patient patient, Path inputFile) throws IOException {
-		this.patient = patient;
 		if (dpuViewer.getSelection().isEmpty())
 			return null;
 
@@ -286,5 +285,10 @@ public class SelectAndConfigureDPUPage extends WizardPage {
 		// IPatientService.RESULT -> document this somewhere, very important!
 		outputMap.put(IPatientService.RESULT, outputStream);
 		return outputMap;
+	}
+	
+	@Override
+	public void checkContents() {
+		
 	}
 }

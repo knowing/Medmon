@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
-import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_RAW;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_FILE;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_SENSOR;
 
@@ -13,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -23,9 +24,7 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectAndConfigureDPUPage;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
@@ -155,12 +154,16 @@ public class TherapyResultWizard extends Wizard {
 		
 		try {
 			selectDPUPage.configureAndExecuteDPU(patient, sensor, uri);
+			// selectDPUPage.configureAndExecuteDPU(patient, data);
 		} catch (IOException e) {
 			e.printStackTrace();
+			MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
 		}
 		
+		//TODO Create TherapyResult entity and link with created Data object
+		TherapyResult result = new TherapyResult();
+		// EntityManager entityManager = Activator.getEntityManagerService().createEntityManager();
 		
-		// selectDPUPage.configureAndExecuteDPU(patient, data);
 
 		return true;
 	}
