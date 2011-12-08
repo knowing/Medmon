@@ -105,7 +105,6 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 		} else {
 			textFirstname.setText(patient.getFirstname());
 			textLastname.setText(patient.getLastname());
-			ImportDataWizard wizard = (ImportDataWizard) getWizard();
 		}
 	}
 

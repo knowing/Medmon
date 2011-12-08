@@ -6,6 +6,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
 
 public class QuickAnalyseHandler extends AbstractHandler {
@@ -14,7 +17,9 @@ public class QuickAnalyseHandler extends AbstractHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		TherapyResultWizard wizard = new TherapyResultWizard();
+		IGlobalSelectionService selectionService = Activator.getGlobalSelectionService();
+		Therapy selectedTherapy = selectionService.getSelection(Therapy.class);
+		TherapyResultWizard wizard = new TherapyResultWizard(selectedTherapy);
 		WizardDialog dialog = new WizardDialog(HandlerUtil.getActiveShell(event), wizard);
 		dialog.open();
 		return null;
