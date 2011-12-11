@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
@@ -33,6 +34,7 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> entityServiceTracker;
 	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorManagerServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
+	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
@@ -63,6 +65,9 @@ public class Activator extends AbstractUIPlugin {
 		entityServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
 		entityServiceTracker.open();
 		
+		globalSelectionServiceTracker = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class, null);
+		globalSelectionServiceTracker.open();
+		
 	}
 
 	/*
@@ -83,6 +88,9 @@ public class Activator extends AbstractUIPlugin {
 		
 		entityServiceTracker.close();
 		entityServiceTracker = null;
+		
+		globalSelectionServiceTracker.close();
+		globalSelectionServiceTracker = null;
 
 		super.stop(context);
 	}
@@ -121,5 +129,9 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static IEntityManagerService getEntityManagerService() {
 		return entityServiceTracker.getService();
+	}
+	
+	public static IGlobalSelectionService getGlobalSelectionService() {
+		return globalSelectionServiceTracker.getService();
 	}
 }
