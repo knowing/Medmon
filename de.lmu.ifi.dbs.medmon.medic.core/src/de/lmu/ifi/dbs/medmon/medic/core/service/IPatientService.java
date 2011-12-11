@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Date;
 
@@ -89,6 +90,9 @@ public interface IPatientService {
 	 * Generates an OutputStream based on the given parameters.
 	 * </p>
 	 * 
+	 * <p>NOTE: This method should return the OutputStream and the {@link Data} object
+	 * it has created. User can use the data entity more easy after storing it.</p>
+	 * 
 	 * @param p - Patient associated with data
 	 * @param s - Sensor associated with data
 	 * @param type - data type - RAW, TRAIN or RESULT
@@ -98,6 +102,30 @@ public interface IPatientService {
 	 * @throws IOException 
 	 */
 	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
+	
+	/**
+	 * NOTE: this should return the created {@link Data} entity
+	 * 
+	 * @param patient
+	 * @param sensor
+	 * @param type
+	 * @param inputURL
+	 * @throws IOException
+	 */
+	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
+	
+	
+	/**
+	 * <p>stores the data located on a sensor into the database</p>
+	 * NOTE: this should return the created {@link Data} entity
+	 * 
+	 * @param patient - the patient to which the data belongs
+	 * @param sensorService - a sensor-service
+	 * @param type - the type of the data to be stored
+	 * @throws IOException 
+	 */
+	public void store(Patient patient, ISensor sensorService, String type) throws IOException;
+	
 	
 	/**
 	 * <p>Generates an InputStream to load the
@@ -131,14 +159,5 @@ public interface IPatientService {
 	 */
 	public void remove(Data d) throws IOException;
 	
-	
-	/**
-	 * <p>stores the data located on a sensor into the database</p>
-	 * @param patient - the patient to which the data belongs
-	 * @param sensorService - a sensor-service
-	 * @param type - the type of the data to be stored
-	 * @throws IOException 
-	 */
-	public void store(Patient patient, ISensor sensorService, String type) throws IOException;
 
 }

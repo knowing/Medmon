@@ -74,11 +74,11 @@ class SegmentationWrapper extends JProcessor {
      //Configure your classifier here with
      val segmentation = this.asInstanceOf[Segmentation]
      //val debug = properties.getProperty(DEBUG)
-     val minCorrelation = properties.getProperty(MIN_CORRELATION)
-     val patternSize = properties.getProperty(PATTERNSIZE)
-     val minSegmentLength = properties.getProperty(MIN_SEGMENT_LENGTH)
-     val shiftSampleLength = properties.getProperty(SHIFTSAMPLE_LENGTH)
-     val minAttributesWithSegments = properties.getProperty(MIN_ATTRIBUTES_WITH_SEGMENTS)
+     val minCorrelation = properties.getProperty(MIN_CORRELATION, "0.75")
+     val patternSize = properties.getProperty(PATTERNSIZE, "25")
+     val minSegmentLength = properties.getProperty(MIN_SEGMENT_LENGTH, "100")
+     val shiftSampleLength = properties.getProperty(SHIFTSAMPLE_LENGTH, "100")
+     val minAttributesWithSegments = properties.getProperty(MIN_ATTRIBUTES_WITH_SEGMENTS, "1")
      //segmentation.setDebug(debug.toBoolean)     
      segmentation.setMinCorrelation(minCorrelation.toDouble)
      segmentation.setPatternSize(patternSize.toInt)

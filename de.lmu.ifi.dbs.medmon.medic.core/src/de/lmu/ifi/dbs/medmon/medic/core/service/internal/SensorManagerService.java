@@ -45,18 +45,27 @@ public class SensorManagerService implements ISensorManagerService {
 	public ISensor getSensor(String id) {
 		return sensorMap.get(id);
 	}
+	
+	@Override
+	public void notifySensorObservers(ISensor sensor) {
+		for (ISensorObserver observer : observers) {
+			observer.sensorUpdated(sensor);
+		}		
+	}
 
 	@Override
 	public Sensor loadSensorEntity(ISensor sensor) {
 
-		EntityManager entityManager = entityManagerService.getEntityManager();
+		EntityManager entityManager = entityManagerService.createEntityManager();
 		@SuppressWarnings("unchecked")
 		List<Sensor> results = entityManager.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId())
 				.getResultList();
 
+		entityManager.close();
+		
 		if (results.isEmpty())
 			return null;
-
+		
 		return results.get(0);
 	}
 

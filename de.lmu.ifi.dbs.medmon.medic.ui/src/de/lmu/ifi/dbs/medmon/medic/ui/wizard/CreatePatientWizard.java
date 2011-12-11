@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
@@ -44,17 +45,20 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 			patient = Activator.getPatientService().createPatient();
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e1.getMessage());
 			return false;
 		}
 
 		EntityManager entityManager = JPAUtil.createEntityManager();
+
 		entityManager.getTransaction().begin();
 		patient = entityManager.merge(patient);
 		patientpage.initializePatient(patient);
 		entityManager.getTransaction().commit();
+
 		entityManager.detach(patient);
 
-		IGlobalSelectionProvider SelectionProvider  = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+		IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		SelectionProvider.setSelection(Patient.class, patient);
 		SelectionProvider.unregister();
 
