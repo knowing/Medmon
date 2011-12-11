@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -146,7 +147,7 @@ public class PatientService implements IPatientService {
 	 * @throws IOException
 	 */
 	@Override
-	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
+	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
 		EntityManager em = entityManagerService.createEntityManager();
 		em.getTransaction().begin();
 		Patient patient = em.merge(p);
@@ -165,23 +166,24 @@ public class PatientService implements IPatientService {
 		em.persist(data);
 		em.getTransaction().commit();
 		em.close();
-		return outputStream;
+		return new DataStoreOutput(outputStream, data);
 	}
 
 	/**
 	 * 
 	 */
 	@Override
-	public void store(Patient p, ISensor s, String type) throws IOException {
+	public DataStoreOutput store(Patient p, ISensor s, String type) throws IOException {
 		IConverter converter = sensorManagerService.createConverter(s);
 
 		if (converter == null)
-			return;
+			return null;
 
 		Sensor entity = sensorManagerService.loadSensorEntity(s);
 		Interval interval = converter.getInterval();
 
-		try (OutputStream os = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+		try ( DataStoreOutput output = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+				OutputStream os = output.outputStream;
 				InputStream in = sensorManagerService.createDefaultInput(s)) {
 
 			byte[] buffer = new byte[4096];
@@ -189,6 +191,7 @@ public class PatientService implements IPatientService {
 			while ((bytesRead = in.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
 			}
+			return output;
 		} catch (IOException e) {
 			// Log error and forward to caller
 			log.error("Error read from InputStream or writing to OutputStream.", e);
@@ -204,16 +207,17 @@ public class PatientService implements IPatientService {
 	 * @param inputURL
 	 */
 	@Override
-	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException {
+	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException {
 		IConverter converter = sensorManagerService.createConverter(sensor);
 
 		if (converter == null)
-			return;
+			return null;
 
 		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
-		
-		try (OutputStream os = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+
+		try (DataStoreOutput output = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+				OutputStream os = output.outputStream;
 				InputStream in = new FileInputStream(new File(inputURL))) {
 
 			byte[] buffer = new byte[4096];
@@ -221,6 +225,7 @@ public class PatientService implements IPatientService {
 			while ((bytesRead = in.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
 			}
+			return output;
 		} catch (IOException e) {
 			log.error("Error read from InputStream or writing to OutputStream.", e);
 			throw e;
@@ -257,7 +262,7 @@ public class PatientService implements IPatientService {
 		else
 			to = d2.getTo();
 
-		return store(d1.getPatient(), d1.getSensor(), d1.getType(), from, to);
+		return store(d1.getPatient(), d1.getSensor(), d1.getType(), from, to).outputStream;
 	}
 
 	/**

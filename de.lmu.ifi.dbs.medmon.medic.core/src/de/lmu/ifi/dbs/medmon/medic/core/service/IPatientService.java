@@ -10,6 +10,7 @@ import java.util.Date;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 /**
@@ -101,7 +102,7 @@ public interface IPatientService {
 	 * @return - Ready to write OutputStream
 	 * @throws IOException 
 	 */
-	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
+	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
 	
 	/**
 	 * NOTE: this should return the created {@link Data} entity
@@ -112,7 +113,7 @@ public interface IPatientService {
 	 * @param inputURL
 	 * @throws IOException
 	 */
-	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
+	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
 	
 	
 	/**
@@ -124,7 +125,7 @@ public interface IPatientService {
 	 * @param type - the type of the data to be stored
 	 * @throws IOException 
 	 */
-	public void store(Patient patient, ISensor sensorService, String type) throws IOException;
+	public DataStoreOutput store(Patient patient, ISensor sensorService, String type) throws IOException;
 	
 	
 	/**

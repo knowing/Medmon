@@ -267,7 +267,7 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 	
 	private Map<String, OutputStream> createOutputMap(Patient patient, Data data, IPatientService patientService) throws IOException {
 		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
-		OutputStream outputStream = patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo());
+		OutputStream outputStream = patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo()).outputStream;
 
 		// IPatientService.RESULT -> document this somewhere, very important!
 		outputMap.put(IPatientService.RESULT, outputStream);
@@ -280,7 +280,7 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 		IConverter converter = Activator.getSensorManagerService().createConverter(sensor);
 		Sensor sensorEntity = Activator.getSensorManagerService().loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
-		OutputStream outputStream = patientService.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(), interval.getEnd().toDate());
+		OutputStream outputStream = patientService.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(), interval.getEnd().toDate()).outputStream;
 
 		// IPatientService.RESULT -> document this somewhere, very important!
 		outputMap.put(IPatientService.RESULT, outputStream);

@@ -21,11 +21,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 
+import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
@@ -68,9 +70,10 @@ public class ImportDataWizard extends Wizard {
 		if ((options & (SOURCE_SENSOR | IMPORT_RAW)) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
-				patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
+				DataStoreOutput output = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
 				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-				selectionProvider.updateSelection(Patient.class);
+				selectionProvider.setSelection(Patient.class, selectedPatient);
+				selectionProvider.setSelection(Data.class, output.dataEntity);
 				selectionProvider.unregister();
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
@@ -80,9 +83,10 @@ public class ImportDataWizard extends Wizard {
 		} else if ((options & (SOURCE_FILE | IMPORT_RAW)) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
-				patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
+				DataStoreOutput output = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
 				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-				selectionProvider.updateSelection(Patient.class);
+				selectionProvider.setSelection(Patient.class, selectedPatient);
+				selectionProvider.setSelection(Data.class, output.dataEntity);
 				selectionProvider.unregister();
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
