@@ -5,28 +5,36 @@
       version="1.0.1.qualifier"
       provider-name="LMU Munich - Database Systems Group">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
+      Medmon core features including:
+      * database access (Derby DB included)
+      * sensor access
+      * classification algorithms
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="http://www.dbs.ifi.lmu.de/">
+      Copyright [2011] [LMU Munich - Database Systems Group]
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="http://www.apache.org/licenses/">
+      Copyright [2011] [LMU Munich - Database Systems Group]
+
+Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
    </license>
 
    <url>
-      <update label="Medmon Repository" url="http://medmon.mukis.de/repository/"/>
+      <update label="Medmon Repository" url="http://medmon.mukis.de/repository/medmon/"/>
    </url>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.base.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="de.lmu.ifi.dbs.medmon.derby"
@@ -67,42 +75,42 @@
          id="org.eclipse.gemini.dbaccess.derby"
          download-size="0"
          install-size="0"
-         version="1.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.gemini.jpa"
          download-size="0"
          install-size="0"
-         version="1.0.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.antlr"
          download-size="0"
          install-size="0"
-         version="2.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.asm"
          download-size="0"
          install-size="0"
-         version="2.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.core"
          download-size="0"
          install-size="0"
-         version="2.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.jpa"
          download-size="0"
          install-size="0"
-         version="2.3.0"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -170,6 +178,70 @@
 
    <plugin
          id="org.joda.time"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.scala-ide.scala.library"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.modeling"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.modeling.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.osgi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.osgi.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.platform"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.workspace"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.wst.common.uriresolver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.java"
          download-size="0"
          install-size="0"
          version="0.0.0"
