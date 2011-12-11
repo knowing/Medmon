@@ -158,10 +158,10 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
   override def configure(properties: Properties) = {
     //Configure your classifier here with
     val lda = filter.asInstanceOf[LDAFilter]
-    val debug = properties.getProperty(DEBUG)
-    val dimreduction = properties.getProperty(DIMREDUCTION)
+    val debug = properties.getProperty(DEBUG, "false")
+    val dimreduction = properties.getProperty(DIMREDUCTION, "false")
     val outdimensions = properties.getProperty(OUTDIMENSIONS)
-    val attNamePrefix = properties.getProperty(ATTRIBUTE_NAME_PREFIX);
+    val attNamePrefix = properties.getProperty(ATTRIBUTE_NAME_PREFIX, "FV_");
     lda.setDebug(debug.toBoolean)
     lda.setDimensionReduction(dimreduction.toBoolean)
     if (outdimensions != null) {
