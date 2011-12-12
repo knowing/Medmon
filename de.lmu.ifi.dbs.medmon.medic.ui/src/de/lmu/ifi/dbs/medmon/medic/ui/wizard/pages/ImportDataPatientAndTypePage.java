@@ -1,40 +1,50 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_RAW;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_TRAINING;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.NO_OPTION;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.PATIENT_SELECTED;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_SENSOR;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_FILE;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.ui.actions.SelectionProviderAction;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportDataWizard;
-import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.*;
 
-public class ImportDataPatientAndTypePage extends WizardPage {
-	private Text	textLastname;
-	private Text	textFirstname;
-	private int		options	= 0;
+public class ImportDataPatientAndTypePage extends WizardPage implements IValidationPage {
+	private Text				textLastname;
+	private Text				textFirstname;
+	private int					options						= 0;
 
-	private Button	btnRawData;
-	private Button	btnSensor;
-	private Button	btnFile;
-	private Button	btnTraining;
+	private Button				btnRawData;
+	private Button				btnSensor;
+	private Button				btnFile;
+	private Button				btnTraining;
 
-	private Patient	selectedPatient = null;
+	private Patient				selectedPatient				= null;
+
+	private SortedSet<String>	errors						= new TreeSet<String>();
+	private static String		ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgewählt";
 
 	/**
 	 * Create the wizard.
@@ -45,14 +55,21 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		setDescription("<missing>");
 	}
 
-	public int getOption() {
-		return options;
+	/**
+	 * WIZZARD-GET: get selected Patient 
+	 * @return
+	 */
+	public Patient getSelectedPatient() {
+		return selectedPatient;
 	}
-
-	private void refreshOption() {
+	
+	/**
+	 * WIZZARD-GET: get selected Options
+	 * @return
+	 */
+	public int getOption() {
 		options = NO_OPTION;
-		
-		//Acquire Flags
+
 		if (btnRawData.getSelection())
 			options = options | IMPORT_RAW;
 		if (btnTraining.getSelection())
@@ -60,25 +77,24 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		if (btnSensor.getSelection())
 			options = options | SOURCE_SENSOR;
 		if (btnFile.getSelection())
-			options = options | SOURCE_SENSOR;
-		if(selectedPatient != null)
+			options = options | SOURCE_FILE;
+		if (selectedPatient != null)
 			options = options | PATIENT_SELECTED;
-		
-		//Test PageComplete Flags
-		if((options & PATIENT_SELECTED) != 0)
-			setPageComplete(true);
-		else
-			setPageComplete(false);
+
+		return options;
 	}
 
+	/**
+	 * WIZZARD-INIT:
+	 * @return
+	 */
 	private void initialize() {
-
-		setPageComplete(false);
-		refreshOption();
 
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
 		selectPatient(selectedPatient);
+
+		checkContents();
 	}
 
 	private void selectPatient(Patient patient) {
@@ -89,10 +105,7 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		} else {
 			textFirstname.setText(patient.getFirstname());
 			textLastname.setText(patient.getLastname());
-			ImportDataWizard wizard = (ImportDataWizard) getWizard();
-			wizard.setSelectedPatient(patient);
 		}
-		refreshOption();
 	}
 
 	/**
@@ -124,10 +137,11 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 
 		Button btnChoosePatient = new Button(container, SWT.NONE);
 		btnChoosePatient.setText("ausw\u00E4hlen");
-		btnChoosePatient.addSelectionListener(new SelectionAdapter() {
+		btnChoosePatient.addSelectionListener(new ValidationListener(this) {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectPatient(DialogFactory.openPatientSelectionDialog(getShell()));
+				super.widgetSelected(e);
 			}
 		});
 
@@ -143,21 +157,9 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		btnSensor = new Button(grpSource, SWT.RADIO);
 		btnSensor.setSelection(true);
 		btnSensor.setText("Sensor - importiert Daten von einem angeschlossenem Sensor");
-		btnSensor.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				refreshOption();
-			}
-		});
 
 		btnFile = new Button(grpSource, SWT.RADIO);
 		btnFile.setText("Datei - importiert die Daten aus einer Datei auf diesem Computer");
-		btnFile.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				refreshOption();
-			}
-		});
 
 		Group grpType = new Group(grpDataType, SWT.NONE);
 		grpType.setText("Typ:");
@@ -166,22 +168,27 @@ public class ImportDataPatientAndTypePage extends WizardPage {
 		btnRawData = new Button(grpType, SWT.RADIO);
 		btnRawData.setSelection(true);
 		btnRawData.setText("Rohdaten");
-		btnRawData.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				refreshOption();
-			}
-		});
 
 		btnTraining = new Button(grpType, SWT.RADIO);
 		btnTraining.setText("Training");
-		btnTraining.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				refreshOption();
-			}
-		});
 
 		initialize();
+	}
+
+	@Override
+	public void checkContents() {
+
+		if (selectedPatient == null)
+			errors.add(ERROR_NO_PATIENT_SELECTED);
+		else
+			errors.remove(ERROR_NO_PATIENT_SELECTED);
+
+		if (errors.isEmpty()) {
+			setErrorMessage(null);
+			setPageComplete(true);
+		} else {
+			setErrorMessage(errors.first());
+			setPageComplete(false);
+		}
 	}
 }

@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
-import java.util.Date;
-
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
@@ -31,11 +30,11 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
 
 public class TherapyDetailPage implements IDetailsPage {
 
@@ -48,6 +47,7 @@ public class TherapyDetailPage implements IDetailsPage {
 	private Listener					successChangedListener;
 	private EntityManager				entityManager;
 	private IGlobalSelectionProvider	selectionProvider;
+	private Therapy	therapy;
 
 	/**
 	 * Create the details page.
@@ -225,29 +225,11 @@ public class TherapyDetailPage implements IDetailsPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
+				//
+				TherapyResultWizard wizard = new TherapyResultWizard(therapy);
+				WizardDialog dialog = new WizardDialog(managedForm.getForm().getShell(), wizard);
+				dialog.open();
 
-				/************************************************************
-				 * Database Access Begin
-				 ************************************************************/
-
-				TherapyResult mTherapyResult = new TherapyResult();
-				Therapy mTherapy = entityManager.merge(selectedTherapy);
-				// SetSomeStuff
-				mTherapyResult.setTherapy(mTherapy);
-
-				entityManager.getTransaction().begin();
-				entityManager.persist(mTherapyResult);
-				entityManager.getTransaction().commit();
-				
-				entityManager.detach(mTherapy);
-
-				/************************************************************
-				 * Database Access End
-				 ************************************************************/
-
-				selectionProvider.updateSelection(Patient.class);
-				selectionProvider.updateSelection(Therapy.class);
 			}
 		});
 
@@ -282,7 +264,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-		Therapy therapy = (Therapy) structuredSelection.getFirstElement();
+		therapy = (Therapy) structuredSelection.getFirstElement();
 
 		selectionProvider.setSelection(Therapy.class, therapy);
 

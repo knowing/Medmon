@@ -2,9 +2,11 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,22 +16,33 @@ import javax.persistence.Query;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -51,10 +64,15 @@ import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.jface.viewers.ComboViewer;
 
 public class PatientView extends ViewPart {
 	public PatientView() {
@@ -86,11 +104,12 @@ public class PatientView extends ViewPart {
 	private CDateTime					dateBirth;
 
 	private PatientFileDetailBlock		patientFileDetailBlock;
-	private Text						text;
 	private IGlobalSelectionProvider	selectionProvider;
 	private EntityManager				entityManager;
 	private TaskSeriesCollection		dataset;
 	private JFreeChart					chart;
+	private Table						dataTable;
+	private ComboViewer					comboViewer;
 
 	/**
 	 * @wbp.nonvisual location=82,149
@@ -244,6 +263,7 @@ public class PatientView extends ViewPart {
 		 * Listener for Patient.class
 		 ************************************************************/
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
+			private Patient	selectedPatient;
 
 			@SuppressWarnings("unchecked")
 			@Override
@@ -253,6 +273,8 @@ public class PatientView extends ViewPart {
 				 * selection != null
 				 ************************************************************/
 				if (selection != null) {
+
+					selectedPatient = selection;
 
 					/************************************************************
 					 * Fill the UI components
@@ -273,38 +295,44 @@ public class PatientView extends ViewPart {
 					}
 					textInsuranceId.setText(selection.getInsuranceId());
 
-					/************************************************************
-					 * fill JFreechart
-					 ************************************************************/
-
 					entityManager.getTransaction().begin();
 					Patient mPatient = entityManager.merge(selection);
 					entityManager.getTransaction().commit();
 
+					/************************************************************
+					 * fill TableViewer
+					 ************************************************************/
+					Query allDataQuery = entityManager.createNamedQuery("Data.findByPatient");
+					List<Data> allData = allDataQuery.setParameter("patient", mPatient).getResultList();
+					dataTableViewer.setInput(allData);
+
+					/************************************************************
+					 * fill JFreechart
+					 ************************************************************/
 					TaskSeries series = new TaskSeries(new String());
+					if (allData.size() > 0) {
 
-					Query leftBoundsQuery = entityManager.createNamedQuery("Data.findEarliestOfPatient");
-					Query rightBoundsQuery = entityManager.createNamedQuery("Data.findLatestOfPatient");
-					Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
-							.getResultList().get(0);
-					Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
-							.getResultList().get(0);
-					
-					Query allSensorsQuery = entityManager.createNamedQuery("Sensor.findByPatient");
-					List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
-							.getResultList();
+						Query leftBoundsQuery = entityManager.createNamedQuery("Data.findEarliestOfPatient");
+						Query rightBoundsQuery = entityManager.createNamedQuery("Data.findLatestOfPatient");
 
-					for (Sensor sensor : allSensors) {
-						Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
-						Query dataFromSensorQuery = entityManager.createNamedQuery("Data.findByPatientAndSensor");
-						List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient).setParameter("sensor", sensor)
+						Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
+						Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
+
+						Query allSensorsQuery = entityManager.createNamedQuery("Sensor.findByPatient");
+						List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
 								.getResultList();
-						for(Data data : dataFromSensor){
-							task.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
-						}
-						series.add(task);
-					}
 
+						for (Sensor sensor : allSensors) {
+							Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
+							Query dataFromSensorQuery = entityManager.createNamedQuery("Data.findByPatientAndSensor");
+							List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient)
+									.setParameter("sensor", sensor).getResultList();
+							for (Data data : dataFromSensor) {
+								task.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
+							}
+							series.add(task);
+						}
+					}
 					dataset.removeAll();
 					dataset.add(series);
 					entityManager.detach(mPatient);
@@ -329,8 +357,9 @@ public class PatientView extends ViewPart {
 
 			@Override
 			public void selectionUpdated() {
-				// TODO Auto-generated method stub
-
+				if (selectedPatient == null)
+					return;
+				selectionChanged(selectedPatient);
 			}
 
 			@Override
@@ -342,11 +371,6 @@ public class PatientView extends ViewPart {
 		 * Listener END
 		 ************************************************************/
 
-		/*
-		 * dBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DATE_SHORT); data =
-		 * new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		 * data.widthHint = 160; dBirth.setLayoutData(data);
-		 */
 	}
 
 	/* ==================================== */
@@ -406,17 +430,111 @@ public class PatientView extends ViewPart {
 		toolkit.paintBordersFor(cTimeline);
 		cTimeline.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		text = new Text(formData.getBody(), SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		toolkit.adapt(text, true, true);
+		comboViewer = new ComboViewer(formData.getBody(), SWT.NONE);
+		final Combo comboFilter = comboViewer.getCombo();
+		comboFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.paintBordersFor(comboFilter);
+		comboFilter.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				dataTableViewer.refresh(false);
+			}
 
-		Table dataTable = toolkit.createTable(formData.getBody(), SWT.NONE);
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
+		comboFilter.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dataTableViewer.refresh(false);
+			}
+		});
+		comboViewer.setContentProvider(ArrayContentProvider.getInstance());
+		comboViewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((ISensor) element).getName();
+			}
+		});
+
+		ISensorObserver sensorObserver = new ISensorObserver() {
+			private List<ISensor>	localSensorList	= new LinkedList<ISensor>();
+
+			@Override
+			public void init(List<ISensor> sensors) {
+				localSensorList.addAll(sensors);
+				comboViewer.setInput(localSensorList);
+			}
+
+			@Override
+			public void sensorAdded(ISensor service) {
+				localSensorList.add(service);
+				comboViewer.refresh();
+			}
+
+			@Override
+			public void sensorRemoved(ISensor service) {
+				localSensorList.remove(service);
+				comboViewer.refresh();
+			}
+
+			@Override
+			public void sensorUpdated(ISensor service) {
+				comboViewer.refresh();
+			}
+
+		};
+		Activator.getBundleContext().registerService(ISensorObserver.class, sensorObserver, null);
+
+		dataTable = toolkit.createTable(formData.getBody(), SWT.FULL_SELECTION);
 		dataTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		toolkit.paintBordersFor(dataTable);
 		dataTable.setHeaderVisible(true);
 		dataTable.setLinesVisible(true);
 		dataTableViewer = new DataViewer(dataTable);
-		// createDataTabToolbar(formData.getToolBarManager());
+		dataTable.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection selection = (IStructuredSelection) dataTableViewer.getSelection();
+				if (selection.isEmpty())
+					return;
+				selectionProvider.setSelection(Data.class, (Data) selection.getFirstElement());
+			}
+		});
+		dataTableViewer.addFilter(new ViewerFilter() {
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				System.out.println("select");
+				String filter = comboFilter.getText().toLowerCase();
+				Data d = (Data) element;
+				if (d.getSensor().getName().toLowerCase().contains(filter))
+					return true;
+				return false;
+			}
+		});
+
+		Menu popUpMenu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
+		MenuItem itemDelete = new MenuItem(popUpMenu, SWT.PUSH);
+		itemDelete.setText("löschen");
+		itemDelete.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Data mData = selectionProvider.getSelection(Data.class);
+				if (mData == null)
+					return;
+
+				entityManager.getTransaction().begin();
+				mData = entityManager.merge(mData);
+				File file = new File(mData.getFile());
+				file.delete();
+				entityManager.remove(mData);
+				entityManager.getTransaction().commit();
+
+				selectionProvider.updateSelection(Patient.class);
+				selectionProvider.setSelection(Data.class, null);
+			}
+		});
+		dataTable.setMenu(popUpMenu);
 	}
 
 	private void createDataTabToolbar(IToolBarManager toolbar) {

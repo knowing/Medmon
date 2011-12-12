@@ -1,6 +1,6 @@
 instructions.configure=\
-  addRepository(type:0,location:http${#58}//medmon.mukis.de/repository/);\
-  addRepository(type:1,location:http${#58}//medmon.mukis.de/repository/);\
-  addRepository(type:0,location:http${#58}//medmon.mukis.de/addons/);\
-  addRepository(type:1,location:http${#58}//medmon.mukis.de/addons/);
+  addRepository(type:0,location:http${#58}//medmon.mukis.de/repository/medmon/);\
+  addRepository(type:1,location:http${#58}//medmon.mukis.de/repository/medmon/);\
+  addRepository(type:0,location:http${#58}//medmon.mukis.de/repository/ide/);\
+  addRepository(type:1,location:http${#58}//medmon.mukis.de/repository/ide/);
 

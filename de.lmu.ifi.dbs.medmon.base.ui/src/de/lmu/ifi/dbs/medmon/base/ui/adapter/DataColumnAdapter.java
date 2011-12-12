@@ -37,11 +37,13 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 		Data adapter = (Data) element;
 		switch (columnIndex) {
 		case 0:
-			return adapter.getPatient().toString();
-		case 1:
 			return df.format(adapter.getFrom());
-		case 2:
+		case 1:
 			return df.format(adapter.getTo());
+		case 2:
+			return adapter.getSensor().getName();
+		case 3:
+			return "<not implemented>";
 		default:
 			return "-";
 		}

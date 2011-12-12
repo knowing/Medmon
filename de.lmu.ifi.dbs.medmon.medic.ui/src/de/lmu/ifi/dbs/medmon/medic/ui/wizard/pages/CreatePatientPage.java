@@ -29,27 +29,28 @@ import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 
 public class CreatePatientPage extends WizardPage implements IValidationPage {
 
-	private static final String MALE_STRING = "Maennlich";
-	private static final String FEMAL_STRING = "Weiblich";
+	private static final String	MALE_STRING						= "Maennlich";
+	private static final String	FEMAL_STRING					= "Weiblich";
 
 	// User can choose next, but not finish
-	private boolean flip = false;
+	private boolean				flip							= false;
 
-	private Patient patient = new Patient();
+	private Patient				patient							= new Patient();
 
-	private Text tFirstname;
-	private Text tLastname;
-	private Text tInsuranceId;
+	private Text				tFirstname;
+	private Text				tLastname;
+	private Text				tInsuranceId;
 
-	private CDateTime dBirth;
-	private ComboViewer genderViewer;
+	private CDateTime			dBirth;
+	private ComboViewer			genderViewer;
 
 	// Errors
 	/** The <code>Stack</code> for errors occured in this page. */
-	private SortedSet<String> errors;
+	private SortedSet<String>	errors;
 
-	private static final String ERROR_IDENTICAL_PATIENT = "Identischer Patient vorhanden";
-	private static final String ERROR_IDENTICAL_INSURANCE_ID = "Identische Versicherungsnummer";
+	private static final String	ERROR_IDENTICAL_PATIENT			= "Identischer Patient vorhanden";
+	private static final String	ERROR_IDENTICAL_INSURANCE_ID	= "Identische Versicherungsnummer";
+	private static final String	ERROR_NO_INSURANCE_ID			= "Keine Versicherungsnummer";
 
 	public CreatePatientPage() {
 		super("Patient auswaehlen");
@@ -125,31 +126,28 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 	@Override
 	public void checkContents() {
 		// Check identical patient
-		if (tFirstname.getText().length() > 2 && tLastname.getText().length() > 4) {
-			EntityManager em = JPAUtil.createEntityManager();
-			List resultList = em.createNamedQuery("Patient.findIdentical")
-					.setParameter("firstname", tFirstname.getText()).setParameter("lastname", tLastname.getText())
-					.setParameter("birth", dBirth.getSelection()).getResultList();
+		EntityManager em = JPAUtil.createEntityManager();
+		List resultList = em.createNamedQuery("Patient.findIdentical").setParameter("firstname", tFirstname.getText())
+				.setParameter("lastname", tLastname.getText()).setParameter("birth", dBirth.getSelection()).getResultList();
 
-			if (!resultList.isEmpty())
-				errors.add(ERROR_IDENTICAL_PATIENT);
-			else
-				errors.remove(ERROR_IDENTICAL_PATIENT);
+		if (!resultList.isEmpty())
+			errors.add(ERROR_IDENTICAL_PATIENT);
+		else
+			errors.remove(ERROR_IDENTICAL_PATIENT);
 
-			em.close();
+		// Check InsuranceNumber empty
+		if (tInsuranceId.getText().isEmpty()) {
+			errors.add(ERROR_NO_INSURANCE_ID);
+		} else {
+			errors.remove(ERROR_NO_INSURANCE_ID);
 		}
+
 		// Check InsuranceNumber
-		if (tInsuranceId.getText().length() > 7) {
-			EntityManager em = JPAUtil.createEntityManager();
-			List resultList = em.createNamedQuery("Patient.findByInsuranceId").setParameter("insuranceId", tInsuranceId.getText())
-					.getResultList();
-			if (!resultList.isEmpty())
-				errors.add(ERROR_IDENTICAL_INSURANCE_ID);
-			else
-				errors.remove(ERROR_IDENTICAL_INSURANCE_ID);
-			em.close();
-			
-		}
+		resultList = em.createNamedQuery("Patient.findByInsuranceId").setParameter("insuranceId", tInsuranceId.getText()).getResultList();
+		if (!resultList.isEmpty())
+			errors.add(ERROR_IDENTICAL_INSURANCE_ID);
+		else
+			errors.remove(ERROR_IDENTICAL_INSURANCE_ID);
 
 		if (errors.isEmpty()) {
 			setErrorMessage(null);
@@ -160,7 +158,7 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 			flip = false;
 			setPageComplete(false);
 		}
-
+		em.close();
 	}
 
 	public void initializePatient(Patient patient) {

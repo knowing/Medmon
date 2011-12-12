@@ -8,16 +8,21 @@ import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.READ;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -146,13 +151,21 @@ public class PatientService implements IPatientService {
 		em.getTransaction().begin();
 		Patient patient = em.merge(p);
 		Sensor sensor = em.merge(s);
+
 		Data data = new Data(patient, sensor, type, from, to);
 		Path file = locateDirectory(patient, type).resolve(generateFilename(sensor, type, from, to));
+		OutputStream outputStream = null;
+		try {
+			outputStream = newOutputStream(file, CREATE_NEW);
+		} catch (IOException e) {
+			em.close();
+			throw e;
+		}
 		data.setFile(file.toString());
 		em.persist(data);
 		em.getTransaction().commit();
 		em.close();
-		return newOutputStream(file, CREATE_NEW);
+		return outputStream;
 	}
 
 	/**
@@ -181,7 +194,37 @@ public class PatientService implements IPatientService {
 			log.error("Error read from InputStream or writing to OutputStream.", e);
 			throw e;
 		}
+	}
 
+	/**
+	 * 
+	 * @param patient
+	 * @param sensor
+	 * @param type
+	 * @param inputURL
+	 */
+	@Override
+	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException {
+		IConverter converter = sensorManagerService.createConverter(sensor);
+
+		if (converter == null)
+			return;
+
+		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
+		Interval interval = converter.getInterval();
+		
+		try (OutputStream os = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+				InputStream in = new FileInputStream(new File(inputURL))) {
+
+			byte[] buffer = new byte[4096];
+			int bytesRead = 0;
+			while ((bytesRead = in.read(buffer)) != -1) {
+				os.write(buffer, 0, bytesRead);
+			}
+		} catch (IOException e) {
+			log.error("Error read from InputStream or writing to OutputStream.", e);
+			throw e;
+		}
 	}
 
 	/**
