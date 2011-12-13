@@ -23,45 +23,48 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "THERAPY")
-@NamedQueries( {@NamedQuery(name = "Therapy.findByPatientId", query = "SELECT t FROM Therapy t WHERE t.patient = :patientId") })
+@NamedQueries({ @NamedQuery(name = "Therapy.findByPatientId", query = "SELECT t FROM Therapy t WHERE t.patient = :patientId") })
 public class Therapy implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long	serialVersionUID	= 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
-	
+
 	@Column
-	String name;
+	String caption;
 
 	// bi-directional many-to-one association to Patient
-	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "PATIENT_ID", nullable = false)
 	private Patient patient;
 
-	@OneToMany(mappedBy = "therapy", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	Set<TherapyResult> therapyResults = new HashSet<TherapyResult>();
+	@OneToMany(mappedBy = "therapy", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	private Set<TherapyResult>	therapyResults = new HashSet<TherapyResult>();
 
 	@Temporal(TemporalType.DATE)
-	Date therapyStart;
+	private Date therapyStart;
 
 	@Temporal(TemporalType.DATE)
-	Date therapyEnd;
+	private Date therapyEnd;
 
 	@Column
-	String comment;
+	private String comment;
 
 	@Column(/* 0-100 ? */)
-	int success;
+	private int success;
 
-
-	public void updateSuccess(){
-		int sum = 0;
-		for(TherapyResult therapyResult : therapyResults){
-			sum += therapyResult.getSuccess();
+	public void updateSuccess() {
+		if (!therapyResults.isEmpty()) {
+			int sum = 0;
+			for (TherapyResult therapyResult : therapyResults) {
+				sum += therapyResult.getSuccess();
+			}
+			sum /= therapyResults.size();
+			setSuccess(sum);
+		} else {
+			setSuccess(0);
 		}
-		sum /= therapyResults.size();
-		setSuccess(sum);
 	}
 
 	/**
@@ -107,26 +110,26 @@ public class Therapy implements Serializable {
 		return therapyResults;
 	}
 
-	public String getName() {
-		return name;
+	public String getCaption() {
+		return caption;
 	}
-	
-	public void setName(String name) {
-		this.name = name;
+
+	public void setCaption(String name) {
+		this.caption = name;
 	}
-	
+
 	public String getComment() {
 		return comment;
 	}
-	
+
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

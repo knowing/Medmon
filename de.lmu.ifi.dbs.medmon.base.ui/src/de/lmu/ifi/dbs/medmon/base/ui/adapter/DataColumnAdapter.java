@@ -34,16 +34,18 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
-		Data adapter = (Data) element;
+		Data data = (Data) element;
 		switch (columnIndex) {
 		case 0:
-			return df.format(adapter.getFrom());
+			return df.format(data.getFrom());
 		case 1:
-			return df.format(adapter.getTo());
+			return df.format(data.getTo());
 		case 2:
-			return adapter.getSensor().getName();
+			return data.getSensor().getName();
 		case 3:
-			return "<not implemented>";
+			if(data.getTherapyResult() == null)
+				return "";
+			return data.getTherapyResult().getCaption();
 		default:
 			return "-";
 		}

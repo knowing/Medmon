@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.database.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -55,21 +57,25 @@ public class Data implements Serializable {
 	// private String originalFile;
 	private String				type;
 
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "SENSOR_ID", nullable = false)
 	private Sensor				sensor;
 
 	// bi-directional many-to-one association to Comment
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "ARCHIV_ID")
 	private Archiv				archiv;
 
 	// bi-directional many-to-one association to Patient
 	//
-	@ManyToOne
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false)
 	private Patient				patient;
 
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinColumn(name = "DATA_ID", nullable = true)
+	TherapyResult therapyResult;
+	
 	public Data() {
 	}
 
@@ -143,6 +149,14 @@ public class Data implements Serializable {
 
 	public void setSensor(Sensor sensor) {
 		this.sensor = sensor;
+	}
+	
+	public TherapyResult getTherapyResult() {
+		return therapyResult;
+	}
+	
+	public void setTherapyResult(TherapyResult therapyResult) {
+		this.therapyResult = therapyResult;
 	}
 
 	@Override

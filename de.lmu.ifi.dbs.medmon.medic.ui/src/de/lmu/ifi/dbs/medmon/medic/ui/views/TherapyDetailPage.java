@@ -47,7 +47,8 @@ public class TherapyDetailPage implements IDetailsPage {
 	private Listener					successChangedListener;
 	private EntityManager				entityManager;
 	private IGlobalSelectionProvider	selectionProvider;
-	private Therapy	therapy;
+	private Therapy						therapy;
+	private Text						textComment;
 
 	/**
 	 * Create the details page.
@@ -88,7 +89,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 		Label lblTherapy = new Label(composite, SWT.NONE);
 		toolkit.adapt(lblTherapy, true, true);
-		lblTherapy.setText("Ma\u00DFnahmen:");
+		lblTherapy.setText("Bezeichnung:");
 
 		textTherapy = new Text(composite, SWT.BORDER);
 		textTherapy.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
@@ -172,7 +173,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		toolkit.paintBordersFor(groupComment);
 		groupComment.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		Text txtComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
+		textComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
 
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(4, false));
@@ -268,11 +269,18 @@ public class TherapyDetailPage implements IDetailsPage {
 
 		selectionProvider.setSelection(Therapy.class, therapy);
 
-		textTherapy.setText("<empty>");
+		entityManager.getTransaction().begin();
+		therapy = entityManager.merge(therapy);
+		entityManager.getTransaction().commit();
+		
+		textTherapy.setText(therapy.getCaption());
+		textComment.setText(therapy.getComment());
 		dateStart.setSelection(therapy.getTherapyStart());
 		dateEnd.setSelection(therapy.getTherapyEnd());
 		scaleSuccess.setSelection(therapy.getSuccess());
 		successChangedListener.handleEvent(null);
+		
+		entityManager.detach(therapy);
 
 		update();
 	}
@@ -280,13 +288,22 @@ public class TherapyDetailPage implements IDetailsPage {
 	public void commit(boolean onSave) {
 		Therapy therapy = selectionProvider.getSelection(Therapy.class);
 
-		therapy.setSuccess(scaleSuccess.getSelection());
+		entityManager.getTransaction().begin();
+		therapy = entityManager.merge(therapy);
+		therapy.setCaption(textTherapy.getText());
+		therapy.setComment(textComment.getText());
 		therapy.setTherapyStart(dateStart.getSelection());
 		therapy.setTherapyEnd(dateEnd.getSelection());
+		therapy.setSuccess(scaleSuccess.getSelection());
+		entityManager.getTransaction().commit();
+		entityManager.detach(therapy);
+
+		selectionProvider.updateSelection(Therapy.class);
+		selectionProvider.updateSelection(Patient.class);
 	}
 
 	public boolean isDirty() {
-		return false;
+		return true;
 	}
 
 	public boolean isStale() {

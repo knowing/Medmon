@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.database.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -57,19 +58,19 @@ public class Patient implements Serializable {
 	private Date therapystart;
 
 	// bi-directional many-to-one association to Appointment
-	@OneToMany(mappedBy = "patient")
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private Set<Appointment> appointments = new HashSet<Appointment>();
 
 	// bi-directional many-to-one association to Data
-	@OneToMany(mappedBy = "patient")
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private Set<Data> data = new HashSet<Data>();
 
 	// bi-directional many-to-one association to Archives
-	@OneToMany(mappedBy = "patient")
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {

@@ -32,9 +32,9 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	private boolean				isDirectorySectionEnabled	= false;
 	private SortedSet<String>	errors						= new TreeSet<String>();
 
-	private static String		ERROR_NO_FILE_CHOOSEN		= "Keine datei ausgewählt";
+	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgewählt";
 	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgewählt";
-	private Button				btnChooseFile;
+	private Button				btnChooseDirectory;
 
 	/**
 	 * Create the wizard.
@@ -64,7 +64,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	 */
 	public void setDirectorySectionEnabled(boolean flag) {
 		isDirectorySectionEnabled = flag;
-		btnChooseFile.setEnabled(flag);
+		btnChooseDirectory.setEnabled(flag);
 	}
 
 	/**
@@ -103,9 +103,9 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 		textFile.setEditable(false);
 		textFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		btnChooseFile = new Button(container, SWT.NONE);
-		btnChooseFile.setText("Datei");
-		btnChooseFile.addSelectionListener(new ValidationListener(this) {
+		btnChooseDirectory = new Button(container, SWT.NONE);
+		btnChooseDirectory.setText("Durchsuchen");
+		btnChooseDirectory.addSelectionListener(new ValidationListener(this) {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				DirectoryDialog dlg = new DirectoryDialog(getShell());
@@ -124,14 +124,14 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 
 	@Override
 	public void checkContents() {
-		
+
 		if (isDirectorySectionEnabled) {
 			if (selectedDirectory == null)
-				errors.add(ERROR_NO_FILE_CHOOSEN);
+				errors.add(ERROR_NO_DIRECTORY_CHOOSEN);
 			else
-				errors.remove(ERROR_NO_FILE_CHOOSEN);
+				errors.remove(ERROR_NO_DIRECTORY_CHOOSEN);
 		} else
-			errors.remove(ERROR_NO_FILE_CHOOSEN);
+			errors.remove(ERROR_NO_DIRECTORY_CHOOSEN);
 
 		if (selectedSensor == null)
 			errors.add(ERROR_NO_SENSOR_SELECTED);

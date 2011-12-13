@@ -74,6 +74,18 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		gl_composite.horizontalSpacing = 15;
 		composite.setLayout(gl_composite);
 
+		Text text = new Text(composite, SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		toolkit.adapt(text, true, true);
+
+		final SectionPart sectionPart = new SectionPart(section);
+		managedForm.addPart(sectionPart);
+
+		therapiesViewer = new TreeViewer(composite, SWT.BORDER);
+		Tree tree = therapiesViewer.getTree();
+		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		toolkit.paintBordersFor(tree);
+
 		Composite composite_1 = new Composite(composite, SWT.NONE);
 		composite_1.setLayout(new GridLayout(2, false));
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
@@ -96,6 +108,8 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 				Therapy mTherapy = new Therapy();
 
+				mTherapy.setCaption("neue Therapie");
+				mTherapy.setComment("kein Kommentar.");
 				mTherapy.setTherapyStart(new Date());
 				mTherapy.setTherapyEnd(new Date());
 				mTherapy.setPatient(localPatientSelection);
@@ -111,28 +125,16 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				selectionProvider.updateSelection(Patient.class);
 			}
 		});
-		
+
 		Label lblPlaceholder1 = new Label(composite_1, SWT.NONE);
 		lblPlaceholder1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(lblPlaceholder1, true, true);
 		linkAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
 			}
 		});
-	
-		Text text = new Text(composite, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		toolkit.adapt(text, true, true);
-
-		final SectionPart sectionPart = new SectionPart(section);
-		managedForm.addPart(sectionPart);
-
-		therapiesViewer = new TreeViewer(composite, SWT.BORDER);
-		Tree tree = therapiesViewer.getTree();
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		toolkit.paintBordersFor(tree);
 		therapiesViewer.setContentProvider(new BaseWorkbenchContentProvider());
 		therapiesViewer.setLabelProvider(new WorkbenchLabelProvider());
 		therapiesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -160,7 +162,10 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					 * Database Access Begin
 					 ************************************************************/
 
+					entityManager.getTransaction().begin();
 					localPatientSelection = entityManager.merge(selection);
+					entityManager.getTransaction().commit();
+					
 					therapiesViewer.setInput(localPatientSelection);
 
 					/************************************************************
@@ -175,7 +180,6 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/
-				System.out.println("refresh");
 
 				entityManager.getTransaction().begin();
 				entityManager.refresh(localPatientSelection);

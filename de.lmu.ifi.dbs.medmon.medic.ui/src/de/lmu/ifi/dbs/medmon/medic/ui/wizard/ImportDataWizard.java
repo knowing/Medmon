@@ -6,7 +6,6 @@ import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_S
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,21 +13,18 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
@@ -67,7 +63,7 @@ public class ImportDataWizard extends Wizard {
 
 		IPatientService patientService = Activator.getPatientService();
 
-		if ((options & (SOURCE_SENSOR | IMPORT_RAW)) != 0) {
+		if ((options & IMPORT_RAW) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
 				DataStoreOutput output = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
@@ -75,20 +71,9 @@ public class ImportDataWizard extends Wizard {
 				selectionProvider.setSelection(Patient.class, selectedPatient);
 				selectionProvider.setSelection(Data.class, output.dataEntity);
 				selectionProvider.unregister();
-			} catch (IOException e) {
-				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
-				e.printStackTrace();
-			}
-			return true;
-		} else if ((options & (SOURCE_FILE | IMPORT_RAW)) != 0) {
-			try {
-				selectedURI = dataPage.getSelectedURI();
-				DataStoreOutput output = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
-				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-				selectionProvider.setSelection(Patient.class, selectedPatient);
-				selectionProvider.setSelection(Data.class, output.dataEntity);
-				selectionProvider.unregister();
-			} catch (IOException e) {
+				PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+			} catch (IOException | WorkbenchException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
 				e.printStackTrace();
 			}
@@ -112,10 +97,13 @@ public class ImportDataWizard extends Wizard {
 				dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
 			if ((options & SOURCE_FILE) != 0) {
 				List<URI> uriList = new ArrayList<URI>();
-				try {
-					DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory));
-					for (Path file : directoyStream)
-						uriList.add(file.toUri());
+				try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory))) {
+					String filePrefix = selectedSensor.getFilePrefix();
+					for (Path file : directoyStream) {
+						//Don't use file.endsWith() -> checks the last foldername of the path not the prefix of the file
+						if (file.toString().endsWith(filePrefix))
+							uriList.add(file.toUri());
+					}
 
 				} catch (IOException e) {
 					e.printStackTrace();

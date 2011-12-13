@@ -19,7 +19,7 @@ public class TherapyResultColumnAdapter implements IWorkbenchAdapter {
 	}
 
 	public String getLabel(Object o) {
-		return "Result";
+		return ((TherapyResult)o).getCaption();
 	}
 
 	public Object getParent(Object o) {

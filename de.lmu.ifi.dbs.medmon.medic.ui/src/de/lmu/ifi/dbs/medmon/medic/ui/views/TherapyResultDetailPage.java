@@ -55,12 +55,15 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private Listener					successChangedListener;
 	private IGlobalSelectionProvider	selectionProvider;
 	private EntityManager				entityManager;
+	private Text						textComment;
+	private TherapyResult				therapyResult;
+
 	/**
 	 * Create the details page.
 	 */
 	public TherapyResultDetailPage() {
 		// Create the details page
-		
+
 	}
 
 	/**
@@ -152,7 +155,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		toolkit.paintBordersFor(groupComment);
 		groupComment.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		Text txtComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
+		textComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
 
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(3, false));
@@ -168,7 +171,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 			public void widgetSelected(SelectionEvent e) {
 
 				TherapyResult selectedTherapyResult = selectionProvider.getSelection(TherapyResult.class);
-				
+
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/
@@ -184,11 +187,10 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
-				
-				selectionProvider.updateSelection(Patient.class);
-				selectionProvider.updateSelection(Therapy.class);
-				selectionProvider.setSelection(TherapyResult.class, null);
 
+				selectionProvider.setSelection(TherapyResult.class, null);
+				selectionProvider.updateSelection(Therapy.class);
+				selectionProvider.updateSelection(Patient.class);
 			}
 		});
 
@@ -227,27 +229,42 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-		TherapyResult therapyResult = (TherapyResult) structuredSelection.getFirstElement();
+		therapyResult = (TherapyResult) structuredSelection.getFirstElement();
 
 		selectionProvider.setSelection(TherapyResult.class, therapyResult);
 
-		textTherapy.setText("<empty>");
+		entityManager.getTransaction().begin();
+		therapyResult = entityManager.merge(therapyResult);
+		entityManager.getTransaction().commit();
+
+		textTherapy.setText(therapyResult.getCaption());
+		textComment.setText(therapyResult.getComment());
 		dateTimestamp.setSelection(therapyResult.getTimestamp());
 		scaleSuccess.setSelection(therapyResult.getSuccess());
 		successChangedListener.handleEvent(null);
+
+		entityManager.detach(therapyResult);
 
 		update();
 	}
 
 	public void commit(boolean onSave) {
-		TherapyResult therapyResult = selectionProvider.getSelection(TherapyResult.class);
 
+		entityManager.getTransaction().begin();
+		therapyResult = entityManager.merge(therapyResult);
+		therapyResult.setCaption(textTherapy.getText());
+		therapyResult.setComment(textTherapy.getText());
 		therapyResult.setSuccess(scaleSuccess.getSelection());
 		therapyResult.setTimestamp(dateTimestamp.getSelection());
+		entityManager.getTransaction().commit();
+		entityManager.detach(therapyResult);
+
+		selectionProvider.updateSelection(TherapyResult.class);
+		selectionProvider.updateSelection(Patient.class);
 	}
 
 	public boolean isDirty() {
-		return false;
+		return true;
 	}
 
 	public boolean isStale() {
