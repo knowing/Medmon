@@ -488,13 +488,16 @@ public class PatientView extends ViewPart {
 					selectedPatient = selection;
 
 					/**
-					 * this is needed because the entity Manager holds all entities it queries in its persistence memory.
-					 * thus is ignores updates. merging or refreshing of entities already persisted is frustrating and needs a lot of
-					 * overhead to determine the persistence state of the iterated entities.
-					 * so i went with the clear() solution. this shit took me an half an hour to figure out!
+					 * this is needed because the entity Manager holds all
+					 * entities it queries in its persistence memory. thus is
+					 * ignores updates. merging or refreshing of entities
+					 * already persisted is frustrating and needs a lot of
+					 * overhead to determine the persistence state of the
+					 * iterated entities. so i went with the clear() solution.
+					 * this shit took me an half an hour to figure out!
 					 */
 					entityManager.clear();
-					
+
 					entityManager.getTransaction().begin();
 					Patient mPatient = entityManager.merge(selection);
 					entityManager.getTransaction().commit();
@@ -529,9 +532,10 @@ public class PatientView extends ViewPart {
 									.setParameter("sensor", sensor).getResultList();
 							for (Data data : dataFromSensor) {
 								Task subTask = new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo());
-								TherapyResult therapyResult;
-								if ((therapyResult = data.getTherapyResult()) != null)
+								TherapyResult therapyResult = data.getTherapyResult();
+								if (therapyResult != null) {
 									subTask.setPercentComplete((double) therapyResult.getSuccess() / 100);
+								}
 								task.addSubtask(subTask);
 							}
 							series.add(task);

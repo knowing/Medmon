@@ -159,10 +159,6 @@ public class TherapyResultWizard extends Wizard {
 				}
 			}
 
-			IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-			selectionProvider.updateSelection(Patient.class);
-			selectionProvider.unregister();
-
 			try {
 				PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
 						PlatformUI.getWorkbench().getActiveWorkbenchWindow());
@@ -179,31 +175,20 @@ public class TherapyResultWizard extends Wizard {
 		data = entityManager.merge(data);
 		therapy = entityManager.merge(therapy);
 		entityManager.persist(therapyResult);
-
+		
 		therapyResult.setTherapy(therapy);
-		/**
-		 * Huge bummer:
-		 * as it seems
-		 *   - data.setTherapyResult(therapyResult);
-		 *   and
-		 *   -therapyResult.setData(data)
-		 *   are NOT the same thing
-		 *   
-		 *   you ALWAYS have the OWNING entity setting the TARGET entity
-		 *   
-		 */
 		data.setTherapyResult(therapyResult);
 		therapyResult.setCaption("neues Ergebnis");
 		therapyResult.setComment("kein Kommentar.");
 		therapyResult.setSuccess(50);
 		therapyResult.setTimestamp(null);
-
 		entityManager.getTransaction().commit();
-		entityManager.close();
+		entityManager.close();	
+	
+		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+		selectionProvider.updateSelection(Patient.class);
+		selectionProvider.unregister();
 		
-		System.out.println(therapyResult.getData());
-		System.out.println(data.getTherapyResult());
-
 		return true;
 	}
 }

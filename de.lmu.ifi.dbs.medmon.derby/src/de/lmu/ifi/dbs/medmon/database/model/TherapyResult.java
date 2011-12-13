@@ -88,10 +88,6 @@ public class TherapyResult {
 		return data;
 	}
 	
-	public void setData(Data data) {
-		this.data = data;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

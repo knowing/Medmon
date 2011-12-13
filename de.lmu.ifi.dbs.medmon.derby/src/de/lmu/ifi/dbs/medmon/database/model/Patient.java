@@ -158,30 +158,13 @@ public class Patient implements Serializable {
 		return this.appointments;
 	}
 
-	public void setAppointments(Set<Appointment> appointments) {
-		this.appointments = appointments;
-	}
-
-	public Set<Data> getData() {
-		return this.data;
-	}
-
 	public void setData(Set<Data> data) {
 		this.data = data;
 	}
-
-	public Set<Archiv> getArchives() {
-		return archives;
-	}
-
+	
 	public void setArchives(Set<Archiv> archives) {
 		this.archives = archives;
 	}
-
-	public void setTherapies(Set<Therapy> therapies) {
-		this.therapies = therapies;
-	}
-
 	public Set<Therapy> getTherapies() {
 		return therapies;
 	}

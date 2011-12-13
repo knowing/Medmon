@@ -46,13 +46,6 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	private Patient						localPatientSelection;
 
 	/**
-	 * Create the master details block.
-	 */
-	public PatientFileDetailBlock() {
-		// Create the master details block
-	}
-
-	/**
 	 * Create contents of the master details block.
 	 * 
 	 * @param managedForm
@@ -63,10 +56,10 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		toolkit = managedForm.getToolkit();
 		entityManager = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		//
+
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
 		section.setText("Patientenakte");
-		//
+	
 		Composite composite = toolkit.createComposite(section, SWT.NONE);
 		toolkit.paintBordersFor(composite);
 		section.setClient(composite);
@@ -165,7 +158,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					entityManager.getTransaction().begin();
 					localPatientSelection = entityManager.merge(selection);
 					entityManager.getTransaction().commit();
-					
+
 					therapiesViewer.setInput(localPatientSelection);
 
 					/************************************************************

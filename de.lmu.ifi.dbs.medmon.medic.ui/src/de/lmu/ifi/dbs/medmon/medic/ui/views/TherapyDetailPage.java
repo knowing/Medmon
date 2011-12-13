@@ -197,13 +197,14 @@ public class TherapyDetailPage implements IDetailsPage {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				Therapy mTherapy = entityManager.merge(selectedTherapy);
-				entityManager.getTransaction().commit();
-
-				entityManager.getTransaction().begin();
-				entityManager.remove(mTherapy);
-				entityManager.getTransaction().commit();
+//				entityManager.getTransaction().begin();
+//				Therapy mTherapy = entityManager.merge(selectedTherapy);
+//				entityManager.merge(mTherapy.getTherapyResults());
+////				entityManager.getTransaction().commit();
+//
+////				entityManager.getTransaction().begin();
+//				entityManager.remove(mTherapy);
+//				entityManager.getTransaction().commit();
 
 				/************************************************************
 				 * Database Access End

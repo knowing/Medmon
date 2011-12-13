@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Group;
 
 import de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter;
+import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
@@ -179,7 +180,11 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				entityManager.getTransaction().begin();
 				TherapyResult mTherapyResult = entityManager.merge(selectedTherapyResult);
 				entityManager.getTransaction().commit();
-
+				
+				entityManager.getTransaction().begin();
+				entityManager.merge(mTherapyResult.getData());
+				entityManager.getTransaction().commit();
+				
 				entityManager.getTransaction().begin();
 				entityManager.remove(mTherapyResult);
 				entityManager.getTransaction().commit();
