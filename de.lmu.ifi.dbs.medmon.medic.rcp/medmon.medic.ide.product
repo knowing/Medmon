@@ -14,12 +14,13 @@
    </configIni>
 
    <launcherArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.7
+      <programArgs>-clean -console -consoleLog</programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.5
 -XX:MaxPermSize=256m
 -Xms256m
 -Xmx1024m
 -DREFRESH_BUNDLES=false
--Dderby.system.home=db</vmArgs>
+-Dderby.system.home=${system_property:user.home}${system_property:file.separator}&quot;.derby&quot;</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -37,7 +38,6 @@
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
