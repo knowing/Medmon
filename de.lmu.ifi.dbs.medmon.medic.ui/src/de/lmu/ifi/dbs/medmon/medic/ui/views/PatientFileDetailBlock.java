@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class PatientFileDetailBlock extends MasterDetailsBlock {
+	public PatientFileDetailBlock() {
+	}
 
 	private FormToolkit					toolkit;
 	private IGlobalSelectionProvider	selectionProvider;

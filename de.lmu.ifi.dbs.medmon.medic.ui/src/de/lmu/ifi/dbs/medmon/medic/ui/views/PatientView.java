@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -459,13 +460,12 @@ public class PatientView extends ViewPart {
 				Data mData = selectionProvider.getSelection(Data.class);
 				if (mData == null)
 					return;
-
-				entityManager.getTransaction().begin();
-				mData = entityManager.merge(mData);
-				File file = new File(mData.getFile());
-				file.delete();
-				entityManager.remove(mData);
-				entityManager.getTransaction().commit();
+				
+				try {
+					Activator.getPatientService().remove(mData);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 
 				selectionProvider.updateSelection(Patient.class);
 				selectionProvider.setSelection(Data.class, null);

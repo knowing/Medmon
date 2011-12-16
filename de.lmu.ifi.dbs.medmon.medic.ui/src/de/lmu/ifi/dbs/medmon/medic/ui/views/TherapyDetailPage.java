@@ -30,6 +30,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
@@ -199,10 +200,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 //				entityManager.getTransaction().begin();
 //				Therapy mTherapy = entityManager.merge(selectedTherapy);
-//				entityManager.merge(mTherapy.getTherapyResults());
-////				entityManager.getTransaction().commit();
 //
-////				entityManager.getTransaction().begin();
 //				entityManager.remove(mTherapy);
 //				entityManager.getTransaction().commit();
 
@@ -273,14 +271,14 @@ public class TherapyDetailPage implements IDetailsPage {
 		entityManager.getTransaction().begin();
 		therapy = entityManager.merge(therapy);
 		entityManager.getTransaction().commit();
-		
+
 		textTherapy.setText(therapy.getCaption());
 		textComment.setText(therapy.getComment());
 		dateStart.setSelection(therapy.getTherapyStart());
 		dateEnd.setSelection(therapy.getTherapyEnd());
 		scaleSuccess.setSelection(therapy.getSuccess());
 		successChangedListener.handleEvent(null);
-		
+
 		entityManager.detach(therapy);
 
 		update();

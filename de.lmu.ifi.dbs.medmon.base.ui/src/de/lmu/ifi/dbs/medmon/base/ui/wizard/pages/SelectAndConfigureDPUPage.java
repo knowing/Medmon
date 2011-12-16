@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
@@ -116,25 +117,27 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 	 * @throws IOException
 	 * @return configured DPU or null
 	 */
-	public void configureAndExecuteDPU(Patient patient, Data data) throws IOException {
+	public Data configureAndExecuteDPU(Patient patient, Data data) throws IOException {
 		IPatientService patientService = Activator.getPatientService();
 		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
 		Path inputFile = patientService.locateFilename(data, IPatientService.ROOT);
-		
-		IDataProcessingUnit dpu = configureDPU(patient,inputFile);
+
+		IDataProcessingUnit dpu = configureDPU(patient, inputFile);
 
 		// TODO data is detached. Will this work?
-		Map<String, OutputStream> outputMap = createOutputMap(patient, data, patientService);
+		DataStoreOutput output = createData(patient, data, patientService);
+		Map<String, OutputStream> outputMap = createOutputMap(output.outputStream);
 
 		executeDPU(execPath, dpu, outputMap);
 
+		return output.dataEntity;
 	}
 
-	
 	/**
 	 * <p>
 	 * Configures the selected DPU and executes it with data from sensor.
 	 * </p>
+	 * 
 	 * @param patient
 	 * @param sensor
 	 * @param input
@@ -144,8 +147,8 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 		IPatientService patientService = Activator.getPatientService();
 		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
 		Path inputFile = Paths.get(input);
-		
-		IDataProcessingUnit dpu = configureDPU(patient,inputFile);
+
+		IDataProcessingUnit dpu = configureDPU(patient, inputFile);
 
 		// TODO data is detached. Will this work?
 		Map<String, OutputStream> outputMap = createOutputMap(patient, sensor, input, patientService);
@@ -186,7 +189,6 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 		IDataProcessingUnit dpu = IDataProcessingUnit.TYPE.instantiate();
 		dpu.copy(originalDPU);
 
-
 		// Set properties
 		for (INode node : dpu.getNodes()) {
 
@@ -203,7 +205,7 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 					if (key.equals(INodeProperties.FILE())) {
 						p.setValue(filePropertyValue);
 						filePropertySet = true;
-					} else if (key.equals(INodeProperties.ABSOLUTE_PATH())) { 
+					} else if (key.equals(INodeProperties.ABSOLUTE_PATH())) {
 						p.setValue(String.valueOf(inputFile.isAbsolute()));
 						absolutePathSet = true;
 					} else if (key.equals(INodeProperties.DIR()) || key.equals(INodeProperties.URL())) {
@@ -222,14 +224,15 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 					fileProperty.setKey(INodeProperties.FILE());
 					fileProperty.setValue(filePropertyValue);
 				}
-				
-				// Set Path absolute or relative. Depend if URI or Data was used to create inputFile
-				if(!absolutePathSet) {
+
+				// Set Path absolute or relative. Depend if URI or Data was used
+				// to create inputFile
+				if (!absolutePathSet) {
 					IProperty absoluteProperty = node.getProperties().addNewElement();
 					absoluteProperty.setKey(INodeProperties.ABSOLUTE_PATH());
 					absoluteProperty.setValue(String.valueOf(inputFile.isAbsolute()));
 				}
-				
+
 				log.debug("Set Loader[" + node.getId().getContent() + "] FILE to " + filePropertyValue);
 
 			} else if (node.getType().getContent().equals(NodeType.SAVER)) {
@@ -257,38 +260,43 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 						Path serializeFile = Paths.get(serializePath).getFileName();
 						Path resolvedFile = Paths.get(IPatientService.TRAIN).resolve(serializeFile);
 						p.setValue(resolvedFile.toString());
-						log.debug("Set Processor[" + node.getId().getContent() + "] (DE)SERIALIZE to " + resolvedFile + " [" + p.getValue().getContent() + "]");
+						log.debug("Set Processor[" + node.getId().getContent() + "] (DE)SERIALIZE to " + resolvedFile + " ["
+								+ p.getValue().getContent() + "]");
 					}
 				}
 			}
 		}
 		return dpu;
 	}
-	
-	private Map<String, OutputStream> createOutputMap(Patient patient, Data data, IPatientService patientService) throws IOException {
-		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
-		OutputStream outputStream = patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo()).outputStream;
 
+	private Map<String, OutputStream> createOutputMap(OutputStream outputStream) throws IOException {
+		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
 		// IPatientService.RESULT -> document this somewhere, very important!
 		outputMap.put(IPatientService.RESULT, outputStream);
 		return outputMap;
 	}
-	
-	private Map<String, OutputStream> createOutputMap(Patient patient, ISensor sensor, URI input, IPatientService patientService) throws IOException {
+
+	private DataStoreOutput createData(Patient patient, Data data, IPatientService patientService) throws IOException {
+		return patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo());
+	}
+
+	private Map<String, OutputStream> createOutputMap(Patient patient, ISensor sensor, URI input, IPatientService patientService)
+			throws IOException {
 		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
-		
+
 		IConverter converter = Activator.getSensorManagerService().createConverter(sensor);
 		Sensor sensorEntity = Activator.getSensorManagerService().loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
-		OutputStream outputStream = patientService.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(), interval.getEnd().toDate()).outputStream;
+		OutputStream outputStream = patientService.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(),
+				interval.getEnd().toDate()).outputStream;
 
 		// IPatientService.RESULT -> document this somewhere, very important!
 		outputMap.put(IPatientService.RESULT, outputStream);
 		return outputMap;
 	}
-	
+
 	@Override
 	public void checkContents() {
-		
+
 	}
 }
