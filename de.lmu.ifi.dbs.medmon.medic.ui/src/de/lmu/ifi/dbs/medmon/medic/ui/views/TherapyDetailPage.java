@@ -8,6 +8,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -50,6 +52,9 @@ public class TherapyDetailPage implements IDetailsPage {
 	private IGlobalSelectionProvider	selectionProvider;
 	private Therapy						localTherapySelection;
 	private Text						textComment;
+	private boolean						isDirty				= false;
+	private boolean						ignoreModification	= false;
+	private DirtyListener				dirtyListener		= new DirtyListener();
 
 	/**
 	 * Create the details page.
@@ -95,6 +100,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		textTherapy = new Text(composite, SWT.BORDER);
 		textTherapy.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		toolkit.adapt(textTherapy, true, true);
+		textTherapy.addModifyListener(new DirtyListener());
 
 		Label lblFrom = new Label(composite, SWT.NONE);
 		GridData gd_lblFrom = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -108,6 +114,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		gd_dateStart.widthHint = 100;
 		gd_dateStart.heightHint = 20;
 		dateStart.setLayoutData(gd_dateStart);
+		dateStart.addSelectionListener(dirtyListener);
 
 		toolkit.adapt(dateStart);
 		toolkit.paintBordersFor(dateStart);
@@ -129,6 +136,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		gd_dateEnd.widthHint = 100;
 		gd_dateEnd.heightHint = 20;
 		dateEnd.setLayoutData(gd_dateEnd);
+		dateEnd.addSelectionListener(dirtyListener);
 		toolkit.adapt(dateEnd);
 		toolkit.paintBordersFor(dateEnd);
 		new Label(composite, SWT.NONE);
@@ -140,6 +148,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 		scaleSuccess = new Scale(composite, SWT.NONE);
 		scaleSuccess.setEnabled(false);
+
 		successChangedListener = new Listener() {
 			private int	success;
 
@@ -149,6 +158,7 @@ public class TherapyDetailPage implements IDetailsPage {
 			}
 		};
 		scaleSuccess.addListener(SWT.Selection, successChangedListener);
+		scaleSuccess.addSelectionListener(dirtyListener);
 
 		scaleSuccess.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		toolkit.adapt(scaleSuccess, true, true);
@@ -158,6 +168,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		GridData gd_textSuccess = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_textSuccess.widthHint = 40;
 		textSuccess.setLayoutData(gd_textSuccess);
+		textSuccess.addModifyListener(dirtyListener);
 		toolkit.adapt(textSuccess, true, true);
 		new Label(composite, SWT.NONE);
 
@@ -175,6 +186,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		groupComment.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		textComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
+		textComment.addModifyListener(dirtyListener);
 
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(4, false));
@@ -198,11 +210,10 @@ public class TherapyDetailPage implements IDetailsPage {
 				 * Database Access Begin
 				 ************************************************************/
 
-				// entityManager.getTransaction().begin();
-				// Therapy mTherapy = entityManager.merge(selectedTherapy);
-				//
-				// entityManager.remove(mTherapy);
-				// entityManager.getTransaction().commit();
+				entityManager.getTransaction().begin();
+				Therapy mTherapy = entityManager.find(Therapy.class, selectedTherapy.getId());
+				entityManager.remove(mTherapy);
+				entityManager.getTransaction().commit();
 
 				/************************************************************
 				 * Database Access End
@@ -255,7 +266,9 @@ public class TherapyDetailPage implements IDetailsPage {
 	}
 
 	private void update() {
-		// Update
+		ignoreModification = true;
+		successChangedListener.handleEvent(null);
+		ignoreModification = false;
 	}
 
 	public boolean setFormInput(Object input) {
@@ -263,37 +276,45 @@ public class TherapyDetailPage implements IDetailsPage {
 	}
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
+
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		localTherapySelection = (Therapy) structuredSelection.getFirstElement();
-
 		selectionProvider.setSelection(Therapy.class, localTherapySelection);
 
 		Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
 
+		ignoreModification = true;
 		textTherapy.setText(mTherapy.getCaption());
 		textComment.setText(mTherapy.getComment());
 		dateStart.setSelection(mTherapy.getTherapyStart());
 		dateEnd.setSelection(mTherapy.getTherapyEnd());
 		scaleSuccess.setSelection(mTherapy.getSuccess());
-
-		successChangedListener.handleEvent(null);
+		ignoreModification = false;
 
 		update();
 	}
 
 	public void commit(boolean onSave) {
-		entityManager.getTransaction().begin();
-		Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
-		mTherapy.setCaption(textTherapy.getText());
-		mTherapy.setComment(textComment.getText());
-		mTherapy.setTherapyStart(dateStart.getSelection());
-		mTherapy.setTherapyEnd(dateEnd.getSelection());
-		mTherapy.setSuccess(scaleSuccess.getSelection());
-		entityManager.getTransaction().commit();
-		entityManager.clear();
 
-		selectionProvider.updateSelection(Therapy.class);
-		selectionProvider.updateSelection(Patient.class);
+		if (isDirty) {
+			entityManager.getTransaction().begin();
+			Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
+
+			ignoreModification = true;
+			mTherapy.setCaption(textTherapy.getText());
+			mTherapy.setComment(textComment.getText());
+			mTherapy.setTherapyStart(dateStart.getSelection());
+			mTherapy.setTherapyEnd(dateEnd.getSelection());
+			mTherapy.setSuccess(scaleSuccess.getSelection());
+			ignoreModification = false;
+
+			entityManager.getTransaction().commit();
+			entityManager.clear();
+
+			selectionProvider.updateSelection(Therapy.class);
+			selectionProvider.updateSelection(Patient.class);
+			isDirty = false;
+		}
 	}
 
 	public boolean isDirty() {
@@ -306,6 +327,22 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void refresh() {
 		update();
+	}
+
+	private class DirtyListener extends SelectionAdapter implements ModifyListener {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			if (!ignoreModification)
+				isDirty = true;
+		}
+
+		@Override
+		public void modifyText(ModifyEvent e) {
+			if (!ignoreModification)
+				isDirty = true;
+		}
+
 	}
 
 }

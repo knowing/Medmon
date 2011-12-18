@@ -40,7 +40,7 @@ public class TherapyResult {
 	@Column
 	private int success;
 
-	@OneToOne(mappedBy = "therapyResult")
+	@OneToOne(mappedBy = "therapyResult", cascade = { CascadeType.REFRESH, CascadeType.MERGE })
 	private Data data;
 	
 	public void setTherapy(Therapy therapy) {

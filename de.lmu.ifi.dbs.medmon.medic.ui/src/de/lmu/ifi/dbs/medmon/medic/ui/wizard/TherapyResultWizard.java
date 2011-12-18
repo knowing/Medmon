@@ -185,9 +185,11 @@ public class TherapyResultWizard extends Wizard {
 			
 			// therapy <-> therapyResult
 			mTherapyResult.setTherapy(mTherapy);
+			mTherapy.getTherapyResults().add(mTherapyResult);
 
 			// therapyResult <-> data
 			mTherapyResult.setData(mData);
+			mData.setTherapyResult(mTherapyResult);
 
 			// therapyResult
 			mTherapyResult.setCaption("neues Ergebnis");
