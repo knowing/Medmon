@@ -11,7 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -21,6 +23,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +86,8 @@ public class TherapyResultWizard extends Wizard {
 	@Override
 	public void addPages() {
 		addPage(patientAndTypePage);
-		addPage(therapyPage);
+		if (preselectedTherapy == null)
+			addPage(therapyPage);
 		addPage(sensorAndDirectoryPage);
 		addPage(dataPage);
 		addPage(selectDPUPage);
@@ -121,7 +125,7 @@ public class TherapyResultWizard extends Wizard {
 			}
 			return dataPage;
 		}
-		return super.getNextPage(page);
+		return null;
 	}
 
 	@Override
@@ -168,21 +172,33 @@ public class TherapyResultWizard extends Wizard {
 		}
 
 		try {
-			TherapyResult therapyResult = new TherapyResult();
+			TherapyResult mTherapyResult = new TherapyResult();
 			Therapy therapy = Activator.getGlobalSelectionService().getSelection(Therapy.class);
 
+			// create EM
 			EntityManager entityManager = JPAUtil.createEntityManager();
+			
+			// begin and find
 			entityManager.getTransaction().begin();
-			data = entityManager.merge(data);
-			therapy = entityManager.merge(therapy);
-			entityManager.persist(therapyResult);
+			Data mData = entityManager.find(Data.class, data.getId());
+			Therapy mTherapy = entityManager.find(Therapy.class, therapy.getId());
+			
+			// therapy <-> therapyResult
+			mTherapyResult.setTherapy(mTherapy);
 
-			therapyResult.setTherapy(therapy);
-			data.setTherapyResult(therapyResult);
-			therapyResult.setCaption("neues Ergebnis");
-			therapyResult.setComment("kein Kommentar.");
-			therapyResult.setSuccess(50);
-			therapyResult.setTimestamp(null);
+			// therapyResult <-> data
+			mTherapyResult.setData(mData);
+
+			// therapyResult
+			mTherapyResult.setCaption("neues Ergebnis");
+			mTherapyResult.setComment("kein Kommentar.");
+			mTherapyResult.setSuccess(50);
+			mTherapyResult.setTimestamp(null);
+
+			//persist
+			entityManager.persist(mTherapyResult);
+			
+			// commit and close
 			entityManager.getTransaction().commit();
 			entityManager.close();
 

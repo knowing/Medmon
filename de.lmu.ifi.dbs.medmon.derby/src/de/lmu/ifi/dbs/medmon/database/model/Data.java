@@ -57,22 +57,22 @@ public class Data implements Serializable {
 	// private String originalFile;
 	private String				type;
 
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "SENSOR_ID", nullable = false)
 	private Sensor				sensor;
 
 	// bi-directional many-to-one association to Comment
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "ARCHIV_ID")
 	private Archiv				archiv;
 
 	// bi-directional many-to-one association to Patient
 	//
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false)
 	private Patient				patient;
 
-	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToOne()
 	@JoinColumn(name = "DATA_ID", nullable = true)
 	TherapyResult therapyResult;
 	
@@ -158,7 +158,7 @@ public class Data implements Serializable {
 	public void setTherapyResult(TherapyResult therapyResult) {
 		this.therapyResult = therapyResult;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

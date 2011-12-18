@@ -48,7 +48,7 @@ public class TherapyDetailPage implements IDetailsPage {
 	private Listener					successChangedListener;
 	private EntityManager				entityManager;
 	private IGlobalSelectionProvider	selectionProvider;
-	private Therapy						therapy;
+	private Therapy						localTherapySelection;
 	private Text						textComment;
 
 	/**
@@ -198,11 +198,11 @@ public class TherapyDetailPage implements IDetailsPage {
 				 * Database Access Begin
 				 ************************************************************/
 
-//				entityManager.getTransaction().begin();
-//				Therapy mTherapy = entityManager.merge(selectedTherapy);
-//
-//				entityManager.remove(mTherapy);
-//				entityManager.getTransaction().commit();
+				// entityManager.getTransaction().begin();
+				// Therapy mTherapy = entityManager.merge(selectedTherapy);
+				//
+				// entityManager.remove(mTherapy);
+				// entityManager.getTransaction().commit();
 
 				/************************************************************
 				 * Database Access End
@@ -226,7 +226,7 @@ public class TherapyDetailPage implements IDetailsPage {
 			public void widgetSelected(SelectionEvent e) {
 
 				//
-				TherapyResultWizard wizard = new TherapyResultWizard(therapy);
+				TherapyResultWizard wizard = new TherapyResultWizard(localTherapySelection);
 				WizardDialog dialog = new WizardDialog(managedForm.getForm().getShell(), wizard);
 				dialog.open();
 
@@ -264,38 +264,33 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-		therapy = (Therapy) structuredSelection.getFirstElement();
+		localTherapySelection = (Therapy) structuredSelection.getFirstElement();
 
-		selectionProvider.setSelection(Therapy.class, therapy);
+		selectionProvider.setSelection(Therapy.class, localTherapySelection);
 
-		entityManager.getTransaction().begin();
-		therapy = entityManager.merge(therapy);
-		entityManager.getTransaction().commit();
+		Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
 
-		textTherapy.setText(therapy.getCaption());
-		textComment.setText(therapy.getComment());
-		dateStart.setSelection(therapy.getTherapyStart());
-		dateEnd.setSelection(therapy.getTherapyEnd());
-		scaleSuccess.setSelection(therapy.getSuccess());
+		textTherapy.setText(mTherapy.getCaption());
+		textComment.setText(mTherapy.getComment());
+		dateStart.setSelection(mTherapy.getTherapyStart());
+		dateEnd.setSelection(mTherapy.getTherapyEnd());
+		scaleSuccess.setSelection(mTherapy.getSuccess());
+
 		successChangedListener.handleEvent(null);
-
-		entityManager.detach(therapy);
 
 		update();
 	}
 
 	public void commit(boolean onSave) {
-		Therapy therapy = selectionProvider.getSelection(Therapy.class);
-
 		entityManager.getTransaction().begin();
-		therapy = entityManager.merge(therapy);
-		therapy.setCaption(textTherapy.getText());
-		therapy.setComment(textComment.getText());
-		therapy.setTherapyStart(dateStart.getSelection());
-		therapy.setTherapyEnd(dateEnd.getSelection());
-		therapy.setSuccess(scaleSuccess.getSelection());
+		Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
+		mTherapy.setCaption(textTherapy.getText());
+		mTherapy.setComment(textComment.getText());
+		mTherapy.setTherapyStart(dateStart.getSelection());
+		mTherapy.setTherapyEnd(dateEnd.getSelection());
+		mTherapy.setSuccess(scaleSuccess.getSelection());
 		entityManager.getTransaction().commit();
-		entityManager.detach(therapy);
+		entityManager.clear();
 
 		selectionProvider.updateSelection(Therapy.class);
 		selectionProvider.updateSelection(Patient.class);

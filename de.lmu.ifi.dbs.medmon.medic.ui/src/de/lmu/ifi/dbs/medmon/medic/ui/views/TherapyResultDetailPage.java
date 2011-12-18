@@ -61,8 +61,9 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private IGlobalSelectionProvider	selectionProvider;
 	private EntityManager				entityManager;
 	private Text						textComment;
-	private TherapyResult				therapyResult;
-	private boolean						isDirty;
+	private TherapyResult				localTherapyResultSelection;
+	private boolean						isDirty		= false;
+	private boolean						ignoreDirty	= false;
 
 	/**
 	 * Create the details page.
@@ -188,6 +189,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
+				System.out.println("Xxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				commit(true);
 				TherapyResult selectedTherapyResult = selectionProvider.getSelection(TherapyResult.class);
 
@@ -196,20 +198,21 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				 ************************************************************/
 
 				entityManager.getTransaction().begin();
-				TherapyResult mTherapyResult = entityManager.merge(selectedTherapyResult);
-				Data mData = entityManager.merge(mTherapyResult.getData());
-				entityManager.merge(selectedTherapyResult.getTherapy());
-				entityManager.getTransaction().commit();
+				// TherapyResult mTherapyResult =
+				// entityManager.merge(selectedTherapyResult);
+				// Data mData = entityManager.merge(mTherapyResult.getData());
+				// entityManager.merge(selectedTherapyResult.getTherapy());
 
-				try {
-					Activator.getPatientService().remove(mData);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				entityManager.remove(selectedTherapyResult);
 
-				entityManager.getTransaction().begin();
-				entityManager.remove(mTherapyResult);
 				entityManager.getTransaction().commit();
+				entityManager.clear();
+
+				// try {
+				// Activator.getPatientService().remove(mData);
+				// } catch (IOException e1) {
+				// e1.printStackTrace();
+				// }
 
 				/************************************************************
 				 * Database Access End
@@ -257,39 +260,42 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	public void selectionChanged(IFormPart part, ISelection selection) {
 
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-		therapyResult = (TherapyResult) structuredSelection.getFirstElement();
+		localTherapyResultSelection = (TherapyResult) structuredSelection.getFirstElement();
 
-		selectionProvider.setSelection(TherapyResult.class, therapyResult);
+		selectionProvider.setSelection(TherapyResult.class, localTherapyResultSelection);
 
 		entityManager.getTransaction().begin();
-		therapyResult = entityManager.merge(therapyResult);
+		TherapyResult mTherapyResult = entityManager.find(TherapyResult.class, localTherapyResultSelection.getId());
+		textTherapy.setText(mTherapyResult.getCaption());
+		textComment.setText(mTherapyResult.getComment());
+		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
+		scaleSuccess.setSelection(mTherapyResult.getSuccess());
 		entityManager.getTransaction().commit();
+		entityManager.clear();
 
-		textTherapy.setText(therapyResult.getCaption());
-		textComment.setText(therapyResult.getComment());
-		dateTimestamp.setSelection(therapyResult.getTimestamp());
-		scaleSuccess.setSelection(therapyResult.getSuccess());
 		successChangedListener.handleEvent(null);
-
-		entityManager.detach(therapyResult);
-
 		update();
 	}
 
 	public void commit(boolean onSave) {
 
 		if (isDirty) {
+			System.out.println("save");
+			ignoreDirty = true;
+			TherapyResult mTherapyResult = entityManager.find(TherapyResult.class, localTherapyResultSelection.getId());
+			
 			entityManager.getTransaction().begin();
-			therapyResult = entityManager.merge(therapyResult);
-			therapyResult.setCaption(textTherapy.getText());
-			therapyResult.setComment(textTherapy.getText());
-			therapyResult.setSuccess(scaleSuccess.getSelection());
-			therapyResult.setTimestamp(dateTimestamp.getSelection());
+			mTherapyResult.setCaption(textTherapy.getText());
+			mTherapyResult.setComment(textTherapy.getText());
+			mTherapyResult.setSuccess(scaleSuccess.getSelection());
+			mTherapyResult.setTimestamp(dateTimestamp.getSelection());
+			entityManager.merge(mTherapyResult);
 			entityManager.getTransaction().commit();
-			entityManager.detach(therapyResult);
+			entityManager.clear();
 
 			selectionProvider.updateSelection(TherapyResult.class);
 			selectionProvider.updateSelection(Patient.class);
+			ignoreDirty = false;
 			isDirty = false;
 		}
 	}
@@ -310,12 +316,14 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			isDirty = true;
+			if (!ignoreDirty)
+				isDirty = true;
 		}
 
 		@Override
 		public void modifyText(ModifyEvent e) {
-			isDirty = true;
+			if (!ignoreDirty)
+				isDirty = true;
 		}
 
 	}

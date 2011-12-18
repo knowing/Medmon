@@ -35,11 +35,11 @@ public class Therapy implements Serializable {
 	String caption;
 
 	// bi-directional many-to-one association to Patient
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "PATIENT_ID", nullable = false)
 	private Patient patient;
 
-	@OneToMany(mappedBy = "therapy", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "therapy", cascade = { CascadeType.REFRESH, CascadeType.MERGE }  )
 	private Set<TherapyResult>	therapyResults = new HashSet<TherapyResult>();
 
 	@Temporal(TemporalType.DATE)
@@ -126,6 +126,10 @@ public class Therapy implements Serializable {
 		return id;
 	}
 
+	public void setTherapyResults(Set<TherapyResult> therapyResults) {
+		this.therapyResults = therapyResults;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

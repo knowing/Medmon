@@ -24,7 +24,7 @@ public class TherapyResult {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "THERAPY_ID", nullable = false)
 	private Therapy therapy;
 	
@@ -40,7 +40,7 @@ public class TherapyResult {
 	@Column
 	private int success;
 
-	@OneToOne(mappedBy = "therapyResult", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToOne(mappedBy = "therapyResult")
 	private Data data;
 	
 	public void setTherapy(Therapy therapy) {
@@ -86,6 +86,14 @@ public class TherapyResult {
 
 	public Data getData() {
 		return data;
+	}
+	
+	public void setData(Data data) {
+		this.data = data;
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	@Override

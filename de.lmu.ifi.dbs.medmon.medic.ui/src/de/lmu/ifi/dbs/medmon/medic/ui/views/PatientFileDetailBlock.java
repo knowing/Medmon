@@ -61,7 +61,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
 		section.setText("Patientenakte");
-	
+
 		Composite composite = toolkit.createComposite(section, SWT.NONE);
 		toolkit.paintBordersFor(composite);
 		section.setClient(composite);
@@ -103,13 +103,15 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 				Therapy mTherapy = new Therapy();
 
+				entityManager.getTransaction().begin();
+				Patient mPatient = entityManager.find(Patient.class, localPatientSelection.getId());
+
 				mTherapy.setCaption("neue Therapie");
 				mTherapy.setComment("kein Kommentar.");
 				mTherapy.setTherapyStart(new Date());
 				mTherapy.setTherapyEnd(new Date());
-				mTherapy.setPatient(localPatientSelection);
-
-				entityManager.getTransaction().begin();
+				mTherapy.setPatient(mPatient);
+				
 				entityManager.persist(mTherapy);
 				entityManager.getTransaction().commit();
 
@@ -157,10 +159,8 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					 * Database Access Begin
 					 ************************************************************/
 
-					entityManager.getTransaction().begin();
-					localPatientSelection = entityManager.merge(selection);
-					entityManager.getTransaction().commit();
-
+					localPatientSelection = entityManager.find(Patient.class, selection.getId());
+					System.out.println(localPatientSelection.getTherapies().size());
 					therapiesViewer.setInput(localPatientSelection);
 
 					/************************************************************
@@ -176,10 +176,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
 				entityManager.refresh(localPatientSelection);
-				entityManager.getTransaction().commit();
-
 				therapiesViewer.refresh();
 
 				/************************************************************

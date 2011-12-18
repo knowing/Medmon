@@ -49,7 +49,6 @@ public class ImportDataWizard extends Wizard {
 
 	@Override
 	public void addPages() {
-
 		addPage(patientAndTypePage = new ImportDataPatientAndTypePage());
 		addPage(sensorAndDirectoryPage = new ImportDataSensorAndDirectoryPage());
 		addPage(dataPage = new ImportDataDataPage());
