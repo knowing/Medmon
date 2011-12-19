@@ -59,7 +59,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private CDateTime					dateTimestamp;
 	private Listener					successChangedListener;
 	private IGlobalSelectionProvider	selectionProvider;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private Text						textComment;
 	private TherapyResult				localTherapyResultSelection;
 	private boolean						isDirty				= false;
@@ -89,7 +89,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	 * @param parent
 	 */
 	public void createContents(Composite parent) {
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
@@ -190,19 +190,20 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				TherapyResult mTherapyResult = entityManager.find(TherapyResult.class, selectedTherapyResult.getId());
+				workerEM.getTransaction().begin();
+				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, selectedTherapyResult.getId());
 
 				if (mTherapyResult.getData() != null) {
 					try {
-						Activator.getPatientService().remove(mTherapyResult.getData());
+						Activator.getPatientService().deleteData(mTherapyResult.getData());
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
 				}
 
-				entityManager.remove(mTherapyResult);
-				entityManager.getTransaction().commit();
+				workerEM.remove(mTherapyResult);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
 
 				/************************************************************
 				 * Database Access End
@@ -231,7 +232,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 	public void dispose() {
 		// Dispose
-		entityManager.close();
+		workerEM.close();
 		selectionProvider.unregister();
 	}
 
@@ -251,29 +252,41 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 
+		/************************************************************
+		 * Database Access Begin
+		 ************************************************************/
+		
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		localTherapyResultSelection = (TherapyResult) structuredSelection.getFirstElement();
 		selectionProvider.setSelection(TherapyResult.class, localTherapyResultSelection);
 
-		entityManager.getTransaction().begin();
-		TherapyResult mTherapyResult = entityManager.find(TherapyResult.class, localTherapyResultSelection.getId());
-
+		workerEM.getTransaction().begin();
+		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
 		ignoreModification = true;
 		textTherapy.setText(mTherapyResult.getCaption());
 		textComment.setText(mTherapyResult.getComment());
 		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
 		scaleSuccess.setSelection(mTherapyResult.getSuccess());
-		entityManager.getTransaction().commit();
+		workerEM.getTransaction().commit();
 		ignoreModification = false;
 
+		workerEM.clear();
 		update();
+		
+		/************************************************************
+		 * Database Access End
+		 ************************************************************/
 	}
 
 	public void commit(boolean onSave) {
 
+		/************************************************************
+		 * Database Access Begin
+		 ************************************************************/
+		
 		if (isDirty) {
-			TherapyResult mTherapyResult = entityManager.find(TherapyResult.class, localTherapyResultSelection.getId());
-			entityManager.getTransaction().begin();
+			TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
+			workerEM.getTransaction().begin();
 
 			ignoreModification = true;
 			mTherapyResult.setCaption(textTherapy.getText());
@@ -282,14 +295,18 @@ public class TherapyResultDetailPage implements IDetailsPage {
 			mTherapyResult.setTimestamp(dateTimestamp.getSelection());
 			ignoreModification = false;
 
-			entityManager.merge(mTherapyResult);
-			entityManager.getTransaction().commit();
-			entityManager.clear();
+			workerEM.merge(mTherapyResult);
+			workerEM.getTransaction().commit();
+			workerEM.clear();
 
 			selectionProvider.updateSelection(TherapyResult.class);
 			selectionProvider.updateSelection(Patient.class);
 			isDirty = false;
 		}
+		
+		/************************************************************
+		 * Database Access End
+		 ************************************************************/
 	}
 
 	public boolean isDirty() {

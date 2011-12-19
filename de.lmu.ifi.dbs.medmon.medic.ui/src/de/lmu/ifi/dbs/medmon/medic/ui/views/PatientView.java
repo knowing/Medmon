@@ -108,7 +108,7 @@ public class PatientView extends ViewPart {
 
 	private PatientFileDetailBlock		patientFileDetailBlock;
 	private IGlobalSelectionProvider	selectionProvider;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private TaskSeriesCollection		dataset;
 	private JFreeChart					chart;
 	private Table						dataTable;
@@ -126,7 +126,7 @@ public class PatientView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
@@ -235,8 +235,8 @@ public class PatientView extends ViewPart {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				Patient mPatient = entityManager.merge(selection);
+				workerEM.getTransaction().begin();
+				Patient mPatient = workerEM.find(Patient.class, selection.getId());
 
 				mPatient.setFirstname(textFirstname.getText());
 				mPatient.setLastname(textLastName.getText());
@@ -247,8 +247,8 @@ public class PatientView extends ViewPart {
 				else
 					mPatient.setGender((short) 1);
 
-				entityManager.getTransaction().commit();
-				entityManager.detach(mPatient);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
 
 				/************************************************************
 				 * Database Access End
@@ -276,10 +276,11 @@ public class PatientView extends ViewPart {
 					 * Fill the UI components
 					 ************************************************************/
 
-					textLastName.setText(selection.getLastname());
-					textFirstname.setText(selection.getFirstname());
-					dateBirth.setSelection(selection.getBirth());
-					switch (selection.getGender()) {
+					Patient mPatient = workerEM.find(Patient.class, selectedPatient.getId());
+					textLastName.setText(mPatient.getLastname());
+					textFirstname.setText(mPatient.getFirstname());
+					dateBirth.setSelection(mPatient.getBirth());
+					switch (mPatient.getGender()) {
 					case 0:
 						btnFemale.setSelection(false);
 						btnMale.setSelection(true);
@@ -289,7 +290,8 @@ public class PatientView extends ViewPart {
 						btnMale.setSelection(false);
 						break;
 					}
-					textInsuranceId.setText(selection.getInsuranceId());
+					textInsuranceId.setText(mPatient.getInsuranceId());
+					workerEM.clear();
 				}
 				/************************************************************
 				 * selection == null
@@ -460,9 +462,9 @@ public class PatientView extends ViewPart {
 				Data mData = selectionProvider.getSelection(Data.class);
 				if (mData == null)
 					return;
-				
+
 				try {
-					Activator.getPatientService().remove(mData);
+					Activator.getPatientService().deleteData(mData);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -496,16 +498,16 @@ public class PatientView extends ViewPart {
 					 * iterated entities. so i went with the clear() solution.
 					 * this shit took me an half an hour to figure out!
 					 */
-					entityManager.clear();
+					workerEM.clear();
 
-					entityManager.getTransaction().begin();
-					Patient mPatient = entityManager.merge(selection);
-					entityManager.getTransaction().commit();
+					workerEM.getTransaction().begin();
+					Patient mPatient = workerEM.find(Patient.class, selection.getId());
+					workerEM.getTransaction().commit();
 
 					/************************************************************
 					 * fill TableViewer
 					 ************************************************************/
-					Query allDataQuery = entityManager.createNamedQuery("Data.findByPatient");
+					Query allDataQuery = workerEM.createNamedQuery("Data.findByPatient");
 					List<Data> allData = allDataQuery.setParameter("patient", mPatient).getResultList();
 					dataTableViewer.setInput(allData);
 
@@ -515,19 +517,19 @@ public class PatientView extends ViewPart {
 					TaskSeries series = new TaskSeries(new String());
 					if (allData.size() > 0) {
 
-						Query leftBoundsQuery = entityManager.createNamedQuery("Data.findEarliestOfPatient");
-						Query rightBoundsQuery = entityManager.createNamedQuery("Data.findLatestOfPatient");
+						Query leftBoundsQuery = workerEM.createNamedQuery("Data.findEarliestOfPatient");
+						Query rightBoundsQuery = workerEM.createNamedQuery("Data.findLatestOfPatient");
 
 						Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
 						Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
 
-						Query allSensorsQuery = entityManager.createNamedQuery("Sensor.findByPatient");
+						Query allSensorsQuery = workerEM.createNamedQuery("Sensor.findByPatient");
 						List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
 								.getResultList();
 
 						for (Sensor sensor : allSensors) {
 							Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
-							Query dataFromSensorQuery = entityManager.createNamedQuery("Data.findByPatientAndSensor");
+							Query dataFromSensorQuery = workerEM.createNamedQuery("Data.findByPatientAndSensor");
 							List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient)
 									.setParameter("sensor", sensor).getResultList();
 							for (Data data : dataFromSensor) {
@@ -543,7 +545,6 @@ public class PatientView extends ViewPart {
 					}
 					dataset.removeAll();
 					dataset.add(series);
-					entityManager.detach(mPatient);
 
 				}
 				/************************************************************
@@ -591,7 +592,7 @@ public class PatientView extends ViewPart {
 	@Override
 	public void dispose() {
 		selectionProvider.unregister();
-		entityManager.close();
+		workerEM.close();
 		super.dispose();
 	}
 }

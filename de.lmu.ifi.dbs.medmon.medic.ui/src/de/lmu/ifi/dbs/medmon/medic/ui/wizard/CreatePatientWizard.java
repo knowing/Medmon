@@ -49,14 +49,12 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 			return false;
 		}
 
-		EntityManager entityManager = JPAUtil.createEntityManager();
-
-		entityManager.getTransaction().begin();
-		patient = entityManager.merge(patient);
-		patientpage.initializePatient(patient);
-		entityManager.getTransaction().commit();
-
-		entityManager.detach(patient);
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		tempEM.getTransaction().begin();
+		Patient mPatient = tempEM.find(Patient.class, patient.getId());
+		patientpage.initializePatient(mPatient);
+		tempEM.getTransaction().commit();
+		tempEM.close();
 
 		IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		SelectionProvider.setSelection(Patient.class, patient);

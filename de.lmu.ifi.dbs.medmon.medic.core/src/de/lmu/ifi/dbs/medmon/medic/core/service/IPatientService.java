@@ -10,6 +10,8 @@ import java.util.Date;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
@@ -87,6 +89,30 @@ public interface IPatientService {
 	public void deletePatient(Patient p) throws IOException;
 	
 	/**
+	 * <p>Throws an exception if the corresponding source
+	 * couldn't be deleted</p>
+	 * @param d - Data instance to delete
+	 * @throws IOException
+	 */
+	public void deleteData(Data d) throws IOException;
+	
+	/**
+	 * <p>Throws an exception if the corresponding source
+	 * couldn't be deleted</p>
+	 * @param t - TherapyResult instance to delete
+	 * @throws IOException
+	 */
+	public void deleteTherapyResult(TherapyResult r) throws IOException;
+	
+	/**
+	 * <p>Throws an exception if the corresponding source
+	 * couldn't be deleted</p>
+	 * @param t - Therapy instance to delete
+	 * @throws IOException
+	 */
+	public void deleteTherapy(Therapy t) throws IOException;
+	
+	/**
 	 * <p>
 	 * Generates an OutputStream based on the given parameters.
 	 * </p>
@@ -151,14 +177,4 @@ public interface IPatientService {
 	 * @throws IOException
 	 */
 	public OutputStream merge(Data d1, Data d2) throws IOException;
-	
-	/**
-	 * <p>Throws an exception if the corresponding source
-	 * couldn't be deleted</p>
-	 * @param d - Data instance to delete
-	 * @throws IOException
-	 */
-	public void remove(Data d) throws IOException;
-	
-
 }

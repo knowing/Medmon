@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
@@ -100,12 +102,12 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public Patient createPatient() throws IOException {
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
+		EntityManager tempEM = entityManagerService.createEntityManager();
+		tempEM.getTransaction().begin();
 		Patient patient = new Patient();
-		em.persist(patient);
-		em.getTransaction().commit();
-		em.close();
+		tempEM.persist(patient);
+		tempEM.getTransaction().commit();
+		tempEM.close();
 		Path root = createDirectories(locateDirectory(patient, ROOT));
 		createDirectory(root.resolve(TRAIN));
 		createDirectory(root.resolve(RESULT));
@@ -123,15 +125,54 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public void deletePatient(Patient p) throws IOException {
-		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = em.merge(p);
-		em.remove(patient);
-		em.getTransaction().commit();
-		em.close();
+		try {
+			throw new Exception("deletePatient() -> UNIMPLEMENTED METHOD");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
+		// EntityManager tempEM = entityManagerService.createEntityManager();
+		// tempEM.getTransaction().begin();
+		// Patient patient = tempEM.merge(p);
+		// tempEM.remove(patient);
+		// tempEM.getTransaction().commit();
+		// tempEM.close();
 	}
 
+	@Override
+	public void deleteData(Data d) throws IOException {
+		try {
+			throw new Exception("deleteData() -> UNIMPLEMENTED METHOD");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//		Files.delete(locateFile(d));
+//		EntityManager temoEM = entityManagerService.createEntityManager();
+//		temoEM.getTransaction().begin();
+//		Data data = temoEM.merge(d);
+//		temoEM.remove(data);
+//		temoEM.getTransaction().commit();
+//		temoEM.close();
+	}
+	
+	@Override
+	public void deleteTherapyResult(TherapyResult r) throws IOException {
+		try {
+			throw new Exception("deleteTherapyResult() -> UNIMPLEMENTED METHOD");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void deleteTherapy(Therapy t) throws IOException {
+		try {
+			throw new Exception("deleteTherapy() -> UNIMPLEMENTED METHOD");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * <p>
 	 * Creates a new file and {@link Data} instance and returns the
@@ -148,25 +189,31 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = em.merge(p);
-		Sensor sensor = em.merge(s);
+		EntityManager tempEM = entityManagerService.createEntityManager();
+		tempEM.getTransaction().begin();
+		Patient mPatient = tempEM.find(Patient.class, p.getId());
+		Sensor mSensor = tempEM.find(Sensor.class, s.getId());
 
-		Data data = new Data(patient, sensor, type, from, to);
-		Path file = locateDirectory(patient, type).resolve(generateFilename(sensor, type, from, to));
+		Data mData = new Data(mPatient, mSensor, type, from, to);
+		Path file = locateDirectory(mPatient, type).resolve(generateFilename(mSensor, type, from, to));
+		
+		// <-> bidirectional
+		mData.setFile(file.toString());
+		mSensor.getData().add(mData);
+		mPatient.getData().add(mData);
+		
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
 		} catch (IOException e) {
-			em.close();
+			tempEM.close();
 			throw e;
 		}
-		data.setFile(file.toString());
-		em.persist(data);
-		em.getTransaction().commit();
-		em.close();
-		return new DataStoreOutput(outputStream, data);
+
+		tempEM.persist(mData);
+		tempEM.getTransaction().commit();
+		tempEM.close();
+		return new DataStoreOutput(outputStream, mData);
 	}
 
 	/**
@@ -182,7 +229,7 @@ public class PatientService implements IPatientService {
 		Sensor entity = sensorManagerService.loadSensorEntity(s);
 		Interval interval = converter.getInterval();
 
-		try ( DataStoreOutput output = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+		try (DataStoreOutput output = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
 				OutputStream os = output.outputStream;
 				InputStream in = sensorManagerService.createDefaultInput(s)) {
 
@@ -263,26 +310,6 @@ public class PatientService implements IPatientService {
 			to = d2.getTo();
 
 		return store(d1.getPatient(), d1.getSensor(), d1.getType(), from, to).outputStream;
-	}
-
-	/**
-	 * <p>
-	 * Deletes the source and then the db entity
-	 * </p>
-	 * 
-	 * @param d
-	 *            - detached {@link Data} object
-	 * @throws IOException
-	 */
-	@Override
-	public void remove(Data d) throws IOException {
-		Files.delete(locateFile(d));
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Data data = em.merge(d);
-		em.remove(data);
-		em.getTransaction().commit();
-		em.close();
 	}
 
 	/**

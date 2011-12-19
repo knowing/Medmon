@@ -70,7 +70,7 @@ public class Patient implements Serializable {
 	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient", cascade = { CascadeType.REFRESH, CascadeType.MERGE })
+	@OneToMany(mappedBy = "patient")
 	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
@@ -177,11 +177,16 @@ public class Patient implements Serializable {
 		this.appointments = appointments;
 	}
 	
+
+	public Set<Data> getData() {
+		return data;
+	}
+	
 	@Override
 	public String toString() {
 		return firstname + " " + lastname;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -44,7 +45,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	private FormToolkit					toolkit;
 	private IGlobalSelectionProvider	selectionProvider;
 	private TreeViewer					therapiesViewer;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private Patient						localPatientSelection;
 
 	/**
@@ -56,7 +57,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	@Override
 	protected void createMasterPart(final IManagedForm managedForm, Composite parent) {
 		toolkit = managedForm.getToolkit();
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
@@ -103,17 +104,19 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 				Therapy mTherapy = new Therapy();
 
-				entityManager.getTransaction().begin();
-				Patient mPatient = entityManager.find(Patient.class, localPatientSelection.getId());
+				workerEM.getTransaction().begin();
+				Patient mPatient = workerEM.find(Patient.class, localPatientSelection.getId());
 
 				mTherapy.setCaption("neue Therapie");
 				mTherapy.setComment("kein Kommentar.");
 				mTherapy.setTherapyStart(new Date());
 				mTherapy.setTherapyEnd(new Date());
 				mTherapy.setPatient(mPatient);
-				
-				entityManager.persist(mTherapy);
-				entityManager.getTransaction().commit();
+				mPatient.getTherapies().add(mTherapy);
+
+				workerEM.persist(mTherapy);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
 
 				/************************************************************
 				 * Database Access End
@@ -154,14 +157,15 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					localPatientSelection = null;
 					therapiesViewer.setInput(null);
 				} else {
+					localPatientSelection = selection;
 
 					/************************************************************
 					 * Database Access Begin
 					 ************************************************************/
 
-					localPatientSelection = entityManager.find(Patient.class, selection.getId());
-					System.out.println(localPatientSelection.getTherapies().size());
-					therapiesViewer.setInput(localPatientSelection);
+					Patient mPatient = workerEM.find(Patient.class, selection.getId());
+					therapiesViewer.setInput(mPatient);
+					workerEM.clear();
 
 					/************************************************************
 					 * Database Access End
@@ -176,8 +180,19 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.refresh(localPatientSelection);
-				therapiesViewer.refresh();
+				Patient mPatient = workerEM.find(Patient.class, localPatientSelection.getId());
+				Object[] expandedElements = therapiesViewer.getExpandedElements();
+				therapiesViewer.setInput(mPatient);
+				therapiesViewer.setExpandedElements(expandedElements);
+				workerEM.clear();
+
+				// nice one - isn't it
+				// i could have gone with refresh -> but i would have to set
+				// cascade refresh but this is total bullcrap so i reset the
+				// input, cause it's lazy loading and only the previous expanded
+				// elements are fetched !!!
+				// BOOYAKASHA BRO
+				// fuck you JPA. from now on we are cascade-free !!!
 
 				/************************************************************
 				 * Database Access End

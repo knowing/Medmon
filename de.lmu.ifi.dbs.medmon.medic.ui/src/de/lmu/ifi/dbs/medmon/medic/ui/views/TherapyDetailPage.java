@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelection;
@@ -48,7 +50,7 @@ public class TherapyDetailPage implements IDetailsPage {
 	private CDateTime					dateStart;
 	private CDateTime					dateEnd;
 	private Listener					successChangedListener;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private IGlobalSelectionProvider	selectionProvider;
 	private Therapy						localTherapySelection;
 	private Text						textComment;
@@ -79,7 +81,7 @@ public class TherapyDetailPage implements IDetailsPage {
 	 * @param parent
 	 */
 	public void createContents(Composite parent) {
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 
 		FormToolkit toolkit = managedForm.getToolkit();
@@ -210,11 +212,13 @@ public class TherapyDetailPage implements IDetailsPage {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				Therapy mTherapy = entityManager.find(Therapy.class, selectedTherapy.getId());
-				entityManager.remove(mTherapy);
-				entityManager.getTransaction().commit();
-
+				workerEM.getTransaction().begin();
+				Therapy mTherapy = workerEM.find(Therapy.class, selectedTherapy.getId());
+				mTherapy.getPatient().getTherapies().remove(mTherapy);
+				workerEM.remove(mTherapy);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
+				
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
@@ -257,7 +261,7 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void dispose() {
 		// Dispose
-		entityManager.close();
+		workerEM.close();
 		selectionProvider.unregister();
 	}
 
@@ -277,11 +281,15 @@ public class TherapyDetailPage implements IDetailsPage {
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 
+		/************************************************************
+		 * Database Access Begin
+		 ************************************************************/
+		
 		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		localTherapySelection = (Therapy) structuredSelection.getFirstElement();
 		selectionProvider.setSelection(Therapy.class, localTherapySelection);
 
-		Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
+		Therapy mTherapy = workerEM.find(Therapy.class, localTherapySelection.getId());
 
 		ignoreModification = true;
 		textTherapy.setText(mTherapy.getCaption());
@@ -291,14 +299,23 @@ public class TherapyDetailPage implements IDetailsPage {
 		scaleSuccess.setSelection(mTherapy.getSuccess());
 		ignoreModification = false;
 
+		workerEM.clear();
 		update();
+		
+		/************************************************************
+		 * Database Access End
+		 ************************************************************/
 	}
 
 	public void commit(boolean onSave) {
 
+		/************************************************************
+		 * Database Access Begin
+		 ************************************************************/
+		
 		if (isDirty) {
-			entityManager.getTransaction().begin();
-			Therapy mTherapy = entityManager.find(Therapy.class, localTherapySelection.getId());
+			workerEM.getTransaction().begin();
+			Therapy mTherapy = workerEM.find(Therapy.class, localTherapySelection.getId());
 
 			ignoreModification = true;
 			mTherapy.setCaption(textTherapy.getText());
@@ -308,13 +325,17 @@ public class TherapyDetailPage implements IDetailsPage {
 			mTherapy.setSuccess(scaleSuccess.getSelection());
 			ignoreModification = false;
 
-			entityManager.getTransaction().commit();
-			entityManager.clear();
+			workerEM.getTransaction().commit();
+			workerEM.clear();
 
 			selectionProvider.updateSelection(Therapy.class);
 			selectionProvider.updateSelection(Patient.class);
 			isDirty = false;
 		}
+		
+		/************************************************************
+		 * Database Access End
+		 ************************************************************/
 	}
 
 	public boolean isDirty() {
