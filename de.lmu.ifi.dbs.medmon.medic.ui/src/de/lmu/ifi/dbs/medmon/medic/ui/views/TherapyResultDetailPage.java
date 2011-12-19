@@ -183,35 +183,42 @@ public class TherapyResultDetailPage implements IDetailsPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
+				//needed, so this page can be discarded with all progress saved.
 				commit(true);
-				TherapyResult selectedTherapyResult = selectionProvider.getSelection(TherapyResult.class);
-
-				/************************************************************
-				 * Database Access Begin
-				 ************************************************************/
-
-				workerEM.getTransaction().begin();
-				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, selectedTherapyResult.getId());
-
-				if (mTherapyResult.getData() != null) {
-					try {
-						Activator.getPatientService().deleteData(mTherapyResult.getData());
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+				
+				try {
+					Activator.getPatientService().deleteTherapyResult(localTherapyResultSelection);
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
-
-				workerEM.remove(mTherapyResult);
-				workerEM.getTransaction().commit();
-				workerEM.clear();
-
-				/************************************************************
-				 * Database Access End
-				 ************************************************************/
-
-				selectionProvider.setSelection(TherapyResult.class, null);
-				selectionProvider.updateSelection(Therapy.class);
-				selectionProvider.updateSelection(Patient.class);
+				
+				
+//				/************************************************************
+//				 * Database Access Begin
+//				 ************************************************************/
+//
+//				workerEM.getTransaction().begin();
+//				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, selectedTherapyResult.getId());
+//
+//				if (mTherapyResult.getData() != null) {
+//					try {
+//						Activator.getPatientService().deleteData(mTherapyResult.getData());
+//					} catch (IOException e1) {
+//						e1.printStackTrace();
+//					}
+//				}
+//
+//				workerEM.remove(mTherapyResult);
+//				workerEM.getTransaction().commit();
+//				workerEM.clear();
+//
+//				/************************************************************
+//				 * Database Access End
+//				 ************************************************************/
+//
+//				selectionProvider.setSelection(TherapyResult.class, null);
+//				selectionProvider.updateSelection(Therapy.class);
+//				selectionProvider.updateSelection(Patient.class);
 			}
 		});
 

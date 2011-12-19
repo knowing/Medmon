@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -26,21 +27,31 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.PlatformUI;
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import weka.filters.unsupervised.attribute.Remove;
 
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.medic.core.Activator;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
@@ -116,11 +127,137 @@ public class PatientService implements IPatientService {
 	}
 
 	/**
-	 * <p>
-	 * Deletes first the source and then the db entities
-	 * </p>
+	 * unhooks the data completely from the db and removes it
 	 * 
-	 * @param - Patient to delete
+	 * @param d
+	 * @throws IOException
+	 */
+	private void deleteDataTask(Data d) throws IOException {
+
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		tempEM.getTransaction().begin();
+		Data mData = tempEM.find(Data.class, d.getId());
+
+		if (mData.getTherapyResult() != null)
+			mData.getTherapyResult().setData(null);
+		mData.setTherapyResult(null);
+		mData.getPatient().getData().remove(mData);
+		mData.getSensor().getData().remove(mData);
+
+		Files.deleteIfExists(Paths.get(mData.getFile()));
+		tempEM.remove(mData);
+
+		tempEM.getTransaction().commit();
+		tempEM.close();
+	}
+
+	/**
+	 * unhooks the TherapyResults completely from the db and deletes it
+	 * 
+	 * @param t
+	 * @throws IOException
+	 */
+	private void deleteTherapyResultTask(TherapyResult t) throws IOException {
+
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		tempEM.getTransaction().begin();
+		TherapyResult mTherapyResult = tempEM.find(TherapyResult.class, t.getId());
+
+		if (mTherapyResult.getData() != null)
+			mTherapyResult.getData().setTherapyResult(null);
+		mTherapyResult.getTherapy().getTherapyResults().remove(mTherapyResult);
+
+		tempEM.remove(mTherapyResult);
+
+		tempEM.getTransaction().commit();
+		tempEM.close();
+	}
+
+	/**
+	 * 
+	 * @param p
+	 * @throws IOException
+	 */
+	private void deletePatientTask(Patient p) throws IOException {
+		// TODO
+	}
+	
+
+	/**
+	 * 
+	 * @param p
+	 * @throws IOException
+	 */
+	private void deleteTherapyTask(Therapy t) throws IOException {
+		// TODO
+	}
+	
+
+	/**
+	 * performs the removal of all entities given as paramteres this methods
+	 * delegates the deletion process to the delete<Class>task() methods.
+	 * internaly this method only handles the Progressdialog and the
+	 * SelectionService updates.
+	 * 
+	 * @param data
+	 * @param results
+	 */
+	private void executeDeletion(final Data[] data, final TherapyResult[] results /*
+																				 * ...
+																				 * patients
+																				 * ,
+																				 * sensors
+																				 * ,
+																				 * etc
+																				 * ...
+																				 */) {
+
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+
+		try {
+			dialog.run(false, false, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						monitor.beginTask("lösche Daten", data.length);
+						for (Data d : data) {
+							deleteDataTask(d);
+							monitor.worked(1);
+							Thread.sleep(1000); // only for testing
+						}
+						monitor.beginTask("lösche Ergebnisse", results.length);
+						for (TherapyResult r : results) {
+							deleteTherapyResultTask(r);
+							monitor.worked(1);
+							Thread.sleep(1000); // only for testing
+						}
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		} catch (InvocationTargetException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// tell the Selection Service about possible removals
+		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+
+		if (data != null)
+			if (data.length != 0)
+				selectionProvider.setSelection(Data.class, null);
+		if (results != null)
+			if (results.length != 0)
+				selectionProvider.updateSelection(Patient.class);
+
+		selectionProvider.updateSelection(Patient.class);
+		selectionProvider.unregister();
+	}
+
+	/**
+	 * Deletes the patient and all connected entities
+	 * also shows a ProgressDialog
 	 * @throws IOException
 	 */
 	@Override
@@ -130,40 +267,47 @@ public class PatientService implements IPatientService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
-		// EntityManager tempEM = entityManagerService.createEntityManager();
-		// tempEM.getTransaction().begin();
-		// Patient patient = tempEM.merge(p);
-		// tempEM.remove(patient);
-		// tempEM.getTransaction().commit();
-		// tempEM.close();
 	}
 
+	/**
+	 * Deletes the Data and all connected entities
+	 * also shows a ProgressDialog
+	 * @throws IOException
+	 */
 	@Override
 	public void deleteData(Data d) throws IOException {
-		try {
-			throw new Exception("deleteData() -> UNIMPLEMENTED METHOD");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-//		Files.delete(locateFile(d));
-//		EntityManager temoEM = entityManagerService.createEntityManager();
-//		temoEM.getTransaction().begin();
-//		Data data = temoEM.merge(d);
-//		temoEM.remove(data);
-//		temoEM.getTransaction().commit();
-//		temoEM.close();
+
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		Data mData = tempEM.find(Data.class, d.getId());
+		TherapyResult[] mTherapyResults = (mData.getTherapyResult() == null) ? null : new TherapyResult[] { mData.getTherapyResult() };
+		tempEM.close();
+
+		executeDeletion(new Data[] { mData }, mTherapyResults);
+
 	}
-	
+
+	/**
+	 * Deletes the TherapyResult and all connected entities
+	 * also shows a ProgressDialog
+	 * @throws IOException
+	 */
 	@Override
 	public void deleteTherapyResult(TherapyResult r) throws IOException {
-		try {
-			throw new Exception("deleteTherapyResult() -> UNIMPLEMENTED METHOD");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		TherapyResult mTherapyResult = tempEM.find(TherapyResult.class, r.getId());
+		Data[] mData = (mTherapyResult.getData() == null) ? null : new Data[] { mTherapyResult.getData() };
+		tempEM.close();
+
+		executeDeletion(mData, new TherapyResult[] { mTherapyResult });
+
 	}
-	
+
+	/**
+	 * Deletes the Therapy and all connected entities
+	 * also shows a ProgressDialog
+	 * @throws IOException
+	 */
 	@Override
 	public void deleteTherapy(Therapy t) throws IOException {
 		try {
@@ -171,8 +315,9 @@ public class PatientService implements IPatientService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
-	
+
 	/**
 	 * <p>
 	 * Creates a new file and {@link Data} instance and returns the
@@ -196,12 +341,12 @@ public class PatientService implements IPatientService {
 
 		Data mData = new Data(mPatient, mSensor, type, from, to);
 		Path file = locateDirectory(mPatient, type).resolve(generateFilename(mSensor, type, from, to));
-		
+
 		// <-> bidirectional
 		mData.setFile(file.toString());
 		mSensor.getData().add(mData);
 		mPatient.getData().add(mData);
-		
+
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);

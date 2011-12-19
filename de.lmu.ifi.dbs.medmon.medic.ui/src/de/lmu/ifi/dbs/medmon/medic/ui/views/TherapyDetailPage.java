@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
+import java.io.IOException;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -203,28 +204,37 @@ public class TherapyDetailPage implements IDetailsPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
-				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
-				if (selectedTherapy == null) {
-					return;
-				}
-
-				/************************************************************
-				 * Database Access Begin
-				 ************************************************************/
-
-				workerEM.getTransaction().begin();
-				Therapy mTherapy = workerEM.find(Therapy.class, selectedTherapy.getId());
-				mTherapy.getPatient().getTherapies().remove(mTherapy);
-				workerEM.remove(mTherapy);
-				workerEM.getTransaction().commit();
-				workerEM.clear();
+				//needed, so this page can be discarded with all progress saved.
+				commit(true);
 				
-				/************************************************************
-				 * Database Access End
-				 ************************************************************/
-
-				selectionProvider.setSelection(Therapy.class, null);
-				selectionProvider.updateSelection(Patient.class);
+				try {
+					Activator.getPatientService().deleteTherapy(localTherapySelection);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+//				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
+//				if (selectedTherapy == null) {
+//					return;
+//				}
+//
+//				/************************************************************
+//				 * Database Access Begin
+//				 ************************************************************/
+//
+//				workerEM.getTransaction().begin();
+//				Therapy mTherapy = workerEM.find(Therapy.class, selectedTherapy.getId());
+//				mTherapy.getPatient().getTherapies().remove(mTherapy);
+//				workerEM.remove(mTherapy);
+//				workerEM.getTransaction().commit();
+//				workerEM.clear();
+//				
+//				/************************************************************
+//				 * Database Access End
+//				 ************************************************************/
+//
+//				selectionProvider.setSelection(Therapy.class, null);
+//				selectionProvider.updateSelection(Patient.class);
 
 			}
 		});

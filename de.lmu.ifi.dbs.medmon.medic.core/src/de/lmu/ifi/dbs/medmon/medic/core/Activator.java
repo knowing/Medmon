@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -30,7 +31,8 @@ public class Activator extends AbstractUIPlugin {
 	private static final Logger log = LoggerFactory.getLogger(PLUGIN_ID);
 
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> emServiceTracker;
-
+	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> emSelectionService;
+	
 	public static BundleContext getBundleContext(){
 		return Activator.plugin.getBundle().getBundleContext();
 	}
@@ -52,6 +54,9 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		emServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
 		emServiceTracker.open();
+		emSelectionService = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class, null);
+		emSelectionService.open();
+		
 		createApplicationFolders();
 	}
 
@@ -64,6 +69,7 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		emServiceTracker.close();
+		emSelectionService.close();
 		plugin = null;
 		super.stop(context);
 	}
@@ -80,7 +86,11 @@ public class Activator extends AbstractUIPlugin {
 	public static IEntityManagerService getEntityManagerService() {
 		return emServiceTracker.getService();
 	}
-
+	
+	public static IGlobalSelectionService getSelectionService() {
+		return emSelectionService.getService();
+	}
+	
 	private void createApplicationFolders() {
 		IPreferenceStore store = plugin.getPreferenceStore();
 
