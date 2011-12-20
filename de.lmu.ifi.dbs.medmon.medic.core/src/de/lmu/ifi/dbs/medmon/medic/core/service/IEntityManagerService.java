@@ -1,14 +1,16 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
+import java.io.IOException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public interface IEntityManagerService {
+import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 
-	/**
-	 * @return always the same EntityManager instances
-	 */
-	public EntityManager getEntityManager();
+public interface IEntityManagerService {
 	
 	/**
 	 * 

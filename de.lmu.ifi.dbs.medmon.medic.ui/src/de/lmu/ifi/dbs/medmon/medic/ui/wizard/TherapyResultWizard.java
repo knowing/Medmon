@@ -154,7 +154,7 @@ public class TherapyResultWizard extends Wizard {
 				} catch (IOException e) {
 					e.printStackTrace();
 					try {
-						Activator.getPatientService().deleteData(data);
+						Activator.getDBModelService().deleteData(data);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -214,8 +214,8 @@ public class TherapyResultWizard extends Wizard {
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
-				Activator.getPatientService().deleteData(data);
-				Activator.getPatientService().deleteData(taggedData);
+				Activator.getDBModelService().deleteData(data);
+				Activator.getDBModelService().deleteData(taggedData);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

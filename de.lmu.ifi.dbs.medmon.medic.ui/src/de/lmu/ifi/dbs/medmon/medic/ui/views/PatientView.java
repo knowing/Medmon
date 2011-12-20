@@ -464,7 +464,7 @@ public class PatientView extends ViewPart {
 					return;
 
 				try {
-					Activator.getPatientService().deleteData(mData);
+					Activator.getDBModelService().deleteData(mData);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

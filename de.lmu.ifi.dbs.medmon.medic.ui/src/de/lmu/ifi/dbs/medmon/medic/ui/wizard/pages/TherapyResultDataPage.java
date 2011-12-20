@@ -79,7 +79,7 @@ public class TherapyResultDataPage extends WizardPage {
 			public void selectionChanged(Patient selection) {
 				if (selection == null)
 					return;
-				EntityManager entityManager = Activator.getEntityManagerService().getEntityManager();
+				EntityManager entityManager = Activator.getEntityManagerService().createEntityManager();
 				@SuppressWarnings("unchecked")
 				List<Sensor> results = entityManager.createNamedQuery("Therapy.findByPatientId")
 						.setParameter("patientId", selection.getId()).getResultList();

@@ -208,7 +208,7 @@ public class TherapyDetailPage implements IDetailsPage {
 				commit(true);
 				
 				try {
-					Activator.getPatientService().deleteTherapy(localTherapySelection);
+					Activator.getDBModelService().deleteTherapy(localTherapySelection);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

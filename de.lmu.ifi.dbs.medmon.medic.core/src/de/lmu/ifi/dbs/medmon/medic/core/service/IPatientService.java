@@ -68,49 +68,14 @@ public interface IPatientService {
 	 * @return relative Path to relativeToType param
 	 */
 	public Path locateFilename(Data d, String relativeToType);
+
 	
 	/**
-	 * <p>This has to be called when a new {@link Patient} is
-	 * persisted in the database.</p>
+	 * Creates the File Hierarchy, that is used to store Data for the Patient
 	 * 
-	 * @return newly created Patient
-	 * @throws IOException
+	 * @param p - Patient that should be initialized
 	 */
-	public Patient createPatient() throws IOException;
-	
-	/**
-	 * <p>This has to be called when a {@link Patient} is
-	 * deleted in the database. This will delete ALL data
-	 * linked with the patient.</p>
-	 * 
-	 * @param p - patient to delete
-	 * @throws IOException
-	 */
-	public void deletePatient(Patient p) throws IOException;
-	
-	/**
-	 * <p>Throws an exception if the corresponding source
-	 * couldn't be deleted</p>
-	 * @param d - Data instance to delete
-	 * @throws IOException
-	 */
-	public void deleteData(Data d) throws IOException;
-	
-	/**
-	 * <p>Throws an exception if the corresponding source
-	 * couldn't be deleted</p>
-	 * @param t - TherapyResult instance to delete
-	 * @throws IOException
-	 */
-	public void deleteTherapyResult(TherapyResult r) throws IOException;
-	
-	/**
-	 * <p>Throws an exception if the corresponding source
-	 * couldn't be deleted</p>
-	 * @param t - Therapy instance to delete
-	 * @throws IOException
-	 */
-	public void deleteTherapy(Therapy t) throws IOException;
+	public void initializePatient(Patient p) throws IOException;
 	
 	/**
 	 * <p>

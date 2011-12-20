@@ -42,7 +42,7 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 	public boolean performFinish() {
 		Patient patient = null;
 		try {
-			patient = Activator.getPatientService().createPatient();
+			patient = Activator.getDBModelService().createPatient();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e1.getMessage());
