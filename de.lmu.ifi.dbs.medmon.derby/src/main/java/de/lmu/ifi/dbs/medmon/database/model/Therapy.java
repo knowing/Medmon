@@ -35,7 +35,7 @@ public class Therapy implements Serializable {
 	String caption;
 
 	// bi-directional many-to-one association to Patient
-	@ManyToOne()
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "PATIENT_ID", nullable = false)
 	private Patient patient;
 

@@ -70,7 +70,7 @@ public class Patient implements Serializable {
 	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient")
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.ALL})
 	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
