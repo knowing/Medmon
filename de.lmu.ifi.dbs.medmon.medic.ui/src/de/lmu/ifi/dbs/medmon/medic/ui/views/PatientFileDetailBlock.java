@@ -9,6 +9,8 @@ import javax.persistence.EntityManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -81,6 +83,31 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		Tree tree = therapiesViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		toolkit.paintBordersFor(tree);
+		therapiesViewer.setComparator(new ViewerComparator() {
+			private String	empty	= new String();
+
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+
+				String o1, o2;
+
+				if (e1 instanceof Therapy)
+					o1 = ((Therapy) e1).getCaption();
+				else if (e1 instanceof TherapyResult)
+					o1 = ((TherapyResult) e1).getCaption();
+				else
+					o1 = empty;
+
+				if (e2 instanceof Therapy)
+					o2 = ((Therapy) e2).getCaption();
+				else if (e2 instanceof TherapyResult)
+					o2 = ((TherapyResult) e2).getCaption();
+				else
+					o2 = empty;
+
+				return o1.compareTo(o2);
+			}
+		});
 
 		Composite composite_1 = new Composite(composite, SWT.NONE);
 		composite_1.setLayout(new GridLayout(2, false));
@@ -98,31 +125,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				if (localPatientSelection == null)
 					return;
 
-				/************************************************************
-				 * Database Access Begin
-				 ************************************************************/
-
-				Therapy mTherapy = new Therapy();
-
-				workerEM.getTransaction().begin();
-				Patient mPatient = workerEM.find(Patient.class, localPatientSelection.getId());
-
-				mTherapy.setCaption("neue Therapie");
-				mTherapy.setComment("kein Kommentar.");
-				mTherapy.setTherapyStart(new Date());
-				mTherapy.setTherapyEnd(new Date());
-				mTherapy.setPatient(mPatient);
-				mPatient.getTherapies().add(mTherapy);
-
-				workerEM.persist(mTherapy);
-				workerEM.getTransaction().commit();
-				workerEM.clear();
-
-				/************************************************************
-				 * Database Access End
-				 ************************************************************/
-
-				selectionProvider.updateSelection(Patient.class);
+				Activator.getDBModelService().createTherapy(localPatientSelection);
 			}
 		});
 

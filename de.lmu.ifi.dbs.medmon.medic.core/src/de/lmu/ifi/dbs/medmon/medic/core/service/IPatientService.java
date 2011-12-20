@@ -73,9 +73,18 @@ public interface IPatientService {
 	/**
 	 * Creates the File Hierarchy, that is used to store Data for the Patient
 	 * 
-	 * @param p - Patient that should be initialized
+	 * @param p - Patient to be initialized
 	 */
 	public void initializePatient(Patient p) throws IOException;
+	
+	
+	/**
+	 * Deletes all Content of a Patient that has been created by initializePatient()
+	 * 
+	 * @param p - Patient to be released
+	 * @throws IOException 
+	 */
+	public void releasePatient(Patient p) throws IOException;
 	
 	/**
 	 * <p>

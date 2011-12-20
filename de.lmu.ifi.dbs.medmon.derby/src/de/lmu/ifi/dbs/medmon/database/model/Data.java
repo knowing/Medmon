@@ -79,14 +79,6 @@ public class Data implements Serializable {
 	public Data() {
 	}
 
-	public Data(Patient patient, Sensor sensor, String type, Date from, Date to) {
-		this.from = from;
-		this.to = to;
-		this.type = type;
-		this.sensor = sensor;
-		this.patient = patient;
-	}
-
 	public int getId() {
 		return id;
 	}
@@ -158,7 +150,7 @@ public class Data implements Serializable {
 	public void setTherapyResult(TherapyResult therapyResult) {
 		this.therapyResult = therapyResult;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

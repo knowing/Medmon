@@ -8,7 +8,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.activation.ActivateFailedException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,10 +29,30 @@ import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class DBModelService implements IDBModelService {
+
+	private IGlobalSelectionProvider	selectionProvider	= null;
+	private EntityManager				workerEM			= null;
+
+	public void deactivate() {
+		selectionProvider.unregister();
+		workerEM.close();
+	}
+
+	public void bindEntityManagerService(IEntityManagerService service) {
+		if (workerEM == null)
+			workerEM = service.createEntityManager();
+	}
+
+	public void bindGlobalSelectionProvider(IGlobalSelectionProvider service) {
+		if (selectionProvider == null)
+			selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+	}
 
 	/**
 	 * unhooks the data completely from the db and removes it
@@ -40,9 +62,8 @@ public class DBModelService implements IDBModelService {
 	 */
 	private void deleteDataTask(Data d) throws IOException {
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		Data mData = tempEM.find(Data.class, d.getId());
+		workerEM.getTransaction().begin();
+		Data mData = workerEM.find(Data.class, d.getId());
 
 		if (mData.getTherapyResult() != null)
 			mData.getTherapyResult().setData(null);
@@ -57,10 +78,10 @@ public class DBModelService implements IDBModelService {
 		mData.setSensor(null);
 
 		Files.deleteIfExists(Paths.get(mData.getFile()));
-		tempEM.remove(mData);
+		workerEM.remove(mData);
 
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		workerEM.getTransaction().commit();
+		workerEM.clear();
 	}
 
 	/**
@@ -71,9 +92,8 @@ public class DBModelService implements IDBModelService {
 	 */
 	private void deleteTherapyResultTask(TherapyResult t) throws IOException {
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		TherapyResult mTherapyResult = tempEM.find(TherapyResult.class, t.getId());
+		workerEM.getTransaction().begin();
+		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, t.getId());
 
 		if (mTherapyResult.getData() != null)
 			mTherapyResult.getData().setTherapyResult(null);
@@ -83,10 +103,10 @@ public class DBModelService implements IDBModelService {
 			mTherapyResult.getTherapy().getTherapyResults().remove(mTherapyResult);
 		mTherapyResult.setTherapy(null);
 
-		tempEM.remove(mTherapyResult);
+		workerEM.remove(mTherapyResult);
 
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		workerEM.getTransaction().commit();
+		workerEM.clear();
 	}
 
 	/**
@@ -96,9 +116,8 @@ public class DBModelService implements IDBModelService {
 	 */
 	private void deleteTherapyTask(Therapy t) throws IOException {
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		Therapy mTherapy = tempEM.find(Therapy.class, t.getId());
+		workerEM.getTransaction().begin();
+		Therapy mTherapy = workerEM.find(Therapy.class, t.getId());
 
 		if (mTherapy.getPatient() != null)
 			mTherapy.getPatient().getTherapies().remove(mTherapy);
@@ -108,10 +127,10 @@ public class DBModelService implements IDBModelService {
 			r.setTherapy(null);
 		mTherapy.getTherapyResults().clear();
 
-		tempEM.remove(mTherapy);
+		workerEM.remove(mTherapy);
 
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		workerEM.getTransaction().commit();
+		workerEM.clear();
 	}
 
 	/**
@@ -121,9 +140,8 @@ public class DBModelService implements IDBModelService {
 	 */
 	private void deletePatientTask(Patient p) throws IOException {
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		Patient mPatient = tempEM.find(Patient.class, p.getId());
+		workerEM.getTransaction().begin();
+		Patient mPatient = workerEM.find(Patient.class, p.getId());
 
 		for (Data d : mPatient.getData())
 			d.setPatient(null);
@@ -133,10 +151,12 @@ public class DBModelService implements IDBModelService {
 			t.setPatient(null);
 		mPatient.getData().clear();
 
-		tempEM.remove(mPatient);
+		Activator.getPatientService().releasePatient(mPatient);
 
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		workerEM.remove(mPatient);
+
+		workerEM.getTransaction().commit();
+		workerEM.clear();
 	}
 
 	/**
@@ -203,8 +223,7 @@ public class DBModelService implements IDBModelService {
 
 		Set<Object> entitiesToDelete = new HashSet<Object>();
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		Patient mPatient = tempEM.find(Patient.class, p.getId());
+		Patient mPatient = workerEM.find(Patient.class, p.getId());
 		entitiesToDelete.add(mPatient);
 
 		for (Therapy t : mPatient.getTherapies()) {
@@ -216,7 +235,7 @@ public class DBModelService implements IDBModelService {
 			}
 		}
 
-		tempEM.close();
+		workerEM.clear();
 
 		performDeletion(entitiesToDelete);
 	}
@@ -231,12 +250,11 @@ public class DBModelService implements IDBModelService {
 
 		Set<Object> entitiesToDelete = new HashSet<Object>();
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		Data mData = tempEM.find(Data.class, d.getId());
+		Data mData = workerEM.find(Data.class, d.getId());
 		entitiesToDelete.add(mData);
 		if (mData.getTherapyResult() != null)
 			entitiesToDelete.add(mData.getTherapyResult());
-		tempEM.close();
+		workerEM.clear();
 
 		performDeletion(entitiesToDelete);
 
@@ -253,12 +271,11 @@ public class DBModelService implements IDBModelService {
 
 		Set<Object> entitiesToDelete = new HashSet<Object>();
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		TherapyResult mTherapyResult = tempEM.find(TherapyResult.class, r.getId());
+		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, r.getId());
 		entitiesToDelete.add(mTherapyResult);
 		if (mTherapyResult.getData() != null)
 			entitiesToDelete.add(mTherapyResult.getData());
-		tempEM.close();
+		workerEM.clear();
 
 		performDeletion(entitiesToDelete);
 
@@ -275,8 +292,7 @@ public class DBModelService implements IDBModelService {
 
 		Set<Object> entitiesToDelete = new HashSet<Object>();
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		Therapy mTherapy = tempEM.find(Therapy.class, t.getId());
+		Therapy mTherapy = workerEM.find(Therapy.class, t.getId());
 		entitiesToDelete.add(mTherapy);
 
 		for (TherapyResult r : mTherapy.getTherapyResults()) {
@@ -285,7 +301,7 @@ public class DBModelService implements IDBModelService {
 				entitiesToDelete.add(r.getData());
 		}
 
-		tempEM.close();
+		workerEM.clear();
 
 		performDeletion(entitiesToDelete);
 	}
@@ -303,14 +319,120 @@ public class DBModelService implements IDBModelService {
 
 		Patient mPatient = new Patient();
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		tempEM.persist(mPatient);
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		workerEM.getTransaction().begin();
+		workerEM.persist(mPatient);
+		workerEM.getTransaction().commit();
+		workerEM.clear();
 
 		Activator.getPatientService().initializePatient(mPatient);
 
 		return mPatient;
+	}
+
+	/**
+	 * Creates a new Therapy for a Patient
+	 * 
+	 * @param p
+	 *            - a Patient
+	 * @return a new Therapy
+	 */
+	@Override
+	public Therapy createTherapy(Patient p) {
+
+		Therapy mTherapy = new Therapy();
+
+		workerEM.getTransaction().begin();
+
+		Patient mPatient = workerEM.find(Patient.class, p.getId());
+
+		mTherapy.setCaption("neue Therapie");
+		mTherapy.setComment("kein Kommentar.");
+		mTherapy.setTherapyStart(new Date());
+		mTherapy.setTherapyEnd(new Date());
+
+		mTherapy.setPatient(mPatient);
+		mPatient.getTherapies().add(mTherapy);
+
+		workerEM.persist(mTherapy);
+		workerEM.getTransaction().commit();
+		workerEM.clear();
+
+		selectionProvider.updateSelection(Patient.class);
+
+		return mTherapy;
+	}
+
+	/**
+	 * Creates a new TherapyResult and connects it to a Data entity and a
+	 * Therapy entity
+	 * 
+	 * @param d
+	 *            - a Data entity
+	 * @param t
+	 *            - a Therapy entity
+	 * @return - a new TherapyResult
+	 */
+	@Override
+	public TherapyResult createTherapyResult(Data d, Therapy t) {
+
+		TherapyResult mTherapyResult = new TherapyResult();
+
+		workerEM.getTransaction().begin();
+		Data mData = workerEM.find(Data.class, d.getId());
+		Therapy mTherapy = workerEM.find(Therapy.class, t.getId());
+
+		mTherapyResult.setTherapy(mTherapy);
+		mTherapy.getTherapyResults().add(mTherapyResult);
+
+		mTherapyResult.setData(mData);
+		mData.setTherapyResult(mTherapyResult);
+
+		mTherapy.getPatient().getData().add(mData);
+		mData.setPatient(mTherapy.getPatient());
+
+		mTherapyResult.setCaption("neues Ergebnis");
+		mTherapyResult.setComment("kein Kommentar.");
+		mTherapyResult.setSuccess(50);
+		mTherapyResult.setTimestamp(null);
+
+		workerEM.persist(mTherapyResult);
+
+		workerEM.getTransaction().commit();
+		workerEM.clear();
+
+		selectionProvider.updateSelection(Patient.class);
+
+		return mTherapyResult;
+	}
+
+	/**
+	 * Creates a mew Data entity
+	 */
+	@Override
+	public Data createData(Patient p, Sensor s, String type, Date from, Date to, String file) {
+
+		Data mData = new Data();
+
+		workerEM.getTransaction().begin();
+
+		Patient mPatient = workerEM.find(Patient.class, p.getId());
+		Sensor mSensor = workerEM.find(Sensor.class, s.getId());
+
+		mData.setPatient(mPatient);
+		mData.setSensor(mSensor);
+		mData.setType(type);
+		mData.setFrom(from);
+		mData.setTo(to);
+		mData.setFile(file);
+
+		mPatient.getData().add(mData);
+		mSensor.getData().add(mData);
+
+		workerEM.persist(mData);
+
+		workerEM.getTransaction().commit();
+		workerEM.clear();
+
+		return mData;
 	}
 }

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
@@ -34,6 +35,7 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> emServiceTracker;
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> emSelectionService;
 	private static ServiceTracker<IPatientService, IPatientService> emPatientService;
+	private static ServiceTracker<IDBModelService, IDBModelService> emDBModelService;
 	
 	public static BundleContext getBundleContext(){
 		return Activator.plugin.getBundle().getBundleContext();
@@ -64,6 +66,9 @@ public class Activator extends AbstractUIPlugin {
 		emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
 		emPatientService.open();	
 		
+		emDBModelService = new ServiceTracker<IDBModelService, IDBModelService>(context, IDBModelService.class, null);
+		emDBModelService.open();			
+		
 		createApplicationFolders();
 	}
 
@@ -78,6 +83,7 @@ public class Activator extends AbstractUIPlugin {
 		emServiceTracker.close();
 		emSelectionService.close();
 		emPatientService.close();
+		emDBModelService.close();
 		plugin = null;
 		super.stop(context);
 	}
@@ -101,6 +107,10 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static IPatientService getPatientService() {
 		return emPatientService.getService();
+	}
+	
+	public static IDBModelService getDBModelService() {
+		return emDBModelService.getService();
 	}
 	
 	private void createApplicationFolders() {

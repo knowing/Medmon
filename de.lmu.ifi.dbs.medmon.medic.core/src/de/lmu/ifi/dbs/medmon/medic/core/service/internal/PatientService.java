@@ -4,6 +4,7 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createDirectory;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.READ;
 
@@ -49,6 +50,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -110,6 +112,12 @@ public class PatientService implements IPatientService {
 		createDirectory(root.resolve(RAW));
 	}
 	
+	@Override
+	public void releasePatient(Patient p) throws IOException {
+
+		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
+	}
+	
 	/**
 	 * <p>
 	 * Creates a new file and {@link Data} instance and returns the
@@ -126,31 +134,19 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
-		EntityManager tempEM = entityManagerService.createEntityManager();
-		tempEM.getTransaction().begin();
-		Patient mPatient = tempEM.find(Patient.class, p.getId());
-		Sensor mSensor = tempEM.find(Sensor.class, s.getId());
-
-		Data mData = new Data(mPatient, mSensor, type, from, to);
-		Path file = locateDirectory(mPatient, type).resolve(generateFilename(mSensor, type, from, to));
-
-		// <-> bidirectional
-		mData.setFile(file.toString());
-		mSensor.getData().add(mData);
-		mPatient.getData().add(mData);
-
+		
+		Path file = locateDirectory(p, type).resolve(generateFilename(s, type, from, to));
+		
+		Data data = Activator.getDBModelService().createData(p, s, type, from, to, file.toString());
+		
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
 		} catch (IOException e) {
-			tempEM.close();
 			throw e;
 		}
-
-		tempEM.persist(mData);
-		tempEM.getTransaction().commit();
-		tempEM.close();
-		return new DataStoreOutput(outputStream, mData);
+		
+		return new DataStoreOutput(outputStream, data);
 	}
 
 	/**
