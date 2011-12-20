@@ -25,7 +25,7 @@ public class TherapyResult {
 	private int id;
 
 	@ManyToOne()
-	@JoinColumn(name = "THERAPY_ID", nullable = false)
+	@JoinColumn(name = "THERAPY_ID")
 	private Therapy therapy;
 	
 	@Temporal(TemporalType.DATE)

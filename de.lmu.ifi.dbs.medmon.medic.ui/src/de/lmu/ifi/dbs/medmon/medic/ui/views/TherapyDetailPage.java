@@ -212,30 +212,6 @@ public class TherapyDetailPage implements IDetailsPage {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
-//				Therapy selectedTherapy = selectionProvider.getSelection(Therapy.class);
-//				if (selectedTherapy == null) {
-//					return;
-//				}
-//
-//				/************************************************************
-//				 * Database Access Begin
-//				 ************************************************************/
-//
-//				workerEM.getTransaction().begin();
-//				Therapy mTherapy = workerEM.find(Therapy.class, selectedTherapy.getId());
-//				mTherapy.getPatient().getTherapies().remove(mTherapy);
-//				workerEM.remove(mTherapy);
-//				workerEM.getTransaction().commit();
-//				workerEM.clear();
-//				
-//				/************************************************************
-//				 * Database Access End
-//				 ************************************************************/
-//
-//				selectionProvider.setSelection(Therapy.class, null);
-//				selectionProvider.updateSelection(Patient.class);
-
 			}
 		});
 

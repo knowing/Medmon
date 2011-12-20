@@ -191,34 +191,6 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
-				
-//				/************************************************************
-//				 * Database Access Begin
-//				 ************************************************************/
-//
-//				workerEM.getTransaction().begin();
-//				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, selectedTherapyResult.getId());
-//
-//				if (mTherapyResult.getData() != null) {
-//					try {
-//						Activator.getPatientService().deleteData(mTherapyResult.getData());
-//					} catch (IOException e1) {
-//						e1.printStackTrace();
-//					}
-//				}
-//
-//				workerEM.remove(mTherapyResult);
-//				workerEM.getTransaction().commit();
-//				workerEM.clear();
-//
-//				/************************************************************
-//				 * Database Access End
-//				 ************************************************************/
-//
-//				selectionProvider.setSelection(TherapyResult.class, null);
-//				selectionProvider.updateSelection(Therapy.class);
-//				selectionProvider.updateSelection(Patient.class);
 			}
 		});
 

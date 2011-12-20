@@ -30,7 +30,7 @@ public class Patient implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(nullable = false)
+	@Column()
 	private int id;
 
 	@Column(length = 30)
