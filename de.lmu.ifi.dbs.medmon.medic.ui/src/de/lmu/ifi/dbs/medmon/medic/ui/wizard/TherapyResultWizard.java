@@ -154,7 +154,7 @@ public class TherapyResultWizard extends Wizard {
 				} catch (IOException e) {
 					e.printStackTrace();
 					try {
-						Activator.getPatientService().deleteData(data);
+						Activator.getDBModelService().deleteData(data);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -172,50 +172,16 @@ public class TherapyResultWizard extends Wizard {
 		}
 
 		try {
-			TherapyResult mTherapyResult = new TherapyResult();
-			Therapy therapy = Activator.getGlobalSelectionService().getSelection(Therapy.class);
-
-			// create EM
-			EntityManager tempEM = JPAUtil.createEntityManager();
-			
-			// begin and find
-			tempEM.getTransaction().begin();
-			Data mData = tempEM.find(Data.class, data.getId());
-			Therapy mTherapy = tempEM.find(Therapy.class, therapy.getId());
-			
-			// therapy <-> therapyResult
-			mTherapyResult.setTherapy(mTherapy);
-			mTherapy.getTherapyResults().add(mTherapyResult);
-
-			// therapyResult <-> data
-			mTherapyResult.setData(mData);
-			mData.setTherapyResult(mTherapyResult);
-			
-			// patient <-> data
-			mTherapy.getPatient().getData().add(mData);
-			mData.setPatient(mTherapy.getPatient());
-
-			// therapyResult
-			mTherapyResult.setCaption("neues Ergebnis");
-			mTherapyResult.setComment("kein Kommentar.");
-			mTherapyResult.setSuccess(50);
-			mTherapyResult.setTimestamp(null);
-
-			//persist
-			tempEM.persist(mTherapyResult);
-			
-			// commit and close
-			tempEM.getTransaction().commit();
-			tempEM.close();
-
-			IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-			selectionProvider.updateSelection(Patient.class);
-			selectionProvider.unregister();
+			if(preselectedTherapy != null)
+				Activator.getDBModelService().createTherapyResult(data, preselectedTherapy);
+			else
+				Activator.getDBModelService().createTherapyResult(data, therapyPage.getSelectedTherapy() );
+				
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
-				Activator.getPatientService().deleteData(data);
-				Activator.getPatientService().deleteData(taggedData);
+				Activator.getDBModelService().deleteData(data);
+				Activator.getDBModelService().deleteData(taggedData);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

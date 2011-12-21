@@ -38,7 +38,7 @@ public class DeletePatientHandler extends AbstractHandler {
 
 				if (option) {
 					try {
-						Activator.getPatientService().deletePatient(selection);
+						Activator.getDBModelService().deletePatient(selection);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -50,7 +50,7 @@ public class DeletePatientHandler extends AbstractHandler {
 
 			if (option) {
 				try {
-					Activator.getPatientService().deletePatient(selection);
+					Activator.getDBModelService().deletePatient(selection);
 					selectionProvider.setSelection(Patient.class, null);
 				} catch (IOException e) {
 					e.printStackTrace();

@@ -145,7 +145,7 @@ public class SensorManagerService implements ISensorManagerService {
 		sensorMap.put(service.getId(), service);
 
 		if (loadSensorEntity(service) == null) {
-			EntityManager tempEM = entityManagerService.getEntityManager();
+			EntityManager tempEM = entityManagerService.createEntityManager();
 
 			Sensor mSensor = new Sensor(service.getName(), service.getId(), service.getVersion());
 			mSensor.setDefaultpath(System.getProperty("user.home"));

@@ -21,16 +21,6 @@ public class EntityManagerService implements IEntityManagerService {
 	private List<EntityManagerFactory> emFactories = new ArrayList<EntityManagerFactory>();
 	private EntityManagerFactoryBuilder emfBuilder;
 
-	private EntityManager em;
-
-	@Override
-	public EntityManager getEntityManager() {
-		if (em != null)
-			return em;
-		em = createEntityManager();
-		return em;
-	}
-
 	@Override
 	public EntityManager createEntityManager() {
 		EntityManagerFactory emf = getEntityManagerFactory();

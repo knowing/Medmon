@@ -25,7 +25,7 @@ public class TherapyResult {
 	private int id;
 
 	@ManyToOne()
-	@JoinColumn(name = "THERAPY_ID", nullable = false)
+	@JoinColumn(name = "THERAPY_ID")
 	private Therapy therapy;
 	
 	@Temporal(TemporalType.DATE)
@@ -43,11 +43,6 @@ public class TherapyResult {
 	@OneToOne(mappedBy = "therapyResult")
 	private Data data;
 	
-	public TherapyResult(Data data, Therapy therapy) {
-		this.data = data;
-		this.therapy = therapy;
-	}
-
 	public void setTherapy(Therapy therapy) {
 		this.therapy = therapy;
 	}

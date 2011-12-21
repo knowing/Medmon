@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" deactivate="deactivate" name="de.lmu.ifi.dbs.medmon.medic.core.DBModelService">
+   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.DBModelService"/>
+   <service>
+      <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService"/>
+   </service>
+   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic"/>
+   <reference bind="bindGlobalSelectionProvider" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider" name="IGlobalSelectionProvider" policy="dynamic"/>
+</scr:component>

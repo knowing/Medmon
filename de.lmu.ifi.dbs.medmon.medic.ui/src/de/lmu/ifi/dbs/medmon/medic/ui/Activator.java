@@ -12,6 +12,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
@@ -35,6 +36,7 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorManagerServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
+	private static ServiceTracker<IDBModelService, IDBModelService> dbModelServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
@@ -67,6 +69,10 @@ public class Activator extends AbstractUIPlugin {
 		
 		globalSelectionServiceTracker = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class, null);
 		globalSelectionServiceTracker.open();
+	
+		dbModelServiceTracker = new ServiceTracker<IDBModelService, IDBModelService>(context, IDBModelService.class, null);
+		dbModelServiceTracker.open();
+		
 		
 	}
 
@@ -88,6 +94,9 @@ public class Activator extends AbstractUIPlugin {
 		
 		entityServiceTracker.close();
 		entityServiceTracker = null;
+	
+		dbModelServiceTracker.close();
+		dbModelServiceTracker = null;
 		
 		globalSelectionServiceTracker.close();
 		globalSelectionServiceTracker = null;
@@ -134,4 +143,9 @@ public class Activator extends AbstractUIPlugin {
 	public static IGlobalSelectionService getGlobalSelectionService() {
 		return globalSelectionServiceTracker.getService();
 	}
+	
+	public static IDBModelService getDBModelService() {
+		return dbModelServiceTracker.getService();
+	}
+	
 }
