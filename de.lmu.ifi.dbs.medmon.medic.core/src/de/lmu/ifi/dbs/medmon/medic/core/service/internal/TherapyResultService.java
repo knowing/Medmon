@@ -69,17 +69,21 @@ public class TherapyResultService implements ITherapyResultService {
 	public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, Data data) throws Exception {
 		// TODO Try/Catch block to rollback actions on failure
 
+		//Resolve data location -> inputfile
 		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
 		Path inputFile = patientService.locateFilename(data, IPatientService.ROOT);
 
+		//Configure properties to run with inputFile
 		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
 
-		// TODO data is detached. Will this work?
+		//Generate Data entity which stores the result
 		DataStoreOutput store = createData(patient, data);
 		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
 
+		//Finally run the DPU
 		executeDPU(execPath, configuredDPU, outputMap);
 
+		//Create the TherapyResultEntity with the data entity
 		return dbModelService.createTherapyResult(store.dataEntity, therapy);
 	}
 
@@ -92,7 +96,6 @@ public class TherapyResultService implements ITherapyResultService {
 
 		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
 
-		// TODO data is detached. Will this work?
 		DataStoreOutput store = createData(patient, sensor, input);
 		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
 
@@ -103,17 +106,22 @@ public class TherapyResultService implements ITherapyResultService {
 	private void executeDPU(Path execPath, IDataProcessingUnit dpu, Map<String, OutputStream> outputMap) throws Exception {
 		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
 		// TODO Create own UIFactory! Check if uiFactories aren't empty, etc
+		if(uiFactories.isEmpty()) 
+			throw new Exception("No UIFactory. Unable to display results.");
+		
 		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), mapAsScalaMap(new HashMap<String, InputStream>()),
 				mapAsScalaMap(outputMap));
-
 	}
 
 	/**
 	 * <p>
-	 * Configures the selected DPU and executes it.
+	 * Configures the selected DPU:
+	 * <li>Remove all FILE, DIR, URL properties on NodeType.LOADER</li>
+	 * <li>Remove all FILE, DIR, URL properties on NodeType.SAVER</li>
+	 * <li>Set (DE)SERIALIZE property</li>
 	 * </p>
 	 * 
-	 * @param originalDDPU
+	 * @param originalDPU
 	 * @param patient
 	 * @param data
 	 * @throws IOException
