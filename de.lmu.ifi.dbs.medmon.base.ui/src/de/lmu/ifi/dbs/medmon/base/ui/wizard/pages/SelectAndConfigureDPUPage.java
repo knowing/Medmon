@@ -158,13 +158,14 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 
 	private void executeDPU(Path execPath, IDataProcessingUnit dpu, Map<String, OutputStream> outputMap) {
 		try {
-			IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
-			PresenterView pView = (PresenterView) view;
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
 			// TODO Create own UIFactory!
 			IEvaluateService evalService = Activator.getEvaluationService();
-			evalService.evaluate(dpu, pView.uifactory(), execPath.toUri(), mapAsScalaMap(new HashMap<String, InputStream>()),
+			evalService.evaluate(dpu, execPath.toUri(), PresenterView.ID(), mapAsScalaMap(new HashMap<String, InputStream>()),
 					mapAsScalaMap(outputMap));
 		} catch (PartInitException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
