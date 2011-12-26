@@ -160,7 +160,6 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 		try {
 			IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
 			PresenterView pView = (PresenterView) view;
-			pView.clearTabs();
 			// TODO Create own UIFactory!
 			IEvaluateService evalService = Activator.getEvaluationService();
 			evalService.evaluate(dpu, pView.uifactory(), execPath.toUri(), mapAsScalaMap(new HashMap<String, InputStream>()),
