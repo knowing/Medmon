@@ -27,6 +27,7 @@ import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectAndConfigureDPUPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -35,6 +36,7 @@ import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
@@ -125,7 +127,7 @@ public class TherapyResultWizard extends Wizard {
 			}
 			return dataPage;
 		}
-		return null;
+		return super.getNextPage(page);
 	}
 
 	@Override
@@ -136,7 +138,6 @@ public class TherapyResultWizard extends Wizard {
 
 		int options = patientAndTypePage.getOption();
 		Data data = null;
-		Data taggedData = null;
 
 		if (((options & SOURCE_SENSOR) | (options & SOURCE_FILE)) != 0) {
 
@@ -150,8 +151,11 @@ public class TherapyResultWizard extends Wizard {
 
 			if (currentPage == selectDPUPage) {
 				try {
-					taggedData = selectDPUPage.configureAndExecuteDPU(selectedPatient, data);
-				} catch (IOException e) {
+					IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
+					ITherapyResultService resultService = Activator.getTherapyResultService();
+					TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
+					log.debug("Therapy Results created " + results);
+				} catch (Exception e) {
 					e.printStackTrace();
 					try {
 						Activator.getDBModelService().deleteData(data);
@@ -171,21 +175,19 @@ public class TherapyResultWizard extends Wizard {
 			}
 		}
 
-		try {
-			if(preselectedTherapy != null)
-				Activator.getDBModelService().createTherapyResult(data, preselectedTherapy);
-			else
-				Activator.getDBModelService().createTherapyResult(data, therapyPage.getSelectedTherapy() );
-				
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				Activator.getDBModelService().deleteData(data);
-				Activator.getDBModelService().deleteData(taggedData);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
+		// This cannot work - if an exception is thrown there is no return type!
+		/*
+		 * try { if(preselectedTherapy != null)
+		 * Activator.getDBModelService().createTherapyResult(data,
+		 * preselectedTherapy); else
+		 * Activator.getDBModelService().createTherapyResult(data,
+		 * therapyPage.getSelectedTherapy() );
+		 * 
+		 * } catch (Exception e) { e.printStackTrace(); try {
+		 * Activator.getDBModelService().deleteData(data);
+		 * Activator.getDBModelService().deleteData(taggedData); } catch
+		 * (IOException e1) { e1.printStackTrace(); } }
+		 */
 
 		return true;
 	}

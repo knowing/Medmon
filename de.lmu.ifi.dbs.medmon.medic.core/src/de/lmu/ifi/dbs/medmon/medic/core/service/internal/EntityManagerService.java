@@ -15,6 +15,13 @@ import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 
+/**
+ * Handles Eclipse Gemini JPA EntityManager services.
+ * 
+ * @author Nepomuk Seiler
+ * @version 0.2
+ *
+ */
 public class EntityManagerService implements IEntityManagerService {
 
 	private List<DataSourceFactory> dsFactories = new ArrayList<DataSourceFactory>();
