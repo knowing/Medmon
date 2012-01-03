@@ -38,7 +38,6 @@
       </win>
    </launcher>
 
-
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
       <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</macos>
@@ -76,8 +75,8 @@
    <features>
       <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.R37x_v20110906-782EpBqNKGUkZQpuT8hAlWlFbUeo"/>
       <feature id="org.eclipse.rcp" version="3.7.1.r37x_v20110729-9DB5FmNFnFLSFCtLxnRfMqt15A4A"/>
-      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.1.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.1.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.2.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.2.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.core.feature" version="1.0.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
