@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -20,6 +21,7 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportWizardHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.NewPatientHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
 
 public class HomeView extends ViewPart {
 
@@ -101,16 +103,16 @@ public class HomeView extends ViewPart {
 			}
 		});
 
-		ImageHyperlink cluster = toolkit.createImageHyperlink(container, SWT.NONE);
-		cluster.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		cluster.setText("Training");
-		cluster.setImage(Activator.getImageDescriptor(ISharedImages.IMG_CLUSTER_48).createImage());
-		cluster.addHyperlinkListener(new HyperlinkAdapter() {
+		ImageHyperlink analyseAndImport = toolkit.createImageHyperlink(container, SWT.NONE);
+		analyseAndImport.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		analyseAndImport.setText("Analyse und Import");
+		analyseAndImport.setImage(Activator.getImageDescriptor(ISharedImages.IMG_CLUSTER_48).createImage());
+		analyseAndImport.addHyperlinkListener(new HyperlinkAdapter() {
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
-						IHandlerService.class);
-			
+				TherapyResultWizard wizard = new TherapyResultWizard(null);
+				WizardDialog dialog = new WizardDialog(getSite().getShell(), wizard);
+				dialog.open();
 			}
 		});
 

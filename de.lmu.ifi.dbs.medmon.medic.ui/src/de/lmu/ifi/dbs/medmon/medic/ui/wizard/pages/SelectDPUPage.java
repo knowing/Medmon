@@ -39,7 +39,7 @@ public class SelectDPUPage extends WizardPage {
 				setPageComplete(!event.getSelection().isEmpty());
 			}
 		});
-		setPageComplete(false);
+		setPageComplete(true);
 	}
 	
 	protected ManagedForm createManagedForm(final Composite parent) {

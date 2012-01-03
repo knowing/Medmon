@@ -30,7 +30,7 @@ public class Patient implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(nullable = false)
+	@Column()
 	private int id;
 
 	@Column(length = 30)
@@ -58,19 +58,19 @@ public class Patient implements Serializable {
 	private Date therapystart;
 
 	// bi-directional many-to-one association to Appointment
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "patient")
 	private Set<Appointment> appointments = new HashSet<Appointment>();
 
 	// bi-directional many-to-one association to Data
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "patient")
 	private Set<Data> data = new HashSet<Data>();
 
 	// bi-directional many-to-one association to Archives
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "patient")
 	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "patient")
 	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
@@ -169,11 +169,24 @@ public class Patient implements Serializable {
 		return therapies;
 	}
 
+	public void setTherapies(Set<Therapy> therapies) {
+		this.therapies = therapies;
+	}
+	
+	public void setAppointments(Set<Appointment> appointments) {
+		this.appointments = appointments;
+	}
+	
+
+	public Set<Data> getData() {
+		return data;
+	}
+	
 	@Override
 	public String toString() {
 		return firstname + " " + lastname;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

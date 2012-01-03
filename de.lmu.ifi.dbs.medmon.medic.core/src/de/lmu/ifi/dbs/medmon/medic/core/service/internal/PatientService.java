@@ -13,19 +13,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.PlatformUI;
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -34,11 +41,17 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.medic.core.Activator;
+import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
@@ -89,49 +102,22 @@ public class PatientService implements IPatientService {
 			return path.getFileName();
 		}
 	}
-
-	/**
-	 * <p>
-	 * Create root directory with three subdirectories TRAIN/RESULT/RAW
-	 * </p>
-	 * 
-	 * @return Patient
-	 * @throws IOException
-	 */
+	
 	@Override
-	public Patient createPatient() throws IOException {
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = new Patient();
-		em.persist(patient);
-		em.getTransaction().commit();
-		em.close();
-		Path root = createDirectories(locateDirectory(patient, ROOT));
+	public void initializePatient(Patient p) throws IOException {
+		
+		Path root = createDirectories(locateDirectory(p, ROOT));
 		createDirectory(root.resolve(TRAIN));
 		createDirectory(root.resolve(RESULT));
 		createDirectory(root.resolve(RAW));
-		return patient;
 	}
-
-	/**
-	 * <p>
-	 * Deletes first the source and then the db entities
-	 * </p>
-	 * 
-	 * @param - Patient to delete
-	 * @throws IOException
-	 */
+	
 	@Override
-	public void deletePatient(Patient p) throws IOException {
-		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = em.merge(p);
-		em.remove(patient);
-		em.getTransaction().commit();
-		em.close();
-	}
+	public void releasePatient(Patient p) throws IOException {
 
+		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
+	}
+	
 	/**
 	 * <p>
 	 * Creates a new file and {@link Data} instance and returns the
@@ -148,24 +134,18 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Patient patient = em.merge(p);
-		Sensor sensor = em.merge(s);
-
-		Data data = new Data(patient, sensor, type, from, to);
-		Path file = locateDirectory(patient, type).resolve(generateFilename(sensor, type, from, to));
+		
+		Path file = locateDirectory(p, type).resolve(generateFilename(s, type, from, to));
+		
+		Data data = Activator.getDBModelService().createData(p, s, type, from, to, file.toString());
+		
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
 		} catch (IOException e) {
-			em.close();
 			throw e;
 		}
-		data.setFile(file.toString());
-		em.persist(data);
-		em.getTransaction().commit();
-		em.close();
+		
 		return new DataStoreOutput(outputStream, data);
 	}
 
@@ -182,7 +162,7 @@ public class PatientService implements IPatientService {
 		Sensor entity = sensorManagerService.loadSensorEntity(s);
 		Interval interval = converter.getInterval();
 
-		try ( DataStoreOutput output = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
+		try (DataStoreOutput output = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
 				OutputStream os = output.outputStream;
 				InputStream in = sensorManagerService.createDefaultInput(s)) {
 
@@ -263,26 +243,6 @@ public class PatientService implements IPatientService {
 			to = d2.getTo();
 
 		return store(d1.getPatient(), d1.getSensor(), d1.getType(), from, to).outputStream;
-	}
-
-	/**
-	 * <p>
-	 * Deletes the source and then the db entity
-	 * </p>
-	 * 
-	 * @param d
-	 *            - detached {@link Data} object
-	 * @throws IOException
-	 */
-	@Override
-	public void remove(Data d) throws IOException {
-		Files.delete(locateFile(d));
-		EntityManager em = entityManagerService.createEntityManager();
-		em.getTransaction().begin();
-		Data data = em.merge(d);
-		em.remove(data);
-		em.getTransaction().commit();
-		em.close();
 	}
 
 	/**

@@ -34,7 +34,7 @@ import javax.persistence.TemporalType;
 		@NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date"),
 		@NamedQuery(name = "Data.findByPatientAndSensor", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.sensor = :sensor"),
 		@NamedQuery(name = "Data.findEarliestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.from < d.from))"),
-		@NamedQuery(name = "Data.findLatestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.to > d.to))")})
+		@NamedQuery(name = "Data.findLatestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.to > d.to))") })
 public class Data implements Serializable {
 	private static final long	serialVersionUID	= 1L;
 
@@ -42,11 +42,11 @@ public class Data implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int					id;
 
-	@Column(name = "BEGIN_DATE", nullable = false, updatable = false)
+	@Column(name = "BEGIN_DATE", updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date				from;
 
-	@Column(name = "END_DATE", nullable = false, updatable = false)
+	@Column(name = "END_DATE", updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date				to;
 
@@ -57,34 +57,26 @@ public class Data implements Serializable {
 	// private String originalFile;
 	private String				type;
 
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name = "SENSOR_ID", nullable = false)
+	@ManyToOne()
+	@JoinColumn(name = "SENSOR_ID")
 	private Sensor				sensor;
 
 	// bi-directional many-to-one association to Comment
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne()
 	@JoinColumn(name = "ARCHIV_ID")
 	private Archiv				archiv;
 
 	// bi-directional many-to-one association to Patient
 	//
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false)
+	@ManyToOne()
+	@JoinColumn(name = "PATIENT_ID", updatable = false)
 	private Patient				patient;
 
-	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name = "DATA_ID", nullable = true)
-	TherapyResult therapyResult;
-	
-	public Data() {
-	}
+	@OneToOne()
+	@JoinColumn(name = "DATA_ID")
+	TherapyResult				therapyResult;
 
-	public Data(Patient patient, Sensor sensor, String type, Date from, Date to) {
-		this.from = from;
-		this.to = to;
-		this.type = type;
-		this.sensor = sensor;
-		this.patient = patient;
+	public Data() {
 	}
 
 	public int getId() {
@@ -150,15 +142,15 @@ public class Data implements Serializable {
 	public void setSensor(Sensor sensor) {
 		this.sensor = sensor;
 	}
-	
+
 	public TherapyResult getTherapyResult() {
 		return therapyResult;
 	}
-	
+
 	public void setTherapyResult(TherapyResult therapyResult) {
 		this.therapyResult = therapyResult;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

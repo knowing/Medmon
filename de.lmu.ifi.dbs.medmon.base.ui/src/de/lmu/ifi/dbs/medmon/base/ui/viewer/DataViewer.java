@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.medmon.database.model.Data;
 
 public class DataViewer extends TableViewer {
 
-	private static final String[]	columns		= new String[] { "Von", "Bis", "Sensor", "Ergebnisse" };
-	private static final int[]		width		= new int[] { 170, 170, 120, 100 };
+	private static final String[]	columns		= new String[] { "Type", "Von", "Bis", "Sensor", "Ergebnisse" };
+	private static final int[]		width		= new int[] { 60, 150, 150, 200, 200 };
 	private ViewerComparator[]		comparator	= new ViewerComparator[4];
 
 	public DataViewer(Composite parent, int style) {
@@ -39,7 +39,7 @@ public class DataViewer extends TableViewer {
 	}
 
 	private void initComparators() {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 1; i < 4; i++) {
 			final int column = i;
 			comparator[i] = new ViewerComparator() {
 				@Override

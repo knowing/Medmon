@@ -2,12 +2,15 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -38,11 +41,13 @@ import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class PatientFileDetailBlock extends MasterDetailsBlock {
+	public PatientFileDetailBlock() {
+	}
 
 	private FormToolkit					toolkit;
 	private IGlobalSelectionProvider	selectionProvider;
 	private TreeViewer					therapiesViewer;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private Patient						localPatientSelection;
 
 	/**
@@ -54,12 +59,12 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	@Override
 	protected void createMasterPart(final IManagedForm managedForm, Composite parent) {
 		toolkit = managedForm.getToolkit();
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
 		section.setText("Patientenakte");
-	
+
 		Composite composite = toolkit.createComposite(section, SWT.NONE);
 		toolkit.paintBordersFor(composite);
 		section.setClient(composite);
@@ -78,6 +83,31 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		Tree tree = therapiesViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		toolkit.paintBordersFor(tree);
+		therapiesViewer.setComparator(new ViewerComparator() {
+			private String	empty	= new String();
+
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2) {
+
+				String o1, o2;
+
+				if (e1 instanceof Therapy)
+					o1 = ((Therapy) e1).getCaption();
+				else if (e1 instanceof TherapyResult)
+					o1 = ((TherapyResult) e1).getCaption();
+				else
+					o1 = empty;
+
+				if (e2 instanceof Therapy)
+					o2 = ((Therapy) e2).getCaption();
+				else if (e2 instanceof TherapyResult)
+					o2 = ((TherapyResult) e2).getCaption();
+				else
+					o2 = empty;
+
+				return o1.compareTo(o2);
+			}
+		});
 
 		Composite composite_1 = new Composite(composite, SWT.NONE);
 		composite_1.setLayout(new GridLayout(2, false));
@@ -95,27 +125,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				if (localPatientSelection == null)
 					return;
 
-				/************************************************************
-				 * Database Access Begin
-				 ************************************************************/
-
-				Therapy mTherapy = new Therapy();
-
-				mTherapy.setCaption("neue Therapie");
-				mTherapy.setComment("kein Kommentar.");
-				mTherapy.setTherapyStart(new Date());
-				mTherapy.setTherapyEnd(new Date());
-				mTherapy.setPatient(localPatientSelection);
-
-				entityManager.getTransaction().begin();
-				entityManager.persist(mTherapy);
-				entityManager.getTransaction().commit();
-
-				/************************************************************
-				 * Database Access End
-				 ************************************************************/
-
-				selectionProvider.updateSelection(Patient.class);
+				Activator.getDBModelService().createTherapy(localPatientSelection);
 			}
 		});
 
@@ -150,16 +160,15 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					localPatientSelection = null;
 					therapiesViewer.setInput(null);
 				} else {
+					localPatientSelection = selection;
 
 					/************************************************************
 					 * Database Access Begin
 					 ************************************************************/
 
-					entityManager.getTransaction().begin();
-					localPatientSelection = entityManager.merge(selection);
-					entityManager.getTransaction().commit();
-
-					therapiesViewer.setInput(localPatientSelection);
+					Patient mPatient = workerEM.find(Patient.class, selection.getId());
+					therapiesViewer.setInput(mPatient);
+					workerEM.clear();
 
 					/************************************************************
 					 * Database Access End
@@ -174,11 +183,19 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				entityManager.refresh(localPatientSelection);
-				entityManager.getTransaction().commit();
+				Patient mPatient = workerEM.find(Patient.class, localPatientSelection.getId());
+				Object[] expandedElements = therapiesViewer.getExpandedElements();
+				therapiesViewer.setInput(mPatient);
+				therapiesViewer.setExpandedElements(expandedElements);
+				workerEM.clear();
 
-				therapiesViewer.refresh();
+				// nice one - isn't it
+				// i could have gone with refresh -> but i would have to set
+				// cascade refresh but this is total bullcrap so i reset the
+				// input, cause it's lazy loading and only the previous expanded
+				// elements are fetched !!!
+				// BOOYAKASHA BRO
+				// fuck you JPA. from now on we are cascade-free !!!
 
 				/************************************************************
 				 * Database Access End

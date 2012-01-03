@@ -17,14 +17,4 @@ public class JPAUtil {
 			return null;
 		return ems.createEntityManager();
 	}
-	
-	/**
-	 * @return same entity manager
-	 */
-	public static EntityManager getEntityManager() {
-		IEntityManagerService ems = getEntityManagerService();
-		if (ems == null)
-			return null;
-		return ems.getEntityManager();
-	}
 }

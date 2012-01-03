@@ -2,21 +2,15 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 /**
  * 
- * @author Nepomuk Seiler
+ * @author Nepomuk Seiler, Stephan Picker
  * @since 2011-10-14
- * @version 0.1
+ * @version 0.2
  */
 public interface IGlobalSelectionListener<T> {
 
 	/**
-<<<<<<< HEAD
-	 * Callback for UI components
-	 * @param clazz
-	 * @param selection
-=======
 	 * notifies the listener on selection changes
 	 * @param selection - selected object
->>>>>>> refs/heads/SEP
 	 */
 	void selectionChanged(T selection);
 	

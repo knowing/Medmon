@@ -11,7 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -21,9 +23,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectAndConfigureDPUPage;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -32,12 +36,14 @@ import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataSensorAndDirectoryPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultPatientAndTypePage;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultTherapyPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 /**
@@ -60,6 +66,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
  */
 public class TherapyResultWizard extends Wizard {
 
+	private TherapyResultTherapyPage			therapyPage				= new TherapyResultTherapyPage();
 	private TherapyResultPatientAndTypePage		patientAndTypePage		= new TherapyResultPatientAndTypePage();
 	private ImportDataSensorAndDirectoryPage	sensorAndDirectoryPage	= new ImportDataSensorAndDirectoryPage();
 	private ImportDataDataPage					dataPage				= new ImportDataDataPage();
@@ -67,7 +74,7 @@ public class TherapyResultWizard extends Wizard {
 	private IWizardPage							currentPage				= null;
 
 	private static final Logger					log						= LoggerFactory.getLogger(Activator.PLUGIN_ID);
-	private Therapy								therapy;
+	private Therapy								preselectedTherapy;
 
 	/**
 	 * Only creates a TherapyResult for given Therapy
@@ -75,21 +82,14 @@ public class TherapyResultWizard extends Wizard {
 	 * @param therapy
 	 */
 	public TherapyResultWizard(Therapy therapy) {
-		this.therapy = therapy;
-	}
-
-	@Override
-	public void createPageControls(Composite pageContainer) {
-		if (therapy == null) {
-			MessageDialog
-					.openWarning(getShell(), "Keine Therapie ausgewaehl", "Bitte waehlen Sie zuerst eine Therapie aus um fortzufahren");
-		}
-		super.createPageControls(pageContainer);
+		this.preselectedTherapy = therapy;
 	}
 
 	@Override
 	public void addPages() {
 		addPage(patientAndTypePage);
+		if (preselectedTherapy == null)
+			addPage(therapyPage);
 		addPage(sensorAndDirectoryPage);
 		addPage(dataPage);
 		addPage(selectDPUPage);
@@ -99,7 +99,10 @@ public class TherapyResultWizard extends Wizard {
 	public IWizardPage getNextPage(IWizardPage page) {
 		currentPage = page;
 		int options = patientAndTypePage.getOption();
-		if (page == patientAndTypePage) {
+		if (page == patientAndTypePage && preselectedTherapy == null) {
+			therapyPage.setPatient(patientAndTypePage.getSelectedPatient());
+			return therapyPage;
+		} else if (page == therapyPage || (page == patientAndTypePage && preselectedTherapy != null)) {
 			sensorAndDirectoryPage.setDirectorySectionEnabled(((options & SOURCE_FILE) != 0));
 			sensorAndDirectoryPage.checkContents();
 			return sensorAndDirectoryPage;
@@ -133,14 +136,13 @@ public class TherapyResultWizard extends Wizard {
 		ISensor selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
 		URI selectedUri = dataPage.getSelectedURI();
 
-		IPatientService patientService = Activator.getPatientService();
 		int options = patientAndTypePage.getOption();
 		Data data = null;
 
 		if (((options & SOURCE_SENSOR) | (options & SOURCE_FILE)) != 0) {
 
 			try {
-				data = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedUri).dataEntity;
+				data = Activator.getPatientService().store(selectedPatient, selectedSensor, IPatientService.RAW, selectedUri).dataEntity;
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
 				e.printStackTrace();
@@ -149,11 +151,17 @@ public class TherapyResultWizard extends Wizard {
 
 			if (currentPage == selectDPUPage) {
 				try {
-					// selectDPUPage.configureAndExecuteDPU(patient, sensor,
-					// uri);
-					selectDPUPage.configureAndExecuteDPU(selectedPatient, data);
-				} catch (IOException e) {
+					IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
+					ITherapyResultService resultService = Activator.getTherapyResultService();
+					TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
+					log.debug("Therapy Results created " + results);
+				} catch (Exception e) {
 					e.printStackTrace();
+					try {
+						Activator.getDBModelService().deleteData(data);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 					MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
 					return false;
 				}
@@ -167,28 +175,20 @@ public class TherapyResultWizard extends Wizard {
 			}
 		}
 
-		TherapyResult therapyResult = new TherapyResult();
-		Therapy therapy = Activator.getGlobalSelectionService().getSelection(Therapy.class);
+		// This cannot work - if an exception is thrown there is no return type!
+		/*
+		 * try { if(preselectedTherapy != null)
+		 * Activator.getDBModelService().createTherapyResult(data,
+		 * preselectedTherapy); else
+		 * Activator.getDBModelService().createTherapyResult(data,
+		 * therapyPage.getSelectedTherapy() );
+		 * 
+		 * } catch (Exception e) { e.printStackTrace(); try {
+		 * Activator.getDBModelService().deleteData(data);
+		 * Activator.getDBModelService().deleteData(taggedData); } catch
+		 * (IOException e1) { e1.printStackTrace(); } }
+		 */
 
-		EntityManager entityManager = JPAUtil.createEntityManager();
-		entityManager.getTransaction().begin();
-		data = entityManager.merge(data);
-		therapy = entityManager.merge(therapy);
-		entityManager.persist(therapyResult);
-		
-		therapyResult.setTherapy(therapy);
-		data.setTherapyResult(therapyResult);
-		therapyResult.setCaption("neues Ergebnis");
-		therapyResult.setComment("kein Kommentar.");
-		therapyResult.setSuccess(50);
-		therapyResult.setTimestamp(null);
-		entityManager.getTransaction().commit();
-		entityManager.close();	
-	
-		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		selectionProvider.updateSelection(Patient.class);
-		selectionProvider.unregister();
-		
 		return true;
 	}
 }
