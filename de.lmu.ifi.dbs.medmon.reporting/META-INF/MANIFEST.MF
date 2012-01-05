@@ -8,3 +8,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.eclipse.birt.report.viewer,
+ org.eclipse.birt.report.viewer.api,
+ org.eclipse.birt.report.viewer.browsers,
+ org.eclipse.birt.report.viewer.browsers.custom,
+ org.eclipse.birt.report.viewer.browsers.embedded,
+ org.eclipse.birt.report.viewer.browsers.system,
+ org.eclipse.birt.report.viewer.utilities

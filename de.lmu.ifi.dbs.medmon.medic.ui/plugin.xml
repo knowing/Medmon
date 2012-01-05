@@ -29,7 +29,18 @@
             class="de.lmu.ifi.dbs.medmon.medic.ui.views.HomeView"
             icon="IMG_ETOOL_HOME_NAV"
             id="de.lmu.ifi.dbs.medmon.medic.ui.views.HomeView"
-            name="Startseite"
+            name="HomeView"
+            restorable="true">
+      </view>
+      <view
+            class="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
+            id="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
+            name="New ViewPart">
+      </view>
+      <view
+            class="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
+            id="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
+            name="MedmonPresenterView"
             restorable="true">
       </view>
    </extension>
@@ -53,7 +64,7 @@
       <perspectiveExtension
             targetID="de.lmu.ifi.dbs.medmon.medic.ui.default">
          <view
-               id="de.lmu.ifi.dbs.knowing.core.swt.presenterView"
+               id="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
                minimized="false"
                ratio="0.7f"
                relationship="bottom"
