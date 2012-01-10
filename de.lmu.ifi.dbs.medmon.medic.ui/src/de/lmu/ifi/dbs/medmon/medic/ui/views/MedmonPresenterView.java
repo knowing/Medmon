@@ -2,7 +2,6 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,8 +19,6 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunTask;
 import org.eclipse.birt.report.viewer.utilities.WebViewer;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
@@ -31,14 +28,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.factory.UIFactories;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IReportingService;
+import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.reporting.PatientReportData;
 
 public class MedmonPresenterView extends ViewPart {
 
@@ -61,81 +57,27 @@ public class MedmonPresenterView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		browser = new Browser(container, SWT.NONE);
 
 		try {
-			JAXBContext context = JAXBContext.newInstance(PatientReportData.class);
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			URL designURL = new URL("platform:/plugin/de.lmu.ifi.dbs.medmon.medic.reporting/files/patient_test.rptdesign");
+			URL schemaURL = new URL("platform:/plugin/de.lmu.ifi.dbs.medmon.medic.reporting/files/patient_test.xsd");
+			Path reportDocumentPath = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "document.rtpdocument");
 
-			Path reportDataPath = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "patient_test.xml");
-			Path reportSchema = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "patient_test.xsd");
-			Path reportDesignPath = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "patient_test.rptdesign");
-			Path reportDocumentPath = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "patient_test.rptdocument");
+			IReportingService reportingService = Activator.getReportingService();
+			reportingService.renderReport(designURL, schemaURL, new PatientReportData(), null, reportDocumentPath, Activator.class.getClassLoader());
+
 			
-			marshaller.marshal(new PatientReportData(), new FileWriter(reportDataPath.toFile()));
+			HashMap<String, String> renderParams = new HashMap<String, String>();
+			renderParams.put("SERVLET_NAME_KEY", "run");
+			renderParams.put("FORMAT_KEY", "html");
+			WebViewer.display(reportDocumentPath.toString(), browser, renderParams);
 
-			EngineConfig config = new EngineConfig();
-			org.eclipse.birt.core.framework.Platform.startup(config);
-
-			IReportEngineFactory factory = (IReportEngineFactory) org.eclipse.birt.core.framework.Platform
-					.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
-			IReportEngine reportEngine = factory.createReportEngine(config);
-
-			IReportRunnable design = reportEngine.openReportDesign(reportDesignPath.toString());
-			IRunTask task = reportEngine.createRunTask(design);
-			task.setParameterValue("dataFile", reportDataPath.toString());
-			task.setParameterValue("schemaFile", reportSchema.toString());
-			task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, Activator.class.getClassLoader());
-			task.run(reportDocumentPath.toString());
-			task.close();
-
-			browser = new Browser(container, SWT.NONE);
-			HashMap<String, String> myparms = new HashMap<String, String>();
-			myparms.put("SERVLET_NAME_KEY", "run");
-			myparms.put("FORMAT_KEY", "html");
-			WebViewer.display(reportDocumentPath.toString(), browser, myparms);
-
-		} catch (JAXBException | IOException | BirtException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		// System.out.println("STARTSART");
-		// try {
-		// EngineConfig config = new EngineConfig();
-		// org.eclipse.birt.core.framework.Platform.startup(config);
-		//
-		// IReportEngineFactory factory = (IReportEngineFactory)
-		// org.eclipse.birt.core.framework.Platform
-		// .createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
-		// IReportEngine reportEngine = factory.createReportEngine(config);
-		//
-		// Bundle bundle = Platform.getBundle("de.lmu.ifi.dbs.medmon.medic.ui");
-		// URL url = FileLocator.find(bundle, new Path("patients.rptdesign"),
-		// null);
-		// String reportName = FileLocator.toFileURL(url).getPath();
-		//
-		// IReportRunnable design = reportEngine.openReportDesign(reportName);
-		// IRunTask task = reportEngine.createRunTask(design);
-		// task.setParameterValue("Name", new String("fofofofofofofo"));
-		// task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY,
-		// Activator.class.getClassLoader());
-		// task.run("C:/generated.rptdocument");
-		// task.close();
-		//
-		//
-		//
-		// browser = new Browser(container, SWT.NONE);
-		//
-		// HashMap<String, String> myparms = new HashMap<String, String>();
-		// myparms.put("SERVLET_NAME_KEY", "run");
-		// myparms.put("FORMAT_KEY", "html");
-		// WebViewer.display("C:/generated.rptdocument", browser, myparms);
-		//
-		// } catch (IOException | BirtException e) {
-		// System.out.println("Error");
-		// e.printStackTrace();
-		// }
-
+				
 		uiFactory = UIFactories.newTabUIFactoryInstance(parent, MedmonPresenterView.ID);
 
 		uiFactoryRegistration = Activator.getBundleContext()
