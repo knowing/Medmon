@@ -10,7 +10,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.lmu.ifi.dbs.medmon.medic.reporting.core.IReportData;
 
 @XmlRootElement(name = "TestReportData")
 public class PatientReportData implements IReportData {

@@ -32,8 +32,8 @@ import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.factory.UIFactories;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IReportingService;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
+import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class MedmonPresenterView extends ViewPart {
@@ -52,7 +52,6 @@ public class MedmonPresenterView extends ViewPart {
 	 * 
 	 * @param parent
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void createPartControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
@@ -60,13 +59,13 @@ public class MedmonPresenterView extends ViewPart {
 		
 		browser = new Browser(container, SWT.NONE);
 
-		try {
+/*		try {
 			URL designURL = new URL("platform:/plugin/de.lmu.ifi.dbs.medmon.medic.reporting/files/patient_test.rptdesign");
 			URL schemaURL = new URL("platform:/plugin/de.lmu.ifi.dbs.medmon.medic.reporting/files/patient_test.xsd");
 			Path reportDocumentPath = Paths.get(System.getProperty("user.home"), ".medmon", "reporting", "document.rtpdocument");
 
 			IReportingService reportingService = Activator.getReportingService();
-			reportingService.renderReport(designURL, schemaURL, new PatientReportData(), null, reportDocumentPath, Activator.class.getClassLoader());
+			reportingService.renderReport(designURL, schemaURL, null, reportDocumentPath, Activator.class.getClassLoader());
 
 			
 			HashMap<String, String> renderParams = new HashMap<String, String>();
@@ -76,7 +75,8 @@ public class MedmonPresenterView extends ViewPart {
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+		Activator.getReportingService().displayReport(browser);
 				
 		uiFactory = UIFactories.newTabUIFactoryInstance(parent, MedmonPresenterView.ID);
 

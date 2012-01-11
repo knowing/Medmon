@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.reporting.core;
+package de.lmu.ifi.dbs.medmon.medic.reporting.data;
 
 import java.io.OutputStream;
 import java.nio.file.Path;

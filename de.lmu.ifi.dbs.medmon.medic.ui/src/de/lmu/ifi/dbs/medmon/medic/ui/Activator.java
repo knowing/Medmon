@@ -11,9 +11,9 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IReportingService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
+import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 /**
  * The activator class controls the plug-in life cycle
