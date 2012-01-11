@@ -5,24 +5,12 @@
         <structure>
             <property name="name">FILELIST</property>
             <property name="id">7</property>
-            <expression name="value" type="javascript">params["dataFile"].value</expression>
-        </structure>
-        <structure>
-            <property name="name">ENCODINGLIST</property>
-            <property name="id">7</property>
+            <expression name="value">params["data_xml"].value</expression>
         </structure>
         <structure>
             <property name="name">SCHEMAFILELIST</property>
             <property name="id">7</property>
-            <expression name="value" type="javascript">params["schemaFile"].value</expression>
-        </structure>
-        <structure>
-            <property name="name">OdaConnProfileName</property>
-            <property name="id">7</property>
-        </structure>
-        <structure>
-            <property name="name">OdaConnProfileStorePath</property>
-            <property name="id">7</property>
+            <expression name="value">params["data_xsd"].value</expression>
         </structure>
     </list-property>
     <property name="units">in</property>
@@ -30,7 +18,7 @@
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
     <parameters>
-        <scalar-parameter name="dataFile" id="27">
+        <scalar-parameter name="data_xml" id="27">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
@@ -41,7 +29,7 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
-        <scalar-parameter name="schemaFile" id="28">
+        <scalar-parameter name="data_xsd" id="28">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
@@ -55,12 +43,12 @@
     </parameters>
     <data-sources>
         <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="Data Source" id="7">
-            <property name="FILELIST">C:\Users\Stef\.medmon\reporting\report.data.xml</property>
-            <property name="SCHEMAFILELIST">C:\Users\Stef\.medmon\reporting\PatientReportSchema.xsd</property>
+            <property name="FILELIST">C:\Users\Stef\.medmon\reporting\medmon.medic.patient_test.data.xml</property>
+            <property name="SCHEMAFILELIST">D:\Eclipse\GitRepository\Medmon\de.lmu.ifi.dbs.medmon.medic.reporting\KNOWING-INF\resource\medmon.medic.patient_test.data.xsd</property>
         </oda-data-source>
     </data-sources>
     <data-sets>
-        <oda-data-set extensionID="org.eclipse.datatools.enablement.oda.xml.dataSet" name="Data Set" id="8">
+        <oda-data-set extensionID="org.eclipse.datatools.enablement.oda.xml.dataSet" name="Data Set" id="38">
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">firstName</property>
@@ -229,15 +217,15 @@
             </row>
             <row id="17">
                 <cell id="18">
-                    <data id="29">
+                    <data id="35">
                         <list-property name="boundDataColumns">
                             <structure>
-                                <property name="name">dataFile</property>
-                                <expression name="expression" type="javascript">params["dataFile"]</expression>
+                                <property name="name">data_xml</property>
+                                <expression name="expression" type="javascript">params["data_xml"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
                         </list-property>
-                        <property name="resultSetColumn">dataFile</property>
+                        <property name="resultSetColumn">data_xml</property>
                     </data>
                 </cell>
                 <cell id="19">
@@ -246,7 +234,7 @@
                     </label>
                 </cell>
                 <cell id="20">
-                    <data id="25">
+                    <data id="39">
                         <property name="dataSet">Data Set</property>
                         <list-property name="boundDataColumns">
                             <structure>
@@ -262,15 +250,15 @@
             </row>
             <row id="21">
                 <cell id="22">
-                    <data id="30">
+                    <data id="36">
                         <list-property name="boundDataColumns">
                             <structure>
-                                <property name="name">schemaFile</property>
-                                <expression name="expression" type="javascript">params["schemaFile"]</expression>
+                                <property name="name">data_xsd</property>
+                                <expression name="expression" type="javascript">params["data_xsd"]</expression>
                                 <property name="dataType">string</property>
                             </structure>
                         </list-property>
-                        <property name="resultSetColumn">schemaFile</property>
+                        <property name="resultSetColumn">data_xsd</property>
                     </data>
                 </cell>
                 <cell id="23">
@@ -279,7 +267,7 @@
                     </label>
                 </cell>
                 <cell id="24">
-                    <data id="26">
+                    <data id="40">
                         <property name="dataSet">Data Set</property>
                         <list-property name="boundDataColumns">
                             <structure>

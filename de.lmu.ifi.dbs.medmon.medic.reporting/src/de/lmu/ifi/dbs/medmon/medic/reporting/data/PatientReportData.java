@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement(name = "TestReportData")
-public class PatientReportData implements IReportData {
+public class PatientReportData implements IJAXBReportData {
 
 	@XmlElement
 	public String	firstName;
@@ -25,15 +25,7 @@ public class PatientReportData implements IReportData {
 	}
 
 	@Override
-	public void marshal(Path file) {
-
-		try {
-			JAXBContext context = JAXBContext.newInstance(PatientReportData.class);
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(new PatientReportData(), file.toFile());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
+	public String getId() {
+		return "data";
 	}
 }
