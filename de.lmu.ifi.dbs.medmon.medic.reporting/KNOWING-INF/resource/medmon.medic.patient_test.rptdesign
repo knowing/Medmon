@@ -12,6 +12,28 @@
             <property name="id">7</property>
             <expression name="value">params["data_xsd"].value</expression>
         </structure>
+        <structure>
+            <property name="name">FILELIST</property>
+            <property name="id">41</property>
+            <expression name="value" type="javascript">params["xrff_xml"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">ENCODINGLIST</property>
+            <property name="id">41</property>
+        </structure>
+        <structure>
+            <property name="name">SCHEMAFILELIST</property>
+            <property name="id">41</property>
+            <expression name="value" type="javascript">params["xrff_xsd"].value</expression>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileName</property>
+            <property name="id">41</property>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileStorePath</property>
+            <property name="id">41</property>
+        </structure>
     </list-property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
@@ -40,15 +62,41 @@
                 <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="xrff_xml" id="44">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="xrff_xsd" id="45">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
     </parameters>
     <data-sources>
-        <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="Data Source" id="7">
+        <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="data" id="7">
             <property name="FILELIST">C:\Users\Stef\.medmon\reporting\medmon.medic.patient_test.data.xml</property>
             <property name="SCHEMAFILELIST">D:\Eclipse\GitRepository\Medmon\de.lmu.ifi.dbs.medmon.medic.reporting\KNOWING-INF\resource\medmon.medic.patient_test.data.xsd</property>
         </oda-data-source>
+        <oda-data-source extensionID="org.eclipse.datatools.enablement.oda.xml" name="xrff" id="41">
+            <property name="FILELIST">D:\Eclipse\GitRepository\Medmon\de.lmu.ifi.dbs.medmon.medic.reporting\KNOWING-INF\resource\xrff.test.xml</property>
+            <property name="SCHEMAFILELIST">D:\Eclipse\GitRepository\Medmon\de.lmu.ifi.dbs.medmon.medic.reporting\KNOWING-INF\resource\xrff.xsd</property>
+        </oda-data-source>
     </data-sources>
     <data-sets>
-        <oda-data-set extensionID="org.eclipse.datatools.enablement.oda.xml.dataSet" name="Data Set" id="38">
+        <oda-data-set extensionID="org.eclipse.datatools.enablement.oda.xml.dataSet" name="data_set" id="38">
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">firstName</property>
@@ -75,7 +123,7 @@
                     </structure>
                 </list-property>
             </structure>
-            <property name="dataSource">Data Source</property>
+            <property name="dataSource">data</property>
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
@@ -128,6 +176,71 @@
           </design:attributes>
           <design:usageHints>
             <design:label>lastName</design:label>
+            <design:formattingHints/>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>MAX_ROW</name>
+                    <value>-1</value>
+                </ex-property>
+                <ex-property>
+                    <name>XML_FILE</name>
+                </ex-property>
+            </list-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.datatools.enablement.oda.xml.dataSet" name="xrff_set" id="43">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">value</property>
+                    <property name="analysis">attribute</property>
+                    <text-property name="heading">value</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">value</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">xrff</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">value</property>
+                    <property name="nativeName">value</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[table0#-TNAME-#table0#:#[//instance]#:#{value;STRING;value}#:#<"","http:%%www.w3.org%2001%XMLSchema";"tns","http:%%www.example.org%xrff">]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>value</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>-1</design:precision>
+            <design:scale>-1</design:scale>
+            <design:nullability>Unknown</design:nullability>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>value</design:label>
             <design:formattingHints/>
           </design:usageHints>
         </design:resultColumnDefinitions>
@@ -235,7 +348,7 @@
                 </cell>
                 <cell id="20">
                     <data id="39">
-                        <property name="dataSet">Data Set</property>
+                        <property name="dataSet">data_set</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">firstName</property>
@@ -268,7 +381,7 @@
                 </cell>
                 <cell id="24">
                     <data id="40">
-                        <property name="dataSet">Data Set</property>
+                        <property name="dataSet">data_set</property>
                         <list-property name="boundDataColumns">
                             <structure>
                                 <property name="name">lastName</property>
@@ -280,6 +393,91 @@
                         <property name="resultSetColumn">lastName</property>
                     </data>
                 </cell>
+            </row>
+            <row id="46">
+                <cell id="47">
+                    <data id="54">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">xrff_xml</property>
+                                <expression name="expression" type="javascript">params["xrff_xml"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">xrff_xml</property>
+                    </data>
+                </cell>
+                <cell id="48"/>
+                <cell id="49"/>
+            </row>
+            <row id="50">
+                <cell id="51">
+                    <data id="55">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">xrff_xsd</property>
+                                <expression name="expression" type="javascript">params["xrff_xsd"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">xrff_xsd</property>
+                    </data>
+                </cell>
+                <cell id="52"/>
+                <cell id="53"/>
+            </row>
+            <row id="56">
+                <cell id="57">
+                    <table id="60">
+                        <property name="dataSet">xrff_set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">value</property>
+                                <text-property name="displayName">value</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["value"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="73"/>
+                        <column id="74"/>
+                        <column id="75"/>
+                        <header>
+                            <row id="61">
+                                <cell id="62">
+                                    <label id="78">
+                                        <text-property name="text">Just Some Test Values</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="63">
+                                    <label id="76">
+                                        <text-property name="text">value</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="64"/>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="65">
+                                <cell id="66"/>
+                                <cell id="67">
+                                    <data id="77">
+                                        <property name="resultSetColumn">value</property>
+                                    </data>
+                                </cell>
+                                <cell id="68"/>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="69">
+                                <cell id="70"/>
+                                <cell id="71"/>
+                                <cell id="72"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+                <cell id="58"/>
+                <cell id="59"/>
             </row>
         </grid>
     </body>

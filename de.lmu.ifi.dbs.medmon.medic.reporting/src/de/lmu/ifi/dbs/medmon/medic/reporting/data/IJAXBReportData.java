@@ -1,8 +1,11 @@
 package de.lmu.ifi.dbs.medmon.medic.reporting.data;
 
+import java.nio.file.Path;
 
 public interface IJAXBReportData {
 
-	String getId();
+	public String getId();
+
+	public void marshal(Path destPath);
 
 }

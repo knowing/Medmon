@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.reporting.service;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +12,11 @@ public interface IReportingService {
 
 	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data);
 
-	public void renderReportToBrowser(String reportId, Browser browser, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data);
+	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data);
 	
 	public void renderReportToPDF(String reportId, Path destPath, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data);
 	
-	public void marshallReportData(Path dataPath, IJAXBReportData data);
+	public void registerBrowser(Browser browser, String id);
+
+	public void unregisterBrowser(String id);
 }

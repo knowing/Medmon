@@ -1,26 +1,9 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-import org.eclipse.birt.core.exception.BirtException;
-import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.EngineConstants;
-import org.eclipse.birt.report.engine.api.IReportEngine;
-import org.eclipse.birt.report.engine.api.IReportEngineFactory;
-import org.eclipse.birt.report.engine.api.IReportRunnable;
-import org.eclipse.birt.report.engine.api.IRunTask;
-import org.eclipse.birt.report.viewer.utilities.WebViewer;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
@@ -36,7 +19,7 @@ import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.factory.UIFactories;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
-import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
+import de.lmu.ifi.dbs.medmon.medic.reporting.data.XRFFReportData;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class MedmonPresenterView extends ViewPart {
@@ -61,12 +44,8 @@ public class MedmonPresenterView extends ViewPart {
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		browser = new Browser(container, SWT.NONE);
+		Activator.getReportingService().registerBrowser(browser, "default");
 
-		List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
-		reportData.add(new PatientReportData());
-		Activator.getReportingService().renderReportToBrowser("medmon.medic.patient_test", browser, null, Activator.class.getClassLoader(),
-				reportData);
-		
 		uiFactory = UIFactories.newTabUIFactoryInstance(parent, MedmonPresenterView.ID);
 
 		uiFactoryRegistration = Activator.getBundleContext()

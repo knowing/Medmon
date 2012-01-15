@@ -41,27 +41,21 @@ import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 public class ReportingService implements IReportingService {
 
-	private final Logger	log				= LoggerFactory.getLogger(IReportingService.class);
-	private Path			tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
-	private IResourceStore	resourceStore;
+	private final Logger			log				= LoggerFactory.getLogger(IReportingService.class);
+	private Path					tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
+	private IResourceStore			resourceStore;
+	private Map<String, Browser>	browserMap		= new HashMap<String, Browser>();
 
-	/**
-	 * NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE
-	 * 
-	 * didn't like the Files.createTemp... gear
-	 * Now "user.home/.medmon/reporting/.temp" is created by the service and removed afterwards
-	 * via activator and deactivator.
-	 * 
-	 * also i thought about the renderProvidedreport ... but i think renderReport() is generic enough
-	 * correct me if i'm wrong
-	 * 
-	 * UI currently uses renderReportToBrowser() to minimize code.
-	 * 
-	 * check it out for yourself
-	 * 
-	 * NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE ! NOTE
-	 */
-	
+	@Override
+	public void registerBrowser(Browser browser, String id) {
+		browserMap.put(id, browser);
+	}
+
+	@Override
+	public void unregisterBrowser(String id) {
+		browserMap.remove(id);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) {
@@ -96,8 +90,8 @@ public class ReportingService implements IReportingService {
 		/* ==== Create Report Data XML files ==== */
 		for (IJAXBReportData d : data) {
 
-			String dataFileName = reportId + "." + d.getId() + ".xml";
-			String schemaFileName = reportId + "." + d.getId() + ".xsd";
+			String dataFileName = d.getId() + ".xml";
+			String schemaFileName = d.getId() + ".xsd";
 			String dataParam = d.getId() + "_" + "xml";
 			String schemaParam = d.getId() + "_" + "xsd";
 
@@ -105,7 +99,7 @@ public class ReportingService implements IReportingService {
 			Path reportSchemaDestPath = Paths.get(tempDirectory.toString(), schemaFileName);
 			URL reportDataSchemaSourceURL = resourceStore.getResource(schemaFileName).get();
 
-			marshallReportData(reportDataDestPath, d);
+			d.marshal(reportDataDestPath);
 
 			try {
 				Files.copy(reportDataSchemaSourceURL.openStream(), reportSchemaDestPath, StandardCopyOption.REPLACE_EXISTING);
@@ -132,8 +126,8 @@ public class ReportingService implements IReportingService {
 		/* === Delete Files === */
 		for (IJAXBReportData d : data) {
 
-			String dataFileName = reportId + "." + d.getId() + ".xml";
-			String schemaFileName = reportId + "." + d.getId() + ".xsd";
+			String dataFileName = d.getId() + ".xml";
+			String schemaFileName = d.getId() + ".xsd";
 
 			try {
 				Files.deleteIfExists(Paths.get(tempDirectory.toString(), dataFileName));
@@ -147,10 +141,14 @@ public class ReportingService implements IReportingService {
 	}
 
 	@Override
-	public void renderReportToBrowser(String reportId, Browser browser, Map<String, Object> taskParameters, ClassLoader classLoader,
+	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader,
 			List<IJAXBReportData> data) {
 
-		Path documentPath =  renderReport(reportId, taskParameters, classLoader, data);
+		Browser browser = browserMap.get(id);
+		if (browser == null)
+			return;
+
+		Path documentPath = renderReport(reportId, taskParameters, classLoader, data);
 
 		HashMap<String, String> myparms = new HashMap<String, String>();
 		myparms.put("SERVLET_NAME_KEY", "run");
@@ -162,18 +160,6 @@ public class ReportingService implements IReportingService {
 	public void renderReportToPDF(String reportId, Path destPath, Map<String, Object> taskParameters, ClassLoader classLoader,
 			List<IJAXBReportData> data) {
 
-	}
-
-	@Override
-	public void marshallReportData(Path dataPath, IJAXBReportData reportData) {
-		try {
-			JAXBContext context = JAXBContext.newInstance(reportData.getClass());
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(reportData, dataPath.toFile());
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
 	}
 
 	protected void activate() {

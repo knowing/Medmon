@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"  xmlns:tns="http://www.example.org/xrff" elementFormDefault="qualified">
+
+    
+
+    <element name="dataset" type="tns:datasetType"></element>
+    
+    <complexType name="datasetType">
+    	<sequence>
+    		<element name="header" type="string"></element>
+    		<element name="body" type="tns:bodyType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="bodyType">
+
+    	<sequence>
+    		<element name="instances" type="tns:instancesType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="instancesType">
+    	<sequence>
+    		<element name="instance" type="tns:instanceType"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="instanceType">
+    	<sequence>
+    		<element name="value" type="string" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+</schema>
