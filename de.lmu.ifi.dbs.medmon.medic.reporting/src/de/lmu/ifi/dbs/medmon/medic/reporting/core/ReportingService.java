@@ -3,19 +3,24 @@ package de.lmu.ifi.dbs.medmon.medic.reporting.core;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.walkFileTree;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -29,6 +34,7 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunTask;
 import org.eclipse.birt.report.viewer.utilities.WebViewer;
+import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.swt.browser.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +51,7 @@ public class ReportingService implements IReportingService {
 	private Path					tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
 	private IResourceStore			resourceStore;
 	private Map<String, Browser>	browserMap		= new HashMap<String, Browser>();
+	private EngineConfig			engineConfig;
 
 	@Override
 	public void registerBrowser(Browser browser, String id) {
@@ -58,82 +65,81 @@ public class ReportingService implements IReportingService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) {
+	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data)
+			throws IOException, EngineException {
 
 		/* ==== Create Design and Document Paths ==== */
 		URL reportDesign = resourceStore.getResource(reportId + ".rptdesign").get();
 		Path documentPath = Paths.get(tempDirectory.toString(), reportId + ".rptdocument");
 
-		/* ==== Startup BIRT platform ==== */
-		EngineConfig config = new EngineConfig();
-		try {
-			org.eclipse.birt.core.framework.Platform.startup(config);
-		} catch (BirtException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-
 		/* ==== Configure and run task ==== */
 		IReportEngineFactory factory = (IReportEngineFactory) org.eclipse.birt.core.framework.Platform
 				.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
-		IReportEngine reportEngine = factory.createReportEngine(config);
+		IReportEngine reportEngine = factory.createReportEngine(engineConfig);
 
-		IReportRunnable design;
-		try {
-			design = reportEngine.openReportDesign(reportId, reportDesign.openStream());
-		} catch (EngineException | IOException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-		IRunTask task = reportEngine.createRunTask(design);
+		try (InputStream reportInputStream = reportDesign.openStream()) {
+			IReportRunnable design;
+			design = reportEngine.openReportDesign(reportId, reportInputStream);
 
-		/* ==== Create Report Data XML files ==== */
-		for (IJAXBReportData d : data) {
+			IRunTask task = reportEngine.createRunTask(design);
 
-			String dataFileName = d.getId() + ".xml";
-			String schemaFileName = d.getId() + ".xsd";
-			String dataParam = d.getId() + "_" + "xml";
-			String schemaParam = d.getId() + "_" + "xsd";
+			/* ==== Create Report Data XML files ==== */
+			for (IJAXBReportData d : data) {
 
-			Path reportDataDestPath = Paths.get(tempDirectory.toString(), dataFileName);
-			Path reportSchemaDestPath = Paths.get(tempDirectory.toString(), schemaFileName);
-			URL reportDataSchemaSourceURL = resourceStore.getResource(schemaFileName).get();
+				String dataFileName = d.getId() + ".xml";
+				String schemaFileName = d.getId() + ".xsd";
+				String dataParam = d.getId() + "_" + "xml";
+				String schemaParam = d.getId() + "_" + "xsd";
 
-			d.marshal(reportDataDestPath);
+				Path reportDataDestPath = Paths.get(tempDirectory.toString(), dataFileName);
+				Path reportSchemaDestPath = Paths.get(tempDirectory.toString(), schemaFileName);
+				URL reportDataSchemaSourceURL = resourceStore.getResource(schemaFileName).get();
 
-			try {
-				Files.copy(reportDataSchemaSourceURL.openStream(), reportSchemaDestPath, StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				e.printStackTrace();
+				/* === delete file if exists -> create file -> copy data to file -> tell report about data files ===*/
+				Files.deleteIfExists(reportDataDestPath);
+				try (OutputStream fileOutputStream = Files.newOutputStream(reportDataDestPath, StandardOpenOption.CREATE_NEW)) {
+					d.marshal(fileOutputStream);
+					Files.copy(reportDataSchemaSourceURL.openStream(), reportSchemaDestPath, StandardCopyOption.REPLACE_EXISTING);
+					task.setParameterValue(dataParam, reportDataDestPath.toString());
+					task.setParameterValue(schemaParam, reportSchemaDestPath.toString());
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw e;
+				}
 			}
 
-			task.setParameterValue(dataParam, reportDataDestPath.toString());
-			task.setParameterValue(schemaParam, reportSchemaDestPath.toString());
-		}
+			/* ==== Set the rest of the Parameters ==== */
 
-		/* ==== Set the rest of the Parameters ==== */
+			/* === Render === */
+			try {
+				task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, classLoader);
+				task.run(documentPath.toString());
+				task.close();
+			} catch (EngineException e) {
+				e.printStackTrace();
+				task.close();
+			}
 
-		/* === Render === */
-		try {
-			task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, classLoader);
-			task.run(documentPath.toString());
-			task.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
 		} catch (EngineException e) {
 			e.printStackTrace();
-			task.close();
-		}
+			throw e;
+		} finally {
 
-		/* === Delete Files === */
-		for (IJAXBReportData d : data) {
+			/* === Delete Files === */
+			for (IJAXBReportData d : data) {
 
-			String dataFileName = d.getId() + ".xml";
-			String schemaFileName = d.getId() + ".xsd";
+				String dataFileName = d.getId() + ".xml";
+				String schemaFileName = d.getId() + ".xsd";
 
-			try {
-				Files.deleteIfExists(Paths.get(tempDirectory.toString(), dataFileName));
-				Files.deleteIfExists(Paths.get(tempDirectory.toString(), schemaFileName));
-			} catch (IOException e) {
-				e.printStackTrace();
+				try {
+					Files.deleteIfExists(Paths.get(tempDirectory.toString(), dataFileName));
+					Files.deleteIfExists(Paths.get(tempDirectory.toString(), schemaFileName));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -142,7 +148,7 @@ public class ReportingService implements IReportingService {
 
 	@Override
 	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader,
-			List<IJAXBReportData> data) {
+			List<IJAXBReportData> data) throws EngineException, IOException {
 
 		Browser browser = browserMap.get(id);
 		if (browser == null)
@@ -163,17 +169,23 @@ public class ReportingService implements IReportingService {
 	}
 
 	protected void activate() {
-		log.debug("ReportingService activated");
+
 		try {
 			Files.createDirectories(tempDirectory);
-		} catch (IOException e) {
+			engineConfig = new EngineConfig();
+			org.eclipse.birt.core.framework.Platform.startup(engineConfig);
+
+		} catch (IOException | BirtException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
+		log.debug("ReportingService activated");
 	}
 
 	protected void deactivate() {
 		try {
 			walkFileTree(tempDirectory, new DeleteDirectoryVisitor());
+			org.eclipse.birt.core.framework.Platform.shutdown();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -193,8 +194,13 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
 				reportData.add(new PatientReportData());
 				reportData.add(new XRFFReportData(path));
-				Activator.getReportingService().renderReportToBrowser("medmon.medic.patient_test", "default", null,
-						Activator.class.getClassLoader(), reportData);
+				
+				try {
+					Activator.getReportingService().renderReportToBrowser("medmon.medic.patient_test", "default", null,
+							Activator.class.getClassLoader(), reportData);
+				} catch (EngineException | IOException e1) {
+					e1.printStackTrace();
+				}
 
 			}
 		});

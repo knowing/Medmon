@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.reporting.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -26,7 +27,7 @@ public class XRFFReportData extends JAXBReportData {
 	}
 
 	@Override
-	public void marshal(Path destPath) {
+	public void marshal(OutputStream outputStream) {
 
 		try (InputStream inputStream = Files.newInputStream(dataPath)) {
 
@@ -36,8 +37,7 @@ public class XRFFReportData extends JAXBReportData {
 			Saver saver = new XRFFSaver();
 			saver.setInstances(dataset);
 
-			Files.deleteIfExists(destPath);
-			saver.setDestination(Files.newOutputStream(destPath, StandardOpenOption.CREATE_NEW));
+			saver.setDestination(outputStream);
 			saver.writeBatch();
 
 		} catch (IOException e) {
