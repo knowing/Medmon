@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
-
-<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.1.ALPHA2" useFeatures="true" includeLaunchers="true">
+<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.rcp.product" application="de.lmu.ifi.dbs.medmon.medic.rcp.application" version="1.0.1.ALPHA2" useFeatures="true" includeLaunchers="false">
 
    <aboutInfo>
       <image path="/de.lmu.ifi.dbs.medmon.medic.rcp/medmon.trans.png"/>
@@ -103,5 +102,4 @@
       <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="4" />
    </configurations>
-
 </product>

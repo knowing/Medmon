@@ -189,14 +189,6 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				therapiesViewer.setExpandedElements(expandedElements);
 				workerEM.clear();
 
-				// nice one - isn't it
-				// i could have gone with refresh -> but i would have to set
-				// cascade refresh but this is total bullcrap so i reset the
-				// input, cause it's lazy loading and only the previous expanded
-				// elements are fetched !!!
-				// BOOYAKASHA BRO
-				// fuck you JPA. from now on we are cascade-free !!!
-
 				/************************************************************
 				 * Database Access End
 				 ************************************************************/
