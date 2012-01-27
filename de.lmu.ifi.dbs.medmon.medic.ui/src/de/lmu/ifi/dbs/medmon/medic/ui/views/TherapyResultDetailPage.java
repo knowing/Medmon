@@ -4,61 +4,49 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
-import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IDetailsPage;
 import org.eclipse.ui.forms.IFormPart;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.nebula.widgets.cdatetime.CDateTime;
-import org.eclipse.nebula.widgets.cdatetime.CDT;
-import org.eclipse.swt.widgets.Scale;
-import org.eclipse.ui.forms.widgets.ImageHyperlink;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Group;
 
-import de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.XRFFReportData;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Link;
 
 public class TherapyResultDetailPage implements IDetailsPage {
 
@@ -194,11 +182,11 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
 				reportData.add(new PatientReportData());
 				reportData.add(new XRFFReportData(path));
-				
+
 				try {
 					Activator.getReportingService().renderReportToBrowser("medmon.medic.patient_test", "default", null,
 							Activator.class.getClassLoader(), reportData);
-				} catch (EngineException | IOException e1) {
+				} catch (BirtProcessingException | IOException e1) {
 					e1.printStackTrace();
 				}
 

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.swt.browser.Browser;
 
+import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 
 public interface IReportingService {
@@ -23,7 +24,7 @@ public interface IReportingService {
 	 * @throws IOException
 	 * @throws EngineException
 	 */
-	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) throws IOException, EngineException;
+	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) throws IOException, BirtProcessingException;
 
 	/**
 	 * Renders a report into a registered Browser
@@ -37,7 +38,7 @@ public interface IReportingService {
 	 * @throws EngineException
 	 * @throws IOException
 	 */
-	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) throws EngineException, IOException;
+	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data) throws BirtProcessingException, IOException;
 	
 	/**
 	 * UNSUPPORTED YET

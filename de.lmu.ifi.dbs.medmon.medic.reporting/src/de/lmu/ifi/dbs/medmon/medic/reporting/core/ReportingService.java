@@ -1,29 +1,19 @@
 package de.lmu.ifi.dbs.medmon.medic.reporting.core;
 
-import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.walkFileTree;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.management.RuntimeErrorException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.engine.api.EngineConfig;
@@ -34,7 +24,6 @@ import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunTask;
 import org.eclipse.birt.report.viewer.utilities.WebViewer;
-import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.swt.browser.Browser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.knowing.core.service.IResourceStore;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 public class ReportingService implements IReportingService {
@@ -66,7 +54,7 @@ public class ReportingService implements IReportingService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data)
-			throws IOException, EngineException {
+			throws IOException, BirtProcessingException {
 
 		/* ==== Create Design and Document Paths ==== */
 		URL reportDesign = resourceStore.getResource(reportId + ".rptdesign").get();
@@ -125,7 +113,7 @@ public class ReportingService implements IReportingService {
 			throw e;
 		} catch (EngineException e) {
 			e.printStackTrace();
-			throw e;
+			throw new BirtProcessingException("<TODO>");
 		} finally {
 
 			/* === Delete Files === */
@@ -148,7 +136,7 @@ public class ReportingService implements IReportingService {
 
 	@Override
 	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader,
-			List<IJAXBReportData> data) throws EngineException, IOException {
+			List<IJAXBReportData> data) throws BirtProcessingException, IOException {
 
 		Browser browser = browserMap.get(id);
 		if (browser == null)
