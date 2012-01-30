@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -35,6 +36,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgewählt";
 	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgewählt";
 	private Button				btnChooseDirectory;
+	private SensorTableViewer	sensorTableViewer;
 
 	/**
 	 * Create the wizard.
@@ -71,6 +73,13 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	 * WIZZARD-INIT
 	 */
 	private void initialize() {
+
+		if (table.getItemCount() > 0) {
+			table.setSelection(0);
+			IStructuredSelection selection = (IStructuredSelection) sensorTableViewer.getSelection();
+			selectedSensor = (ISensor) selection.getFirstElement();
+		}
+
 		checkContents();
 	}
 
@@ -83,7 +92,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 		setControl(container);
 		container.setLayout(new GridLayout(2, false));
 
-		final SensorTableViewer sensorTableViewer = new SensorTableViewer(container, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+		sensorTableViewer = new SensorTableViewer(container, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
 		// final TableViewer sensorTableViewer = new TableViewer(container);
 		table = sensorTableViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));

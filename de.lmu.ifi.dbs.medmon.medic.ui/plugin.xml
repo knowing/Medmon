@@ -35,7 +35,7 @@
       <view
             class="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
             id="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
-            name="New ViewPart">
+            name="Berichte">
       </view>
       <view
             class="de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView"
