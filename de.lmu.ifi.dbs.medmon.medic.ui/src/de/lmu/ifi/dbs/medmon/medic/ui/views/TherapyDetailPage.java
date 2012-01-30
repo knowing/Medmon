@@ -173,13 +173,6 @@ public class TherapyDetailPage implements IDetailsPage {
 		textSuccess.setLayoutData(gd_textSuccess);
 		textSuccess.addModifyListener(dirtyListener);
 		toolkit.adapt(textSuccess, true, true);
-		new Label(composite, SWT.NONE);
-
-		Link link = new Link(composite, SWT.NONE);
-		toolkit.adapt(link, true, true);
-		link.setText("<a>Datensatz anzeigen</a>");
-		new Label(composite, SWT.NONE);
-		new Label(composite, SWT.NONE);
 
 		Group groupComment = new Group(composite, SWT.NONE);
 		groupComment.setText("Kommentar:");

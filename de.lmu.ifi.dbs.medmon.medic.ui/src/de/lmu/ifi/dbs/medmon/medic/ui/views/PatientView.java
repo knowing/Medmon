@@ -362,11 +362,12 @@ public class PatientView extends ViewPart {
 		chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
 
-		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
+		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		toolkit.adapt(chartComposite);
 		toolkit.paintBordersFor(chartComposite);
 
 		Composite cTimeline = toolkit.createComposite(formData.getBody(), SWT.NONE);
+		cTimeline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.paintBordersFor(cTimeline);
 		cTimeline.setLayout(new FillLayout(SWT.HORIZONTAL));
 
