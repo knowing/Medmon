@@ -105,7 +105,7 @@ public class Activator extends AbstractUIPlugin {
 		
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 * 
