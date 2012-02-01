@@ -58,16 +58,6 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 			((IGlobalSelectionListener<T>) listener).selectionUpdated();
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> void refireSelection(Class<T> clazz) {
-		T oldSelection = (T) selectionMap.get(clazz);
-		if (oldSelection != null) {
-			for (IGlobalSelectionListener<?> listener : listenerServices.get(clazz))
-				((IGlobalSelectionListener<T>) listener).selectionChanged(oldSelection);
-		}
-	}
-
 	private void savePatient() {
 		IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
 		if (getSelection(Patient.class) != null) {
@@ -104,7 +94,6 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 
 	protected void unbindProvider(IGlobalSelectionProvider provider) {
 		providerServices.remove(provider);
-		// provider.setGlobalSelectionService(null); ???
 	}
 
 	public void bindEntityManagerService(IEntityManagerService service) {
@@ -119,12 +108,15 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 		workerEM = null;
 	}
 
-	protected void bindListener(IGlobalSelectionListener<?> listener) {
+	@SuppressWarnings("unchecked")
+	protected <T> void bindListener(IGlobalSelectionListener<T> listener) {
 		if (listenerServices.get(listener.getType()) == null) {
 			listenerServices.put(listener.getType(), new HashSet<IGlobalSelectionListener<?>>());
 		}
 		listenerServices.get(listener.getType()).add(listener);
-		log.debug("bound:" + listener.getType());
+		T currentSelection = (T) selectionMap.get(listener.getType());
+		if (currentSelection != null)
+			listener.selectionChanged(currentSelection);
 	}
 
 	protected void unbindListener(IGlobalSelectionListener<?> listener) {

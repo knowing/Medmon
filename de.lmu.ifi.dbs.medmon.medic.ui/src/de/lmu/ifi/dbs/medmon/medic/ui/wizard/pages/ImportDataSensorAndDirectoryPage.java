@@ -3,26 +3,21 @@ package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.*;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportDataWizard;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataSensorAndDirectoryPage extends WizardPage implements IValidationPage {

@@ -30,5 +30,4 @@ public interface IGlobalSelectionService {
 	 */
 	<T> void updateSelection(Class<T> clazz);
 
-	<T> void refireSelection(Class<T> clazz);
 }

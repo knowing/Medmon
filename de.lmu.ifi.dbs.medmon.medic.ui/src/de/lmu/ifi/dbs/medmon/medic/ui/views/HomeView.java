@@ -1,14 +1,15 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
-import org.eclipse.jface.wizard.WizardDialog;
+import javax.persistence.EntityManager;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
@@ -24,21 +25,20 @@ import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportWizardHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.NewPatientHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.TherapyResultWizard;
-import org.eclipse.swt.widgets.Link;
 
 public class HomeView extends ViewPart {
 
-	private FormToolkit	toolkit;
-	private Link		linkOpenLastPatient;
+	private FormToolkit		toolkit;
+	private Link			linkOpenLastPatient;
+	private EntityManager	workerEM;
 
 	public HomeView() {
-
+		workerEM = JPAUtil.createEntityManager();
 	}
 
 	@Override
@@ -106,7 +106,17 @@ public class HomeView extends ViewPart {
 		toolkit.adapt(linkOpenLastPatient, true, true);
 		linkOpenLastPatient.setText("<a>letzten Patienten öffnen</a>");
 		linkOpenLastPatient.setEnabled(false);
-		refreshPatientLink(Activator.getGlobalSelectionService().getSelection(Patient.class));
+		linkOpenLastPatient.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
+							PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+				} catch (WorkbenchException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
@@ -148,30 +158,28 @@ public class HomeView extends ViewPart {
 	}
 
 	private void refreshPatientLink(Patient selection) {
-		linkOpenLastPatient.setText("<a>" + selection.getLastname() + "" + selection.getFirstname() + " öffnen</a>");
+		if (selection == null) {
+			linkOpenLastPatient.setText("<a>letzten Patienten öffnen</a>");
+			linkOpenLastPatient.setEnabled(false);
+			return;
+		}
+
+		selection = workerEM.find(Patient.class, selection.getId());
+		workerEM.clear();
+
+		linkOpenLastPatient.setText("<a>" + selection.getLastname() + " " + selection.getFirstname() + " öffnen</a>");
 		linkOpenLastPatient.setEnabled(true);
-		linkOpenLastPatient.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Display.getCurrent().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
-									PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-						} catch (WorkbenchException e1) {
-							e1.printStackTrace();
-						}
-						Activator.getGlobalSelectionService().refireSelection(Patient.class);
-					}
-				});
-			}
-		});
 	};
 
 	@Override
 	public void setFocus() {
 
+	}
+
+	@Override
+	public void dispose() {
+		workerEM.close();
+		super.dispose();
 	}
 
 }

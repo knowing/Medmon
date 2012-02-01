@@ -200,8 +200,10 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		toolkit.paintBordersFor(groupComment);
 		groupComment.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		textComment = toolkit.createText(groupComment, "New Text", SWT.MULTI);
-
+		textComment = new Text(groupComment, SWT.BORDER);
+		toolkit.adapt(textComment, true, true);
+		textComment.addModifyListener(dirtyListener);
+		
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(3, false));
 		compositeLinks.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -272,17 +274,16 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		localTherapyResultSelection = (TherapyResult) structuredSelection.getFirstElement();
 		selectionProvider.setSelection(TherapyResult.class, localTherapyResultSelection);
 
-		workerEM.getTransaction().begin();
 		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
+		workerEM.clear();
+		
 		ignoreModification = true;
 		textTherapy.setText(mTherapyResult.getCaption());
 		textComment.setText(mTherapyResult.getComment());
 		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
 		scaleSuccess.setSelection(mTherapyResult.getSuccess());
-		workerEM.getTransaction().commit();
 		ignoreModification = false;
 
-		workerEM.clear();
 		update();
 
 		/************************************************************
@@ -297,17 +298,16 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		 ************************************************************/
 
 		if (isDirty) {
-			TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
 			workerEM.getTransaction().begin();
+			TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
 
 			ignoreModification = true;
 			mTherapyResult.setCaption(textTherapy.getText());
-			mTherapyResult.setComment(textTherapy.getText());
+			mTherapyResult.setComment(textComment.getText());
 			mTherapyResult.setSuccess(scaleSuccess.getSelection());
 			mTherapyResult.setTimestamp(dateTimestamp.getSelection());
 			ignoreModification = false;
 
-			workerEM.merge(mTherapyResult);
 			workerEM.getTransaction().commit();
 			workerEM.clear();
 

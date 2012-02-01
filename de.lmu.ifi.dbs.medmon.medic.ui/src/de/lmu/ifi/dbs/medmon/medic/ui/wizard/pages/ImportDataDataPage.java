@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 public class ImportDataDataPage extends WizardPage implements IValidationPage {
 
 	private URI					selectedURI;
-	private ISensor				selectedSensor;
 
 	private SortedSet<String>	errors					= new TreeSet<String>();
 	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgewählt";
@@ -60,7 +59,6 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	 */
 	public void setInput(ISensor sensor, Object input) {
 		selectedURI = null;
-		selectedSensor = sensor;
 		tableViewer.setInput(input);
 
 		if (table.getItemCount() > 0) {
