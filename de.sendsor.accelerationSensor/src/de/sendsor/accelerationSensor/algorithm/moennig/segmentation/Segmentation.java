@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -168,8 +169,9 @@ public class Segmentation extends AbstractProcessor {
         shiftsCorrelation = new double[dimensions];
 		double[][] values = new double[dimensions][inst.numInstances()];       
 
-		Vector<Instance> segment = new Vector<Instance>();
-		Vector<Instance> nonSegment = new Vector<Instance>();
+		
+		LinkedList<Instance> segment = new LinkedList<Instance>();
+		LinkedList<Instance> nonSegment = new LinkedList<Instance>();
 		
 		int timeAttIndex = -1;
 		for(int i=0; i < inst.numAttributes(); i++){
@@ -223,8 +225,8 @@ public class Segmentation extends AbstractProcessor {
                 		   nonSegment.addAll(segment);
                 	   }
                 	   else{
-                		   Timestamp t1 = new Timestamp((long)nonSegment.lastElement().value(timeAttIndex));
-                		   Timestamp t2 = new Timestamp((long)segment.firstElement().value(timeAttIndex));
+                		   Timestamp t1 = new Timestamp((long)nonSegment.getFirst().value(timeAttIndex));
+                		   Timestamp t2 = new Timestamp((long)segment.getLast().value(timeAttIndex));
                 		   //cobine successive nonSegments
                 		   if(t2.getTime()-t1.getTime()==TIME_BETWEEN_SAMPLES){                			   
                 			   nonSegment.addAll(segment);
@@ -314,11 +316,11 @@ public class Segmentation extends AbstractProcessor {
         return count;
     }
     
-    private Instance buildOutputInstance(Vector<Instance> segment, Instances output){
+    private Instance buildOutputInstance(LinkedList<Instance> segment, Instances output){
     	Instance result = new DenseInstance(numOuputAttributes);
     	result.setDataset(output);
-    	Instance first = segment.firstElement();
-    	Instance last = segment.lastElement();
+    	Instance first = segment.getFirst();
+    	Instance last = segment.getLast();
     	for(int i=0;i<first.numAttributes();i++){
     		if(first.attribute(i).type()==Attribute.DATE){
     			result.setValue(0, first.value(i));		
