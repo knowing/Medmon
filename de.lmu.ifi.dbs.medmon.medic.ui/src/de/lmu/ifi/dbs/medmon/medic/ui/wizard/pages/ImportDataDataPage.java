@@ -1,15 +1,16 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -18,25 +19,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
-import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.jface.viewers.TableViewerColumn;
 
 public class ImportDataDataPage extends WizardPage implements IValidationPage {
 
 	private URI					selectedURI;
-	private ISensor				selectedSensor;
 
 	private SortedSet<String>	errors					= new TreeSet<String>();
 	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgewählt";
@@ -45,6 +36,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	private TableViewerColumn	clmViewerFile;
 	private TableViewerColumn	clmViewerFrom;
 	private TableViewerColumn	clmViewerTo;
+	private Table				table;
 
 	/**
 	 * Create the wizard.
@@ -67,8 +59,15 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	 */
 	public void setInput(ISensor sensor, Object input) {
 		selectedURI = null;
-		selectedSensor = sensor;
 		tableViewer.setInput(input);
+
+		if (table.getItemCount() > 0) {
+			table.setSelection(0);
+			IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
+			selectedURI = (URI) selection.getFirstElement();
+		}
+
+		checkContents();
 	}
 
 	/**
@@ -90,7 +89,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		container.setLayout(new GridLayout(1, false));
 
 		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-		Table table = tableViewer.getTable();
+		table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -113,7 +112,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		clmTo.setWidth(120);
 		clmTo.setText("Bis");
 
-		table.addSelectionListener(new ValidationListener(this){
+		table.addSelectionListener(new ValidationListener(this) {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
@@ -128,7 +127,9 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		clmViewerFile.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((URI) cell.getElement()).toString());
+				URI uri = ((URI) cell.getElement());
+				Path fileName = Paths.get(uri).getFileName();
+				cell.setText(fileName.toString());
 			}
 		});
 		clmViewerFrom.setLabelProvider(new CellLabelProvider() {
@@ -141,7 +142,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 			public void update(ViewerCell cell) {
 			}
 		});
-		
+
 		initialize();
 	}
 

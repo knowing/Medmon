@@ -6,4 +6,5 @@
    <service>
       <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService"/>
    </service>
+   <reference bind="bindEntityManagerService" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
 </scr:component>

@@ -149,22 +149,20 @@ public class TherapyResultWizard extends Wizard {
 				return false;
 			}
 
-			if (currentPage == selectDPUPage) {
+			try {
+				IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
+				ITherapyResultService resultService = Activator.getTherapyResultService();
+				TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
+				log.debug("Therapy Results created " + results);
+			} catch (Exception e) {
+				e.printStackTrace();
 				try {
-					IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
-					ITherapyResultService resultService = Activator.getTherapyResultService();
-					TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
-					log.debug("Therapy Results created " + results);
-				} catch (Exception e) {
-					e.printStackTrace();
-					try {
-						Activator.getDBModelService().deleteData(data);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
-					return false;
+					Activator.getDBModelService().deleteData(data);
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
+				MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
+				return false;
 			}
 
 			try {

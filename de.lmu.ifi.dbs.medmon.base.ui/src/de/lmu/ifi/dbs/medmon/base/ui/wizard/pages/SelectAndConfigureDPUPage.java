@@ -1,10 +1,14 @@
 package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -20,13 +24,20 @@ import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
+import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class SelectAndConfigureDPUPage extends WizardPage implements IValidationPage {
 
-	private final Logger	log	= LoggerFactory.getLogger(Activator.PLUGIN_ID);
+	private final Logger		log						= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
-	private Text			textSearch;
-	private DPUTableViewer	dpuViewer;
+	private Text				textSearch;
+	private DPUTableViewer		dpuViewer;
+	private IDataProcessingUnit	selectedDPU;
+	private SortedSet<String>	errors					= new TreeSet<String>();
+	private Table				table;
+
+	private String				ERROR_NO_DPU_SELECTED	= "Kein Algorithmus ausgewählt";
 
 	/**
 	 * Create the wizard.
@@ -73,21 +84,58 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 		dpuViewer = new DPUTableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		dpuViewer.addFilter(dpuSearchFilter);
 		dpuViewer.addFilter(dpuInputFilter);
-		Table table = dpuViewer.getTable();
+		table = dpuViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		table.addSelectionListener(new ValidationListener(this) {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection selection = (IStructuredSelection) dpuViewer.getSelection();
+				if (!selection.isEmpty())
+					selectedDPU = (IDataProcessingUnit) selection.getFirstElement();
+				else
+					selectedDPU = null;
+				super.widgetSelected(e);
+			}
+		});
+
+		initialize();
+	}
+
+	private void initialize() {
+
+		if (table.getItemCount() > 0) {
+			table.setSelection(0);
+			IStructuredSelection selection = (IStructuredSelection) dpuViewer.getSelection();
+			selectedDPU = (IDataProcessingUnit) selection.getFirstElement();
+		}
+
+		checkContents();
+
 	}
 
 	@Override
 	public void checkContents() {
 
+		if (selectedDPU == null)
+			errors.add(ERROR_NO_DPU_SELECTED);
+		else
+			errors.remove(ERROR_NO_DPU_SELECTED);
+
+		if (errors.isEmpty()) {
+			setErrorMessage(null);
+			setPageComplete(true);
+		} else {
+			setErrorMessage(errors.first());
+			setPageComplete(false);
+		}
 	}
-	
+
 	/**
 	 * @return selected DPU or null
 	 */
 	public IDataProcessingUnit getDataProcessingUnit() {
 		IStructuredSelection selection = (IStructuredSelection) dpuViewer.getSelection();
-		if(selection.isEmpty())
+		if (selection.isEmpty())
 			return null;
 		return (IDataProcessingUnit) selection.getFirstElement();
 	}

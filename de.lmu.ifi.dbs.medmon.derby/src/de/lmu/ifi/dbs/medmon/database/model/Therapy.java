@@ -39,7 +39,7 @@ public class Therapy implements Serializable {
 	@JoinColumn(name = "PATIENT_ID")
 	private Patient patient;
 
-	@OneToMany(mappedBy = "therapy" )
+	@OneToMany(mappedBy = "therapy")
 	private Set<TherapyResult>	therapyResults = new HashSet<TherapyResult>();
 
 	@Temporal(TemporalType.DATE)

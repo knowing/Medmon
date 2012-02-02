@@ -93,7 +93,7 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
 		selectPatient(selectedPatient);
-
+		
 		checkContents();
 	}
 

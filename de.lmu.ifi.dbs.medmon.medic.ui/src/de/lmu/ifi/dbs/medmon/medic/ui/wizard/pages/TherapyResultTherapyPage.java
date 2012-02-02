@@ -41,6 +41,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmTherapy;
+	private Table				table;
 
 	/**
 	 * Create the wizard.
@@ -64,12 +65,12 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	@SuppressWarnings("unchecked")
 	public void setPatient(Patient patient) {
 		this.patient = patient;
-		
+
 		EntityManager entityManager = JPAUtil.createEntityManager();
 		Query allTherapiesQuery = entityManager.createNamedQuery("Therapy.findByPatientId");
 		List<Therapy> allTherapies = allTherapiesQuery.setParameter("patientId", patient).getResultList();
 		entityManager.close();
-		
+
 		tableViewer.setInput(allTherapies);
 	}
 
@@ -77,6 +78,13 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	 * WIZZARD-INIT:
 	 */
 	private void initialize() {
+
+		if (table.getItemCount() > 0) {
+			table.setSelection(0);
+			IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
+			selectedTherapy = (Therapy) selection.getFirstElement();
+		}
+
 		checkContents();
 	}
 
@@ -93,7 +101,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 		container.setLayout(new GridLayout(1, false));
 
 		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-		Table table = tableViewer.getTable();
+		table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -122,7 +130,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 				cell.setText(((Therapy) cell.getElement()).getCaption());
 			}
 		});
-		
+
 		initialize();
 	}
 

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 
@@ -35,7 +34,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
@@ -173,13 +171,6 @@ public class TherapyDetailPage implements IDetailsPage {
 		textSuccess.setLayoutData(gd_textSuccess);
 		textSuccess.addModifyListener(dirtyListener);
 		toolkit.adapt(textSuccess, true, true);
-		new Label(composite, SWT.NONE);
-
-		Link link = new Link(composite, SWT.NONE);
-		toolkit.adapt(link, true, true);
-		link.setText("<a>Datensatz anzeigen</a>");
-		new Label(composite, SWT.NONE);
-		new Label(composite, SWT.NONE);
 
 		Group groupComment = new Group(composite, SWT.NONE);
 		groupComment.setText("Kommentar:");
@@ -276,7 +267,8 @@ public class TherapyDetailPage implements IDetailsPage {
 		selectionProvider.setSelection(Therapy.class, localTherapySelection);
 
 		Therapy mTherapy = workerEM.find(Therapy.class, localTherapySelection.getId());
-
+		workerEM.clear();
+		
 		ignoreModification = true;
 		textTherapy.setText(mTherapy.getCaption());
 		textComment.setText(mTherapy.getComment());
@@ -284,8 +276,7 @@ public class TherapyDetailPage implements IDetailsPage {
 		dateEnd.setSelection(mTherapy.getTherapyEnd());
 		scaleSuccess.setSelection(mTherapy.getSuccess());
 		ignoreModification = false;
-
-		workerEM.clear();
+		
 		update();
 		
 		/************************************************************

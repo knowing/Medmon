@@ -13,6 +13,7 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
+import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -23,7 +24,7 @@ public class Activator extends AbstractUIPlugin {
 	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	public static Activator plugin;
 
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
@@ -33,6 +34,7 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
 	private static ServiceTracker<IDBModelService, IDBModelService> dbModelServiceTracker;
 	private static ServiceTracker<ITherapyResultService, ITherapyResultService> therapyResultServiceTracker;
+	private static ServiceTracker<IReportingService, IReportingService> reportingServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
@@ -66,6 +68,8 @@ public class Activator extends AbstractUIPlugin {
 		therapyResultServiceTracker = new ServiceTracker<ITherapyResultService, ITherapyResultService>(context, ITherapyResultService.class, null);
 		therapyResultServiceTracker.open();
 		
+		reportingServiceTracker = new ServiceTracker<IReportingService, IReportingService>(context, IReportingService.class, null);
+		reportingServiceTracker.open();
 	}
 
 	/*
@@ -96,9 +100,12 @@ public class Activator extends AbstractUIPlugin {
 		therapyResultServiceTracker.close();
 		therapyResultServiceTracker = null;
 		
+		reportingServiceTracker.close();
+		reportingServiceTracker = null;
+		
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 * 
@@ -146,4 +153,7 @@ public class Activator extends AbstractUIPlugin {
 		return therapyResultServiceTracker.getService();
 	}
 	
+	public static IReportingService getReportingService(){
+		return reportingServiceTracker.getService();
+	}
 }
