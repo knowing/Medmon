@@ -25,7 +25,7 @@ import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 
 public class SelectAndConfigureDPUPage extends WizardPage implements IValidationPage {
 
@@ -98,24 +98,14 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 			}
 		});
 
-		initialize();
-	}
-
-	private void initialize() {
-
-		if (table.getItemCount() > 0) {
-			table.setSelection(0);
-			IStructuredSelection selection = (IStructuredSelection) dpuViewer.getSelection();
-			selectedDPU = (IDataProcessingUnit) selection.getFirstElement();
-		}
-
 		checkContents();
-
 	}
 
 	@Override
 	public void checkContents() {
 
+		selectedDPU = JFaceUtil.initializeViewerSelection(IDataProcessingUnit.class,dpuViewer);
+		
 		if (selectedDPU == null)
 			errors.add(ERROR_NO_DPU_SELECTED);
 		else

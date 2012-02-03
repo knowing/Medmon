@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class TherapyResultTherapyPage extends WizardPage implements IValidationPage {
@@ -75,20 +76,6 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	}
 
 	/**
-	 * WIZZARD-INIT:
-	 */
-	private void initialize() {
-
-		if (table.getItemCount() > 0) {
-			table.setSelection(0);
-			IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
-			selectedTherapy = (Therapy) selection.getFirstElement();
-		}
-
-		checkContents();
-	}
-
-	/**
 	 * Create contents of the wizard.
 	 * 
 	 * @param parent
@@ -131,11 +118,13 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 			}
 		});
 
-		initialize();
+		checkContents();
 	}
 
 	@Override
 	public void checkContents() {
+
+		selectedTherapy = JFaceUtil.initializeViewerSelection(Therapy.class, tableViewer);
 
 		if (selectedTherapy == null)
 			errors.add(ERROR_NO_THERAPY_SELECTED);

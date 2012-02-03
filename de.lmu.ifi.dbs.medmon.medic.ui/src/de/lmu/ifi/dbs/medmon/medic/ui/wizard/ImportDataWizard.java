@@ -36,7 +36,6 @@ public class ImportDataWizard extends Wizard {
 	private ImportDataPatientAndTypePage		patientAndTypePage;
 	private ImportDataSensorAndDirectoryPage	sensorAndDirectoryPage;
 	private ImportDataDataPage					dataPage;
-	private int									options;
 
 	private Patient								selectedPatient;
 	private ISensor								selectedSensor;
@@ -62,6 +61,7 @@ public class ImportDataWizard extends Wizard {
 
 		IPatientService patientService = Activator.getPatientService();
 
+		int options = patientAndTypePage.getOption();
 		if ((options & IMPORT_RAW) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
@@ -83,34 +83,39 @@ public class ImportDataWizard extends Wizard {
 
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
+		int options = patientAndTypePage.getOption();
 		if (page == patientAndTypePage) {
-			options = patientAndTypePage.getOption();
 			sensorAndDirectoryPage.setDirectorySectionEnabled(((options & SOURCE_FILE) != 0));
 			sensorAndDirectoryPage.checkContents();
+			prepateDataPage(options);
 			return sensorAndDirectoryPage;
 		} else if (page == sensorAndDirectoryPage) {
-			options = patientAndTypePage.getOption();
-			selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
-			selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
-			if ((options & SOURCE_SENSOR) != 0)
-				dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
-			if ((options & SOURCE_FILE) != 0) {
-				List<URI> uriList = new ArrayList<URI>();
-				try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory))) {
-					String filePrefix = selectedSensor.getFilePrefix();
-					for (Path file : directoyStream) {
-						//Don't use file.endsWith() -> checks the last foldername of the path not the prefix of the file
-						if (file.toString().endsWith(filePrefix))
-							uriList.add(file.toUri());
-					}
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				dataPage.setInput(null, uriList);
-			}
+			prepateDataPage(options);
 			return dataPage;
 		}
 		return null;
+	}
+
+	private void prepateDataPage(int options) {
+		selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
+		selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
+		if ((options & SOURCE_SENSOR) != 0)
+			dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
+		if ((options & SOURCE_FILE) != 0) {
+			List<URI> uriList = new ArrayList<URI>();
+			try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory))) {
+				String filePrefix = selectedSensor.getFilePrefix();
+				for (Path file : directoyStream) {
+					// Don't use file.endsWith() -> checks the last foldername
+					// of the path not the prefix of the file
+					if (file.toString().endsWith(filePrefix))
+						uriList.add(file.toUri());
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			dataPage.setInput(null, uriList);
+		}
 	}
 }

@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataDataPage extends WizardPage implements IValidationPage {
@@ -60,12 +61,6 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	public void setInput(ISensor sensor, Object input) {
 		selectedURI = null;
 		tableViewer.setInput(input);
-
-		if (table.getItemCount() > 0) {
-			table.setSelection(0);
-			IStructuredSelection selection = (IStructuredSelection) tableViewer.getSelection();
-			selectedURI = (URI) selection.getFirstElement();
-		}
 
 		checkContents();
 	}
@@ -148,6 +143,8 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 
 	@Override
 	public void checkContents() {
+
+		selectedURI = JFaceUtil.initializeViewerSelection(URI.class, tableViewer);
 
 		if (selectedURI == null)
 			errors.add(ERROR_NO_URI_SELECTED);

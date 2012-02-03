@@ -489,25 +489,10 @@ public class PatientView extends ViewPart {
 				if (selection != null) {
 
 					selectedPatient = selection;
-
-					/**
-					 * this is needed because the entity Manager holds all
-					 * entities it queries in its persistence memory. thus is
-					 * ignores updates. merging or refreshing of entities
-					 * already persisted is frustrating and needs a lot of
-					 * overhead to determine the persistence state of the
-					 * iterated entities. so i went with the clear() solution.
-					 * this shit took me an half an hour to figure out!
-					 */
-					workerEM.clear();
-
-					workerEM.getTransaction().begin();
-					Patient mPatient = workerEM.find(Patient.class, selection.getId());
-					workerEM.getTransaction().commit();
-
 					/************************************************************
 					 * fill TableViewer
 					 ************************************************************/
+					Patient mPatient = workerEM.find(Patient.class, selection.getId());
 					Query allDataQuery = workerEM.createNamedQuery("Data.findByPatient");
 					List<Data> allData = allDataQuery.setParameter("patient", mPatient).getResultList();
 					dataTableViewer.setInput(allData);
@@ -546,6 +531,7 @@ public class PatientView extends ViewPart {
 					}
 					dataset.removeAll();
 					dataset.add(series);
+					workerEM.clear();
 
 				}
 				/************************************************************

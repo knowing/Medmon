@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Text;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
+import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataSensorAndDirectoryPage extends WizardPage implements IValidationPage {
@@ -32,7 +33,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgewählt";
 	private Button				btnChooseDirectory;
 	private SensorTableViewer	sensorTableViewer;
-
+	
 	/**
 	 * Create the wizard.
 	 */
@@ -62,20 +63,6 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	public void setDirectorySectionEnabled(boolean flag) {
 		isDirectorySectionEnabled = flag;
 		btnChooseDirectory.setEnabled(flag);
-	}
-
-	/**
-	 * WIZZARD-INIT
-	 */
-	private void initialize() {
-
-		if (table.getItemCount() > 0) {
-			table.setSelection(0);
-			IStructuredSelection selection = (IStructuredSelection) sensorTableViewer.getSelection();
-			selectedSensor = (ISensor) selection.getFirstElement();
-		}
-
-		checkContents();
 	}
 
 	/**
@@ -123,11 +110,13 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 			}
 		});
 
-		initialize();
+		checkContents();
 	}
 
 	@Override
 	public void checkContents() {
+
+		selectedSensor = JFaceUtil.initializeViewerSelection(ISensor.class, sensorTableViewer);
 
 		if (isDirectorySectionEnabled) {
 			if (selectedDirectory == null)

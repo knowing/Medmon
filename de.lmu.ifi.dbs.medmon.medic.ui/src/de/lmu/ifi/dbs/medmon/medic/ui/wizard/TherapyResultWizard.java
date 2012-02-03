@@ -71,7 +71,6 @@ public class TherapyResultWizard extends Wizard {
 	private ImportDataSensorAndDirectoryPage	sensorAndDirectoryPage	= new ImportDataSensorAndDirectoryPage();
 	private ImportDataDataPage					dataPage				= new ImportDataDataPage();
 	private SelectAndConfigureDPUPage			selectDPUPage			= new SelectAndConfigureDPUPage();
-	private IWizardPage							currentPage				= null;
 
 	private static final Logger					log						= LoggerFactory.getLogger(Activator.PLUGIN_ID);
 	private Therapy								preselectedTherapy;
@@ -96,8 +95,16 @@ public class TherapyResultWizard extends Wizard {
 	}
 
 	@Override
+	public boolean canFinish() {
+		for (IWizardPage page : getPages()) {
+			System.out.println(page.getTitle() + "   " + page.isPageComplete());
+		}
+
+		return super.canFinish();
+	}
+
+	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
-		currentPage = page;
 		int options = patientAndTypePage.getOption();
 		if (page == patientAndTypePage && preselectedTherapy == null) {
 			therapyPage.setPatient(patientAndTypePage.getSelectedPatient());
@@ -105,29 +112,34 @@ public class TherapyResultWizard extends Wizard {
 		} else if (page == therapyPage || (page == patientAndTypePage && preselectedTherapy != null)) {
 			sensorAndDirectoryPage.setDirectorySectionEnabled(((options & SOURCE_FILE) != 0));
 			sensorAndDirectoryPage.checkContents();
+			prepateDataPage(options);
 			return sensorAndDirectoryPage;
 		} else if (page == sensorAndDirectoryPage) {
-			ISensor selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
-			String selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
-			if ((options & SOURCE_SENSOR) != 0)
-				dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
-			if ((options & SOURCE_FILE) != 0) {
-				List<URI> uriList = new ArrayList<URI>();
-				try {
-					DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory));
-					String filePrefix = selectedSensor.getFilePrefix();
-					for (Path file : directoyStream)
-						if (file.toString().endsWith(filePrefix))
-							uriList.add(file.toUri());
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				dataPage.setInput(null, uriList);
-			}
+			prepateDataPage(options);
 			return dataPage;
 		}
-		return super.getNextPage(page);
+		return null;
+	}
+
+	private void prepateDataPage(int options) {
+		ISensor selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
+		String selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
+		if ((options & SOURCE_SENSOR) != 0)
+			dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
+		if ((options & SOURCE_FILE) != 0) {
+			List<URI> uriList = new ArrayList<URI>();
+			try {
+				DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory));
+				String filePrefix = selectedSensor.getFilePrefix();
+				for (Path file : directoyStream)
+					if (file.toString().endsWith(filePrefix))
+						uriList.add(file.toUri());
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			dataPage.setInput(null, uriList);
+		}
 	}
 
 	@Override
