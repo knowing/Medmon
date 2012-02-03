@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -169,11 +170,12 @@ public class PatientService implements IPatientService {
 	 * @param patient
 	 * @param sensor
 	 * @param type
-	 * @param inputURL
+	 * @param inputURI
 	 */
 	@Override
-	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException {
-		IConverter converter = sensorManagerService.createConverter(sensor);
+	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURI) throws IOException {
+		InputStream inputStream = sensorManagerService.createInput(sensor, inputURI);
+		IConverter converter = sensor.newConverter(inputStream);
 
 		if (converter == null)
 			return null;
@@ -181,15 +183,11 @@ public class PatientService implements IPatientService {
 		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
 
+		//Copy raw data
 		try (DataStoreOutput output = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
-				OutputStream os = output.outputStream;
-				InputStream in = new FileInputStream(new File(inputURL))) {
+				OutputStream os = output.outputStream) {
 
-			byte[] buffer = new byte[4096];
-			int bytesRead = 0;
-			while ((bytesRead = in.read(buffer)) != -1) {
-				os.write(buffer, 0, bytesRead);
-			}
+			Files.copy(Paths.get(inputURI), os);
 			return output;
 		} catch (IOException e) {
 			log.error("Error read from InputStream or writing to OutputStream.", e);
@@ -244,14 +242,10 @@ public class PatientService implements IPatientService {
 	 * For date formatting {@link DateFormat.MEDIUM} is used.
 	 * </p>
 	 * 
-	 * @param s
-	 *            Sensor
-	 * @param type
-	 *            - RAW, TRAIN or RESULT
-	 * @param from
-	 *            - Data recording start
-	 * @param to
-	 *            - Data recording end
+	 * @param s - Sensor
+	 * @param type - RAW, TRAIN or RESULT
+	 * @param from - Data recording start
+	 * @param to - Data recording end
 	 * @return
 	 */
 	private String generateFilename(Sensor s, String type, Date from, Date to) {
