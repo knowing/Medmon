@@ -2,94 +2,25 @@
 <feature
       id="de.lmu.ifi.dbs.medmon.medic.reporting.feature"
       label="Feature"
-      version="1.0.0.qualifier">
+      version="1.0.0.qualifier"
+      license-feature="de.lmu.ifi.dbs.medmon.common.core.feature"
+      license-feature-version="1.0.1.qualifier">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
+      Adds Reporting functions to Medmon with BIRT
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+   <copyright url="http://www.dbs.ifi.lmu.de/">
+      Copyright [2011] [LMU Munich - Database Systems Group]
    </copyright>
 
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
 
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.medic.reporting"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="ch.qos.logback.classic"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="ch.qos.logback.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="com.ibm.icu"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.knowing.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.knowing.core.logging"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.derby"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.medic.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.medic.logging"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.medic.reporting"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="de.lmu.ifi.dbs.medmon.sensor.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="javax.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
+   <requires>
+      <import feature="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="javax.servlet"
@@ -117,12 +48,6 @@
 
    <plugin
          id="javax.xml.soap"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="nz.ac.waikato.cs.weka"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
@@ -248,12 +173,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.codehaus.aspectwerkz"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.birt.core"
          download-size="0"
          install-size="0"
@@ -338,42 +257,10 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.core.filesystem"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.filesystem.win32.x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
          id="org.eclipse.core.jobs"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.resources"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.runtime"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.core.runtime.compatibility.registry"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
 
    <plugin
          id="org.eclipse.datatools.connectivity"
@@ -473,106 +360,7 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.jface"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.jface.databinding"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.osgi"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.osgi.services"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.persistence.asm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.persistence.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.persistence.jpa"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.sapphire.java"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.sapphire.modeling"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.sapphire.modeling.nl_re"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.sapphire.modeling.xml"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.sapphire.osgi.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.swt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.swt.win32.win32.x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.eclipse.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.ui.workbench"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.wst.common.uriresolver"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
@@ -602,12 +390,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.scala-ide.scala.library"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.w3c.css.sac"
          download-size="0"
          install-size="0"
@@ -627,18 +409,6 @@
 
    <plugin
          id="org.w3c.sac"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="osgi.enterprise"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="slf4j.api"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
@@ -707,6 +477,13 @@
 
    <plugin
          id="javax.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.lmu.ifi.dbs.medmon.medic.reporting"
          download-size="0"
          install-size="0"
          version="0.0.0"
