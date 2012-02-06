@@ -129,6 +129,7 @@ public class PatientService implements IPatientService {
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
 		} catch (IOException e) {
+			Activator.getDBModelService().deleteData(data);
 			throw e;
 		}
 
