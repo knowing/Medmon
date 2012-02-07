@@ -76,7 +76,7 @@ public class Rechner {
                         int last=0;
                         
                         /* =========================================== */
-                        while((read=in.readLine())!=null){
+                        while((read=in.readLine())!=null && read.length()>10){
                                 ++coun;
                                 //System.out.println(++coun);
                                 String h=read.substring(12, 14);
@@ -85,6 +85,7 @@ public class Rechner {
                                 String ms=read.substring(21, 24);;
                                 String timestamp=h+m+s+ms;
                                 int time=Integer.parseInt(timestamp);
+                                
  
                                 if(last+40<time){
                                         last=time;
