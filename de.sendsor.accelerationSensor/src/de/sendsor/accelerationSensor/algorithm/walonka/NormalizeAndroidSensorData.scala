@@ -15,48 +15,49 @@ class NormalizeAndroidSensorData extends TFilter {
   override def filter(instances: Instances): Instances = {
     //static field
     val defaultHz = 25
-    val hz = 100
     
-    val div = defaultHz / hz
-    //Timestamp Attribute
-    val timeAttr = instances.attribute(ATTRIBUTE_TIMESTAMP)
+    val filtered = new Instances(instances, instances.size)
 
-    //Table to return
-    val returns = new Instances(instances, instances.size / div)
-    
-    //25Hz =^ 40ms
-    /*
-    //If you want to average values
-    //Map[Valuename (x,y,z) -> weka.core.Attribute]
-    val valAttr = findValueAttributesAsMap(instances)
-    val values = new Array[Double](returns.numAttributes) */
+    //run it with scala paralell collection
+    val grouped = instances.par groupBy {
+      inst =>
+        val timestamp = inst.value(0).toLong
+        val millis = timestamp % 1000
+        val times = millis / 40 //40ms == 25hz
+        val floor = times * 40
+        val ceil = (times + 1) * 40
 
-    //When to add new instance (row)
-    var condition = true
-    var oldTimestamp:Long = 0
-    for (i <- 0 until instances.size) {
-      val inst = instances.get(i)
-
-      //Timestamp
-      val timestamp = inst.value(timeAttr).toLong
-
-      //If you want to average
-/*      for (attr <- valAttr.values) {
-        //Get value at specific column at specific row
-        val value = inst.value(attr)
-        //do something with this x/y/z value
-        //Don't forget to add the correct timestamp as a double in the array
-      }*/
-
-      if (oldTimestamp+40<timestamp) {
-        //If you want to average
-        //returns.add(new DenseInstance(1, values))
-        oldTimestamp = timestamp;
-        returns.add(inst)
-      }
+        val FloorVal = millis - floor
+        val CeilVal = ceil - millis
+        val nearest = Math.min(FloorVal, CeilVal)
+        nearest match {
+          case FloorVal => timestamp - FloorVal
+          case CeilVal => timestamp + CeilVal
+        }
     }
+    //TODO -> check that no gaps in timestamps
 
-    returns
+    //average values -> extract in custom method
+    grouped.par foreach {
+      case (timestamp, b) if b.isEmpty => throw new Exception("Empty timeslot")
+
+      //only one value
+      case (timestamp, b) if b.size == 1 =>
+        val inst = new DenseInstance(b.head)
+        inst.setValue(0, timestamp)
+        filtered.add(inst)
+
+      //average | choose 
+      case (timestamp, b) =>
+        val inst = new DenseInstance(b.head)
+        inst.setValue(0, timestamp)
+        val sum = b.foldLeft(0.0)((sum, inst) => sum + inst.value(1))
+        val avg = sum / b.size
+        inst.setValue(1, avg)
+        filtered.add(inst)
+    }
+    filtered.sort(0)
+    filtered
   }
 
   def query(query: Instance): Instances = throw new UnsupportedOperationException
