@@ -2,6 +2,7 @@ package de.sendsor.accelerationSensor.algorithm.walonka
 
 import java.util.Properties
 import weka.core.{ Instances, Attribute, DenseInstance, Instance }
+import de.lmu.ifi.dbs.knowing.core.events._
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.{ findValueAttributes, findNumericAttributes }
@@ -23,6 +24,7 @@ class NormalizeAndroidSensorData extends TFilter {
 	private var strategy = STRATEGY_AVERAGE
 
 	override def filter(instances: Instances): Instances = {
+		statusChanged(Progress("Normalize with" + hz,0,4))
 		val filtered = new Instances(instances, instances.size)
 		val timeslot = 1000 / hz //in ms
 
@@ -33,6 +35,7 @@ class NormalizeAndroidSensorData extends TFilter {
 		}
 		val timeAttr = instances.attribute(ATTRIBUTE_TIMESTAMP)
 
+		statusChanged(Progress("Group timeslots",1,4))
 		//run it with scala parallel collection
 		val grouped = instances.par groupBy {
 			inst =>
@@ -50,6 +53,8 @@ class NormalizeAndroidSensorData extends TFilter {
 					case CeilVal => timestamp + CeilVal
 				}
 		}
+		statusChanged(Progress("Use " + strategy, 2,4))
+		
 		//average values -> extract in custom method
 		grouped.par foreach {
 			case (timestamp, instances) if instances.isEmpty => throw new Exception("Empty timeslot at " + timestamp)
@@ -70,8 +75,12 @@ class NormalizeAndroidSensorData extends TFilter {
 				inst.setValue(timeAttr, timestamp)
 				filtered.add(inst)
 		}
+		statusChanged(Progress("Sort results", 3,4))
 		//make sure it's sorted
 		filtered.sort(timeAttr)
+		
+		statusChanged(Progress("Finished", 4,4))
+		statusChanged(Ready())
 		filtered
 	}
 
