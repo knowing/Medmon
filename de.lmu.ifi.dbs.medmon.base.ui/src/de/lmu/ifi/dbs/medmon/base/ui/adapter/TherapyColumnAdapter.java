@@ -16,7 +16,7 @@ public class TherapyColumnAdapter implements IWorkbenchAdapter {
 	}
 
 	public String getLabel(Object o) {
-		return "Therapy";
+		return ((Therapy)o).getCaption();
 	}
 
 	public Object getParent(Object o) {

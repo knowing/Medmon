@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,22 +24,25 @@ public class TherapyResult {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
-	@JoinColumn(name = "THERAPY_ID", nullable = false)
+	@ManyToOne()
+	@JoinColumn(name = "THERAPY_ID")
 	private Therapy therapy;
 	
 	@Temporal(TemporalType.DATE)
-	Date timestamp;
+	private Date timestamp;
 
 	@Column
-	String comment;
+	private String comment;
 
 	@Column
-	String report;
+	private String caption;
 
 	@Column
-	int success;
+	private int success;
 
+	@OneToOne(mappedBy = "therapyResult")
+	private Data data;
+	
 	public void setTherapy(Therapy therapy) {
 		this.therapy = therapy;
 	}
@@ -55,14 +59,22 @@ public class TherapyResult {
 		return timestamp;
 	}
 
-	public void setReport(String report) {
-		this.report = report;
+	public void setCaption(String report) {
+		this.caption = report;
 	}
 
-	public String getReport() {
-		return report;
+	public String getCaption() {
+		return caption;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+	
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	
 	public void setSuccess(int success) {
 		this.success = success;
 		therapy.updateSuccess();
@@ -72,6 +84,18 @@ public class TherapyResult {
 		return success;
 	}
 
+	public Data getData() {
+		return data;
+	}
+	
+	public void setData(Data data) {
+		this.data = data;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -4,14 +4,18 @@ import java.text.DateFormat;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
 
+import base.ui.icons.Icons;
+
+import de.lmu.ifi.dbs.medmon.base.ui.util.SWTResourceManager;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
 public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
-	private final DateFormat df = DateFormat.getDateTimeInstance();
-	
-	
+	private final DateFormat	df	= DateFormat.getDateTimeInstance();
+
 	@Override
 	public Object[] getChildren(Object o) {
 		return null;
@@ -24,7 +28,7 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getLabel(Object o) {
-		return "";
+		return null;
 	}
 
 	@Override
@@ -34,23 +38,30 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
-		Data adapter = (Data) element;
+		Data data = (Data) element;
 		switch (columnIndex) {
-		case 0:
-			return df.format(adapter.getFrom());
 		case 1:
-			return df.format(adapter.getTo());
+			return df.format(data.getFrom());
 		case 2:
-			return adapter.getSensor().getName();
+			return df.format(data.getTo());
 		case 3:
-			return "<not implemented>";
+			return data.getSensor().getName();
+		case 4:
+			if (data.getTherapyResult() == null)
+				return null;
+			return data.getTherapyResult().getCaption();
 		default:
-			return "-";
+			return null;
 		}
 	}
 
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
+		Data data = (Data) element;
+		switch (columnIndex) {
+		case 0:
+			return SWTResourceManager.getImage(Icons.class, data.getType() + ".gif");
+		}
 		return null;
 	}
 }

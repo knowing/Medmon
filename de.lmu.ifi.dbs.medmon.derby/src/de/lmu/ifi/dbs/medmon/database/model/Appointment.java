@@ -27,7 +27,7 @@ public class Appointment implements Serializable {
 
 	//bi-directional many-to-one association to Patient
     @ManyToOne
-	@JoinColumn(name="PATIENT_ID", nullable=false )
+	@JoinColumn(name="PATIENT_ID")
 	private Patient patient;
 
     public Appointment() {

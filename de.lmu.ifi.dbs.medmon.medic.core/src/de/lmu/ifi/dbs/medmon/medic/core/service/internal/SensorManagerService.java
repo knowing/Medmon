@@ -56,12 +56,12 @@ public class SensorManagerService implements ISensorManagerService {
 	@Override
 	public Sensor loadSensorEntity(ISensor sensor) {
 
-		EntityManager entityManager = entityManagerService.createEntityManager();
+		EntityManager tempEM = entityManagerService.createEntityManager();
 		@SuppressWarnings("unchecked")
-		List<Sensor> results = entityManager.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId())
+		List<Sensor> results = tempEM.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId())
 				.getResultList();
 
-		entityManager.close();
+		tempEM.close();
 		
 		if (results.isEmpty())
 			return null;
@@ -145,16 +145,17 @@ public class SensorManagerService implements ISensorManagerService {
 		sensorMap.put(service.getId(), service);
 
 		if (loadSensorEntity(service) == null) {
-			EntityManager entityManager = entityManagerService.getEntityManager();
+			EntityManager tempEM = entityManagerService.createEntityManager();
 
 			Sensor mSensor = new Sensor(service.getName(), service.getId(), service.getVersion());
 			mSensor.setDefaultpath(System.getProperty("user.home"));
 			mSensor.setFilePrefix(service.getFilePrefix());
 
-			entityManager.getTransaction().begin();
-			entityManager.persist(mSensor);
-			entityManager.getTransaction().commit();
-			entityManager.detach(mSensor);
+			tempEM.getTransaction().begin();
+			tempEM.persist(mSensor);
+			tempEM.getTransaction().commit();
+			
+			tempEM.close();
 
 			log.info("Sensor " + service.getName() + " " + service.getVersion() + " registered and DB entry created");
 		}

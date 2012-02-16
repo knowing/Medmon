@@ -35,8 +35,6 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 	// User can choose next, but not finish
 	private boolean				flip							= false;
 
-	private Patient				patient							= new Patient();
-
 	private Text				tFirstname;
 	private Text				tLastname;
 	private Text				tInsuranceId;
