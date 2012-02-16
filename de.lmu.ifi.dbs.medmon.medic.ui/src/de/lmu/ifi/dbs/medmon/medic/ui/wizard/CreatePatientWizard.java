@@ -42,21 +42,19 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 	public boolean performFinish() {
 		Patient patient = null;
 		try {
-			patient = Activator.getPatientService().createPatient();
+			patient = Activator.getDBModelService().createPatient();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e1.getMessage());
 			return false;
 		}
 
-		EntityManager entityManager = JPAUtil.createEntityManager();
-
-		entityManager.getTransaction().begin();
-		patient = entityManager.merge(patient);
-		patientpage.initializePatient(patient);
-		entityManager.getTransaction().commit();
-
-		entityManager.detach(patient);
+		EntityManager tempEM = JPAUtil.createEntityManager();
+		tempEM.getTransaction().begin();
+		Patient mPatient = tempEM.find(Patient.class, patient.getId());
+		patientpage.initializePatient(mPatient);
+		tempEM.getTransaction().commit();
+		tempEM.close();
 
 		IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		SelectionProvider.setSelection(Patient.class, patient);

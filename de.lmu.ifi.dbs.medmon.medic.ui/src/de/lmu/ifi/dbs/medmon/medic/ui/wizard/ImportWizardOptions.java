@@ -7,6 +7,7 @@ public interface ImportWizardOptions {
 	public static int	IMPORT_TRAINING		= 1 << 1;
 	public static int	SOURCE_SENSOR		= 1 << 2;
 	public static int	SOURCE_FILE			= 1 << 3;
-	public static int	PATIENT_SELECTED	= 1 << 4;
+	public static int	SOURCE_DATABASE		= 1 << 4;
+	public static int	PATIENT_SELECTED	= 1 << 5;
 
 }

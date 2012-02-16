@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,8 @@ import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.model.Therapy;
+import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
@@ -105,7 +108,7 @@ public class PatientView extends ViewPart {
 
 	private PatientFileDetailBlock		patientFileDetailBlock;
 	private IGlobalSelectionProvider	selectionProvider;
-	private EntityManager				entityManager;
+	private EntityManager				workerEM;
 	private TaskSeriesCollection		dataset;
 	private JFreeChart					chart;
 	private Table						dataTable;
@@ -123,7 +126,7 @@ public class PatientView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		entityManager = JPAUtil.createEntityManager();
+		workerEM = JPAUtil.createEntityManager();
 
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
@@ -139,13 +142,9 @@ public class PatientView extends ViewPart {
 		update();
 	}
 
-	/* ==================================== */
-	/* =========== Personal Tab =========== */
-	/* ==================================== */
-
-	/**
-	 * 
-	 */
+	/************************************************************
+	 * Personal Tab
+	 ************************************************************/
 	private void createPersonalTab() {
 		TabItem tPersonalData = new TabItem(tabFolder, SWT.NONE);
 		tPersonalData.setText("Persoenliche Daten");
@@ -236,8 +235,8 @@ public class PatientView extends ViewPart {
 				 * Database Access Begin
 				 ************************************************************/
 
-				entityManager.getTransaction().begin();
-				Patient mPatient = entityManager.merge(selection);
+				workerEM.getTransaction().begin();
+				Patient mPatient = workerEM.find(Patient.class, selection.getId());
 
 				mPatient.setFirstname(textFirstname.getText());
 				mPatient.setLastname(textLastName.getText());
@@ -248,8 +247,8 @@ public class PatientView extends ViewPart {
 				else
 					mPatient.setGender((short) 1);
 
-				entityManager.getTransaction().commit();
-				entityManager.detach(mPatient);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
 
 				/************************************************************
 				 * Database Access End
@@ -259,9 +258,6 @@ public class PatientView extends ViewPart {
 			}
 		});
 
-		/************************************************************
-		 * Listener for Patient.class
-		 ************************************************************/
 		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
 			private Patient	selectedPatient;
 
@@ -280,10 +276,11 @@ public class PatientView extends ViewPart {
 					 * Fill the UI components
 					 ************************************************************/
 
-					textLastName.setText(selection.getLastname());
-					textFirstname.setText(selection.getFirstname());
-					dateBirth.setSelection(selection.getBirth());
-					switch (selection.getGender()) {
+					Patient mPatient = workerEM.find(Patient.class, selectedPatient.getId());
+					textLastName.setText(mPatient.getLastname());
+					textFirstname.setText(mPatient.getFirstname());
+					dateBirth.setSelection(mPatient.getBirth());
+					switch (mPatient.getGender()) {
 					case 0:
 						btnFemale.setSelection(false);
 						btnMale.setSelection(true);
@@ -293,58 +290,13 @@ public class PatientView extends ViewPart {
 						btnMale.setSelection(false);
 						break;
 					}
-					textInsuranceId.setText(selection.getInsuranceId());
-
-					entityManager.getTransaction().begin();
-					Patient mPatient = entityManager.merge(selection);
-					entityManager.getTransaction().commit();
-
-					/************************************************************
-					 * fill TableViewer
-					 ************************************************************/
-					Query allDataQuery = entityManager.createNamedQuery("Data.findByPatient");
-					List<Data> allData = allDataQuery.setParameter("patient", mPatient).getResultList();
-					dataTableViewer.setInput(allData);
-
-					/************************************************************
-					 * fill JFreechart
-					 ************************************************************/
-					TaskSeries series = new TaskSeries(new String());
-					if (allData.size() > 0) {
-
-						Query leftBoundsQuery = entityManager.createNamedQuery("Data.findEarliestOfPatient");
-						Query rightBoundsQuery = entityManager.createNamedQuery("Data.findLatestOfPatient");
-
-						Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
-						Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
-
-						Query allSensorsQuery = entityManager.createNamedQuery("Sensor.findByPatient");
-						List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
-								.getResultList();
-
-						for (Sensor sensor : allSensors) {
-							Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
-							Query dataFromSensorQuery = entityManager.createNamedQuery("Data.findByPatientAndSensor");
-							List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient)
-									.setParameter("sensor", sensor).getResultList();
-							for (Data data : dataFromSensor) {
-								task.addSubtask(new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo()));
-							}
-							series.add(task);
-						}
-					}
-					dataset.removeAll();
-					dataset.add(series);
-					entityManager.detach(mPatient);
-
+					textInsuranceId.setText(mPatient.getInsuranceId());
+					workerEM.clear();
 				}
 				/************************************************************
 				 * selection == null
 				 ************************************************************/
 				else {
-					/************************************************************
-					 * fill all UI components with blank strings
-					 ************************************************************/
 					textLastName.setText("");
 					textFirstname.setText("");
 					dateBirth.setSelection(new Date());
@@ -370,15 +322,11 @@ public class PatientView extends ViewPart {
 		/************************************************************
 		 * Listener END
 		 ************************************************************/
-
 	}
 
-	/* ==================================== */
-	/* ============= Therapy Tab =========== */
-	/* ==================================== */
-	/**
-	 * 
-	 */
+	/************************************************************
+	 * create the Therapy Tab
+	 ************************************************************/
 	private void createTherapyTab() {
 
 		TabItem tTherapy = new TabItem(tabFolder, SWT.NONE);
@@ -391,16 +339,11 @@ public class PatientView extends ViewPart {
 
 		patientFileDetailBlock = new PatientFileDetailBlock();
 		patientFileDetailBlock.createContent(new ManagedForm(cTherapy));
-
 	}
 
-	/* ==================================== */
-	/* ============== Data Tab ============ */
-	/* ==================================== */
-
-	/**
-	 * 
-	 */
+	/************************************************************
+	 * Data Tab
+	 ************************************************************/
 	private void createDataTab() {
 		tabCluster = new TabItem(tabFolder, SWT.NONE);
 		tabCluster.setText("Daten");
@@ -415,18 +358,16 @@ public class PatientView extends ViewPart {
 		formData.setText("Daten");
 		formData.getBody().setLayout(new GridLayout(1, false));
 
-		/*
-		 * create the chart
-		 */
 		dataset = new TaskSeriesCollection();
 		chart = ChartFactory.createGanttChart(null, null, null, dataset, false, true, false);
 		ChartComposite chartComposite = new ChartComposite(formData.getBody(), SWT.NONE, chart);
 
-		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
+		chartComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		toolkit.adapt(chartComposite);
 		toolkit.paintBordersFor(chartComposite);
 
 		Composite cTimeline = toolkit.createComposite(formData.getBody(), SWT.NONE);
+		cTimeline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.paintBordersFor(cTimeline);
 		cTimeline.setLayout(new FillLayout(SWT.HORIZONTAL));
 
@@ -523,18 +464,98 @@ public class PatientView extends ViewPart {
 				if (mData == null)
 					return;
 
-				entityManager.getTransaction().begin();
-				mData = entityManager.merge(mData);
-				File file = new File(mData.getFile());
-				file.delete();
-				entityManager.remove(mData);
-				entityManager.getTransaction().commit();
+				try {
+					Activator.getDBModelService().deleteData(mData);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 
 				selectionProvider.updateSelection(Patient.class);
 				selectionProvider.setSelection(Data.class, null);
 			}
 		});
 		dataTable.setMenu(popUpMenu);
+
+		selectionProvider.registerSelectionListener(new IGlobalSelectionListener<Patient>() {
+			private Patient	selectedPatient;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void selectionChanged(Patient selection) {
+
+				/************************************************************
+				 * selection != null
+				 ************************************************************/
+				if (selection != null) {
+
+					selectedPatient = selection;
+					/************************************************************
+					 * fill TableViewer
+					 ************************************************************/
+					Patient mPatient = workerEM.find(Patient.class, selection.getId());
+					Query allDataQuery = workerEM.createNamedQuery("Data.findByPatient");
+					List<Data> allData = allDataQuery.setParameter("patient", mPatient).getResultList();
+					dataTableViewer.setInput(allData);
+
+					/************************************************************
+					 * fill JFreechart
+					 ************************************************************/
+					TaskSeries series = new TaskSeries(new String());
+					if (allData.size() > 0) {
+
+						Query leftBoundsQuery = workerEM.createNamedQuery("Data.findEarliestOfPatient");
+						Query rightBoundsQuery = workerEM.createNamedQuery("Data.findLatestOfPatient");
+
+						Data leftBounds = (Data) leftBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
+						Data rightBounds = (Data) rightBoundsQuery.setParameter("patient", mPatient).getResultList().get(0);
+
+						Query allSensorsQuery = workerEM.createNamedQuery("Sensor.findByPatient");
+						List<Sensor> allSensors = allSensorsQuery.setParameter("patient", mPatient).setParameter("patient", mPatient)
+								.getResultList();
+
+						for (Sensor sensor : allSensors) {
+							Task task = new Task(sensor.getName(), leftBounds.getFrom(), rightBounds.getTo());
+							Query dataFromSensorQuery = workerEM.createNamedQuery("Data.findByPatientAndSensor");
+							List<Data> dataFromSensor = dataFromSensorQuery.setParameter("patient", mPatient)
+									.setParameter("sensor", sensor).getResultList();
+							for (Data data : dataFromSensor) {
+								Task subTask = new Task("Sensor" + data.getSensor().getId(), data.getFrom(), data.getTo());
+								TherapyResult therapyResult = data.getTherapyResult();
+								if (therapyResult != null) {
+									subTask.setPercentComplete((double) therapyResult.getSuccess() / 100);
+								}
+								task.addSubtask(subTask);
+							}
+							series.add(task);
+						}
+					}
+					dataset.removeAll();
+					dataset.add(series);
+					workerEM.clear();
+
+				}
+				/************************************************************
+				 * selection == null
+				 ************************************************************/
+				else {
+
+					dataTableViewer.setInput(null);
+					dataset.removeAll();
+				}
+			}
+
+			@Override
+			public void selectionUpdated() {
+				if (selectedPatient == null)
+					return;
+				selectionChanged(selectedPatient);
+			}
+
+			@Override
+			public Class<Patient> getType() {
+				return Patient.class;
+			}
+		});
 	}
 
 	private void createDataTabToolbar(IToolBarManager toolbar) {
@@ -558,7 +579,7 @@ public class PatientView extends ViewPart {
 	@Override
 	public void dispose() {
 		selectionProvider.unregister();
-		entityManager.close();
+		workerEM.close();
 		super.dispose();
 	}
 }

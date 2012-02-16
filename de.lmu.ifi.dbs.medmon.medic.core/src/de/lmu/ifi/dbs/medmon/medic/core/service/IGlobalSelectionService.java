@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
+import de.lmu.ifi.dbs.medmon.database.model.Patient;
+
 /**
  * 
  * @author Nepomuk Seiler
@@ -27,4 +29,5 @@ public interface IGlobalSelectionService {
 	 * @param clazz
 	 */
 	<T> void updateSelection(Class<T> clazz);
+
 }

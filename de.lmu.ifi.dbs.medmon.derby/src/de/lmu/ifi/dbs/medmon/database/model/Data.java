@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.medmon.database.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,7 +34,7 @@ import javax.persistence.TemporalType;
 		@NamedQuery(name = "Data.findByPatientAndBeforeFrom", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.from > :date"),
 		@NamedQuery(name = "Data.findByPatientAndSensor", query = "SELECT d FROM Data d WHERE d.patient = :patient AND d.sensor = :sensor"),
 		@NamedQuery(name = "Data.findEarliestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.from < d.from))"),
-		@NamedQuery(name = "Data.findLatestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.to > d.to))")})
+		@NamedQuery(name = "Data.findLatestOfPatient", query = "SELECT d FROM Data d WHERE d.patient = :patient AND NOT(EXISTS(SELECT o FROM Data o WHERE o.to > d.to))") })
 public class Data implements Serializable {
 	private static final long	serialVersionUID	= 1L;
 
@@ -40,11 +42,11 @@ public class Data implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int					id;
 
-	@Column(name = "BEGIN_DATE", nullable = false, updatable = false)
+	@Column(name = "BEGIN_DATE", updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date				from;
 
-	@Column(name = "END_DATE", nullable = false, updatable = false)
+	@Column(name = "END_DATE", updatable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date				to;
 
@@ -55,30 +57,26 @@ public class Data implements Serializable {
 	// private String originalFile;
 	private String				type;
 
-	@ManyToOne
-	@JoinColumn(name = "SENSOR_ID", nullable = false)
+	@ManyToOne()
+	@JoinColumn(name = "SENSOR_ID")
 	private Sensor				sensor;
 
 	// bi-directional many-to-one association to Comment
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "ARCHIV_ID")
 	private Archiv				archiv;
 
 	// bi-directional many-to-one association to Patient
 	//
-	@ManyToOne
-	@JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false)
+	@ManyToOne()
+	@JoinColumn(name = "PATIENT_ID", updatable = false)
 	private Patient				patient;
 
-	public Data() {
-	}
+	@OneToOne()
+	@JoinColumn(name = "DATA_ID")
+	TherapyResult				therapyResult;
 
-	public Data(Patient patient, Sensor sensor, String type, Date from, Date to) {
-		this.from = from;
-		this.to = to;
-		this.type = type;
-		this.sensor = sensor;
-		this.patient = patient;
+	public Data() {
 	}
 
 	public int getId() {
@@ -145,6 +143,14 @@ public class Data implements Serializable {
 		this.sensor = sensor;
 	}
 
+	public TherapyResult getTherapyResult() {
+		return therapyResult;
+	}
+
+	public void setTherapyResult(TherapyResult therapyResult) {
+		this.therapyResult = therapyResult;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

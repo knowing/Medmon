@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.medmon.database.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +31,7 @@ public class Patient implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(nullable = false)
+	@Column()
 	private int id;
 
 	@Column(length = 30)
@@ -69,7 +71,7 @@ public class Patient implements Serializable {
 	private Set<Archiv> archives = new HashSet<Archiv>();
 
 	// bi-directional many-to-one association to Therapy
-	@OneToMany(mappedBy = "patient", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "patient")
 	private Set<Therapy> therapies;// = new HashSet<Therapy>();
 
 	public Patient() {
@@ -157,39 +159,35 @@ public class Patient implements Serializable {
 		return this.appointments;
 	}
 
-	public void setAppointments(Set<Appointment> appointments) {
-		this.appointments = appointments;
-	}
-
-	public Set<Data> getData() {
-		return this.data;
-	}
-
 	public void setData(Set<Data> data) {
 		this.data = data;
 	}
-
-	public Set<Archiv> getArchives() {
-		return archives;
-	}
-
+	
 	public void setArchives(Set<Archiv> archives) {
 		this.archives = archives;
+	}
+	public Set<Therapy> getTherapies() {
+		return therapies;
 	}
 
 	public void setTherapies(Set<Therapy> therapies) {
 		this.therapies = therapies;
 	}
-
-	public Set<Therapy> getTherapies() {
-		return therapies;
+	
+	public void setAppointments(Set<Appointment> appointments) {
+		this.appointments = appointments;
 	}
+	
 
+	public Set<Data> getData() {
+		return data;
+	}
+	
 	@Override
 	public String toString() {
 		return firstname + " " + lastname;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

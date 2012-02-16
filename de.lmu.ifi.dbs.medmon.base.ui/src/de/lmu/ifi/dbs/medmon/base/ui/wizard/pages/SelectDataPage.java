@@ -259,7 +259,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				UIFactory uiFactory = TypedActor.newInstance(UIFactory.class, new TypedActorFactory() {
 					@Override
 					public TypedActor create() {
-						return new CompositeUIFactory(gPreview);
+						return new CompositeUIFactory(gPreview,"de.sendsor.3d.SensorPreview");
 					}
 				});
 				// Configure dpu!
@@ -287,7 +287,7 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 				}
 				//Evalute
 				try {
-					ActorRef supervisor = eval.evaluate(dpu, uiFactory, url.toURI());
+					ActorRef supervisor = eval.evaluate(dpu,url.toURI(),uiFactory);
 					supervisor.tell(new ChartProgressListenerRegister(new ChartProgressListener() {
 						@Override
 						public void chartProgress(ChartProgressEvent event) {
@@ -310,6 +310,8 @@ public class SelectDataPage extends WizardPage implements IValidationPage {
 					
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();
+				}catch (Exception e2) {
+					e2.printStackTrace();
 				}
 			}
 		});

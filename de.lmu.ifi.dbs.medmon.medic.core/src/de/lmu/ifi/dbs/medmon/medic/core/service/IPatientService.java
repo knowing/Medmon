@@ -10,6 +10,7 @@ import java.util.Date;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 /**
@@ -65,25 +66,23 @@ public interface IPatientService {
 	 * @return relative Path to relativeToType param
 	 */
 	public Path locateFilename(Data d, String relativeToType);
+
 	
 	/**
-	 * <p>This has to be called when a new {@link Patient} is
-	 * persisted in the database.</p>
+	 * Creates the File Hierarchy, that is used to store Data for the Patient
 	 * 
-	 * @return newly created Patient
-	 * @throws IOException
+	 * @param p - Patient to be initialized
 	 */
-	public Patient createPatient() throws IOException;
+	public void initializePatient(Patient p) throws IOException;
+	
 	
 	/**
-	 * <p>This has to be called when a {@link Patient} is
-	 * deleted in the database. This will delete ALL data
-	 * linked with the patient.</p>
+	 * Deletes all Content of a Patient that has been created by initializePatient()
 	 * 
-	 * @param p - patient to delete
-	 * @throws IOException
+	 * @param p - Patient to be released
+	 * @throws IOException 
 	 */
-	public void deletePatient(Patient p) throws IOException;
+	public void releasePatient(Patient p) throws IOException;
 	
 	/**
 	 * <p>
@@ -101,7 +100,7 @@ public interface IPatientService {
 	 * @return - Ready to write OutputStream
 	 * @throws IOException 
 	 */
-	public OutputStream store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
+	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException;
 	
 	/**
 	 * NOTE: this should return the created {@link Data} entity
@@ -112,7 +111,7 @@ public interface IPatientService {
 	 * @param inputURL
 	 * @throws IOException
 	 */
-	public void store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
+	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
 	
 	
 	/**
@@ -124,7 +123,7 @@ public interface IPatientService {
 	 * @param type - the type of the data to be stored
 	 * @throws IOException 
 	 */
-	public void store(Patient patient, ISensor sensorService, String type) throws IOException;
+	public DataStoreOutput store(Patient patient, ISensor sensorService, String type) throws IOException;
 	
 	
 	/**
@@ -150,14 +149,4 @@ public interface IPatientService {
 	 * @throws IOException
 	 */
 	public OutputStream merge(Data d1, Data d2) throws IOException;
-	
-	/**
-	 * <p>Throws an exception if the corresponding source
-	 * couldn't be deleted</p>
-	 * @param d - Data instance to delete
-	 * @throws IOException
-	 */
-	public void remove(Data d) throws IOException;
-	
-
 }
