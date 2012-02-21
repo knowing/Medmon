@@ -22,10 +22,10 @@ import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUInputFilter;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
+import de.lmu.ifi.dbs.medmon.base.ui.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DPUTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 
 public class SelectAndConfigureDPUPage extends WizardPage implements IValidationPage {
 
@@ -37,7 +37,7 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 	private SortedSet<String>	errors					= new TreeSet<String>();
 	private Table				table;
 
-	private String				ERROR_NO_DPU_SELECTED	= "Kein Algorithmus ausgewählt";
+	private String				ERROR_NO_DPU_SELECTED	= "Kein Algorithmus ausgewï¿½hlt";
 
 	/**
 	 * Create the wizard.

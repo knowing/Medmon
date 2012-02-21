@@ -15,10 +15,10 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
+import de.lmu.ifi.dbs.medmon.base.ui.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataSensorAndDirectoryPage extends WizardPage implements IValidationPage {
@@ -29,8 +29,8 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	private boolean				isDirectorySectionEnabled	= false;
 	private SortedSet<String>	errors						= new TreeSet<String>();
 
-	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgewählt";
-	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgewählt";
+	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgewï¿½hlt";
+	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgewï¿½hlt";
 	private Button				btnChooseDirectory;
 	private SensorTableViewer	sensorTableViewer;
 	

@@ -21,9 +21,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+import de.lmu.ifi.dbs.medmon.base.ui.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataDataPage extends WizardPage implements IValidationPage {
@@ -31,7 +31,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	private URI					selectedURI;
 
 	private SortedSet<String>	errors					= new TreeSet<String>();
-	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgewählt";
+	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgewï¿½hlt";
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmViewerFile;

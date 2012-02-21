@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+import de.lmu.ifi.dbs.medmon.base.ui.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -29,7 +30,6 @@ import de.lmu.ifi.dbs.medmon.database.model.Therapy;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class TherapyResultTherapyPage extends WizardPage implements IValidationPage {
@@ -38,7 +38,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	private Therapy				selectedTherapy;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgewählt";
+	private static String		ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgewï¿½hlt";
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmTherapy;
@@ -49,7 +49,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	 */
 	public TherapyResultTherapyPage() {
 		super("wizardPage");
-		setTitle("Therapie auswählen");
+		setTitle("Therapie auswï¿½hlen");
 		setDescription("<missing>");
 	}
 
