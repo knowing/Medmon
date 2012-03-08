@@ -18,115 +18,114 @@ import ReClassification._
 
 class ReClassification extends TProcessor {
 
-  val windowCount: HashMap[String, Double] = new HashMap[String, Double]();
+	val windowCount: HashMap[String, Double] = new HashMap[String, Double]();
 
-  def query(query: Instance): Instances = null
+	override def process(input: Instances) = {
+		case _ =>
+			statusChanged(Progress("Reclassify", 10, 140))
+			val claIndex: Int = ResultsUtil.guessClassIndex(input)
+			input.setClassIndex(claIndex)
+			val labels = input.classAttribute.enumerateValues.toList
 
-  def result(result: Instances, query: Instance) = {}
+			var timeIndex: Int = -1
+			for (i <- 0 until input.numAttributes) {
+				if (input.attribute(i).`type` == Attribute.DATE && timeIndex < 0) {
+					timeIndex = i
+				}
+			}
+			statusChanged(Progress("Split input", 20, 140))
+			val splittedInput: Map[String, Instances] = ResultsUtil.splitInstanceBySource(input, false)
 
-  def configure(properties: Properties) = {
+			val halfSize: Int = WINDOW_SIZE / 2
+			for (inst: Instances <- splittedInput.values) {
+				inst.sort(timeIndex)
+				val oldLabels = new Array[String](inst.numInstances)
+				for (i <- 0 until inst.numInstances) {
+					oldLabels(i) = ResultsUtil.highestProbability(inst.get(i))._2
+				}
 
-  }
+				var worked = 1 // just for status progress
+				var instNum = 0
+				for (i <- 0 until inst.numInstances) {
 
-  override def build(input: Instances) {
-    statusChanged(Progress("Reclassify", 10, 140))
-    val claIndex: Int = ResultsUtil.guessClassIndex(input)
-    input.setClassIndex(claIndex)
-    val labels = input.classAttribute.enumerateValues.toList
+					//=== just for status progress ===
+					instNum += 1
+					worked = (instNum * 100) / inst.numInstances match {
+						case 0 => 0
+						case w if w == worked => w
+						case w if w > worked =>
+							statusChanged(Progress("Reclassified", 30 + w, 140))
+							w
+					}
+					//=================================
 
-    var timeIndex: Int = -1
-    for (i <- 0 until input.numAttributes) {
-      if (input.attribute(i).`type` == Attribute.DATE && timeIndex < 0) {
-        timeIndex = i
-      }
-    }
-    statusChanged(Progress("Split input", 20, 140))
-    val splittedInput: Map[String, Instances] = ResultsUtil.splitInstanceBySource(input, false)
+					windowCount.clear()
+					for (j <- 1 to halfSize) {
+						if (i - j > 0) {
+							updateWindowCount(oldLabels(i - j), halfSize - (j - 1))
+						}
+						if (i + j < oldLabels.length) {
+							updateWindowCount(oldLabels(i + j), halfSize - (j - 1))
+						}
+					}
 
-    val halfSize: Int = WINDOW_SIZE / 2
-    for (inst: Instances <- splittedInput.values) {
-      inst.sort(timeIndex)
-      val oldLabels = new Array[String](inst.numInstances)
-      for (i <- 0 until inst.numInstances) {
-        oldLabels(i) = ResultsUtil.highestProbability(inst.get(i))._2
-      }
+					var total = 0.0
+					var max = 0.0
+					var newClass: String = null
 
-      var worked = 1	// just for status progress
-      var instNum = 0	
-      for (i <- 0 until inst.numInstances) {
-        
-        //=== just for status progress ===
-        instNum += 1
-        worked = (instNum * 100) / inst.numInstances match {
-          case 0 => 0
-          case w if w == worked => w
-          case w if w > worked =>
-            statusChanged(Progress("Reclassified", 30 + w, 140))
-            w
-        }
-        //=================================
+					val iter = windowCount.entrySet.iterator
+					while (iter.hasNext) {
+						val e: Entry[String, Double] = iter.next
+						val k: String = e.getKey
+						val v: Double = e.getValue.doubleValue
 
-        windowCount.clear()
-        for (j <- 1 to halfSize) {
-          if (i - j > 0) {
-            updateWindowCount(oldLabels(i - j), halfSize - (j - 1))
-          }
-          if (i + j < oldLabels.length) {
-            updateWindowCount(oldLabels(i + j), halfSize - (j - 1))
-          }
-        }
+						total += v
+						if (v > max && !NOT_CLASSIFIED.equals(k)) {
+							max = v
+							newClass = k
+						}
+					}
+					//reclassify
+					if (max > total / 2.0 || oldLabels(i).equals(NOT_CLASSIFIED)) {
+						//inst.get(0).setClassValue(newClass);
+						for (j <- 0 until labels.size) {
+							if (labels(j).equals(newClass)) {
+								inst.get(0).setValue(inst.attribute("class" + labels.get(j)), 1)
+							} else {
+								inst.get(0).setValue(inst.attribute("class" + labels.get(j)), 0)
+							}
+						}
+					}
+				}
 
-        var total = 0.0
-        var max = 0.0
-        var newClass: String = null
+			}
 
-        val iter = windowCount.entrySet.iterator
-        while (iter.hasNext) {
-          val e: Entry[String, Double] = iter.next
-          val k: String = e.getKey
-          val v: Double = e.getValue.doubleValue
+			val result: Instances = ResultsUtil.appendInstances(input.stringFreeStructure, splittedInput.values.toList);
+			sendEvent(new Results(result));
+	}
 
-          total += v
-          if (v > max && !NOT_CLASSIFIED.equals(k)) {
-            max = v
-            newClass = k
-          }
-        }
-        //reclassify
-        if (max > total / 2.0 || oldLabels(i).equals(NOT_CLASSIFIED)) {
-          //inst.get(0).setClassValue(newClass);
-          for (j <- 0 until labels.size) {
-            if (labels(j).equals(newClass)) {
-              inst.get(0).setValue(inst.attribute("class" + labels.get(j)), 1)
-            } else {
-              inst.get(0).setValue(inst.attribute("class" + labels.get(j)), 0)
-            }
-          }
-        }
-      }
+	def updateWindowCount(lab: String, value: Double) {
+		var label: String = lab;
+		if (label == null) {
+			label = NOT_CLASSIFIED;
+		}
+		if (windowCount.containsKey(label)) {
+			windowCount.put(label, windowCount.get(label) + value);
+		} else {
+			windowCount.put(label, value);
+		}
+	}
 
-    }
+	def query(query: Instances): Instances = throw new UnsupportedOperationException
 
-    val result: Instances = ResultsUtil.appendInstances(input.stringFreeStructure, splittedInput.values.toList);
-    sendEvent(new Results(result));
-  }
+	def configure(properties: Properties) = {
 
-  def updateWindowCount(lab: String, value: Double) {
-    var label: String = lab;
-    if (label == null) {
-      label = NOT_CLASSIFIED;
-    }
-    if (windowCount.containsKey(label)) {
-      windowCount.put(label, windowCount.get(label) + value);
-    } else {
-      windowCount.put(label, value);
-    }
-  }
+	}
 }
 
 object ReClassification {
-  val NOT_CLASSIFIED: String = ResultsUtil.NOT_CLASSIFIED;
-  val WINDOW_SIZE: Int = 750;
+	val NOT_CLASSIFIED: String = ResultsUtil.NOT_CLASSIFIED;
+	val WINDOW_SIZE: Int = 750;
 }
 
 class ReClassificationFactory extends ProcessorFactory(classOf[ReClassification])

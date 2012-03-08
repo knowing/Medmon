@@ -61,10 +61,6 @@ class BarChartFilter extends TFilter {
       intervalInst
   }
 
-  def query(query: Instance): Instances = null
-
-  def result(result: Instances, query: Instance) {}
-
   def configure(properties: Properties) {}
 
 }

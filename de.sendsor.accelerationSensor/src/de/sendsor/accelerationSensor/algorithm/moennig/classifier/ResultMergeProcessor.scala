@@ -2,215 +2,213 @@ package de.sendsor.accelerationSensor.algorithm.moennig.classifier
 
 import java.util.{ ArrayList, Arrays, Collections, List => JList, Properties, Map => JMap }
 import scala.collection.JavaConversions._
-import java.util.Properties
+import java.util.{Date,Properties}
+import java.text.SimpleDateFormat
 import akka.event.EventHandler.{ debug, info, warning, error }
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
-import ResultMergeProcessorFactory._
-import weka.core.Instances
-import weka.core.Instance
-import weka.core.Attribute
-import weka.core.FastVector
-import java.text.SimpleDateFormat
-import java.util.Date
-import weka.core.DenseInstance
+import de.lmu.ifi.dbs.knowing.core.processing.ImmutableInstances
 import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
+import weka.core.{Instance,Instances, Attribute,DenseInstance, FastVector}
+import ResultMergeProcessorFactory._
 
+/**
+ * Never touch this class.
+ * 
+ * @author Christian Moenning
+ * @version 0.1
+ */
 class ResultMergeProcessor extends TProcessor {
 
-  var segments: Instances = _
-  var nonsegments: Instances = _
-  var rawdata: Instances = _
+	var segments: Instances = _
+	var nonsegments: Instances = _
+	var rawdata: Instances = _
 
-  var inputRelIndex = -1
-  var inputStartTime = -1
+	var inputRelIndex = -1
+	var inputStartTime = -1
 
-  var sdf: SimpleDateFormat = _
-  var sdfRaw: SimpleDateFormat = _
+	var sdf: SimpleDateFormat = _
+	var sdfRaw: SimpleDateFormat = _
 
-  var labels: List[Any] = _
+	var labels: List[Any] = _
 
-  override def build = {
-    case (inst, None) => warning(this, "Unkown input in ResultMergeProcessor on default port")
-    case (inst, Some(INPUT_RAWDATA)) => addRawdata(inst)
-    case (inst, Some(INPUT_SEGMENTS)) => addSegments(inst)
-    case (inst, Some(INPUT_NONSEGMENTS)) => addNonSegments(inst)
-    case (_, Some(p)) => warning(this, "Unkown input in ResultMergeProcessor on port " + p)
-  }
+	override def process(inst: Instances) = {
+		case (None, _) => warning(this, "Unkown input in ResultMergeProcessor on default port")
+		case (Some(INPUT_RAWDATA), _) => addRawdata(inst)
+		case (Some(INPUT_SEGMENTS), _) => addSegments(inst)
+		case (Some(INPUT_NONSEGMENTS), _) => addNonSegments(inst)
+		case (Some(p), _) => warning(this, "Unkown input in ResultMergeProcessor on port " + p)
+	}
 
-  def build(instances: Instances) = Unit
+	def addSegments(segs: Instances) {
+		segments = segs;
+		if (segments != null && nonsegments != null && rawdata != null) {
+			merge()
+		}
+	}
 
-  def query(query: Instance): Instances = { null }
+	def addNonSegments(nonSegs: Instances) {
+		nonsegments = nonSegs;
+		if (segments != null && nonsegments != null && rawdata != null) {
+			merge()
+		}
+	}
 
-  def result(result: Instances, query: Instance) = {}
+	def addRawdata(rawd: Instances) {
+		rawdata = rawd;
+		if (segments != null && nonsegments != null && rawdata != null) {
+			merge()
+		}
+	}
 
-  def configure(properties: Properties) = {}
+	def determineFormat(): Instances = {
+		for (i <- 0 until segments.numAttributes) {
+			if (segments.attribute(i).`type` == Attribute.RELATIONAL && inputRelIndex < 0) {
+				inputRelIndex = i
+			}
+			if (segments.attribute(i).`type` == Attribute.DATE && inputStartTime < 0) {
+				inputStartTime = i
+				sdf = new SimpleDateFormat(segments.attribute(i).getDateFormat());
+			}
+		}
 
-  def addSegments(segs: Instances) {
-    segments = segs;
-    if (segments != null && nonsegments != null && rawdata != null) {
-      merge();
-    }
-  }
+		val attributes = new FastVector[Attribute]
+		debug(this, "SEGMENTS " + segments.asInstanceOf[ImmutableInstances].toStringComplete())
+		val relaltionalAttribute: Instances = segments.attribute(inputRelIndex).relation()
+		for (i <- 0 until relaltionalAttribute.numAttributes()) {
+			attributes.addElement(relaltionalAttribute.attribute(i))
+		}
 
-  def addNonSegments(nonSegs: Instances) {
-    nonsegments = nonSegs;
-    if (segments != null && nonsegments != null && rawdata != null) {
-      merge();
-    }
-  }
+		labels = segments.classAttribute.enumerateValues.toList
+		labels foreach (l => attributes.add(new Attribute("class" + l)))
 
-  def addRawdata(rawd: Instances) {
-    rawdata = rawd;
-    if (segments != null && nonsegments != null && rawdata != null) {
-      merge();
-    }
-  }
+		new Instances("data", attributes, 0)
+	}
 
-  def determineFormat(): Instances = {
-    for (i <- 0 until segments.numAttributes) {
-      if (segments.attribute(i).`type` == Attribute.RELATIONAL && inputRelIndex < 0) {
-        inputRelIndex = i;
-      }
-      if (segments.attribute(i).`type` == Attribute.DATE && inputStartTime < 0) {
-        inputStartTime = i;
-        sdf = new SimpleDateFormat(segments.attribute(i).getDateFormat());
-      }
-    }
+	def merge() {
 
-    val attributes: FastVector[Attribute] = new FastVector();
-    val relaltionalAttribute: Instances = segments.attribute(inputRelIndex).relation();
-    for (i <- 0 until relaltionalAttribute.numAttributes()) {
-      attributes.addElement(relaltionalAttribute.attribute(i));
-    }
+		val output = determineFormat()
 
-    labels = segments.classAttribute.enumerateValues.toList
-    labels foreach (l => attributes.add(new Attribute("class" + l)))
+		// Map[String,Instances]
+		val splittedRawdata = ResultsUtil.splitInstanceBySource(rawdata, false)
+		val splittedSegments = ResultsUtil.splitInstanceBySource(segments, false)
+		val splittedNonSegments = ResultsUtil.splitInstanceBySource(nonsegments, false)
 
-    val output = new Instances("data", attributes, 0);
-    return output
-  }
+		for (key: String <- splittedRawdata.keys) {
+			val raw = splittedRawdata(key)
+			val segs = splittedSegments(key)
+			val nonsegs = splittedNonSegments(key)
 
-  def merge() {
+			segs.sort(inputStartTime)
+			nonsegs.sort(inputStartTime)
+			var si = 0
+			var ni = 0
+			var ri = 0
 
-    val output = determineFormat()
+			sdfRaw = new SimpleDateFormat(raw.attribute(inputStartTime).getDateFormat());
 
-    // Map[String,Instances]
-    val splittedRawdata = ResultsUtil.splitInstanceBySource(rawdata, false)
-    val splittedSegments = ResultsUtil.splitInstanceBySource(segments, false)
-    val splittedNonSegments = ResultsUtil.splitInstanceBySource(nonsegments, false)
+			while (si < segs.numInstances || ni < nonsegs.numInstances) {
+				if (si < segs.numInstances && ni < nonsegs.numInstances) {
+					val sDate = sdf.parse(segs.get(si).stringValue(inputStartTime))
+					val nDate = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
+					var rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					while (rDate.before(sDate) && rDate.before(nDate)) {
+						addRawInstnace(output, raw.get(ri))
+						ri += 1
+						rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					}
+					if (sDate.before(nDate)) {
+						ri += addRelationalInstance(output, segs.get(si))
+						si += 1
+					} else {
+						ri += addRelationalInstance(output, nonsegs.get(ni))
+						ni += 1
+					}
+				} else if (si < segs.numInstances) {
+					val sDate: Date = sdf.parse(segs.get(si).stringValue(inputStartTime))
+					var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					while (rDate.before(sDate)) {
+						addRawInstnace(output, raw.get(ri))
+						ri += 1
+						rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					}
+					ri += addRelationalInstance(output, segs.get(si))
+					si += 1
+				} else {
+					val nDate: Date = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
+					var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					while (rDate.before(nDate)) {
+						addRawInstnace(output, raw.get(ri))
+						ri += 1
+						rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
+					}
+					ri += addRelationalInstance(output, nonsegs.get(ni))
+					ni += 1
+				}
+			}
+			while (ri < raw.numInstances()) {
+				addRawInstnace(output, raw.get(ri))
+				ri += 1
+			}
+		}
 
-    for (key: String <- splittedRawdata.keys) {
-      val raw = splittedRawdata(key)
-      val segs = splittedSegments(key)
-      val nonsegs = splittedNonSegments(key)
+		//Set class labels for output
+		guessAndSetClassLabel(output)
+		for (i <- 0 until output.numInstances) ResultsUtil.highestProbability(output(i))._2 match {
+			case ResultsUtil.NOT_CLASSIFIED => output(i).setClassMissing
+			case clazz => output(i).setClassValue(clazz)
+		}
 
-      segs.sort(inputStartTime)
-      nonsegs.sort(inputStartTime)
-      var si = 0
-      var ni = 0
-      var ri = 0
+		sendResults(output)
 
-      sdfRaw = new SimpleDateFormat(raw.attribute(inputStartTime).getDateFormat());
+		//Clean up
+		segments = null
+		nonsegments = null
+		rawdata = null
 
-      while (si < segs.numInstances || ni < nonsegs.numInstances) {
-        if (si < segs.numInstances && ni < nonsegs.numInstances) {
-          val sDate = sdf.parse(segs.get(si).stringValue(inputStartTime))
-          val nDate = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
-          var rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          while (rDate.before(sDate) && rDate.before(nDate)) {
-            addRawInstnace(output, raw.get(ri))
-            ri += 1
-            rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          }
-          if (sDate.before(nDate)) {
-            ri += addRelationalInstance(output, segs.get(si))
-            si += 1
-          } else {
-            ri += addRelationalInstance(output, nonsegs.get(ni))
-            ni += 1
-          }
-        } else if (si < segs.numInstances) {
-          val sDate: Date = sdf.parse(segs.get(si).stringValue(inputStartTime))
-          var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          while (rDate.before(sDate)) {
-            addRawInstnace(output, raw.get(ri))
-            ri += 1
-            rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          }
-          ri += addRelationalInstance(output, segs.get(si))
-          si += 1
-        } else {
-          val nDate: Date = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
-          var rDate: Date = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          while (rDate.before(nDate)) {
-            addRawInstnace(output, raw.get(ri))
-            ri += 1
-            rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
-          }
-          ri += addRelationalInstance(output, nonsegs.get(ni))
-          ni += 1
-        }
-      }
-      while (ri < raw.numInstances()) {
-        addRawInstnace(output, raw.get(ri))
-        ri += 1
-      }
-    }
-    
-    //Set class labels for output
-    guessAndSetClassLabel(output)
-    for(i <- 0 until output.numInstances)  ResultsUtil.highestProbability(output(i))._2 match {
-      case ResultsUtil.NOT_CLASSIFIED => output(i).setClassMissing
-      case clazz =>  output(i).setClassValue(clazz)
-    }
-    	
-    sendResults(output)
+		sdf = null
+		sdfRaw = null
+	}
 
-    //Clean up
-    segments = null
-    nonsegments = null
-    rawdata = null
+	def addRelationalInstance(output: Instances, inst: Instance): Int = {
+		val relAtt: Instances = inst.relationalValue(inputRelIndex);
 
-    sdf = null
-    sdfRaw = null
-  }
+		for (i <- 0 until relAtt.numInstances) {
+			val result = new DenseInstance(output.numAttributes)
+			for (j <- 0 until relAtt.get(i).numAttributes) {
+				result.setValue(j, relAtt.get(i).value(j))
+			}
+			for (j <- 0 until labels.size) {
+				result.setValue(j + relAtt.numAttributes, inst.value(inst.dataset.attribute("class" + labels.get(j))))
+			}
+			output.add(result)
+		}
+		return relAtt.numInstances
+	}
 
-  def addRelationalInstance(output: Instances, inst: Instance): Int = {
-    val relAtt: Instances = inst.relationalValue(inputRelIndex);
+	def addRawInstnace(output: Instances, inst: Instance) {
+		val result = new DenseInstance(output.numAttributes)
+		for (j <- 0 until inst.numAttributes) {
+			result.setValue(j, inst.value(j))
+		}
+		for (j <- 0 until labels.size) {
+			//set unclassified
+			result.setValue(j + inst.numAttributes(), -1.0)
+		}
+		output.add(result)
+	}
 
-    for (i <- 0 until relAtt.numInstances) {
-      val result = new DenseInstance(output.numAttributes)
-      for (j <- 0 until relAtt.get(i).numAttributes) {
-        result.setValue(j, relAtt.get(i).value(j))
-      }
-      for (j <- 0 until labels.size) {
-        result.setValue(j + relAtt.numAttributes, inst.value(inst.dataset.attribute("class" + labels.get(j))))
-      }
-      output.add(result)
-    }
-    return relAtt.numInstances
-  }
+	def query(query: Instances): Instances = throw new UnsupportedOperationException
 
-  def addRawInstnace(output: Instances, inst: Instance) {
-    val result = new DenseInstance(output.numAttributes)
-    for (j <- 0 until inst.numAttributes) {
-      result.setValue(j, inst.value(j))
-    }
-    for (j <- 0 until labels.size) {
-      //set unclassified
-      result.setValue(j + inst.numAttributes(), -1.0)
-    }
-    output.add(result)
-  }
+	def configure(properties: Properties) = {}
 
 }
 
 class ResultMergeProcessorFactory extends ProcessorFactory(classOf[ResultMergeProcessor])
 
 object ResultMergeProcessorFactory {
-  val INPUT_SEGMENTS = "segments"
-  val INPUT_NONSEGMENTS = "nonsegments"
-  val INPUT_RAWDATA = "rawdata"
+	val INPUT_SEGMENTS = "segments"
+	val INPUT_NONSEGMENTS = "nonsegments"
+	val INPUT_RAWDATA = "rawdata"
 }
