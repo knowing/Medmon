@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
 import de.lmu.ifi.dbs.knowing.core.processing.ImmutableInstances
 import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
+import de.lmu.ifi.dbs.knowing.core.results.ClassDistribution.ATTRIBUTE_CLASS
 import weka.core.{Instance,Instances, Attribute,DenseInstance, FastVector}
 import ResultMergeProcessorFactory._
 
@@ -74,7 +75,6 @@ class ResultMergeProcessor extends TProcessor {
 		}
 
 		val attributes = new FastVector[Attribute]
-		debug(this, "SEGMENTS " + segments.asInstanceOf[ImmutableInstances].toStringComplete())
 		val relaltionalAttribute: Instances = segments.attribute(inputRelIndex).relation()
 		for (i <- 0 until relaltionalAttribute.numAttributes()) {
 			attributes.addElement(relaltionalAttribute.attribute(i))
@@ -180,7 +180,7 @@ class ResultMergeProcessor extends TProcessor {
 				result.setValue(j, relAtt.get(i).value(j))
 			}
 			for (j <- 0 until labels.size) {
-				result.setValue(j + relAtt.numAttributes, inst.value(inst.dataset.attribute("class" + labels.get(j))))
+				result.setValue(j + relAtt.numAttributes, inst.value(inst.dataset.attribute(ATTRIBUTE_CLASS + labels.get(j))))
 			}
 			output.add(result)
 		}
