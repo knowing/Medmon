@@ -5,8 +5,8 @@ import weka.core.{ Instances, Attribute, DenseInstance, Instance }
 import de.lmu.ifi.dbs.knowing.core.events._
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.{ findValueAttributes, findNumericAttributes }
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.ATTRIBUTE_TIMESTAMP
+import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.findNumericAttributes
+import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults.{ATTRIBUTE_TIMESTAMP, findValueAttributes}
 import scala.collection.JavaConversions._
 import scala.collection.parallel.mutable.ParSeq
 import NormalizeAndroidSensorDataFactory._
