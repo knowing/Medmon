@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
 import de.lmu.ifi.dbs.knowing.core.processing.ImmutableInstances
 import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
-import de.lmu.ifi.dbs.knowing.core.results.ClassDistribution.ATTRIBUTE_CLASS
+import de.lmu.ifi.dbs.knowing.core.results.ClassDistributionResults.ATTRIBUTE_CLASS
 import weka.core.{Instance,Instances, Attribute,DenseInstance, FastVector}
 import ResultMergeProcessorFactory._
 

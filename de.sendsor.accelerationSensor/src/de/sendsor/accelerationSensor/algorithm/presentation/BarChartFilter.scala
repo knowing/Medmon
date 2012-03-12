@@ -5,8 +5,9 @@ import akka.event.EventHandler.{ debug, info, warning, error }
 import weka.core.{ Instance, Instances, DenseInstance }
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil.{ ATTRIBUTE_FROM, ATTRIBUTE_TO, ATTRIBUTE_CLASS, ATTRIBUTE_TIMESTAMP }
+import de.lmu.ifi.dbs.knowing.core.results.TimeIntervalResults
+import de.lmu.ifi.dbs.knowing.core.results.TimeIntervalResults._
+import de.lmu.ifi.dbs.knowing.core.results.ResultsType
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -27,11 +28,11 @@ class BarChartFilter extends TFilter {
     case -1 => instances
     case i =>
       val classAttr = instances.classAttribute
-      val timeAttr = instances.attribute(ATTRIBUTE_TIMESTAMP)
+      val timeAttr = instances.attribute(ResultsType.ATTRIBUTE_TIMESTAMP)
       val classList = classAttr.enumerateValues.toList.asInstanceOf[List[String]]
 
       //Create timeIntervalResult Instances and get attribute indices
-      val intervalInst = ResultsUtil.timeIntervalResult(classList)
+      val intervalInst = TimeIntervalResults(classList)
       val fromIndex = intervalInst.attribute(ATTRIBUTE_FROM).index
       val toIndex = intervalInst.attribute(ATTRIBUTE_TO).index
       val classIndex = intervalInst.attribute(ATTRIBUTE_CLASS).index
