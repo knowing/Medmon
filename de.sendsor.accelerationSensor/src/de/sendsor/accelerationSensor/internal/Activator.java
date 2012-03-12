@@ -17,6 +17,7 @@ import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToCla
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.sendsor.accelerationSensor.algorithm.presentation.BarChartFilterFactory;
+import de.sendsor.accelerationSensor.algorithm.walonka.NormalizeAndroidSensorDataFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -54,6 +55,7 @@ public class Activator implements BundleActivator {
 		util.registerProcessor(new ResultMergeProcessorFactory());
 		util.registerProcessor(new ReClassificationFactory());
 		util.registerProcessor(new BarChartFilterFactory());
+		util.registerProcessor(new NormalizeAndroidSensorDataFactory());
 	}
 
 	/*

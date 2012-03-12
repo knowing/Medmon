@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.util;
+package de.lmu.ifi.dbs.medmon.base.ui.util;
 
 import java.util.Collection;
 
@@ -6,7 +6,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 
-public abstract class JFaceUtil {
+public class JFaceUtil {
 
 	/**
 	 * sets first item as default selection if possible and returns this
