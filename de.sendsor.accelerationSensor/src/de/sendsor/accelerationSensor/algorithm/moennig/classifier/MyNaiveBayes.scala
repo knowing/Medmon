@@ -20,13 +20,14 @@ class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
     oout.close
   }
   
-  override def deserialize(in: InputStream) {
+  override def deserialize(in: InputStream): Boolean =  {
     val oin = new ObjectInputStream(in)
     classifier = oin.readObject.asInstanceOf[MyNaiveBayesImpl]
     val c = classifier.asInstanceOf[MyNaiveBayesImpl]
     guessAndCreateClassLabels(c.inputFormat)
     configure(properties)
     debug(this,"MyNaiveBayes model loaded")
+    true
   }
   
   override def configure(properties:Properties) = {
