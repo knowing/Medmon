@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
+import de.lmu.ifi.dbs.medmon.base.ui.util.JFaceUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
@@ -37,17 +38,18 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	private Therapy				selectedTherapy;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgewählt";
+	private static String		ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgewï¿½hlt";
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmTherapy;
+	private Table				table;
 
 	/**
 	 * Create the wizard.
 	 */
 	public TherapyResultTherapyPage() {
 		super("wizardPage");
-		setTitle("Therapie auswählen");
+		setTitle("Therapie auswï¿½hlen");
 		setDescription("<missing>");
 	}
 
@@ -64,20 +66,13 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	@SuppressWarnings("unchecked")
 	public void setPatient(Patient patient) {
 		this.patient = patient;
-		
+
 		EntityManager entityManager = JPAUtil.createEntityManager();
 		Query allTherapiesQuery = entityManager.createNamedQuery("Therapy.findByPatientId");
 		List<Therapy> allTherapies = allTherapiesQuery.setParameter("patientId", patient).getResultList();
 		entityManager.close();
-		
-		tableViewer.setInput(allTherapies);
-	}
 
-	/**
-	 * WIZZARD-INIT:
-	 */
-	private void initialize() {
-		checkContents();
+		tableViewer.setInput(allTherapies);
 	}
 
 	/**
@@ -93,7 +88,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 		container.setLayout(new GridLayout(1, false));
 
 		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-		Table table = tableViewer.getTable();
+		table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -122,12 +117,14 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 				cell.setText(((Therapy) cell.getElement()).getCaption());
 			}
 		});
-		
-		initialize();
+
+		checkContents();
 	}
 
 	@Override
 	public void checkContents() {
+
+		selectedTherapy = JFaceUtil.initializeViewerSelection(Therapy.class, tableViewer);
 
 		if (selectedTherapy == null)
 			errors.add(ERROR_NO_THERAPY_SELECTED);

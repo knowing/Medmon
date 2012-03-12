@@ -4,27 +4,27 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
 import scala.Option;
-
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
 import akka.actor.ActorRef;
-import de.lmu.ifi.dbs.knowing.core.events.Results;
+import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.lmu.ifi.dbs.knowing.core.japi.AbstractProcessor;
 import de.lmu.ifi.dbs.knowing.core.japi.JProcessor;
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
+import de.lmu.ifi.dbs.knowing.core.events.Results;
+
 
 public class Segmentation extends AbstractProcessor {
-	
-	private static final long serialVersionUID = 8254607844622030623L;
 	
 	private static final int REL_ATT_INDEX = 2;
 	
@@ -52,14 +52,6 @@ public class Segmentation extends AbstractProcessor {
 	public Segmentation(JProcessor wrapper) {
 		super(wrapper);
 	}	
-
-	@Override
-	public Instances query(Instance query, ActorRef ref) {
-		return null;
-	}
-
-	@Override
-	public void result(Instances result, Instance query) {}
 
 	@Override
 	public void configure(Properties properties) {}
@@ -126,8 +118,9 @@ public class Segmentation extends AbstractProcessor {
 	}
 	*/
 	
+	
 	@Override
-	public void build (Instances input) {
+	public void process(Instances input, String port, Instances query) {
 	    guessAndSetClassLabel(input);
 	    
 	    Instances segments = determineOutputFormat(input);
@@ -154,9 +147,10 @@ public class Segmentation extends AbstractProcessor {
 	    }		    
 	    
 	    //Create None Object 
-	    Option<String> none = scala.Option.apply(null);
-		sendEvent(new Results(segments, none), SegmentationFactory.SEGMENTS());
-		sendEvent(new Results(nonSegments, none), SegmentationFactory.NONSEGMENTS());
+	    Option<String> noneString = scala.Option.apply(null);
+	    Option<Instances> noneInstances = scala.Option.apply(null);
+		sendEvent(new Results(segments, noneString, noneInstances), SegmentationFactory.SEGMENTS());
+		sendEvent(new Results(nonSegments, noneString, noneInstances), SegmentationFactory.NONSEGMENTS());
 	}
 	
 	private void calcSegmentation(Instances inst, Instances segments, Instances nonSegments){
@@ -168,8 +162,9 @@ public class Segmentation extends AbstractProcessor {
         shiftsCorrelation = new double[dimensions];
 		double[][] values = new double[dimensions][inst.numInstances()];       
 
-		Vector<Instance> segment = new Vector<Instance>();
-		Vector<Instance> nonSegment = new Vector<Instance>();
+		
+		LinkedList<Instance> segment = new LinkedList<Instance>();
+		LinkedList<Instance> nonSegment = new LinkedList<Instance>();
 		
 		int timeAttIndex = -1;
 		for(int i=0; i < inst.numAttributes(); i++){
@@ -223,8 +218,8 @@ public class Segmentation extends AbstractProcessor {
                 		   nonSegment.addAll(segment);
                 	   }
                 	   else{
-                		   Timestamp t1 = new Timestamp((long)nonSegment.lastElement().value(timeAttIndex));
-                		   Timestamp t2 = new Timestamp((long)segment.firstElement().value(timeAttIndex));
+                		   Timestamp t1 = new Timestamp((long)nonSegment.getFirst().value(timeAttIndex));
+                		   Timestamp t2 = new Timestamp((long)segment.getLast().value(timeAttIndex));
                 		   //cobine successive nonSegments
                 		   if(t2.getTime()-t1.getTime()==TIME_BETWEEN_SAMPLES){                			   
                 			   nonSegment.addAll(segment);
@@ -314,11 +309,11 @@ public class Segmentation extends AbstractProcessor {
         return count;
     }
     
-    private Instance buildOutputInstance(Vector<Instance> segment, Instances output){
+    private Instance buildOutputInstance(LinkedList<Instance> segment, Instances output){
     	Instance result = new DenseInstance(numOuputAttributes);
     	result.setDataset(output);
-    	Instance first = segment.firstElement();
-    	Instance last = segment.lastElement();
+    	Instance first = segment.getFirst();
+    	Instance last = segment.getLast();
     	for(int i=0;i<first.numAttributes();i++){
     		if(first.attribute(i).type()==Attribute.DATE){
     			result.setValue(0, first.value(i));		
@@ -418,6 +413,11 @@ public class Segmentation extends AbstractProcessor {
 			}
 			in.setValue(inst.attribute(SSR_ATTRIBUTE_NAME), (rate/buckets));
 		}
+	}
+	
+	@Override
+	public Instances query(Instances query, ActorRef ref) {
+		throw new UnsupportedOperationException("NOT IMPLEMENTED YET");
 	}
     
 	public double getMinCorrelation() {

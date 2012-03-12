@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.database.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
 
 import java.util.Date;
 import java.util.HashSet;

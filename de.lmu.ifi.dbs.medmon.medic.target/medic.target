@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target name="medic" sequenceNumber="2">
+<target name="medic" sequenceNumber="5">
 <locations>
 <location path="${eclipse_home}" type="Directory"/>
+<location path="D:\Eclipse\GitRepository\Knowing\de.lmu.ifi.dbs.knowing.target\plugins" type="Directory"/>
 <location path="${project_loc:/de.lmu.ifi.dbs.medmon.medic.target/plugins}" type="Directory"/>
 </locations>
 </target>

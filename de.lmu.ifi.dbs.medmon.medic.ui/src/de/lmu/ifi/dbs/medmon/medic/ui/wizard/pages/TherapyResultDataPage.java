@@ -4,19 +4,18 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
-import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
@@ -25,16 +24,11 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.jface.viewers.TableViewerColumn;
-
 public class TherapyResultDataPage extends WizardPage {
 
 	IGlobalSelectionProvider	selectionProvider	= GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 	private Table				table;
+	private TableViewer			tableViewer;
 
 	/**
 	 * Create the wizard.
@@ -56,7 +50,7 @@ public class TherapyResultDataPage extends WizardPage {
 		setControl(container);
 		container.setLayout(new GridLayout(1, false));
 
-		final TableViewer tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
+		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		table = tableViewer.getTable();
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -95,8 +89,8 @@ public class TherapyResultDataPage extends WizardPage {
 				return null;
 			}
 		});
-
 	}
+
 
 	@Override
 	public void dispose() {

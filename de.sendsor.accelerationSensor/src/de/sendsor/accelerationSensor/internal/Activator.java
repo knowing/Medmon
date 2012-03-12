@@ -5,19 +5,19 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import de.lmu.ifi.dbs.knowing.core.util.OSGIUtil;
-import de.lmu.ifi.dbs.knowing.core.service.*;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 import de.sendsor.accelerationSensor.AccelerationSensor;
 import de.sendsor.accelerationSensor.SDRLoaderFactory;
+import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ReClassificationFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ResultMergeProcessorFactory;
-import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.sendsor.accelerationSensor.algorithm.presentation.BarChartFilterFactory;
+import de.sendsor.accelerationSensor.algorithm.walonka.NormalizeAndroidSensorDataFactory;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -31,7 +31,6 @@ public class Activator implements BundleActivator {
 	private static Activator plugin;
 
 	private OSGIUtil util;
-	private ServiceRegistration<IDPUProvider> dpuService;
 
 	private ServiceRegistration<ISensor> sensorService;
 	
@@ -56,7 +55,7 @@ public class Activator implements BundleActivator {
 		util.registerProcessor(new ResultMergeProcessorFactory());
 		util.registerProcessor(new ReClassificationFactory());
 		util.registerProcessor(new BarChartFilterFactory());
-		dpuService = context.registerService(IDPUProvider.class, BundleDPUProvider.newInstance(context.getBundle()), null);
+		util.registerProcessor(new NormalizeAndroidSensorDataFactory());
 	}
 
 	/*
@@ -64,7 +63,6 @@ public class Activator implements BundleActivator {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		dpuService.unregister();
 		util.deregisterAll();
 		sensorService.unregister();
 		sensorService = null;

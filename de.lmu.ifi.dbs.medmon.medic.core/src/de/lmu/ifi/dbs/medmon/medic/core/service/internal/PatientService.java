@@ -13,26 +13,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Collection;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ui.PlatformUI;
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -41,17 +32,12 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.model.Data;
 import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
@@ -66,7 +52,7 @@ public class PatientService implements IPatientService {
 	private final DecimalFormat		decimalF				= new DecimalFormat("000000000000");
 
 	/** Format dates with DateFormat.SHORT */
-	private final DateFormat		dateF					= DateFormat.getDateInstance(DateFormat.MEDIUM);
+	private final DateFormat		dateF					= new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss-SSS");
 
 	private IEntityManagerService	entityManagerService	= null;
 	private ISensorManagerService	sensorManagerService	= null;
@@ -102,22 +88,22 @@ public class PatientService implements IPatientService {
 			return path.getFileName();
 		}
 	}
-	
+
 	@Override
 	public void initializePatient(Patient p) throws IOException {
-		
+
 		Path root = createDirectories(locateDirectory(p, ROOT));
 		createDirectory(root.resolve(TRAIN));
 		createDirectory(root.resolve(RESULT));
 		createDirectory(root.resolve(RAW));
 	}
-	
+
 	@Override
 	public void releasePatient(Patient p) throws IOException {
 
 		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
 	}
-	
+
 	/**
 	 * <p>
 	 * Creates a new file and {@link Data} instance and returns the
@@ -134,18 +120,19 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
-		
+
 		Path file = locateDirectory(p, type).resolve(generateFilename(s, type, from, to));
-		
+
 		Data data = Activator.getDBModelService().createData(p, s, type, from, to, file.toString());
-		
+
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
 		} catch (IOException e) {
+			Activator.getDBModelService().deleteData(data);
 			throw e;
 		}
-		
+
 		return new DataStoreOutput(outputStream, data);
 	}
 
@@ -184,11 +171,12 @@ public class PatientService implements IPatientService {
 	 * @param patient
 	 * @param sensor
 	 * @param type
-	 * @param inputURL
+	 * @param inputURI
 	 */
 	@Override
-	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException {
-		IConverter converter = sensorManagerService.createConverter(sensor);
+	public DataStoreOutput store(Patient patient, ISensor sensor, String type, URI inputURI) throws IOException {
+		InputStream inputStream = sensorManagerService.createInput(sensor, inputURI);
+		IConverter converter = sensor.newConverter(inputStream);
 
 		if (converter == null)
 			return null;
@@ -196,15 +184,11 @@ public class PatientService implements IPatientService {
 		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
 
+		//Copy raw data
 		try (DataStoreOutput output = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
-				OutputStream os = output.outputStream;
-				InputStream in = new FileInputStream(new File(inputURL))) {
+				OutputStream os = output.outputStream) {
 
-			byte[] buffer = new byte[4096];
-			int bytesRead = 0;
-			while ((bytesRead = in.read(buffer)) != -1) {
-				os.write(buffer, 0, bytesRead);
-			}
+			Files.copy(Paths.get(inputURI), os);
 			return output;
 		} catch (IOException e) {
 			log.error("Error read from InputStream or writing to OutputStream.", e);
@@ -259,14 +243,10 @@ public class PatientService implements IPatientService {
 	 * For date formatting {@link DateFormat.MEDIUM} is used.
 	 * </p>
 	 * 
-	 * @param s
-	 *            Sensor
-	 * @param type
-	 *            - RAW, TRAIN or RESULT
-	 * @param from
-	 *            - Data recording start
-	 * @param to
-	 *            - Data recording end
+	 * @param s - Sensor
+	 * @param type - RAW, TRAIN or RESULT
+	 * @param from - Data recording start
+	 * @param to - Data recording end
 	 * @return
 	 */
 	private String generateFilename(Sensor s, String type, Date from, Date to) {

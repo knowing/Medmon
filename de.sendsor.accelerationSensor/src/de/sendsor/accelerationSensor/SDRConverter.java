@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
-import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil;
+import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults;
 import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
 
 /**
@@ -81,14 +81,14 @@ public class SDRConverter extends FileConverter {
 	}
 
 	private void init() {
-		header = ResultsUtil.timeSeriesResult(Arrays.asList(new String[] { "x", "y", "z" }));
+		header = TimeSeriesResults.newInstances(Arrays.asList(new String[] { "x", "y", "z" }));
 
-		timeAttribute = header.attribute(ResultsUtil.ATTRIBUTE_TIMESTAMP());
+		timeAttribute = header.attribute(TimeSeriesResults.ATTRIBUTE_TIMESTAMP());
 		// initialize value attributes
 		// TODO SDRConverter -> use ResultUtils.findValueAttributesAsJavaMap
-		List<Attribute> valueAttributes = ResultsUtil.findValueAttributes(header);
+		List<Attribute> valueAttributes = TimeSeriesResults.findValueAttributes(header);
 		for (Attribute attribute : valueAttributes) {
-			String name = attribute.getMetadata().getProperty(ResultsUtil.META_ATTRIBUTE_NAME());
+			String name = attribute.getMetadata().getProperty(TimeSeriesResults.META_ATTRIBUTE_NAME());
 			if (name.equals("x"))
 				xAttribute = attribute;
 			else if (name.equals("y"))

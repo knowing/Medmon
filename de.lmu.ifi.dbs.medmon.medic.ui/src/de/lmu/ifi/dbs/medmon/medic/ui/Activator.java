@@ -1,14 +1,9 @@
 package de.lmu.ifi.dbs.medmon.medic.ui;
 
-import javax.persistence.EntityManager;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +12,8 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
+import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -28,7 +24,7 @@ public class Activator extends AbstractUIPlugin {
 	public static final String										PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.ui"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	public static Activator plugin;
 
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
@@ -37,15 +33,11 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
 	private static ServiceTracker<IDBModelService, IDBModelService> dbModelServiceTracker;
+	private static ServiceTracker<ITherapyResultService, ITherapyResultService> therapyResultServiceTracker;
+	private static ServiceTracker<IReportingService, IReportingService> reportingServiceTracker;
 	
 	private static final Logger log = LoggerFactory.getLogger(Activator.PLUGIN_ID);
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
-	
 
 	/*
 	 * (non-Javadoc)
@@ -73,7 +65,11 @@ public class Activator extends AbstractUIPlugin {
 		dbModelServiceTracker = new ServiceTracker<IDBModelService, IDBModelService>(context, IDBModelService.class, null);
 		dbModelServiceTracker.open();
 		
+		therapyResultServiceTracker = new ServiceTracker<ITherapyResultService, ITherapyResultService>(context, ITherapyResultService.class, null);
+		therapyResultServiceTracker.open();
 		
+		reportingServiceTracker = new ServiceTracker<IReportingService, IReportingService>(context, IReportingService.class, null);
+		reportingServiceTracker.open();
 	}
 
 	/*
@@ -101,9 +97,15 @@ public class Activator extends AbstractUIPlugin {
 		globalSelectionServiceTracker.close();
 		globalSelectionServiceTracker = null;
 
+		therapyResultServiceTracker.close();
+		therapyResultServiceTracker = null;
+		
+		reportingServiceTracker.close();
+		reportingServiceTracker = null;
+		
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 * 
@@ -120,8 +122,7 @@ public class Activator extends AbstractUIPlugin {
 	 * Returns an image descriptor for the image file at the given plug-in
 	 * relative path
 	 * 
-	 * @param path
-	 *            the path
+	 * @param path- the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
@@ -148,4 +149,11 @@ public class Activator extends AbstractUIPlugin {
 		return dbModelServiceTracker.getService();
 	}
 	
+	public static ITherapyResultService getTherapyResultService() {
+		return therapyResultServiceTracker.getService();
+	}
+	
+	public static IReportingService getReportingService(){
+		return reportingServiceTracker.getService();
+	}
 }
