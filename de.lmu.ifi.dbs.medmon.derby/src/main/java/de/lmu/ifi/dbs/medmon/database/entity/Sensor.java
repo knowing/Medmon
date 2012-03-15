@@ -1,8 +1,8 @@
-package de.lmu.ifi.dbs.medmon.database.model;
+package de.lmu.ifi.dbs.medmon.database.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,11 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "SENSOR")
 @NamedQueries({
 		@NamedQuery(name = "Sensor.findAll", query = "SELECT s FROM Sensor s"),
 		@NamedQuery(name = "Sensor.findBySensorId", query = "SELECT s FROM Sensor s WHERE s.sensorId = :sensorId"),
@@ -29,20 +26,16 @@ public class Sensor {
 	@Column(unique = true)
 	private String		sensorId;
 
-	@Column
 	private String		name;
 
-	@Column
 	private String		version;
 
-	@Column
 	private String		defaultpath;
 
-	@Column
 	private String		filePrefix;
 
-	@OneToMany(mappedBy = "sensor")
-	private Set<Data>	data	= new HashSet<Data>();
+	@OneToMany(mappedBy = "sensor", cascade = { CascadeType.REMOVE })
+	private List<Data>	data;
 
 	protected Sensor() {
 	}
@@ -89,12 +82,25 @@ public class Sensor {
 		this.defaultpath = defaultpath;
 	}
 
-	public Set<Data> getData() {
+	public List<Data> getData() {
 		return data;
 	}
 
-	public void setData(Set<Data> data) {
+	protected void setData(List<Data> data) {
 		this.data = data;
+	}
+
+	public boolean addData(Data d) {
+		if (data.contains(d))
+			return false;
+		boolean success = data.add(d);
+		if (!this.equals(d.getSensor()))
+			d.setSensor(this);
+		return success;
+	}
+
+	public void removeData(Data data) {
+		this.data.remove(data);
 	}
 
 	public String getFilePrefix() {
@@ -103,6 +109,12 @@ public class Sensor {
 
 	public void setFilePrefix(String filePrefix) {
 		this.filePrefix = filePrefix;
+	}
+
+	@Override
+	public String toString() {
+		return "Sensor [id=" + id + ", sensorId=" + sensorId + ", name=" + name + ", version=" + version + ", defaultpath=" + defaultpath
+				+ ", filePrefix=" + filePrefix + ", data=" + data + "]";
 	}
 
 	@Override

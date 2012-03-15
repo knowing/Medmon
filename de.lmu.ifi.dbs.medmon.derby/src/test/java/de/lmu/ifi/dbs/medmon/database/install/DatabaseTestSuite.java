@@ -7,9 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
   DatabaseTest.class,
   PatientTest.class,
-  DataTest.class,
-  TherapyTest.class,
-  TherapyResultTest.class
+  DataTest.class
 })
 public class DatabaseTestSuite {
 

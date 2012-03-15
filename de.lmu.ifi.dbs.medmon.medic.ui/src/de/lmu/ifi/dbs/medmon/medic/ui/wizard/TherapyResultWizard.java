@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -22,10 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.SelectAndConfigureDPUPage;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
@@ -108,7 +110,7 @@ public class TherapyResultWizard extends Wizard {
 			prepateDataPage(options);
 			return dataPage;
 		}
-		return null;
+		return super.getNextPage(page);
 	}
 
 	private void prepateDataPage(int options) {
@@ -155,11 +157,21 @@ public class TherapyResultWizard extends Wizard {
 				IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
 				ITherapyResultService resultService = Activator.getTherapyResultService();
 				TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
+				Activator.getGlobalSelectionService().setSelection(TherapyResult.class, results);
+				Activator.getGlobalSelectionService().updateSelection(Therapy.class);
+				Activator.getGlobalSelectionService().updateSelection(Patient.class);
 				log.debug("Therapy Results created " + results);
 			} catch (Exception e) {
 				e.printStackTrace();
 				try {
-					Activator.getDBModelService().deleteData(data);
+//					Activator.getDBModelService().deleteData(data);
+					Path path = Activator.getPatientService().locateFile(data);
+					Files.deleteIfExists(path);
+					EntityManager tempEM= Activator.getEntityManagerService().createEntityManager();
+					tempEM.getTransaction().begin();
+					tempEM.remove(data);
+					tempEM.getTransaction().commit();
+					tempEM.close();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

@@ -18,7 +18,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;

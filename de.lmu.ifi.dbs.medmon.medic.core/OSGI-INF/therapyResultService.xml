@@ -7,6 +7,6 @@
    <reference bind="bindPatientService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService" name="IPatientService" policy="dynamic" unbind="unbindPatientService"/>
    <reference bind="bindSensorManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService" name="ISensorManagerService" policy="dynamic" unbind="unbindSensorManagerService"/>
    <reference bind="bindEvaluateService" cardinality="1..1" interface="de.lmu.ifi.dbs.knowing.core.service.IEvaluateService" name="IEvaluateService" policy="dynamic" unbind="unbindEvaluateService"/>
-   <reference bind="bindDbModelService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService" name="IDBModelService" policy="dynamic" unbind="unbindDbModelService"/>
    <reference bind="bindUiFactories" cardinality="1..1" interface="de.lmu.ifi.dbs.knowing.core.factory.UIFactory" name="UIFactory" policy="dynamic" unbind="unbindUiFactories"/>
+   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
 </scr:component>

@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +20,7 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
@@ -54,15 +53,14 @@ public class SensorManagerService implements ISensorManagerService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Sensor loadSensorEntity(ISensor sensor) {
-
 		EntityManager tempEM = entityManagerService.createEntityManager();
-		@SuppressWarnings("unchecked")
-		List<Sensor> results = tempEM.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId())
+		List<Sensor> results = tempEM.createNamedQuery("Sensor.findBySensorId")
+				.setParameter("sensorId", sensor.getId())
 				.getResultList();
 
 		tempEM.close();
-		
 		if (results.isEmpty())
 			return null;
 		

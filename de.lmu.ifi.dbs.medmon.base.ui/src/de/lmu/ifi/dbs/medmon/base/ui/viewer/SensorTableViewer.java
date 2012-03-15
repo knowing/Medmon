@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
@@ -71,7 +71,7 @@ public class SensorTableViewer extends TableViewer {
 
 				DirectoryDialog dlg = new DirectoryDialog(shell);
 				dlg.setText("Standard-Pfad");
-				dlg.setMessage("wählen sie den neuen Standard-Pfad für diesen Sensor aus!");
+				dlg.setMessage("wï¿½hlen sie den neuen Standard-Pfad fï¿½r diesen Sensor aus!");
 				String dir = dlg.open();
 				if (dir != null) {
 					Sensor mSensor = Activator.getSensorManagerService().loadSensorEntity(selection);

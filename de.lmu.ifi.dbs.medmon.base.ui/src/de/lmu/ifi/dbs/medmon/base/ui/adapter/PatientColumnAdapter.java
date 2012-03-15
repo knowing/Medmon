@@ -1,26 +1,45 @@
 package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 
-public class PatientColumnAdapter implements IWorkbenchAdapter {
+public class PatientColumnAdapter implements IAdapterFactory {
 
-	public Object[] getChildren(Object o) {
-		return ((Patient)o).getTherapies().toArray();
-	}
-
-	public ImageDescriptor getImageDescriptor(Object object) {
+	private static final Class[] types = new Class[] { IWorkbenchColumnAdapter.class, IWorkbenchAdapter.class };
+	
+	@Override
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
+		if(adapterType.equals(IWorkbenchAdapter.class)  && adaptableObject instanceof Patient ) 
+			return new PatientColumnAdapterImpl();
 		return null;
 	}
 
-	public String getLabel(Object o) {
-		return "Patient";
+	@Override
+	public Class[] getAdapterList() {
+		return types;
 	}
+	
+	public class PatientColumnAdapterImpl implements IWorkbenchAdapter {
+		public Object[] getChildren(Object o) {
+			return ((Patient)o).getTherapies().toArray();
+		}
 
-	public Object getParent(Object o) {
-		return null;
+		public ImageDescriptor getImageDescriptor(Object object) {
+			return null;
+		}
+
+		public String getLabel(Object o) {
+			Patient p = (Patient)o;
+			return p.getFirstname() + ", " + p.getLastname();
+		}
+
+		public Object getParent(Object o) {
+			return null;
+		}
+		
 	}
 
 }

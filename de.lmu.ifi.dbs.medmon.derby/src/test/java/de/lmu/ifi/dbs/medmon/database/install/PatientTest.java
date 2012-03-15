@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 
 public class PatientTest extends DatabaseTest {
 
@@ -16,7 +16,7 @@ public class PatientTest extends DatabaseTest {
 		// Insert
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
-		Patient patient = new Patient("John", "Smith");
+		Patient patient = new Patient("John", "Smith", "ABC#" + Math.random());
 		patient.setInsuranceId("abc123");
 		
 		assertTrue(patient.getId() == 0);

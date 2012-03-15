@@ -1,13 +1,10 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Set;
-
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -31,15 +28,20 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
+/**
+ * 
+ * @author Stephan Picker, Nepomuk Seiler
+ * @version 0.1
+ * @since 15.03.2012
+ */
 public class PatientFileDetailBlock extends MasterDetailsBlock {
 	public PatientFileDetailBlock() {
 	}
@@ -47,7 +49,6 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	private FormToolkit					toolkit;
 	private IGlobalSelectionProvider	selectionProvider;
 	private TreeViewer					therapiesViewer;
-	private EntityManager				workerEM;
 	private Patient						localPatientSelection;
 
 	/**
@@ -59,7 +60,6 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 	@Override
 	protected void createMasterPart(final IManagedForm managedForm, Composite parent) {
 		toolkit = managedForm.getToolkit();
-		workerEM = JPAUtil.createEntityManager();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 
 		Section section = toolkit.createSection(parent, ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR);
@@ -108,6 +108,14 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				return o1.compareTo(o2);
 			}
 		});
+		therapiesViewer.setContentProvider(new BaseWorkbenchContentProvider());
+		therapiesViewer.setLabelProvider(new WorkbenchLabelProvider());
+		therapiesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				managedForm.fireSelectionChanged(sectionPart, event.getSelection());
+			}
+		});
 
 		Composite composite_1 = new Composite(composite, SWT.NONE);
 		composite_1.setLayout(new GridLayout(2, false));
@@ -125,27 +133,25 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				if (localPatientSelection == null)
 					return;
 
-				Activator.getDBModelService().createTherapy(localPatientSelection);
+				// Activator.getDBModelService().createTherapy(localPatientSelection);
+				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+				tempEM.getTransaction().begin();
+				Patient mPatient = tempEM.find(Patient.class, localPatientSelection.getId());
+				Therapy therapy = new Therapy("<Neue Therapie>", mPatient);
+				tempEM.persist(therapy);
+				tempEM.getTransaction().commit();
+				tempEM.close();
+				
+				selectionProvider.setSelection(Therapy.class, therapy);
+				therapiesViewer.setSelection(new StructuredSelection(therapy),true);
+				selectionProvider.updateSelection(Patient.class);
 			}
 		});
 
 		Label lblPlaceholder1 = new Label(composite_1, SWT.NONE);
 		lblPlaceholder1.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(lblPlaceholder1, true, true);
-		linkAdd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
 
-			}
-		});
-		therapiesViewer.setContentProvider(new BaseWorkbenchContentProvider());
-		therapiesViewer.setLabelProvider(new WorkbenchLabelProvider());
-		therapiesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				managedForm.fireSelectionChanged(sectionPart, event.getSelection());
-			}
-		});
 
 		final SectionPart therapyPart = new SectionPart(section);
 		managedForm.addPart(therapyPart);
@@ -165,10 +171,13 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 					/************************************************************
 					 * Database Access Begin
 					 ************************************************************/
-
-					Patient mPatient = workerEM.find(Patient.class, selection.getId());
+					
+					EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+					Patient mPatient = tempEM.find(Patient.class, selection.getId());
+					Object[] expandedElements = therapiesViewer.getExpandedElements();
 					therapiesViewer.setInput(mPatient);
-					workerEM.clear();
+					therapiesViewer.setExpandedElements(expandedElements);
+					tempEM.close();
 
 					/************************************************************
 					 * Database Access End
@@ -182,12 +191,13 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/
-
-				Patient mPatient = workerEM.find(Patient.class, localPatientSelection.getId());
+				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+				Patient mPatient = tempEM.find(Patient.class, localPatientSelection.getId());
 				Object[] expandedElements = therapiesViewer.getExpandedElements();
+				System.err.println("Updated patient: " + mPatient);
 				therapiesViewer.setInput(mPatient);
 				therapiesViewer.setExpandedElements(expandedElements);
-				workerEM.clear();
+				tempEM.close();
 
 				/************************************************************
 				 * Database Access End

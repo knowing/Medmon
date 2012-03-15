@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import org.eclipse.swt.widgets.Composite;
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
@@ -26,12 +28,12 @@ import de.lmu.ifi.dbs.knowing.core.model.IProperty;
 import de.lmu.ifi.dbs.knowing.core.model.NodeType;
 import de.lmu.ifi.dbs.knowing.core.processing.INodeProperties;
 import de.lmu.ifi.dbs.knowing.core.service.IEvaluateService;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
+import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
@@ -57,8 +59,8 @@ public class TherapyResultService implements ITherapyResultService {
 	private ISensorManagerService		sensorManagerService;
 	/** 1..1 relation */
 	private IEvaluateService			evaluateService;
-	/** 1..1 relation */
-	private IDBModelService				dbModelService;
+
+	private IEntityManagerService		entityManagerService;
 
 	/** 0..n relation */
 	private List<UIFactory<Composite>>	uiFactories	= new ArrayList<UIFactory<Composite>>();
@@ -69,22 +71,29 @@ public class TherapyResultService implements ITherapyResultService {
 	public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, Data data) throws Exception {
 		// TODO Try/Catch block to rollback actions on failure
 
-		//Resolve data location -> inputfile
+		// Resolve data location -> inputfile
 		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
 		Path inputFile = patientService.locateFilename(data, IPatientService.ROOT);
 
-		//Configure properties to run with inputFile
+		// Configure properties to run with inputFile
 		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
 
-		//Generate Data entity which stores the result
+		// Generate Data entity which stores the result
 		DataStoreOutput store = createData(patient, data);
 		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
 
-		//Finally run the DPU
+		// Finally run the DPU
 		executeDPU(execPath, configuredDPU, outputMap);
 
-		//Create the TherapyResultEntity with the data entity
-		return dbModelService.createTherapyResult(store.dataEntity, therapy);
+		// Create the TherapyResultEntity with the data entity
+		EntityManager tempEm = entityManagerService.createEntityManager();
+		tempEm.getTransaction().begin();
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",store.dataEntity, therapy);
+		tempEm.persist(result);
+		tempEm.getTransaction().commit();
+		tempEm.close();
+		
+		return result;
 	}
 
 	@Override
@@ -100,15 +109,23 @@ public class TherapyResultService implements ITherapyResultService {
 		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
 
 		executeDPU(execPath, configuredDPU, outputMap);
-		return dbModelService.createTherapyResult(store.dataEntity, therapy);
+		// Create the TherapyResultEntity with the data entity
+		EntityManager tempEm = entityManagerService.createEntityManager();
+		tempEm.getTransaction().begin();
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",store.dataEntity, therapy);
+		tempEm.persist(result);
+		tempEm.getTransaction().commit();
+		tempEm.close();
+		
+		return result;
 	}
 
 	private void executeDPU(Path execPath, IDataProcessingUnit dpu, Map<String, OutputStream> outputMap) throws Exception {
 		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
 		// TODO Create own UIFactory! Check if uiFactories aren't empty, etc
-		if(uiFactories.isEmpty()) 
+		if (uiFactories.isEmpty())
 			throw new Exception("No UIFactory. Unable to display results.");
-		
+
 		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), mapAsScalaMap(new HashMap<String, InputStream>()),
 				mapAsScalaMap(outputMap));
 	}
@@ -229,47 +246,47 @@ public class TherapyResultService implements ITherapyResultService {
 		return patientService
 				.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(), interval.getEnd().toDate());
 	}
-	
-	protected void activate(ComponentContext context)  {
-		log.debug("TherapyResultSerive started");
+
+	protected void activate(ComponentContext context) {
+		log.debug("TherapyResultSerivce started");
 	}
-	
+
 	protected void bindPatientService(IPatientService patientService) {
 		this.patientService = patientService;
 	}
-	
+
 	protected void unbindPatientService(IPatientService patientService) {
 		this.patientService = null;
 	}
-	
+
 	protected void bindSensorManagerService(ISensorManagerService sensorManagerService) {
 		this.sensorManagerService = sensorManagerService;
 	}
-	
+
 	protected void unbindSensorManagerService(ISensorManagerService sensorManagerService) {
 		this.sensorManagerService = null;
 	}
-	
+
 	protected void bindEvaluateService(IEvaluateService evaluateService) {
 		this.evaluateService = evaluateService;
 	}
-	
+
 	protected void unbindEvaluateService(IEvaluateService evaluateService) {
 		this.evaluateService = null;
 	}
-	
-	protected void bindDbModelService(IDBModelService dbModelService) {
-		this.dbModelService = dbModelService;
+
+	protected void bindEntityManagerService(IEntityManagerService entityManagerService) {
+		this.entityManagerService = entityManagerService;
 	}
-	
-	protected void unbindDbModelService(IDBModelService dbModelService) {
-		this.dbModelService = null;
+
+	protected void unbindEntityManagerService(IEntityManagerService entityManagerService) {
+		this.entityManagerService = null;
 	}
-	
+
 	protected void bindUiFactories(UIFactory<Composite> uiFactory) {
 		uiFactories.add(uiFactory);
 	}
-	
+
 	protected void unbindUiFactories(UIFactory<Composite> uiFactory) {
 		uiFactories.remove(uiFactory);
 	}

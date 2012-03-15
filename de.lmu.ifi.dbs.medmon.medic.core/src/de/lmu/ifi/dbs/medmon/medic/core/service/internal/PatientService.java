@@ -8,8 +8,6 @@ import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.nio.file.StandardOpenOption.READ;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,15 +21,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
@@ -100,7 +99,6 @@ public class PatientService implements IPatientService {
 
 	@Override
 	public void releasePatient(Patient p) throws IOException {
-
 		walkFileTree(locateDirectory(p, ROOT), new DeleteDirectoryVisitor());
 	}
 
@@ -122,17 +120,26 @@ public class PatientService implements IPatientService {
 	public DataStoreOutput store(Patient p, Sensor s, String type, Date from, Date to) throws IOException {
 
 		Path file = locateDirectory(p, type).resolve(generateFilename(s, type, from, to));
-
-		Data data = Activator.getDBModelService().createData(p, s, type, from, to, file.toString());
+		EntityManager tempEM = entityManagerService.createEntityManager();
+		EntityTransaction tx = tempEM.getTransaction();
+		tx.begin();
+		Data data = new Data(from, to, s);
+		data.setFile(file.toString());
+		data.setPatient(p);
+		data.setType(type);
+		
 
 		OutputStream outputStream = null;
 		try {
 			outputStream = newOutputStream(file, CREATE_NEW);
+			tx.commit();
 		} catch (IOException e) {
-			Activator.getDBModelService().deleteData(data);
+			tx.rollback();
 			throw e;
+		} finally {
+			tempEM.close();
 		}
-
+		
 		return new DataStoreOutput(outputStream, data);
 	}
 
@@ -184,7 +191,7 @@ public class PatientService implements IPatientService {
 		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
 
-		//Copy raw data
+		// Copy raw data
 		try (DataStoreOutput output = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
 				OutputStream os = output.outputStream) {
 
@@ -243,10 +250,14 @@ public class PatientService implements IPatientService {
 	 * For date formatting {@link DateFormat.MEDIUM} is used.
 	 * </p>
 	 * 
-	 * @param s - Sensor
-	 * @param type - RAW, TRAIN or RESULT
-	 * @param from - Data recording start
-	 * @param to - Data recording end
+	 * @param s
+	 *            - Sensor
+	 * @param type
+	 *            - RAW, TRAIN or RESULT
+	 * @param from
+	 *            - Data recording start
+	 * @param to
+	 *            - Data recording end
 	 * @return
 	 */
 	private String generateFilename(Sensor s, String type, Date from, Date to) {

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 
 public class DataViewer extends TableViewer {
 

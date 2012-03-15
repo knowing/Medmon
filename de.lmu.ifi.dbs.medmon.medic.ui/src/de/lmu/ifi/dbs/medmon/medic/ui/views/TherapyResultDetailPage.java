@@ -36,8 +36,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
@@ -203,7 +203,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		textComment = new Text(groupComment, SWT.BORDER);
 		toolkit.adapt(textComment, true, true);
 		textComment.addModifyListener(dirtyListener);
-		
+
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(3, false));
 		compositeLinks.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -221,11 +221,13 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				// saved.
 				commit(true);
 
-				try {
-					Activator.getDBModelService().deleteTherapyResult(localTherapyResultSelection);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+				tempEM.getTransaction().begin();
+				tempEM.remove(localTherapyResultSelection);
+				tempEM.getTransaction().commit();
+				tempEM.close();
+				
+				//TODO: Remove the corresponding data from disc
 			}
 		});
 
@@ -276,10 +278,10 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
 		workerEM.clear();
-		
+
 		ignoreModification = true;
-		textTherapy.setText(mTherapyResult.getCaption());
-		textComment.setText(mTherapyResult.getComment());
+		textTherapy.setText(mTherapyResult.getCaption() == null ? "<Neues Ergebnis>" : mTherapyResult.getCaption()); 
+		textComment.setText(mTherapyResult.getComment() == null ? "" : mTherapyResult.getComment());
 		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
 		scaleSuccess.setSelection(mTherapyResult.getSuccess());
 		ignoreModification = false;

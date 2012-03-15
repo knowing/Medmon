@@ -15,13 +15,19 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.CreatePatientPage;
 
+/**
+ * 
+ *
+ * @author Stephan Picker, Nepomuk Seiler
+ * @version 0.1
+ * @since 15.03.2012
+ */
 public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IExecutableExtension {
 
 	/* Pages */
@@ -40,25 +46,27 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 
 	@Override
 	public boolean performFinish() {
-		Patient patient = null;
 		try {
-			patient = Activator.getDBModelService().createPatient();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e1.getMessage());
+			EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+			tempEM.getTransaction().begin();
+			Patient mPatient = new Patient();
+			patientpage.initializePatient(mPatient);
+			tempEM.persist(mPatient);
+			tempEM.getTransaction().commit();
+			tempEM.close();
+			
+			Activator.getPatientService().initializePatient(mPatient);
+			IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+			SelectionProvider.setSelection(Patient.class, mPatient);
+			SelectionProvider.unregister();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e.getMessage());
 			return false;
 		}
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
-		tempEM.getTransaction().begin();
-		Patient mPatient = tempEM.find(Patient.class, patient.getId());
-		patientpage.initializePatient(mPatient);
-		tempEM.getTransaction().commit();
-		tempEM.close();
 
-		IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		SelectionProvider.setSelection(Patient.class, patient);
-		SelectionProvider.unregister();
 
 		if (finalPerspectiveId != null && !finalPerspectiveId.isEmpty()) {
 			try {

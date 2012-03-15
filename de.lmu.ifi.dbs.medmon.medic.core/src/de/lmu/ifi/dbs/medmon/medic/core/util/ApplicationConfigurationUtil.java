@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 

@@ -13,7 +13,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.medmon.database.model.*;
+import de.lmu.ifi.dbs.medmon.database.entity.*;
 
 public class DatabaseTest {
 
@@ -35,6 +35,16 @@ public class DatabaseTest {
 		List<Sensor> sensors = em.createNamedQuery("Sensor.findAll").getResultList();
 		for (Sensor sensor : sensors) {
 			em.remove(sensor);
+		}
+		
+		List<Therapy> therapies = em.createNamedQuery("Therapy.findAll").getResultList();
+		for (Therapy therapy : therapies) {
+			em.remove(therapy);
+		}
+		
+		List<TherapyResult> therapyResults = em.createNamedQuery("TherapyResult.findAll").getResultList();
+		for (TherapyResult therapyResult : therapyResults) {
+			em.remove(therapyResult);
 		}
 		
 		em.getTransaction().commit();
@@ -63,6 +73,7 @@ public class DatabaseTest {
 		em.persist(sensor);
 		em.getTransaction().commit();
 		em.close();
+		trace("created sensor " + sensor);
 		return sensor;
 	}
 
@@ -74,17 +85,19 @@ public class DatabaseTest {
 		em.remove(s);
 		em.getTransaction().commit();
 		em.close();
+		trace("removed sensor " + s);
 		return true;
 	}
 
 	protected Patient createPatient() {
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
-		Patient patient = new Patient("John", "Smith");
+		Patient patient = new Patient("John", "Smith", "123A" + Math.random());
 		patient.setInsuranceId("xyz123");
 		em.persist(patient);
 		em.getTransaction().commit();
 		em.close();
+		trace("created patient " + patient);
 		return patient;
 	}
 
@@ -97,19 +110,21 @@ public class DatabaseTest {
 		em.remove(p);
 		em.getTransaction().commit();
 		em.close();
+		trace("created patient " + p);
 		return true;
 	}
 
 	protected Data createData(Patient patient, Sensor sensor) {
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
-		Data data = new Data(patient, sensor, "raw", new Date(0), new Date(10));
+		Data data = new Data(new Date(0), new Date(10),sensor);
 
 		assertEquals("Id should not be set", data.getId(), 0);
 		em.persist(data);
 		assertTrue("Id should be set", data.getId() != 0);
 		em.getTransaction().commit();
 		em.close();
+		trace("created data " + data + " for patient " + patient + ", sensor " + sensor);
 		return data;
 	}
 	
@@ -118,16 +133,19 @@ public class DatabaseTest {
 		em.getTransaction().begin();
 		Data d = em.find(Data.class, data.getId());
 		assertNotNull("Data not persisted!",d);
-		assertNotNull("Relation to Patient not persisted",d.getPatient());
 		assertNotNull("Relation to Sensor not persisted",d.getSensor());
 		
-		assertEquals("Patients not equally", d.getPatient(), patient);
 		assertEquals("Sensors not equally", d.getSensor(), sensor);
 		
 		em.remove(d);
 		em.getTransaction().commit();
 		em.close();
+		trace("removed data " + data);
 		return true;
+	}
+	
+	protected void trace(String msg) {
+		System.out.println("[DEBUG] " + msg);
 	}
 
 }

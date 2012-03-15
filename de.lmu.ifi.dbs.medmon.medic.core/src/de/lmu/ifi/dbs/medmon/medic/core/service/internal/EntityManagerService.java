@@ -12,21 +12,26 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
 /**
  * Handles Eclipse Gemini JPA EntityManager services.
  * 
  * @author Nepomuk Seiler
  * @version 0.2
- *
+ * 
  */
 public class EntityManagerService implements IEntityManagerService {
 
-	private List<DataSourceFactory> dsFactories = new ArrayList<DataSourceFactory>();
-	private List<EntityManagerFactory> emFactories = new ArrayList<EntityManagerFactory>();
-	private EntityManagerFactoryBuilder emfBuilder;
+	private List<DataSourceFactory>		dsFactories	= new ArrayList<DataSourceFactory>();
+	private List<EntityManagerFactory>	emFactories	= new ArrayList<EntityManagerFactory>();
+	private EntityManagerFactoryBuilder	emfBuilder;
+
+	private final Logger				log			= LoggerFactory.getLogger(IPatientService.class);
 
 	@Override
 	public EntityManager createEntityManager() {
@@ -42,7 +47,7 @@ public class EntityManagerService implements IEntityManagerService {
 		return emFactories.get(0);
 	}
 
-	public void bindEntityManagerFactoryBuilder(EntityManagerFactoryBuilder emfBuilder, Map properties) {
+	public void bindEntityManagerFactoryBuilder(EntityManagerFactoryBuilder emfBuilder, Map<String, String> properties) {
 		this.emfBuilder = emfBuilder;
 	}
 
@@ -67,7 +72,7 @@ public class EntityManagerService implements IEntityManagerService {
 	}
 
 	protected void activate(ComponentContext context) {
-		System.out.println("EntityManagerServiceComponent activated");
+		log.debug("EntityManagerServiceComponent activated");
 	}
 
 	protected void deactivate(ComponentContext context) {

@@ -9,7 +9,7 @@ import org.eclipse.ui.ISharedImages;
 import base.ui.icons.Icons;
 
 import de.lmu.ifi.dbs.medmon.base.ui.util.SWTResourceManager;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 
 public class DataColumnAdapter implements IWorkbenchColumnAdapter {

@@ -32,7 +32,6 @@ public class Activator extends AbstractUIPlugin {
 	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorManagerServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
-	private static ServiceTracker<IDBModelService, IDBModelService> dbModelServiceTracker;
 	private static ServiceTracker<ITherapyResultService, ITherapyResultService> therapyResultServiceTracker;
 	private static ServiceTracker<IReportingService, IReportingService> reportingServiceTracker;
 	
@@ -62,9 +61,6 @@ public class Activator extends AbstractUIPlugin {
 		globalSelectionServiceTracker = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class, null);
 		globalSelectionServiceTracker.open();
 	
-		dbModelServiceTracker = new ServiceTracker<IDBModelService, IDBModelService>(context, IDBModelService.class, null);
-		dbModelServiceTracker.open();
-		
 		therapyResultServiceTracker = new ServiceTracker<ITherapyResultService, ITherapyResultService>(context, ITherapyResultService.class, null);
 		therapyResultServiceTracker.open();
 		
@@ -91,9 +87,6 @@ public class Activator extends AbstractUIPlugin {
 		entityServiceTracker.close();
 		entityServiceTracker = null;
 	
-		dbModelServiceTracker.close();
-		dbModelServiceTracker = null;
-		
 		globalSelectionServiceTracker.close();
 		globalSelectionServiceTracker = null;
 
@@ -143,10 +136,6 @@ public class Activator extends AbstractUIPlugin {
 	
 	public static IGlobalSelectionService getGlobalSelectionService() {
 		return globalSelectionServiceTracker.getService();
-	}
-	
-	public static IDBModelService getDBModelService() {
-		return dbModelServiceTracker.getService();
 	}
 	
 	public static ITherapyResultService getTherapyResultService() {
