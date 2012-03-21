@@ -4,7 +4,7 @@ import java.io.OutputStream;
 
 import org.codehaus.aspectwerkz.transform.AspectWerkzPreProcessor.Output;
 
-import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 
 public class DataStoreOutput implements AutoCloseable {
 

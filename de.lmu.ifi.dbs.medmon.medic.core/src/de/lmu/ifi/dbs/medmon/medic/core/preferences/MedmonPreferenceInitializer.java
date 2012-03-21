@@ -1,12 +1,13 @@
 package de.lmu.ifi.dbs.medmon.medic.core.preferences;
 
+import java.util.Arrays;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
-import de.lmu.ifi.dbs.medmon.medic.core.Activator;
-
-public class MedmonPreferenceInitializer extends AbstractPreferenceInitializer {
+public class MedmonPreferenceInitializer extends AbstractPreferenceInitializer implements IMedicPreferences {
 
 	private static final String DIR_USER_HOME = System.getProperty("user.home");
 	private static final String DIR_SEPERATOR = System.getProperty("file.separator");
@@ -14,17 +15,29 @@ public class MedmonPreferenceInitializer extends AbstractPreferenceInitializer {
 	
 	@Override
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		node.put(IMedicPreferences.DIR_USER_HOME_ID, System.getProperty("user.home"));
-		node.put(IMedicPreferences.DIR_SEPERATOR_ID, System.getProperty("file.separator"));
+		IEclipsePreferences medmonNode = ConfigurationScope.INSTANCE.getNode(MEDMON_NODE);
 		
-		node.put(IMedicPreferences.DIR_MEDMON_ID, DIR_MEDMON);
-		node.put(IMedicPreferences.DIR_DERBY_ID, DIR_MEDMON + DIR_SEPERATOR + "db");
-		node.put(IMedicPreferences.DIR_DPU_ID, DIR_MEDMON + DIR_SEPERATOR + "dpu");
-		node.put(IMedicPreferences.DIR_CU_ID, DIR_MEDMON + DIR_SEPERATOR + "cluster");
-		node.put(IMedicPreferences.DIR_PATIENT_ID, DIR_MEDMON + DIR_SEPERATOR + "patients");
-		node.put(IMedicPreferences.DIR_TMP_ID, DIR_MEDMON + DIR_SEPERATOR + ".tmp");
+		medmonNode.put(MEDMON_DIR, DIR_MEDMON);
+		medmonNode.put(MEDMON_DPU, DIR_MEDMON + DIR_SEPERATOR + "dpu");
+		medmonNode.put(MEDMON_PATIENT, DIR_MEDMON + DIR_SEPERATOR + "patients");
+		medmonNode.put(MEDMON_TMP, DIR_MEDMON + DIR_SEPERATOR + ".tmp");
+		try {
+			medmonNode.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
 		
+		//Test
+		System.err.println("Node: " + medmonNode);
+		try {
+			System.err.println("Keys: " + Arrays.toString(medmonNode.keys()));
+			System.err.println("Children: " + Arrays.toString(medmonNode.childrenNames()));
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+		
+		IEclipsePreferences dbNode = ConfigurationScope.INSTANCE.getNode(DATABASE_NODE);
+		dbNode.put(DATABASE_DIR, DIR_MEDMON + DIR_SEPERATOR + "db");
 	}	
 
 }

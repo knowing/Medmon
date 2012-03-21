@@ -31,7 +31,8 @@ Export-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
  de.lmu.ifi.dbs.medmon.base.ui.widgets,
  de.lmu.ifi.dbs.medmon.base.ui.wizard,
  de.lmu.ifi.dbs.medmon.base.ui.wizard.pages
-Import-Package: org.eclipse.sapphire.java,
+Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
+ org.eclipse.sapphire.java,
  org.eclipse.sapphire.modeling,
  org.eclipse.sapphire.modeling.annotations,
  org.eclipse.sapphire.modeling.xml,
@@ -60,3 +61,4 @@ Import-Package: org.eclipse.sapphire.java,
  scala.runtime;version="[2.9.0.1,2.9.3.0]",
  scala.util;version="[2.9.0.1,2.9.3.0]"
 Bundle-Vendor: LMU Munich - Database Systems Group
+

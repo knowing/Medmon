@@ -5,15 +5,18 @@ Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.derby;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Eclipse-BundleShape: dir
-Export-Package: de.lmu.ifi.dbs.medmon.database.model
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
- org.eclipse.ui;bundle-version="3.6.0",
- javax.persistence;bundle-version="2.0.1",
- org.eclipse.persistence.jpa;bundle-version="2.1.1"
+Export-Package: de.lmu.ifi.dbs.medmon.database.entity
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ javax.persistence;bundle-version="2.0.3",
+ org.eclipse.persistence.jpa;bundle-version="2.3.0",
+ org.eclipse.persistence.antlr;bundle-version="2.3.0",
+ org.eclipse.persistence.asm;bundle-version="2.3.0",
+ org.junit;bundle-version="4.8.2";resolution:=optional
 Meta-Persistence: META-INF/persistence.xml
-Import-Package: org.osgi.service.jdbc;version="1.0.0",
+Import-Package: org.apache.derby.database,
+ org.apache.derby.jdbc,
+ org.osgi.service.jdbc;version="1.0.0",
  org.osgi.service.jpa;version="1.0.0"
 Bundle-Vendor: LMU Munich - Database Systems Group
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: de.lmu.ifi.dbs.medmon.database.Activator

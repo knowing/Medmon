@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Text;
 import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
@@ -44,7 +44,7 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 	private Patient				selectedPatient				= null;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgewählt";
+	private static String		ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgewï¿½hlt";
 
 	/**
 	 * Create the wizard.

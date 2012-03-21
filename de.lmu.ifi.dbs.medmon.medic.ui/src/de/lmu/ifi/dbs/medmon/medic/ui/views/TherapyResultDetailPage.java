@@ -36,12 +36,11 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
@@ -56,21 +55,14 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private Scale						scaleSuccess;
 	private CDateTime					dateTimestamp;
 	private Listener					successChangedListener;
-	private IGlobalSelectionProvider	selectionProvider;
-	private EntityManager				workerEM;
 	private Text						textComment;
-	private TherapyResult				localTherapyResultSelection;
+	private IGlobalSelectionProvider	selectionProvider;
+	
 	private boolean						isDirty				= false;
 	private boolean						ignoreModification	= false;
-	private DirtyListener				dirtyListener		= new DirtyListener();
 
-	/**
-	 * Create the details page.
-	 */
-	public TherapyResultDetailPage() {
-		// Create the details page
-
-	}
+	private EntityManager				workerEM;
+	private TherapyResult				localTherapyResultSelection;
 
 	/**
 	 * Initialize the details page.
@@ -87,7 +79,8 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	 * @param parent
 	 */
 	public void createContents(Composite parent) {
-		workerEM = JPAUtil.createEntityManager();
+		workerEM = Activator.getEntityManagerService().createEntityManager();
+		DirtyListener dirtyListener = new DirtyListener();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
@@ -176,7 +169,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				Path path = Paths.get(selection.getData().getFile());
 				if (!Files.exists(path))
 					return;
-				if (selection.getData().getType().equals(IPatientService.TRAIN))
+				if (selection.getData().getType().equals(Data.TRAIN))
 					return;
 
 				List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
@@ -203,7 +196,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		textComment = new Text(groupComment, SWT.BORDER);
 		toolkit.adapt(textComment, true, true);
 		textComment.addModifyListener(dirtyListener);
-		
+
 		Composite compositeLinks = new Composite(composite, SWT.NONE);
 		compositeLinks.setLayout(new GridLayout(3, false));
 		compositeLinks.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -221,11 +214,17 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				// saved.
 				commit(true);
 
-				try {
-					Activator.getDBModelService().deleteTherapyResult(localTherapyResultSelection);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				workerEM.getTransaction().begin();
+				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
+				workerEM.remove(mTherapyResult);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
+
+				localTherapyResultSelection = null;
+				selectionProvider.setSelection(TherapyResult.class, null);
+				selectionProvider.updateSelection(Patient.class);
+
+				// TODO: Remove the corresponding data from disc
 			}
 		});
 
@@ -276,10 +275,10 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 		TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
 		workerEM.clear();
-		
+
 		ignoreModification = true;
-		textTherapy.setText(mTherapyResult.getCaption());
-		textComment.setText(mTherapyResult.getComment());
+		textTherapy.setText(mTherapyResult.getCaption() == null ? "<Neues Ergebnis>" : mTherapyResult.getCaption());
+		textComment.setText(mTherapyResult.getComment() == null ? "" : mTherapyResult.getComment());
 		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
 		scaleSuccess.setSelection(mTherapyResult.getSuccess());
 		ignoreModification = false;

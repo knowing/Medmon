@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.lmu.ifi.dbs.medmon.database.model.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 
 public class DataAdapterFactory implements IAdapterFactory {
 

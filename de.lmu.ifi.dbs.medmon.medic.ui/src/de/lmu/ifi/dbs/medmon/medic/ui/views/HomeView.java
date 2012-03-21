@@ -21,7 +21,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
@@ -104,7 +104,7 @@ public class HomeView extends ViewPart {
 
 		linkOpenLastPatient = new Link(container, SWT.NONE);
 		toolkit.adapt(linkOpenLastPatient, true, true);
-		linkOpenLastPatient.setText("<a>letzten Patienten öffnen</a>");
+		linkOpenLastPatient.setText("<a>letzten Patienten ï¿½ffnen</a>");
 		linkOpenLastPatient.setEnabled(false);
 		linkOpenLastPatient.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -159,7 +159,7 @@ public class HomeView extends ViewPart {
 
 	private void refreshPatientLink(Patient selection) {
 		if (selection == null) {
-			linkOpenLastPatient.setText("<a>letzten Patienten öffnen</a>");
+			linkOpenLastPatient.setText("<a>letzten Patienten ï¿½ffnen</a>");
 			linkOpenLastPatient.setEnabled(false);
 			return;
 		}
@@ -167,7 +167,7 @@ public class HomeView extends ViewPart {
 		selection = workerEM.find(Patient.class, selection.getId());
 		workerEM.clear();
 
-		linkOpenLastPatient.setText("<a>" + selection.getLastname() + " " + selection.getFirstname() + " öffnen</a>");
+		linkOpenLastPatient.setText("<a>" + selection.getLastname() + " " + selection.getFirstname() + " ï¿½ffnen</a>");
 		linkOpenLastPatient.setEnabled(true);
 	};
 

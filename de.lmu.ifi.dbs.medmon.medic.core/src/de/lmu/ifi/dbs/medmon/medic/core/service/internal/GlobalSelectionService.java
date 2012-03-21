@@ -8,14 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
@@ -65,17 +64,14 @@ public class GlobalSelectionService implements IGlobalSelectionService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void loadPatient() {
 		IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
-		int patientId = preferenceStore.getInt(Patient.class.toString());
-
-		Query patientQuery = workerEM.createNamedQuery("Patient.findById");
-		List<Patient> results = patientQuery.setParameter("id", patientId).getResultList();
+		long patientId = preferenceStore.getLong(Patient.class.toString());
+		Patient patient = workerEM.find(Patient.class, patientId);
 		workerEM.clear();
 
-		if (!results.isEmpty()) {
-			setSelection(Patient.class, results.get(0));
+		if (patient != null) {
+			setSelection(Patient.class, patient);
 		}
 	}
 
