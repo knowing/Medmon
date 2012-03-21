@@ -54,10 +54,10 @@ public class Patient {
 	@Temporal(TemporalType.DATE)
 	private Date				therapystart;
 
-	@OneToMany(mappedBy = "patient", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
 	private List<Therapy>		therapies;
 	
-	@OneToMany(mappedBy = "patient", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
 	private List<Data> data;
 
 	transient boolean remove;
@@ -184,11 +184,10 @@ public class Patient {
 	public void removeData(Data d) {
 		data.remove(d);
 	}
-
+	
 	@Override
 	public String toString() {
-		return "Patient [id=" + id + ", firstname=" + firstname + ", lastname=" + lastname + ", therapies=" + printTherapies() + ", data="
-				+ printData() + "]";
+		return getFirstname() + " " + getLastname();
 	}
 
 	private String printTherapies() {

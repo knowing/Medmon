@@ -56,21 +56,14 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private Scale						scaleSuccess;
 	private CDateTime					dateTimestamp;
 	private Listener					successChangedListener;
-	private IGlobalSelectionProvider	selectionProvider;
-	private EntityManager				workerEM;
 	private Text						textComment;
-	private TherapyResult				localTherapyResultSelection;
+	private IGlobalSelectionProvider	selectionProvider;
+	
 	private boolean						isDirty				= false;
 	private boolean						ignoreModification	= false;
-	private DirtyListener				dirtyListener		= new DirtyListener();
 
-	/**
-	 * Create the details page.
-	 */
-	public TherapyResultDetailPage() {
-		// Create the details page
-
-	}
+	private EntityManager				workerEM;
+	private TherapyResult				localTherapyResultSelection;
 
 	/**
 	 * Initialize the details page.
@@ -87,7 +80,8 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	 * @param parent
 	 */
 	public void createContents(Composite parent) {
-		workerEM = JPAUtil.createEntityManager();
+		workerEM = Activator.getEntityManagerService().createEntityManager();
+		DirtyListener dirtyListener = new DirtyListener();
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		FormToolkit toolkit = managedForm.getToolkit();
 		parent.setLayout(new FillLayout());
@@ -221,13 +215,17 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				// saved.
 				commit(true);
 
-				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
-				tempEM.getTransaction().begin();
-				tempEM.remove(localTherapyResultSelection);
-				tempEM.getTransaction().commit();
-				tempEM.close();
-				
-				//TODO: Remove the corresponding data from disc
+				workerEM.getTransaction().begin();
+				TherapyResult mTherapyResult = workerEM.find(TherapyResult.class, localTherapyResultSelection.getId());
+				workerEM.remove(mTherapyResult);
+				workerEM.getTransaction().commit();
+				workerEM.clear();
+
+				localTherapyResultSelection = null;
+				selectionProvider.setSelection(TherapyResult.class, null);
+				selectionProvider.updateSelection(Patient.class);
+
+				// TODO: Remove the corresponding data from disc
 			}
 		});
 
@@ -280,7 +278,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		workerEM.clear();
 
 		ignoreModification = true;
-		textTherapy.setText(mTherapyResult.getCaption() == null ? "<Neues Ergebnis>" : mTherapyResult.getCaption()); 
+		textTherapy.setText(mTherapyResult.getCaption() == null ? "<Neues Ergebnis>" : mTherapyResult.getCaption());
 		textComment.setText(mTherapyResult.getComment() == null ? "" : mTherapyResult.getComment());
 		dateTimestamp.setSelection(mTherapyResult.getTimestamp());
 		scaleSuccess.setSelection(mTherapyResult.getSuccess());
