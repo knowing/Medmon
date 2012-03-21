@@ -55,12 +55,12 @@ public class CreatePatientWizard extends Wizard implements IWorkbenchWizard, IEx
 			tempEM.getTransaction().commit();
 			tempEM.close();
 			
-			Activator.getPatientService().initializePatient(mPatient);
+//			Activator.getPatientService().initializePatient(mPatient);
 			IGlobalSelectionProvider SelectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 			SelectionProvider.setSelection(Patient.class, mPatient);
 			SelectionProvider.unregister();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			MessageDialog.openError(getShell(), "Patient konnte nicht erstellt werden", e.getMessage());
 			return false;

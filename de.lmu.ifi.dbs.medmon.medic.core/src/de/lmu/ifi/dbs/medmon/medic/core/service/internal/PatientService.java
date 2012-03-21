@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;

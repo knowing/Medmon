@@ -2,13 +2,19 @@ package de.lmu.ifi.dbs.medmon.medic.core.preferences;
 
 public interface IMedicPreferences {
 	
-	public static final String DIR_USER_HOME_ID = "DIR_USER_HOME";
-	public static final String DIR_SEPERATOR_ID = "DIR_SEPERATOR";
-	public static final String DIR_MEDMON_ID = "DIR_MEDMON";
+	public static final String MEDMON_NODE = "medmon";
+	public static final String MEDMON_DIR = "directory";
+	public static final String MEDMON_PATIENT = "patient";
+	public static final String MEDMON_DPU = "dpu";
+	public static final String MEDMON_TMP = "tmp";
 	
-	public static final String DIR_DERBY_ID = "DIR_DERBY";
-	public static final String DIR_DPU_ID = "DIR_DPU";
-	public static final String DIR_CU_ID = "DIR_CU";
-	public static final String DIR_PATIENT_ID = "DIR_PATIENT";
-	public static final String DIR_TMP_ID = "DIR_TEMP";
+	
+	/* =============================== */
+	/* ========== Database =========== */
+	/* =============================== */
+	
+	public static final String DATABASE_NODE = "database";
+	public static final String DATABASE_DIR = "directory";
+	public static final String DATABASE_USER = "user";
+	public static final String DATABASE_PASSWORD = "password";
 }

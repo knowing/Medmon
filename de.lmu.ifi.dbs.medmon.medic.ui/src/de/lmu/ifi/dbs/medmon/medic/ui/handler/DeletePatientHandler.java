@@ -44,7 +44,7 @@ public class DeletePatientHandler extends AbstractHandler {
 			try {
 				deletePatient(selection);
 				selectionProvider.setSelection(Patient.class, null);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				MessageDialog.openError(shell, "Fehler beim loeschen des Patienten", e.getMessage());
 				e.printStackTrace();
 			}
@@ -57,10 +57,11 @@ public class DeletePatientHandler extends AbstractHandler {
 	private void deletePatient(Patient patient) throws IOException {
 		EntityManager workerEM = Activator.getEntityManagerService().createEntityManager();
 		workerEM.getTransaction().begin();
-		workerEM.remove(patient);
+		Patient mPatient = workerEM.find(Patient.class, patient.getId());
+		workerEM.remove(mPatient);
 		workerEM.getTransaction().commit();
 		workerEM.close();
-		Activator.getPatientService().releasePatient(patient);
+//		Activator.getPatientService().releasePatient(patient);
 	}
 
 }

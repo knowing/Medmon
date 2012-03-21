@@ -1,5 +1,17 @@
 package de.lmu.ifi.dbs.medmon.database.entity;
 
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.walkFileTree;
+
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -13,9 +25,13 @@ import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 @Entity
 @NamedQueries({
@@ -29,6 +45,11 @@ public class Patient {
 
 	public static final short	MALE	= 0;
 	public static final short	FEMALE	= 1;
+
+	public static String		TRAIN	= "train";
+	public static String		RESULT	= "result";
+	public static String		RAW		= "raw";
+	public static String		ROOT	= "root";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,26 +75,73 @@ public class Patient {
 	@Temporal(TemporalType.DATE)
 	private Date				therapystart;
 
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
+	@OneToMany(mappedBy = "patient", cascade = { CascadeType.REMOVE, CascadeType.REFRESH })
 	private List<Therapy>		therapies;
-	
-	@OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE, CascadeType.REFRESH})
-	private List<Data> data;
 
-	transient boolean remove;
+	@OneToMany(mappedBy = "patient", cascade = { CascadeType.REMOVE, CascadeType.REFRESH })
+	private List<Data>			data;
+
+	transient boolean			remove;
 
 	public Patient() {
 	}
 
 	public Patient(String firstname, String lastname, String insuranceId) {
-		this.firstname = firstname;
-		this.lastname = lastname;
-		this.insuranceId = insuranceId;
+		setFirstname(firstname);
+		setLastname(lastname);
+		setInsuranceId(insuranceId);
 	}
-	
+
+	@PrePersist
+	void prePersist() {
+		try {
+			Path path = locatePatient();
+			Path root = createDirectories(path);
+			createDirectory(root.resolve(TRAIN));
+			createDirectory(root.resolve(RESULT));
+			createDirectory(root.resolve(RAW));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new Error("Error while persisting patient", e);
+		}
+	}
+
 	@PreRemove
-	private void preRemove() {
+	void preRemove() {
 		remove = true;
+		Path path = locatePatient();
+		try {
+			walkFileTree(path, new SimpleFileVisitor<Path>() {
+				
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private Path locatePatient() {
+		IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode("medmon");
+		String folder = node.get("patient", null);
+
+		// TODO throw new Error is not good. Try this one
+		// http://www.java2s.com/Tutorial/Java/0355__JPA/EntityListenersPrePersist.htm
+		if (folder == null)
+			throw new Error("No patient folder defined in preference node " + node);
+
+		DecimalFormat df = new DecimalFormat("000000000000");
+		return Paths.get(folder, df.format(getId()));
 	}
 
 	public long getId() {
@@ -91,11 +159,11 @@ public class Patient {
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
 	}
-	
+
 	public String getLastname() {
 		return lastname;
 	}
-	
+
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
@@ -184,7 +252,7 @@ public class Patient {
 	public void removeData(Data d) {
 		data.remove(d);
 	}
-	
+
 	@Override
 	public String toString() {
 		return getFirstname() + " " + getLastname();
@@ -200,7 +268,7 @@ public class Patient {
 		}
 		return sb.append("]").toString();
 	}
-	
+
 	private String printData() {
 		if (getData() == null)
 			return "null";
