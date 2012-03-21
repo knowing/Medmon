@@ -46,11 +46,6 @@ public class Patient {
 	public static final short	MALE	= 0;
 	public static final short	FEMALE	= 1;
 
-	public static String		TRAIN	= "train";
-	public static String		RESULT	= "result";
-	public static String		RAW		= "raw";
-	public static String		ROOT	= "root";
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long				id;
@@ -95,11 +90,11 @@ public class Patient {
 	@PrePersist
 	void prePersist() {
 		try {
-			Path path = locatePatient();
+			Path path = toPath();
 			Path root = createDirectories(path);
-			createDirectory(root.resolve(TRAIN));
-			createDirectory(root.resolve(RESULT));
-			createDirectory(root.resolve(RAW));
+			createDirectory(root.resolve(Data.TRAIN));
+			createDirectory(root.resolve(Data.RESULT));
+			createDirectory(root.resolve(Data.RAW));
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new Error("Error while persisting patient", e);
@@ -109,7 +104,7 @@ public class Patient {
 	@PreRemove
 	void preRemove() {
 		remove = true;
-		Path path = locatePatient();
+		Path path = toPath();
 		try {
 			walkFileTree(path, new SimpleFileVisitor<Path>() {
 				
@@ -131,7 +126,13 @@ public class Patient {
 
 	}
 
-	private Path locatePatient() {
+	/**
+	 * The directory on disc where all patient data is stored.
+	 * Path can be influenced by preferences set in eclipse preference store.
+	 * 
+	 * @return Path to patient folder on disk
+	 */
+	public Path toPath() {
 		IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode("medmon");
 		String folder = node.get("patient", null);
 

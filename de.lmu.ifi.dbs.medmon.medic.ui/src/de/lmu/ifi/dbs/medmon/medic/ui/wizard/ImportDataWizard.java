@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
@@ -65,10 +64,10 @@ public class ImportDataWizard extends Wizard {
 		if ((options & IMPORT_RAW) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
-				DataStoreOutput output = patientService.store(selectedPatient, selectedSensor, IPatientService.RAW, selectedURI);
+				Data data = patientService.store(selectedPatient, selectedSensor, Data.RAW, selectedURI);
 				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 				selectionProvider.setSelection(Patient.class, selectedPatient);
-				selectionProvider.setSelection(Data.class, output.dataEntity);
+				selectionProvider.setSelection(Data.class, data);
 				selectionProvider.unregister();
 				PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
 						PlatformUI.getWorkbench().getActiveWorkbenchWindow());

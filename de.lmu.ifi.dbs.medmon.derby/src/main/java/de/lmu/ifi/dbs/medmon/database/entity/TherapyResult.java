@@ -36,12 +36,12 @@ public class TherapyResult {
 	@Column
 	private int		success;
 
-	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REFRESH })
+	@OneToOne(cascade = { CascadeType.REFRESH })
 	private Data	data;
 
-	@ManyToOne(cascade = {CascadeType.REFRESH})
+	@ManyToOne(cascade = { CascadeType.REFRESH })
 	private Therapy	therapy;
-	
+
 	protected TherapyResult() {
 	}
 

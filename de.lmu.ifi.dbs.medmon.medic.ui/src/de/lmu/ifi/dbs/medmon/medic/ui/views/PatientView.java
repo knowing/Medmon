@@ -438,7 +438,6 @@ public class PatientView extends ViewPart {
 		dataTableViewer.addFilter(new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				System.out.println("select");
 				String filter = comboFilter.getText().toLowerCase();
 				Data d = (Data) element;
 				if (d.getSensor().getName().toLowerCase().contains(filter))
@@ -453,21 +452,16 @@ public class PatientView extends ViewPart {
 		itemDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Data mData = selectionProvider.getSelection(Data.class);
-				if (mData == null)
+				Data data = selectionProvider.getSelection(Data.class);
+				if (data == null)
 					return;
 
-				try {
-					EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
-					tempEM.getTransaction().begin();
-					tempEM.remove(mData);
-					tempEM.getTransaction().commit();
-					tempEM.close();
-					Path path = Activator.getPatientService().locateFile(mData);
-					Files.deleteIfExists(path);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+				tempEM.getTransaction().begin();
+				Data mData = tempEM.find(Data.class, data.getId());
+				tempEM.remove(mData);
+				tempEM.getTransaction().commit();
+				tempEM.close();
 
 				selectionProvider.updateSelection(Patient.class);
 				selectionProvider.setSelection(Data.class, null);

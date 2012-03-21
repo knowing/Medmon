@@ -36,12 +36,11 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
@@ -170,7 +169,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				Path path = Paths.get(selection.getData().getFile());
 				if (!Files.exists(path))
 					return;
-				if (selection.getData().getType().equals(IPatientService.TRAIN))
+				if (selection.getData().getType().equals(Data.TRAIN))
 					return;
 
 				List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -72,15 +73,15 @@ public class TherapyResultService implements ITherapyResultService {
 		// TODO Try/Catch block to rollback actions on failure
 
 		// Resolve data location -> inputfile
-		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
-		Path inputFile = patientService.locateFilename(data, IPatientService.ROOT);
+		Path execPath = patient.toPath();
+		Path inputFile = data.toPath();
 
 		// Configure properties to run with inputFile
 		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
 
 		// Generate Data entity which stores the result
-		DataStoreOutput store = createData(patient, data);
-		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
+		Data resultData = createData(patient, data);
+		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(resultData.toPath()));
 
 		// Finally run the DPU
 		executeDPU(execPath, configuredDPU, outputMap);
@@ -88,7 +89,7 @@ public class TherapyResultService implements ITherapyResultService {
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
 		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",store.dataEntity, therapy);
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",resultData, therapy);
 		tempEm.persist(result);
 		tempEm.getTransaction().commit();
 		tempEm.close();
@@ -100,19 +101,19 @@ public class TherapyResultService implements ITherapyResultService {
 	public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, ISensor sensor, URI input)
 			throws Exception {
 		// TODO Try/Catch block to rollback actions on failure
-		Path execPath = patientService.locateDirectory(patient, IPatientService.ROOT);
+		Path execPath = patient.toPath();
 		Path inputFile = Paths.get(input);
 
 		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
 
-		DataStoreOutput store = createData(patient, sensor, input);
-		Map<String, OutputStream> outputMap = createOutputMap(store.outputStream);
+		Data data = createData(patient, sensor, input);
+		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
 
 		executeDPU(execPath, configuredDPU, outputMap);
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
 		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",store.dataEntity, therapy);
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",data, therapy);
 		tempEm.persist(result);
 		tempEm.getTransaction().commit();
 		tempEm.close();
@@ -217,7 +218,7 @@ public class TherapyResultService implements ITherapyResultService {
 					if (key.equals(INodeProperties.SERIALIZE()) || key.equals(INodeProperties.DESERIALIZE())) {
 						String serializePath = p.getValue().getContent();
 						Path serializeFile = Paths.get(serializePath).getFileName();
-						Path resolvedFile = Paths.get(IPatientService.TRAIN).resolve(serializeFile);
+						Path resolvedFile = Paths.get(Data.TRAIN).resolve(serializeFile);
 						p.setValue(resolvedFile.toString());
 						log.debug("Set Processor[" + node.getId().getContent() + "] (DE)SERIALIZE to " + resolvedFile + " ["
 								+ p.getValue().getContent() + "]");
@@ -230,25 +231,24 @@ public class TherapyResultService implements ITherapyResultService {
 
 	private Map<String, OutputStream> createOutputMap(OutputStream outputStream) throws IOException {
 		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
-		// IPatientService.RESULT -> document this somewhere, very important!
-		outputMap.put(IPatientService.RESULT, outputStream);
+		// Data.RESULT -> document this somewhere, very important!
+		outputMap.put(Data.RESULT, outputStream);
 		return outputMap;
 	}
 
-	private DataStoreOutput createData(Patient patient, Data data) throws IOException {
-		return patientService.store(patient, data.getSensor(), IPatientService.RESULT, data.getFrom(), data.getTo());
+	private Data createData(Patient patient, Data data) throws IOException {
+		return patientService.store(patient, data.getSensor(), Data.RESULT, data.getFrom(), data.getTo());
 	}
 
-	private DataStoreOutput createData(Patient patient, ISensor sensor, URI input) throws IOException {
+	private Data createData(Patient patient, ISensor sensor, URI input) throws IOException {
 		IConverter converter = sensorManagerService.createConverter(sensor);
 		Sensor sensorEntity = sensorManagerService.loadSensorEntity(sensor);
 		Interval interval = converter.getInterval();
-		return patientService
-				.store(patient, sensorEntity, IPatientService.RESULT, interval.getStart().toDate(), interval.getEnd().toDate());
+		return patientService.store(patient, sensorEntity, Data.RESULT, interval.getStart().toDate(), interval.getEnd().toDate());
 	}
 
 	protected void activate(ComponentContext context) {
-		log.debug("TherapyResultSerivce started");
+		log.debug("TherapyResultSerivce activated");
 	}
 
 	protected void bindPatientService(IPatientService patientService) {

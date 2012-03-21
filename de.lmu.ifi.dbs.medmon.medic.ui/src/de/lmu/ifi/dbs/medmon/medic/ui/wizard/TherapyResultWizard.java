@@ -12,8 +12,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -28,7 +26,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
@@ -146,7 +143,7 @@ public class TherapyResultWizard extends Wizard {
 		if (((options & SOURCE_SENSOR) | (options & SOURCE_FILE)) != 0) {
 
 			try {
-				data = Activator.getPatientService().store(selectedPatient, selectedSensor, IPatientService.RAW, selectedUri).dataEntity;
+				data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW, selectedUri);
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
 				e.printStackTrace();
@@ -163,18 +160,6 @@ public class TherapyResultWizard extends Wizard {
 				log.debug("Therapy Results created " + results);
 			} catch (Exception e) {
 				e.printStackTrace();
-				try {
-//					Activator.getDBModelService().deleteData(data);
-					Path path = Activator.getPatientService().locateFile(data);
-					Files.deleteIfExists(path);
-					EntityManager tempEM= Activator.getEntityManagerService().createEntityManager();
-					tempEM.getTransaction().begin();
-					tempEM.remove(data);
-					tempEM.getTransaction().commit();
-					tempEM.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 				MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
 				return false;
 			}
@@ -186,20 +171,6 @@ public class TherapyResultWizard extends Wizard {
 				e.printStackTrace();
 			}
 		}
-
-		// This cannot work - if an exception is thrown there is no return type!
-		/*
-		 * try { if(preselectedTherapy != null)
-		 * Activator.getDBModelService().createTherapyResult(data,
-		 * preselectedTherapy); else
-		 * Activator.getDBModelService().createTherapyResult(data,
-		 * therapyPage.getSelectedTherapy() );
-		 * 
-		 * } catch (Exception e) { e.printStackTrace(); try {
-		 * Activator.getDBModelService().deleteData(data);
-		 * Activator.getDBModelService().deleteData(taggedData); } catch
-		 * (IOException e1) { e1.printStackTrace(); } }
-		 */
 
 		return true;
 	}
