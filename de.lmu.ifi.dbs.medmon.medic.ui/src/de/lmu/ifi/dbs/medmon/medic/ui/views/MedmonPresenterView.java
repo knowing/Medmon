@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.factory.UIFactories;
@@ -20,14 +22,13 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 public class MedmonPresenterView extends ViewPart {
 
 	public static final String				ID			= "de.lmu.ifi.dbs.medmon.medic.ui.views.MedmonPresenterView";	//$NON-NLS-1$
+	private static Logger					log			= LoggerFactory.getLogger(ID);
+
 	private UIFactory<Composite>			uiFactory;
 	private ServiceRegistration<UIFactory>	uiFactoryRegistration;
 	private final FormToolkit				formToolkit	= new FormToolkit(Display.getDefault());
 	private Browser							browser;
-	private Composite analyseContent;
-
-	public MedmonPresenterView() {
-	}
+	private Composite						analyseContent;
 
 	/**
 	 * Create contents of the view part.

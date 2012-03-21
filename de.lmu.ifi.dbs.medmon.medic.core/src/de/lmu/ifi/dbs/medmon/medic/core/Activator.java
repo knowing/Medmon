@@ -5,11 +5,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -18,13 +13,11 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -75,9 +68,6 @@ public class Activator extends AbstractUIPlugin {
 		emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
 		emPatientService.open();
 
-		emDBModelService = new ServiceTracker<IDBModelService, IDBModelService>(context, IDBModelService.class, null);
-		emDBModelService.open();
-
 		createApplicationFolders();
 	}
 
@@ -92,7 +82,6 @@ public class Activator extends AbstractUIPlugin {
 		emServiceTracker.close();
 		emSelectionService.close();
 		emPatientService.close();
-		emDBModelService.close();
 		plugin = null;
 		super.stop(context);
 	}
@@ -118,17 +107,13 @@ public class Activator extends AbstractUIPlugin {
 		return emPatientService.getService();
 	}
 
-	public static IDBModelService getDBModelService() {
-		return emDBModelService.getService();
-	}
-
 	private void createApplicationFolders() {
 		IPreferenceStore store = plugin.getPreferenceStore();
 
-		Path root = Paths.get(store.getString(IMedicPreferences.DIR_MEDMON_ID));
+		Path root = Paths.get(store.getString(IMedicPreferences.MEDMON_NODE));
 		try {
 			Files.createDirectory(root);
-			Files.createDirectories(root.resolve(store.getString(IMedicPreferences.DIR_DPU_ID)));
+			Files.createDirectories(root.resolve(store.getString(IMedicPreferences.MEDMON_DPU)));
 		} catch (FileAlreadyExistsException e) {
 			log.debug("Medmon folder already exists");
 		} catch (IOException e) {

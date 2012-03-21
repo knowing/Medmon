@@ -262,6 +262,8 @@ public class SDRConverter extends FileConverter {
 		// Return DateTime(0) to trigger recordEnd method
 		if (day == 48 && hour == 48)
 			return new DateTime(0);
+		if(0 > hour || hour > 24  || 1 > day ||  day > 31 || 1 > month || month > 12 )
+			return new DateTime(0);
 
 		return new DateTime(year, month, day, hour, minute, second).minus(TIME_CORRECTION_BEFORE);
 	}

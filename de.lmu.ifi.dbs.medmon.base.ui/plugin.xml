@@ -5,7 +5,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="de.lmu.ifi.dbs.medmon.sensor.core.ISensor"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.SensorAdapterFactory">
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.SensorWorkbenchAdapter">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -15,7 +15,7 @@
       </factory>
       <factory
             adaptableType="de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.DPUAdapterFactory">
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.DPUColumnAdapter">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -31,7 +31,7 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.database.model.Data"
+            adaptableType="de.lmu.ifi.dbs.medmon.database.entity.Data"
             class="de.lmu.ifi.dbs.medmon.base.ui.adapter.DataAdapterFactory">
          <adapter
                type="de.lmu.ifi.dbs.medmon.base.ui.adapter.IWorkbenchColumnAdapter">
@@ -41,22 +41,22 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.database.model.Therapy"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+            adaptableType="de.lmu.ifi.dbs.medmon.database.entity.Therapy"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapter">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.database.model.TherapyResult"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+            adaptableType="de.lmu.ifi.dbs.medmon.database.entity.TherapyResult"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyResultColumnAdapter">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.lmu.ifi.dbs.medmon.database.model.Patient"
-            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.TherapyColumnAdapterFactory">
+            adaptableType="de.lmu.ifi.dbs.medmon.database.entity.Patient"
+            class="de.lmu.ifi.dbs.medmon.base.ui.adapter.PatientColumnAdapter">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>

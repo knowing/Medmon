@@ -3,7 +3,7 @@
    <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.EntityManagerService"/>
    <reference cardinality="1..1" interface="org.osgi.service.jdbc.DataSourceFactory" name="DataSourceFactory" policy="dynamic" />
    <reference bind="bindEntityManagerFactoryBuilder" cardinality="1..1" interface="org.osgi.service.jpa.EntityManagerFactoryBuilder" name="EntityManagerFactoryBuilder" policy="dynamic" unbind="unbindEntityManagerFactoryBuilder"/>
-   <reference bind="bindEntityManagerFactory" cardinality="0..n" interface="javax.persistence.EntityManagerFactory" name="EntityManagerFactory" policy="dynamic" unbind="unbindEntityManagerFactory"/>
+   <reference bind="bindEntityManagerFactory" cardinality="1..n" interface="javax.persistence.EntityManagerFactory" name="EntityManagerFactory" policy="dynamic" unbind="unbindEntityManagerFactory"/>
    <service>
       <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService"/>
    </service>

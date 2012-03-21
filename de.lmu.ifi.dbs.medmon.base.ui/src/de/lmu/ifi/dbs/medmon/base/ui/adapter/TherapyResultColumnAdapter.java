@@ -1,29 +1,45 @@
 package de.lmu.ifi.dbs.medmon.base.ui.adapter;
 
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 
-public class TherapyResultColumnAdapter implements IWorkbenchAdapter {
+public class TherapyResultColumnAdapter implements IAdapterFactory {
 
-	private static Object[] noChildren = new Object[]{};
+	private static final Class[] types = new Class[] { IWorkbenchAdapter.class };
 	
-	public Object[] getChildren(Object o) {
-		return noChildren;
-	}
-
-	public ImageDescriptor getImageDescriptor(Object object) {
+	@Override
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
+		if(adapterType.equals(IWorkbenchAdapter.class) && adaptableObject instanceof TherapyResult)
+			return new TherapyResultColumnAdapterImpl();
 		return null;
 	}
 
-	public String getLabel(Object o) {
-		return ((TherapyResult)o).getCaption();
+	@Override
+	public Class[] getAdapterList() {
+		return types;
 	}
 
-	public Object getParent(Object o) {
-		return ((TherapyResult)o).getTherapy();
+	public class TherapyResultColumnAdapterImpl implements IWorkbenchAdapter {
+
+		public Object[] getChildren(Object o) {
+			return new Object[]{};
+		}
+
+		public ImageDescriptor getImageDescriptor(Object object) {
+			return null;
+		}
+
+		public String getLabel(Object o) {
+			return ((TherapyResult) o).getCaption();
+		}
+
+		public Object getParent(Object o) {
+			return ((TherapyResult) o).getTherapy();
+		}
+
 	}
 
 }

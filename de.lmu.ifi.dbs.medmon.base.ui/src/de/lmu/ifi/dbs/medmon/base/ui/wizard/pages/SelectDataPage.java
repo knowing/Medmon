@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.knowing.core.swt.factory.CompositeUIFactory;
 import de.lmu.ifi.dbs.knowing.core.util.DPUUtil;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 /**

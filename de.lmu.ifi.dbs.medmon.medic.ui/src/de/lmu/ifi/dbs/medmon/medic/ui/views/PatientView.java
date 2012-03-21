@@ -2,15 +2,12 @@ package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import static de.lmu.ifi.dbs.medmon.medic.ui.Activator.getImageDescriptor;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -18,6 +15,7 @@ import javax.persistence.Query;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -30,13 +28,14 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TabFolder;
@@ -59,23 +58,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
-import de.lmu.ifi.dbs.medmon.database.model.Data;
-import de.lmu.ifi.dbs.medmon.database.model.Patient;
-import de.lmu.ifi.dbs.medmon.database.model.Sensor;
-import de.lmu.ifi.dbs.medmon.database.model.Therapy;
-import de.lmu.ifi.dbs.medmon.database.model.TherapyResult;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
+import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
+import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.jface.viewers.ComboViewer;
 
 public class PatientView extends ViewPart {
 	public PatientView() {
@@ -126,7 +119,7 @@ public class PatientView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
-		workerEM = JPAUtil.createEntityManager();
+		workerEM = Activator.getEntityManagerService().createEntityManager();
 
 		toolkit = new FormToolkit(parent.getDisplay());
 		Composite container = toolkit.createComposite(parent);
@@ -445,7 +438,6 @@ public class PatientView extends ViewPart {
 		dataTableViewer.addFilter(new ViewerFilter() {
 			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
-				System.out.println("select");
 				String filter = comboFilter.getText().toLowerCase();
 				Data d = (Data) element;
 				if (d.getSensor().getName().toLowerCase().contains(filter))
@@ -456,19 +448,20 @@ public class PatientView extends ViewPart {
 
 		Menu popUpMenu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 		MenuItem itemDelete = new MenuItem(popUpMenu, SWT.PUSH);
-		itemDelete.setText("löschen");
+		itemDelete.setText("lï¿½schen");
 		itemDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Data mData = selectionProvider.getSelection(Data.class);
-				if (mData == null)
+				Data data = selectionProvider.getSelection(Data.class);
+				if (data == null)
 					return;
 
-				try {
-					Activator.getDBModelService().deleteData(mData);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+				tempEM.getTransaction().begin();
+				Data mData = tempEM.find(Data.class, data.getId());
+				tempEM.remove(mData);
+				tempEM.getTransaction().commit();
+				tempEM.close();
 
 				selectionProvider.updateSelection(Patient.class);
 				selectionProvider.setSelection(Data.class, null);

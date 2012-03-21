@@ -8,6 +8,12 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
+/**
+ * 
+ * @author Nepomuk Seiler
+ * @version 0.1
+ * @since 2011
+ */
 public class ApplicationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	/**
@@ -22,14 +28,14 @@ public class ApplicationPreferencePage extends FieldEditorPreferencePage impleme
 	 */
 	@Override
 	protected void createFieldEditors() {
-		addField(new DirectoryFieldEditor(IMedicPreferences.DIR_MEDMON_ID, "Programmordner", getFieldEditorParent()));
+		addField(new DirectoryFieldEditor(IMedicPreferences.MEDMON_DIR, "Programmordner", getFieldEditorParent()));
 	}
 	
 	@Override
 	protected void checkState() {
 		super.checkState();
-		String defaultValue = getPreferenceStore().getDefaultString(IMedicPreferences.DIR_MEDMON_ID);
-		String value = getPreferenceStore().getString(IMedicPreferences.DIR_MEDMON_ID);
+		String defaultValue = getPreferenceStore().getDefaultString(IMedicPreferences.MEDMON_DIR);
+		String value = getPreferenceStore().getString(IMedicPreferences.MEDMON_DIR);
 		if(!defaultValue.equals(value)) {
 			setErrorMessage("Sie duerfen das Programmverzeichnis nicht aendern");
 			setValid(false);
