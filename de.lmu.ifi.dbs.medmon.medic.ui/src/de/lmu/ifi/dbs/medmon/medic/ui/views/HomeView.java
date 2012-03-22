@@ -79,13 +79,13 @@ public class HomeView extends ViewPart {
 		gl_composite.marginHeight = 0;
 		composite.setLayout(gl_composite);
 
-		Link link = new Link(composite, SWT.NONE);
-		toolkit.adapt(link, true, true);
-		link.setText("<a>import und Analyse von Sensor X</a>");
+		Link linkImportAndAnalyze = new Link(composite, SWT.NONE);
+		toolkit.adapt(linkImportAndAnalyze, true, true);
+		linkImportAndAnalyze.setText("<a>import und Analyse von Sensor X</a>");
 
-		Link link_1 = new Link(composite, SWT.NONE);
-		toolkit.adapt(link_1, true, true);
-		link_1.setText("<a>import von Sensor X</a>");
+		Link linkImport = new Link(composite, SWT.NONE);
+		toolkit.adapt(linkImport, true, true);
+		linkImport.setText("<a>import von Sensor X</a>");
 
 		ImageHyperlink analyse = toolkit.createImageHyperlink(container, SWT.NONE);
 		analyse.setText("Patientenverwaltung");
@@ -104,7 +104,7 @@ public class HomeView extends ViewPart {
 
 		linkOpenLastPatient = new Link(container, SWT.NONE);
 		toolkit.adapt(linkOpenLastPatient, true, true);
-		linkOpenLastPatient.setText("<a>letzten Patienten �ffnen</a>");
+		linkOpenLastPatient.setText("<a>letzten Patienten \u00F6ffnen</a>"); // \u00F6ffnen
 		linkOpenLastPatient.setEnabled(false);
 		linkOpenLastPatient.addSelectionListener(new SelectionAdapter() {
 			@Override
