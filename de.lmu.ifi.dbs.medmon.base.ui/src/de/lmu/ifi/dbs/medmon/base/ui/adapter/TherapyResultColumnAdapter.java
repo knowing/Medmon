@@ -6,6 +6,12 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 
+/**
+ *
+ * @author Nepomuk Seiler
+ * @version 0.1
+ * @since 2011
+ */
 public class TherapyResultColumnAdapter implements IAdapterFactory {
 
 	private static final Class[] types = new Class[] { IWorkbenchAdapter.class };

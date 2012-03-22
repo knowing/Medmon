@@ -91,7 +91,7 @@ public class SelectDPUPage extends WizardPage {
 
 		Button bDelete = new Button(container, SWT.NONE);
 		bDelete.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
-		bDelete.setText("Loeschen");
+		bDelete.setText("L\u00F6schen");
 
 		Button bDetail = new Button(container, SWT.NONE);
 		bDetail.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));

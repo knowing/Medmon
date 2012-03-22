@@ -11,9 +11,11 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.RollbackException;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -448,23 +450,28 @@ public class PatientView extends ViewPart {
 
 		Menu popUpMenu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 		MenuItem itemDelete = new MenuItem(popUpMenu, SWT.PUSH);
-		itemDelete.setText("l�schen");
+		itemDelete.setText("l\u00F6schen");
 		itemDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Data data = selectionProvider.getSelection(Data.class);
 				if (data == null)
 					return;
+				try {
+					EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+					tempEM.getTransaction().begin();
+					Data mData = tempEM.find(Data.class, data.getId());
+					tempEM.remove(mData);
+					tempEM.getTransaction().commit();
+					tempEM.close();
 
-				EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
-				tempEM.getTransaction().begin();
-				Data mData = tempEM.find(Data.class, data.getId());
-				tempEM.remove(mData);
-				tempEM.getTransaction().commit();
-				tempEM.close();
+					selectionProvider.updateSelection(Patient.class);
+					selectionProvider.setSelection(Data.class, null);
+				} catch (RollbackException exc) {
+					MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+							"Daten k\u00F6nnen nicht gel\u00F6scht werden", "Sie m\u00fcssen erst das Therapieergebnis l\u00F6schen");
+				}
 
-				selectionProvider.updateSelection(Patient.class);
-				selectionProvider.setSelection(Data.class, null);
 			}
 		});
 		dataTable.setMenu(popUpMenu);

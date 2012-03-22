@@ -71,7 +71,7 @@ public class SensorTableViewer extends TableViewer {
 
 				DirectoryDialog dlg = new DirectoryDialog(shell);
 				dlg.setText("Standard-Pfad");
-				dlg.setMessage("w�hlen sie den neuen Standard-Pfad f�r diesen Sensor aus!");
+				dlg.setMessage("w\u00e4hlen sie den neuen Standard-Pfad f\u00fcr diesen Sensor aus!");
 				String dir = dlg.open();
 				if (dir != null) {
 					Sensor mSensor = Activator.getSensorManagerService().loadSensorEntity(selection);

@@ -4,15 +4,14 @@ import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_R
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_TRAINING;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.NO_OPTION;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.PATIENT_SELECTED;
-import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_SENSOR;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_FILE;
+import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_SENSOR;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -29,7 +28,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportDataWizard;
 
 public class ImportDataPatientAndTypePage extends WizardPage implements IValidationPage {
 	private Text				textLastname;
@@ -44,7 +42,7 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 	private Patient				selectedPatient				= null;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgew�hlt";
+	private final static String	ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgew\u00e4hlt";
 
 	/**
 	 * Create the wizard.
@@ -56,15 +54,17 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 	}
 
 	/**
-	 * WIZZARD-GET: get selected Patient 
+	 * WIZZARD-GET: get selected Patient
+	 * 
 	 * @return
 	 */
 	public Patient getSelectedPatient() {
 		return selectedPatient;
 	}
-	
+
 	/**
 	 * WIZZARD-GET: get selected Options
+	 * 
 	 * @return
 	 */
 	public int getOption() {
@@ -86,6 +86,7 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 
 	/**
 	 * WIZZARD-INIT:
+	 * 
 	 * @return
 	 */
 	private void initialize() {
@@ -93,7 +94,7 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
 		selectPatient(selectedPatient);
-		
+
 		checkContents();
 	}
 

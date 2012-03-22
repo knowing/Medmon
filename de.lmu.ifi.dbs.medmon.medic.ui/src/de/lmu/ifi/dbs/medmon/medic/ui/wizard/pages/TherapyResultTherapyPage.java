@@ -27,10 +27,7 @@ import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
-import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class TherapyResultTherapyPage extends WizardPage implements IValidationPage {
 
@@ -38,7 +35,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	private Therapy				selectedTherapy;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgew�hlt";
+	private final static String	ERROR_NO_THERAPY_SELECTED	= "Keine Therapie ausgew\u00e4hlt";
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmTherapy;
@@ -49,7 +46,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	 */
 	public TherapyResultTherapyPage() {
 		super("wizardPage");
-		setTitle("Therapie ausw�hlen");
+		setTitle("Therapie ausw\u00e4hlen");
 		setDescription("<missing>");
 	}
 
@@ -80,7 +77,6 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	 * 
 	 * @param parent
 	 */
-	@SuppressWarnings("unchecked")
 	public void createControl(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NULL);

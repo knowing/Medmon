@@ -37,7 +37,7 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 	private SortedSet<String>	errors					= new TreeSet<String>();
 	private Table				table;
 
-	private String				ERROR_NO_DPU_SELECTED	= "Kein Algorithmus ausgew�hlt";
+	private final static String	ERROR_NO_DPU_SELECTED	= "Kein Algorithmus ausgew\u00e4hlt";
 
 	/**
 	 * Create the wizard.
@@ -104,8 +104,8 @@ public class SelectAndConfigureDPUPage extends WizardPage implements IValidation
 	@Override
 	public void checkContents() {
 
-		selectedDPU = JFaceUtil.initializeViewerSelection(IDataProcessingUnit.class,dpuViewer);
-		
+		selectedDPU = JFaceUtil.initializeViewerSelection(IDataProcessingUnit.class, dpuViewer);
+
 		if (selectedDPU == null)
 			errors.add(ERROR_NO_DPU_SELECTED);
 		else

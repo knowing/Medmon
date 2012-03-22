@@ -31,7 +31,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	private URI					selectedURI;
 
 	private SortedSet<String>	errors					= new TreeSet<String>();
-	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgew�hlt";
+	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgew\u00e4hlt";
 
 	private TableViewer			tableViewer;
 	private TableViewerColumn	clmViewerFile;

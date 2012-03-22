@@ -29,8 +29,8 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	private boolean				isDirectorySectionEnabled	= false;
 	private SortedSet<String>	errors						= new TreeSet<String>();
 
-	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgew�hlt";
-	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgew�hlt";
+	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgew\u00e4hlt";
+	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgew\u00e4hlt";
 	private Button				btnChooseDirectory;
 	private SensorTableViewer	sensorTableViewer;
 	

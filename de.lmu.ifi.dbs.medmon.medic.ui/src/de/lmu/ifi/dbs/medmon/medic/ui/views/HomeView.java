@@ -104,7 +104,7 @@ public class HomeView extends ViewPart {
 
 		linkOpenLastPatient = new Link(container, SWT.NONE);
 		toolkit.adapt(linkOpenLastPatient, true, true);
-		linkOpenLastPatient.setText("<a>letzten Patienten \u00F6ffnen</a>"); // \u00F6ffnen
+		linkOpenLastPatient.setText("<a>letzten Patienten \u00F6ffnen</a>");
 		linkOpenLastPatient.setEnabled(false);
 		linkOpenLastPatient.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -159,7 +159,7 @@ public class HomeView extends ViewPart {
 
 	private void refreshPatientLink(Patient selection) {
 		if (selection == null) {
-			linkOpenLastPatient.setText("<a>letzten Patienten �ffnen</a>");
+			linkOpenLastPatient.setText("<a>letzten Patienten \u00F6ffnen</a>");
 			linkOpenLastPatient.setEnabled(false);
 			return;
 		}
@@ -167,7 +167,7 @@ public class HomeView extends ViewPart {
 		selection = workerEM.find(Patient.class, selection.getId());
 		workerEM.clear();
 
-		linkOpenLastPatient.setText("<a>" + selection.getLastname() + " " + selection.getFirstname() + " �ffnen</a>");
+		linkOpenLastPatient.setText("<a>" + selection.getLastname() + " " + selection.getFirstname() + " \u00F6ffnen</a>");
 		linkOpenLastPatient.setEnabled(true);
 	};
 

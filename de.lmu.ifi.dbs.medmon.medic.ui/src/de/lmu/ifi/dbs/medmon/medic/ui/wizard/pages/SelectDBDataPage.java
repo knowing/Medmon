@@ -155,7 +155,7 @@ public class SelectDBDataPage extends WizardPage {
 
 		Button bDelete = new Button(buttonPanel, SWT.NONE);
 		bDelete.setLayoutData(new RowData(70, SWT.DEFAULT));
-		bDelete.setText("Loeschen");
+		bDelete.setText("L\u00F6schen");
 
 		Button bExport = new Button(buttonPanel, SWT.NONE);
 		bExport.setLayoutData(new RowData(70, SWT.DEFAULT));

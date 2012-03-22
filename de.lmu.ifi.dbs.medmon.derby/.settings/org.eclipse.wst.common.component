@@ -3,6 +3,5 @@
     <wb-module deploy-name="de.lmu.ifi.dbs.medmon.derby">
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/src/test/java"/>
-        <wb-resource deploy-path="/" source-path="/src/resources"/>
     </wb-module>
 </project-modules>

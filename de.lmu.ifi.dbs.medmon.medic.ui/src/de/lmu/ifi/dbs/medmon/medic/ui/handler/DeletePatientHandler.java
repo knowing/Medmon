@@ -37,15 +37,15 @@ public class DeletePatientHandler extends AbstractHandler {
 			selection = DialogFactory.openPatientSelectionDialog(HandlerUtil.getActiveShell(event));
 		}
 		
-		boolean option = MessageDialog.openConfirm(shell, "Patienten l�schen?",
-				"Sind sie sicher, dass sie den ausgew�hlten Patienten l�schen wollen ?");
+		boolean option = MessageDialog.openConfirm(shell, "Patienten l\u00F6schen?",
+				"Sind sie sicher, dass sie den ausgew\u00e4hlten Patienten l\u00F6schen wollen ?");
 
 		if (option) {
 			try {
 				deletePatient(selection);
 				selectionProvider.setSelection(Patient.class, null);
 			} catch (Exception e) {
-				MessageDialog.openError(shell, "Fehler beim loeschen des Patienten", e.getMessage());
+				MessageDialog.openError(shell, "Fehler beim l\u00F6schen des Patienten", e.getMessage());
 				e.printStackTrace();
 			}
 		}

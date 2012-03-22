@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
+import java.util.Date;
+
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -88,28 +90,25 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		toolkit.paintBordersFor(tree);
 		therapiesViewer.setComparator(new ViewerComparator() {
-			private String	empty	= new String();
-
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
-
-				String o1, o2;
-
+				Date d1, d2;
 				if (e1 instanceof Therapy)
-					o1 = ((Therapy) e1).getCaption();
+					d1 = ((Therapy) e1).getTherapyStart();
 				else if (e1 instanceof TherapyResult)
-					o1 = ((TherapyResult) e1).getCaption();
+					d1 = ((TherapyResult) e1).getTimestamp();
 				else
-					o1 = empty;
-
+					d1 = new Date();
+				
 				if (e2 instanceof Therapy)
-					o2 = ((Therapy) e2).getCaption();
+					d2 = ((Therapy) e2).getTherapyStart();
 				else if (e2 instanceof TherapyResult)
-					o2 = ((TherapyResult) e2).getCaption();
+					d2 = ((TherapyResult) e2).getTimestamp();
 				else
-					o2 = empty;
-
-				return o1.compareTo(o2);
+					d2 = new Date();
+				if(d1 == null)
+					return -1;
+				return d1.compareTo(d2);
 			}
 		});
 		therapiesViewer.setContentProvider(new BaseWorkbenchContentProvider());
@@ -190,7 +189,7 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 
 			@Override
 			public void selectionUpdated() {
-				
+
 				/************************************************************
 				 * Database Access Begin
 				 ************************************************************/

@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.views.PatientView;
 
 public class TherapyResultPatientAndTypePage extends WizardPage implements IValidationPage {
 	private Text				textLastname;
@@ -42,8 +41,8 @@ public class TherapyResultPatientAndTypePage extends WizardPage implements IVali
 	private Patient				selectedPatient				= null;
 
 	private SortedSet<String>	errors						= new TreeSet<String>();
-	private static String		ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgew�hlt";
-	private Button	btnDB;
+	private final static String	ERROR_NO_PATIENT_SELECTED	= "Kein Patient ausgew\u00e4hlt";
+	private Button				btnDB;
 
 	/**
 	 * Create the wizard.
@@ -92,11 +91,11 @@ public class TherapyResultPatientAndTypePage extends WizardPage implements IVali
 
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
-		
+
 		EntityManager tempEM = JPAUtil.createEntityManager();
 		Patient mPatient = tempEM.find(Patient.class, selectedPatient.getId());
 		tempEM.close();
-		
+
 		selectPatient(mPatient);
 
 		checkContents();
