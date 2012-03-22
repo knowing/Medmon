@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.rcp;
+package de.lmu.ifi.dbs.medmon.medic.ui;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;

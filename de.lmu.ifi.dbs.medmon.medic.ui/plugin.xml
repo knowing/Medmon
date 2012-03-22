@@ -1,7 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+ <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            icon="icons/icon_16.gif"
+            visible="true">
+         <run
+               class="de.lmu.ifi.dbs.medmon.medic.ui.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="de.lmu.ifi.dbs.medmon.medic.ui.application"
+            name="Medmon for Medics">
+         <property
+               name="appName"
+               value="Medmon for Medics">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+         <property
+               name="aboutImage"
+               value="medmon.trans.png">
+         </property>
+         <property
+               name="aboutText"
+               value="Medmon Medic App">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/icon_16.gif,icons/icon_32.gif,icons/icon_64.gif,icons/icon_128.gif"> 
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,275,445,15">
+         </property>
+      </product>
+   </extension>
    <extension
          point="org.eclipse.ui.views">
       
