@@ -38,6 +38,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
+import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
@@ -177,8 +178,11 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				reportData.add(new XRFFReportData(path));
 
 				try {
-					Activator.getReportingService().renderReportToBrowser("medmon.medic.patient_test", "default", null,
-							Activator.class.getClassLoader(), reportData);
+//					Path report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "pdf");
+//					Program.findProgram(".pdf").execute(report.toString());
+					
+					Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "html");
+					selectionProvider.setSelection(Report.class, report);
 				} catch (BirtProcessingException | IOException e1) {
 					e1.printStackTrace();
 				}

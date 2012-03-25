@@ -11,54 +11,58 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
+import org.eclipse.birt.report.engine.api.HTMLRenderOption;
+import org.eclipse.birt.report.engine.api.IPDFRenderOption;
+import org.eclipse.birt.report.engine.api.IRenderOption;
+import org.eclipse.birt.report.engine.api.IRenderTask;
+import org.eclipse.birt.report.engine.api.IReportDocument;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.IReportEngineFactory;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunTask;
-import org.eclipse.birt.report.viewer.utilities.WebViewer;
-import org.eclipse.swt.browser.Browser;
+import org.eclipse.birt.report.engine.api.PDFRenderOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.service.IResourceStore;
+import de.lmu.ifi.dbs.medmon.database.entity.Report;
+import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 public class ReportingService implements IReportingService {
 
-	private final Logger			log				= LoggerFactory.getLogger(IReportingService.class);
-	private Path					tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
-	private IResourceStore			resourceStore;
-	private Map<String, Browser>	browserMap		= new HashMap<String, Browser>();
-	private EngineConfig			engineConfig;
+	private final Logger	log				= LoggerFactory.getLogger(IReportingService.class);
+	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
+	
+	/** 1-1 relation */
+	private IGlobalSelectionService selectionService;
 
-	@Override
-	public void registerBrowser(Browser browser, String id) {
-		browserMap.put(id, browser);
-	}
-
-	@Override
-	public void unregisterBrowser(String id) {
-		browserMap.remove(id);
-	}
+	// TODO get this path via the preferences
+	private Path			tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
+	private IResourceStore	resourceStore;
+	private EngineConfig	engineConfig;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Path renderReport(String reportId, Map<String, Object> taskParameters, ClassLoader classLoader, List<IJAXBReportData> data)
+	public Report renderReport(String reportId, ClassLoader classLoader, List<IJAXBReportData> data, String outputFormat)
 			throws IOException, BirtProcessingException {
 
 		/* ==== Create Design and Document Paths ==== */
 		URL reportDesign = resourceStore.getResource(reportId + ".rptdesign").get();
-		Path documentPath = Paths.get(tempDirectory.toString(), reportId + ".rptdocument");
+		Path documentPath = tempDirectory.resolve(reportId + ".rptdocument");
+		Date timestamp = new Date();
+		Path outputPath = tempDirectory.resolve(df.format(timestamp) + "_" + reportId + "." + outputFormat);
 
 		/* ==== Configure and run task ==== */
 		IReportEngineFactory factory = (IReportEngineFactory) org.eclipse.birt.core.framework.Platform
@@ -66,9 +70,9 @@ public class ReportingService implements IReportingService {
 		IReportEngine reportEngine = factory.createReportEngine(engineConfig);
 
 		try (InputStream reportInputStream = reportDesign.openStream()) {
-			IReportRunnable design;
-			design = reportEngine.openReportDesign(reportId, reportInputStream);
+			IReportRunnable design = reportEngine.openReportDesign(reportId, reportInputStream);
 
+			//TODO this part will be replaced by POJOs instead of XML files
 			IRunTask task = reportEngine.createRunTask(design);
 
 			/* ==== Create Report Data XML files ==== */
@@ -83,7 +87,9 @@ public class ReportingService implements IReportingService {
 				Path reportSchemaDestPath = Paths.get(tempDirectory.toString(), schemaFileName);
 				URL reportDataSchemaSourceURL = resourceStore.getResource(schemaFileName).get();
 
-				/* === delete file if exists -> create file -> copy data to file -> tell report about data files ===*/
+				/*
+				 * === delete file if exists -> create file -> copy data to file -> tell report about data files ===
+				 */
 				Files.deleteIfExists(reportDataDestPath);
 				try (OutputStream fileOutputStream = Files.newOutputStream(reportDataDestPath, StandardOpenOption.CREATE_NEW)) {
 					d.marshal(fileOutputStream);
@@ -96,13 +102,33 @@ public class ReportingService implements IReportingService {
 				}
 			}
 
-			/* ==== Set the rest of the Parameters ==== */
-
-			/* === Render === */
+			
+			/* === Render to temp path and return this path === */
 			try {
 				task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, classLoader);
 				task.run(documentPath.toString());
 				task.close();
+
+				IReportDocument iReportDocument = reportEngine.openReportDocument(documentPath.toString());
+				IRenderOption options = null;
+				if(outputFormat.equals("pdf")) {
+					options = new PDFRenderOption();
+					options.setOption(IPDFRenderOption.PDF_HYPHENATION, true);
+					options.setOption(IPDFRenderOption.PDF_TEXT_WRAPPING, true);
+					options.setOption(IPDFRenderOption.PAGE_OVERFLOW, IPDFRenderOption.FIT_TO_PAGE_SIZE);
+					options.setOption(IPDFRenderOption.DPI, 300);
+				} else if(outputFormat.equals("html")) {
+					options = new HTMLRenderOption();
+					options.setBaseURL("UTF-8");
+					options.setOption(HTMLRenderOption.URL_ENCODING, "UTF-8");
+				}
+				options.setOutputFileName(outputPath.toString());
+				options.setOutputFormat(outputFormat);
+
+				IRenderTask renderTask = reportEngine.createRenderTask(iReportDocument);
+				renderTask.setRenderOption(options);
+				renderTask.render();
+				iReportDocument.close();
 			} catch (EngineException e) {
 				e.printStackTrace();
 				task.close();
@@ -130,34 +156,16 @@ public class ReportingService implements IReportingService {
 				}
 			}
 		}
-
-		return documentPath;
-	}
-
-	@Override
-	public void renderReportToBrowser(String reportId, String id, Map<String, Object> taskParameters, ClassLoader classLoader,
-			List<IJAXBReportData> data) throws BirtProcessingException, IOException {
-
-		Browser browser = browserMap.get(id);
-		if (browser == null)
-			return;
-
-		Path documentPath = renderReport(reportId, taskParameters, classLoader, data);
-
-		HashMap<String, String> myparms = new HashMap<String, String>();
-		myparms.put("SERVLET_NAME_KEY", "run");
-		myparms.put("FORMAT_KEY", "html");
-		WebViewer.display(documentPath.toString(), browser, myparms);
-	}
-
-	@Override
-	public void renderReportToPDF(String reportId, Path destPath, Map<String, Object> taskParameters, ClassLoader classLoader,
-			List<IJAXBReportData> data) {
-
+		Report report = new Report();
+		report.setFile(outputPath.toString());
+		report.setFormat(outputFormat);
+		report.setReportId(reportId);
+		report.setTimestamp(timestamp);
+		
+		return report;
 	}
 
 	protected void activate() {
-
 		try {
 			Files.createDirectories(tempDirectory);
 			engineConfig = new EngineConfig();
@@ -186,5 +194,5 @@ public class ReportingService implements IReportingService {
 	protected void unbindResourceStore(IResourceStore store) {
 		this.resourceStore = null;
 	}
-
+	
 }

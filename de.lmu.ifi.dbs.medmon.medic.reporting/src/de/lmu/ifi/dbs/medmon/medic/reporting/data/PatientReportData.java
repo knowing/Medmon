@@ -12,8 +12,8 @@ public class PatientReportData extends JAXBReportData {
 	public String	lastName;
 
 	public PatientReportData() {
-		firstName = "Silly";
-		lastName = "Goose Man";
+		firstName = "Max";
+		lastName = "Mustermann";
 	}
 
 	@Override
