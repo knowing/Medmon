@@ -16,8 +16,6 @@
 #ignore generated .class files
 *.class
 bin/
-medmon
-
 
 
 #except this file
