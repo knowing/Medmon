@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -86,9 +87,8 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 		managedForm.addPart(sectionPart);
 
 		therapiesViewer = new TreeViewer(composite, SWT.BORDER);
-		Tree tree = therapiesViewer.getTree();
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		toolkit.paintBordersFor(tree);
+		therapiesViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		toolkit.paintBordersFor(therapiesViewer.getTree());
 		therapiesViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
@@ -117,6 +117,11 @@ public class PatientFileDetailBlock extends MasterDetailsBlock {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				managedForm.fireSelectionChanged(sectionPart, event.getSelection());
+				if(event.getSelection().isEmpty())
+					return;
+				IStructuredSelection structedSelection = (IStructuredSelection) event.getSelection();
+				Object elem = structedSelection.getFirstElement();
+				therapiesViewer.expandToLevel(elem,2);
 			}
 		});
 

@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +10,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
@@ -58,7 +62,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 	private Listener					successChangedListener;
 	private Text						textComment;
 	private IGlobalSelectionProvider	selectionProvider;
-	
+
 	private boolean						isDirty				= false;
 	private boolean						ignoreModification	= false;
 
@@ -173,17 +177,35 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				if (selection.getData().getType().equals(Data.TRAIN))
 					return;
 
-				List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
+				final List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
 				reportData.add(new PatientReportData());
 				reportData.add(new XRFFReportData(path));
 
 				try {
-//					Path report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "pdf");
-//					Program.findProgram(".pdf").execute(report.toString());
-					
-					Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "html");
-					selectionProvider.setSelection(Report.class, report);
-				} catch (BirtProcessingException | IOException e1) {
+					IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+						@Override
+						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+							try {
+								monitor.beginTask("Erstelle Bericht", IProgressMonitor.UNKNOWN);
+								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test",
+										Activator.class.getClassLoader(), reportData, "html");
+								textTherapy.getDisplay().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										selectionProvider.setSelection(Report.class, report);
+//										Path report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "pdf");
+//										Program.findProgram(".pdf").execute(report.toString());
+									}
+								});
+								monitor.done();
+							} catch (IOException | BirtProcessingException e) {
+								e.printStackTrace();
+							}
+						}
+					};
+					new ProgressMonitorDialog(textTherapy.getShell()).run(true, false, runnable);
+				} catch (InvocationTargetException | InterruptedException e1) {
 					e1.printStackTrace();
 				}
 
@@ -227,8 +249,6 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				localTherapyResultSelection = null;
 				selectionProvider.setSelection(TherapyResult.class, null);
 				selectionProvider.updateSelection(Patient.class);
-
-				// TODO: Remove the corresponding data from disc
 			}
 		});
 

@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.service.IResourceStore;
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
@@ -45,9 +44,6 @@ public class ReportingService implements IReportingService {
 	private final Logger	log				= LoggerFactory.getLogger(IReportingService.class);
 	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
 	
-	/** 1-1 relation */
-	private IGlobalSelectionService selectionService;
-
 	// TODO get this path via the preferences
 	private Path			tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");
 	private IResourceStore	resourceStore;
