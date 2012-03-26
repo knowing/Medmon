@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 public class ReportingService implements IReportingService {
 
 	private final Logger	log				= LoggerFactory.getLogger(IReportingService.class);
-	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
+	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
 	
 	// TODO get this path via the preferences
 	private Path			tempDirectory	= Paths.get(System.getProperty("user.home"), ".medmon", "reporting", ".temp");

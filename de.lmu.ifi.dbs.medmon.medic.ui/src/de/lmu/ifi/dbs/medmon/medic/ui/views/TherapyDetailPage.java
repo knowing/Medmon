@@ -288,13 +288,15 @@ public class TherapyDetailPage implements IDetailsPage {
 			tempEM.getTransaction().begin();
 			Therapy mTherapy = tempEM.find(Therapy.class, localTherapySelection.getId());
 
-			ignoreModification = true;
-			mTherapy.setCaption(textTherapy.getText());
-			mTherapy.setComment(textComment.getText());
-			mTherapy.setTherapyStart(dateStart.getSelection());
-			mTherapy.setTherapyEnd(dateEnd.getSelection());
-			mTherapy.setSuccess(scaleSuccess.getSelection());
-			ignoreModification = false;
+			if(mTherapy != null) {
+				ignoreModification = true;
+				mTherapy.setCaption(textTherapy.getText());
+				mTherapy.setComment(textComment.getText());
+				mTherapy.setTherapyStart(dateStart.getSelection());
+				mTherapy.setTherapyEnd(dateEnd.getSelection());
+				mTherapy.setSuccess(scaleSuccess.getSelection());
+				ignoreModification = false;
+			}
 
 			tempEM.getTransaction().commit();
 			tempEM.close();

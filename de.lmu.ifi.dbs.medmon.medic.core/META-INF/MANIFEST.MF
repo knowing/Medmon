@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.ui,
  de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0";visibility:=reexport,
  de.lmu.ifi.dbs.knowing.core;visibility:=reexport,
  javax.persistence;bundle-version="2.0.3"
-Service-Component: OSGI-INF/sensorManagerService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/dbModelService.xml, OSGI-INF/therapyResultService.xml
+Service-Component: OSGI-INF/sensorManagerService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/therapyResultService.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
