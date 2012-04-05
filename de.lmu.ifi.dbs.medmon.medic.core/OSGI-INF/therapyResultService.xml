@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="de.lmu.ifi.dbs.medmon.medic.core.TherapyResultService">
-   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.TherapyResultService"/>
-    <service>
-      <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService"/>
-   </service>
-   <reference bind="bindPatientService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService" name="IPatientService" policy="dynamic" unbind="unbindPatientService"/>
-   <reference bind="bindSensorManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService" name="ISensorManagerService" policy="dynamic" unbind="unbindSensorManagerService"/>
+   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.TherapyResultService"/>
+   <reference bind="bindPatientService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.services.IPatientService" name="IPatientService" policy="dynamic" unbind="unbindPatientService"/>
+   <reference bind="bindSensorManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.services.ISensorManagerService" name="ISensorManagerService" policy="dynamic" unbind="unbindSensorManagerService"/>
    <reference bind="bindEvaluateService" cardinality="1..1" interface="de.lmu.ifi.dbs.knowing.core.service.IEvaluateService" name="IEvaluateService" policy="dynamic" unbind="unbindEvaluateService"/>
    <reference bind="bindUiFactories" cardinality="1..1" interface="de.lmu.ifi.dbs.knowing.core.factory.UIFactory" name="UIFactory" policy="dynamic" unbind="unbindUiFactories"/>
-   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
+   <reference bind="bindEntityManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.services.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
+   <service>
+      <provide interface="de.lmu.ifi.dbs.medmon.services.ITherapyResultService"/>
+   </service>
 </scr:component>

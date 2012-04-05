@@ -2,7 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.util;
 
 import javax.persistence.EntityManager;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 
 import static de.lmu.ifi.dbs.medmon.medic.core.Activator.getEntityManagerService;
 

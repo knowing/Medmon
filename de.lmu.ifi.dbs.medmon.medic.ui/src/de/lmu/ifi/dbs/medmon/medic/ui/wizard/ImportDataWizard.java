@@ -21,14 +21,14 @@ import org.eclipse.ui.WorkbenchException;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataSensorAndDirectoryPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
 
 public class ImportDataWizard extends Wizard {
 

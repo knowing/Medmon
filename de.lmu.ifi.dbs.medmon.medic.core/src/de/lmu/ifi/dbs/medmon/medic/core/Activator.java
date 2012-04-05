@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.IDBModelService;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
 
 /**
  * The activator class controls the plug-in life cycle

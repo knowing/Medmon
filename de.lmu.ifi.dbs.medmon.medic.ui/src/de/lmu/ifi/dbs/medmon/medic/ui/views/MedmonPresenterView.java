@@ -23,10 +23,10 @@ import de.lmu.ifi.dbs.knowing.core.factory.UIFactory;
 import de.lmu.ifi.dbs.knowing.core.swt.factory.UIFactories;
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionListener;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
 
 public class MedmonPresenterView extends ViewPart {
 	public MedmonPresenterView() {

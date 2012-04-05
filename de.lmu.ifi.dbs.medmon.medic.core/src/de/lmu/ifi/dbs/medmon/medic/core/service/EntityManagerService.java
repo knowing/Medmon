@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +10,11 @@ import javax.persistence.EntityManagerFactory;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jdbc.DataSourceFactory;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 
 /**
  * Handles Eclipse Gemini JPA EntityManager services.
@@ -27,11 +25,10 @@ import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
  */
 public class EntityManagerService implements IEntityManagerService {
 
-	private List<DataSourceFactory>		dsFactories	= new ArrayList<DataSourceFactory>();
 	private List<EntityManagerFactory>	emFactories	= new ArrayList<EntityManagerFactory>();
 	private EntityManagerFactoryBuilder	emfBuilder;
 
-	private final Logger				log			= LoggerFactory.getLogger(IPatientService.class);
+	private final Logger				log			= LoggerFactory.getLogger(IEntityManagerService.class);
 
 	@Override
 	public EntityManager createEntityManager() {
@@ -53,14 +50,6 @@ public class EntityManagerService implements IEntityManagerService {
 
 	public void unbindEntityManagerFactoryBuilder(EntityManagerFactoryBuilder emfBuilder) {
 		this.emfBuilder = null;
-	}
-
-	public void bindDataSourceFactory(DataSourceFactory dsFactory) {
-		dsFactories.add(dsFactory);
-	}
-
-	public void unbindDataSourceFactory(DataSourceFactory dsFactory) {
-		dsFactories.remove(dsFactory);
 	}
 
 	public void bindEntityManagerFactory(EntityManagerFactory emf) {

@@ -1,19 +1,10 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
-
-import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static java.nio.file.Files.walkFileTree;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.nio.file.StandardOpenOption.READ;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -21,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 
 import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
@@ -31,13 +21,11 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
-import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 
 public class PatientService implements IPatientService {
 

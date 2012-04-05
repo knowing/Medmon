@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.Activator;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionListener;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
 
 public class GlobalSelectionService implements IGlobalSelectionService {
 	// ********************************************************************************

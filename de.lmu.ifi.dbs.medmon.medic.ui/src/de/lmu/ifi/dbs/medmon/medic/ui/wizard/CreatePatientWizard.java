@@ -16,10 +16,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.CreatePatientPage;
+import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
 
 /**
  * 

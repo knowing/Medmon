@@ -8,11 +8,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0";visibility:=reexport,
  de.lmu.ifi.dbs.knowing.core;visibility:=reexport,
- javax.persistence;bundle-version="2.0.3"
+ de.lmu.ifi.dbs.medmon.services;bundle-version="1.0.0";visibility:=reexport
 Service-Component: OSGI-INF/sensorManagerService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/therapyResultService.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
+ javax.persistence;version="2.0.3",
  org.eclipse.persistence.config;version="2.3.0.v20110604-r9504",
  org.eclipse.sapphire.modeling,
  org.eclipse.sapphire.modeling.xml,
@@ -30,6 +31,5 @@ Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
  scala.collection;version="2.9.1.final"
 Export-Package: de.lmu.ifi.dbs.medmon.medic.core.job,
  de.lmu.ifi.dbs.medmon.medic.core.preferences,
- de.lmu.ifi.dbs.medmon.medic.core.service,
  de.lmu.ifi.dbs.medmon.medic.core.util
 Bundle-Vendor: LMU Munich - Database Systems Group

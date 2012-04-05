@@ -7,8 +7,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 import de.lmu.ifi.dbs.knowing.core.service.*;
 
 /**

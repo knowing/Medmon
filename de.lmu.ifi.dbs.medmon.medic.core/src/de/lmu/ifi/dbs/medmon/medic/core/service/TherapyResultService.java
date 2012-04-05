@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import static scala.collection.JavaConversions.mapAsScalaMap;
 
@@ -34,13 +34,13 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DataStoreOutput;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
+import de.lmu.ifi.dbs.medmon.services.ITherapyResultService;
 
 /**
  * Starts the evaluation process with knowing and generates a TherapyResult

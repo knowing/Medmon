@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service;
+package de.lmu.ifi.dbs.medmon.services;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 

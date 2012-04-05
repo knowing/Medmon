@@ -64,13 +64,13 @@ import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionListener;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
+import de.lmu.ifi.dbs.medmon.services.ISensorObserver;
 
 public class PatientView extends ViewPart {
 	public PatientView() {

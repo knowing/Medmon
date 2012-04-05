@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service;
+package de.lmu.ifi.dbs.medmon.services;
 
 import java.io.IOException;
 import java.io.InputStream;

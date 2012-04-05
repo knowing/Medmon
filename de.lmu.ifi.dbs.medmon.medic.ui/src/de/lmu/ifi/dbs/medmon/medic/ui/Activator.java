@@ -7,13 +7,13 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.medic.core.service.IDBModelService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IPatientService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ITherapyResultService;
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
+import de.lmu.ifi.dbs.medmon.services.IDBModelService;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
+import de.lmu.ifi.dbs.medmon.services.IPatientService;
+import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
+import de.lmu.ifi.dbs.medmon.services.ITherapyResultService;
 
 /**
  * The activator class controls the plug-in life cycle

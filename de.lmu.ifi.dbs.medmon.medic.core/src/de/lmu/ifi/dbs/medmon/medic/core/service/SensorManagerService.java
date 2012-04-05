@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.core.service.internal;
+package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorManagerService;
-import de.lmu.ifi.dbs.medmon.medic.core.service.ISensorObserver;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
+import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
+import de.lmu.ifi.dbs.medmon.services.ISensorObserver;
 
 public class SensorManagerService implements ISensorManagerService {
 

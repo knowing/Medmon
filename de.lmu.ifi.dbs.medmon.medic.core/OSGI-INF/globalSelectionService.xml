@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="de.lmu.ifi.dbs.medmon.medic.core.GlobalSelectionService">
-   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.internal.GlobalSelectionService"/>
-   <reference bind="bindProvider" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionProvider" name="IGlobalSelectionProvider" policy="dynamic" unbind="unbindProvider"/>
-   <reference bind="bindListener" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionListener" name="IGlobalSelectionListener" policy="dynamic" unbind="unbindListener"/>
+   <implementation class="de.lmu.ifi.dbs.medmon.medic.core.service.GlobalSelectionService"/>
+   <reference bind="bindProvider" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider" name="IGlobalSelectionProvider" policy="dynamic" unbind="unbindProvider"/>
+   <reference bind="bindListener" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.services.IGlobalSelectionListener" name="IGlobalSelectionListener" policy="dynamic" unbind="unbindListener"/>
    <service>
-      <provide interface="de.lmu.ifi.dbs.medmon.medic.core.service.IGlobalSelectionService"/>
+      <provide interface="de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService"/>
    </service>
-   <reference bind="bindEntityManagerService" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.medic.core.service.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
+   <reference bind="bindEntityManagerService" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.services.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManagerService"/>
 </scr:component>
