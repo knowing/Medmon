@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.ui.product" application="de.lmu.ifi.dbs.medmon.medic.ui.application" version="1.0.1.ALPHA2" useFeatures="true" includeLaunchers="false">
+<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.ui.product" application="de.lmu.ifi.dbs.medmon.medic.ui.application" version="1.0.1.ALPHA3" useFeatures="true" includeLaunchers="false">
 
    <aboutInfo>
       <image path="/de.lmu.ifi.dbs.medmon.medic.ui/medmon.trans.png"/>
@@ -15,7 +15,7 @@
 
    <launcherArgs>
       <programArgs>-clean -console -consoleLog</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.5
+      <vmArgs>-Dosgi.requiredJavaVersion=1.7
 -XX:MaxPermSize=256m
 -Xms256m
 -Xmx1024m
@@ -38,7 +38,6 @@
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
@@ -79,31 +78,27 @@
       <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.v20110906-1605-782EqBqNKGVkiV-PUsgz-uny4gqO"/>
       <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.2.qualifier"/>
       <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.2.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.common.core.feature" version="1.0.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.1.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.1.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.1.qualifier"/>
    </features>
 
    <configurations>
       <plugin id="ch.qos.logback.classic" autoStart="true" startLevel="0" />
       <plugin id="ch.qos.logback.core" autoStart="true" startLevel="0" />
       <plugin id="de.lmu.ifi.dbs.knowing.core.common" autoStart="true" startLevel="0" />
-      <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.base.ui" autoStart="false" startLevel="5" />
-      <plugin id="de.lmu.ifi.dbs.medmon.derby" autoStart="false" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="true" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.rcp" autoStart="true" startLevel="4" />
-      <plugin id="de.lmu.ifi.dbs.medmon.medic.ui" autoStart="false" startLevel="5" />
-      <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="4" />
+      <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="true" startLevel="0" />
+      <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="0" />
+      <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="true" startLevel="0" />
+      <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="0" />
       <plugin id="de.sendsor.accelerationSensor" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="4" />
-      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="3" />
    </configurations>
 
 </product>

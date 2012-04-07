@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.lmu.ifi.dbs.medmon.common.core.feature"
+      id="de.lmu.ifi.dbs.medmon.medic.core"
       label="Medmon Core"
       version="1.0.1.qualifier"
       provider-name="LMU Munich - Database Systems Group">
@@ -242,6 +242,13 @@ limitations under the License.
 
    <plugin
          id="org.eclipse.sapphire.java"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.lmu.ifi.dbs.medmon.services"
          download-size="0"
          install-size="0"
          version="0.0.0"

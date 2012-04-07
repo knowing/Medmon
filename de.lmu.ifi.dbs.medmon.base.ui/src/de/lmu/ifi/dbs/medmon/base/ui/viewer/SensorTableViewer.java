@@ -6,10 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -21,7 +19,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,24 +136,32 @@ public class SensorTableViewer extends TableViewer {
 		ISensorObserver sensorObserver = new ISensorObserver() {
 			@Override
 			public void init(List<ISensor> sensors) {
+				if(SensorTableViewer.this.getControl().isDisposed())
+					return;
 				localSensorList = new LinkedList<ISensor>(sensors);
 				setInput(localSensorList);
 			}
 
 			@Override
 			public void sensorAdded(ISensor service) {
+				if(SensorTableViewer.this.getControl().isDisposed())
+					return;
 				localSensorList.add(service);
 				setInput(localSensorList);
 			}
 
 			@Override
 			public void sensorRemoved(ISensor service) {
+				if(SensorTableViewer.this.getControl().isDisposed())
+					return;
 				localSensorList.remove(service);
 				setInput(localSensorList);
 			}
 
 			@Override
 			public void sensorUpdated(ISensor service) {
+				if(SensorTableViewer.this.getControl().isDisposed())
+					return;
 				refresh();
 			}
 		};

@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.base.ui.viewer.DataViewer;
+import de.lmu.ifi.dbs.medmon.base.ui.viewer.SensorTableViewer;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
@@ -399,24 +400,32 @@ public class PatientView extends ViewPart {
 
 			@Override
 			public void init(List<ISensor> sensors) {
+				if(comboViewer.getControl().isDisposed())
+					return;
 				localSensorList.addAll(sensors);
 				comboViewer.setInput(localSensorList);
 			}
 
 			@Override
 			public void sensorAdded(ISensor service) {
+				if(comboViewer.getControl().isDisposed())
+					return;
 				localSensorList.add(service);
 				comboViewer.refresh();
 			}
 
 			@Override
 			public void sensorRemoved(ISensor service) {
+				if(comboViewer.getControl().isDisposed())
+					return;
 				localSensorList.remove(service);
 				comboViewer.refresh();
 			}
 
 			@Override
 			public void sensorUpdated(ISensor service) {
+				if(comboViewer.getControl().isDisposed())
+					return;
 				comboViewer.refresh();
 			}
 

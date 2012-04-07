@@ -43,13 +43,6 @@ limitations under the License.
    </requires>
 
    <plugin
-         id="de.lmu.ifi.dbs.medmon.medic.rcp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.lmu.ifi.dbs.medmon.medic.ui"
          download-size="0"
          install-size="0"
