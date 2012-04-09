@@ -7,7 +7,7 @@ import scala.collection.immutable.Map
 import scala.collection.mutable.ListBuffer
 import akka.actor.Actor
 import akka.event.EventHandler.{ debug, info, warning, error }
-import de.lmu.ifi.dbs.knowing.core.events.KnowingException
+import de.lmu.ifi.dbs.knowing.core.exceptions.KnowingException
 import de.lmu.ifi.dbs.knowing.core.factory._
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory._
 import de.lmu.ifi.dbs.knowing.core.processing.TSerializable
