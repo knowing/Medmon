@@ -1,13 +1,12 @@
 package de.lmu.ifi.dbs.medmon.medic.reporting.service;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.birt.report.engine.api.EngineException;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 
 public interface IReportingService {
 
@@ -20,14 +19,12 @@ public interface IReportingService {
 	 * @param taskParameters
 	 *            - passes parameters to the reporting engine
 	 * @param classLoader
-	 * @param data
-	 *            - a list of IJAXBReportData interfaces, which will be passed
-	 *            to the reporting engine
+	 * @param data - a map containing the report data
 	 * @return
 	 * @throws IOException
 	 * @throws EngineException
 	 */
-	public Report renderReport(String reportId, ClassLoader classLoader, List<IJAXBReportData> data,
+	public Report renderReport(String reportId, ClassLoader classLoader, Map<String, Object> data,
 			String outputFormat) throws IOException, BirtProcessingException;
 
 }

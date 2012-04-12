@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -45,9 +45,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientReportData;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.XRFFReportData;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
@@ -177,9 +174,11 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				if (selection.getData().getType().equals(Data.TRAIN))
 					return;
 
-				final List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
-				reportData.add(new PatientReportData());
-				reportData.add(new XRFFReportData(path));
+//				final List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
+//				reportData.add(new PatientReportData());
+//				reportData.add(new XRFFReportData(path));
+				final Map<String, Object> reportData = new HashMap<>();
+//				reportData.put("timeSeriesResults", reportModel);
 
 				try {
 					IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -188,7 +187,9 @@ public class TherapyResultDetailPage implements IDetailsPage {
 						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 							try {
 								monitor.beginTask("Erstelle Bericht", IProgressMonitor.UNKNOWN);
-								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test",
+//								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test",
+//										Activator.class.getClassLoader(), reportData, "html");
+								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient.activity_report",
 										Activator.class.getClassLoader(), reportData, "html");
 								textTherapy.getDisplay().asyncExec(new Runnable() {
 									@Override

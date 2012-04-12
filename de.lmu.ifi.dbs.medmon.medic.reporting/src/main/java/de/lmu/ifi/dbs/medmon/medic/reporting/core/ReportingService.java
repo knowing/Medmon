@@ -4,17 +4,14 @@ import static java.nio.file.Files.walkFileTree;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.report.engine.api.EngineConfig;
@@ -36,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.knowing.core.service.IResourceStore;
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.medic.core.util.DeleteDirectoryVisitor;
-import de.lmu.ifi.dbs.medmon.medic.reporting.data.IJAXBReportData;
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
 
 public class ReportingService implements IReportingService {
@@ -51,7 +47,7 @@ public class ReportingService implements IReportingService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Report renderReport(String reportId, ClassLoader classLoader, List<IJAXBReportData> data, String outputFormat)
+	public Report renderReport(String reportId, ClassLoader classLoader, Map<String, Object> data, String outputFormat)
 			throws IOException, BirtProcessingException {
 
 		/* ==== Create Design and Document Paths ==== */
@@ -70,38 +66,13 @@ public class ReportingService implements IReportingService {
 
 			//TODO this part will be replaced by POJOs instead of XML files
 			IRunTask task = reportEngine.createRunTask(design);
-
-			/* ==== Create Report Data XML files ==== */
-			for (IJAXBReportData d : data) {
-
-				String dataFileName = d.getId() + ".xml";
-				String schemaFileName = d.getId() + ".xsd";
-				String dataParam = d.getId() + "_" + "xml";
-				String schemaParam = d.getId() + "_" + "xsd";
-
-				Path reportDataDestPath = Paths.get(tempDirectory.toString(), dataFileName);
-				Path reportSchemaDestPath = Paths.get(tempDirectory.toString(), schemaFileName);
-				URL reportDataSchemaSourceURL = resourceStore.getResource(schemaFileName).get();
-
-				/*
-				 * === delete file if exists -> create file -> copy data to file -> tell report about data files ===
-				 */
-				Files.deleteIfExists(reportDataDestPath);
-				try (OutputStream fileOutputStream = Files.newOutputStream(reportDataDestPath, StandardOpenOption.CREATE_NEW)) {
-					d.marshal(fileOutputStream);
-					Files.copy(reportDataSchemaSourceURL.openStream(), reportSchemaDestPath, StandardCopyOption.REPLACE_EXISTING);
-					task.setParameterValue(dataParam, reportDataDestPath.toString());
-					task.setParameterValue(schemaParam, reportSchemaDestPath.toString());
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw e;
-				}
-			}
-
+			
 			
 			/* === Render to temp path and return this path === */
 			try {
-				task.getAppContext().put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, classLoader);
+				Map<String, Object> appContext = task.getAppContext();
+				appContext.putAll(data);
+				appContext.put(EngineConstants.APPCONTEXT_CLASSLOADER_KEY, classLoader);
 				task.run(documentPath.toString());
 				task.close();
 
@@ -136,22 +107,8 @@ public class ReportingService implements IReportingService {
 		} catch (EngineException e) {
 			e.printStackTrace();
 			throw new BirtProcessingException("<TODO>");
-		} finally {
-
-			/* === Delete Files === */
-			for (IJAXBReportData d : data) {
-
-				String dataFileName = d.getId() + ".xml";
-				String schemaFileName = d.getId() + ".xsd";
-
-				try {
-					Files.deleteIfExists(Paths.get(tempDirectory.toString(), dataFileName));
-					Files.deleteIfExists(Paths.get(tempDirectory.toString(), schemaFileName));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		} 
+		
 		Report report = new Report();
 		report.setFile(outputPath.toString());
 		report.setFormat(outputFormat);
