@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic;
+package de.lmu.ifi.dbs.medmon.medic.reporting;
 
 /**
  * Provides the resource id for all reports.

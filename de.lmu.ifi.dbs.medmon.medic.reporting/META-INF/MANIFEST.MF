@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/reportingService.xml
-Export-Package: de.lmu.ifi.dbs.medmon.medic,
+Export-Package: de.lmu.ifi.dbs.medmon.medic.reporting,
  de.lmu.ifi.dbs.medmon.medic.reporting.data,
  de.lmu.ifi.dbs.medmon.medic.reporting.service
 Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
