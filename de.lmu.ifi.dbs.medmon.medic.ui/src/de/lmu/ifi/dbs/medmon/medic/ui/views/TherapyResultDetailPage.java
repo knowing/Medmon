@@ -1,7 +1,9 @@
 package de.lmu.ifi.dbs.medmon.medic.ui.views;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +12,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
+import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -25,6 +28,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -40,15 +44,24 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
+import weka.core.Instances;
+
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
+import de.lmu.ifi.dbs.medmon.medic.IReports;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
 
+/**
+ * 
+ * @author Stephan Picker, Nepomuk Seiler
+ * @version 0.2
+ * @since 2011
+ * 
+ */
 public class TherapyResultDetailPage implements IDetailsPage {
 
 	private IManagedForm				managedForm;
@@ -127,9 +140,9 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		toolkit.adapt(lblPlaceholder2, true, true);
 		new Label(composite, SWT.NONE);
 
-		Label lblNewLabel_3 = new Label(composite, SWT.NONE);
-		toolkit.adapt(lblNewLabel_3, true, true);
-		lblNewLabel_3.setText("Erfolg:");
+		Label lblSuccess = new Label(composite, SWT.NONE);
+		toolkit.adapt(lblSuccess, true, true);
+		lblSuccess.setText("Erfolg:");
 
 		successChangedListener = new Listener() {
 			private int	success;
@@ -138,8 +151,8 @@ public class TherapyResultDetailPage implements IDetailsPage {
 				success = scaleSuccess.getSelection();
 				textSuccess.setText(success + "%");
 			}
-		};
 
+		};
 		scaleSuccess = new Scale(composite, SWT.NONE);
 		scaleSuccess.addListener(SWT.Selection, successChangedListener);
 		scaleSuccess.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
@@ -163,53 +176,7 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		linkShowReport.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
-				TherapyResult selection = selectionProvider.getSelection(TherapyResult.class);
-
-				if (selection == null)
-					return;
-				Path path = Paths.get(selection.getData().getFile());
-				if (!Files.exists(path))
-					return;
-				if (selection.getData().getType().equals(Data.TRAIN))
-					return;
-
-//				final List<IJAXBReportData> reportData = new LinkedList<IJAXBReportData>();
-//				reportData.add(new PatientReportData());
-//				reportData.add(new XRFFReportData(path));
-				final Map<String, Object> reportData = new HashMap<>();
-//				reportData.put("timeSeriesResults", reportModel);
-
-				try {
-					IRunnableWithProgress runnable = new IRunnableWithProgress() {
-
-						@Override
-						public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-							try {
-								monitor.beginTask("Erstelle Bericht", IProgressMonitor.UNKNOWN);
-//								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient_test",
-//										Activator.class.getClassLoader(), reportData, "html");
-								final Report report = Activator.getReportingService().renderReport("medmon.medic.patient.activity_report",
-										Activator.class.getClassLoader(), reportData, "html");
-								textTherapy.getDisplay().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										selectionProvider.setSelection(Report.class, report);
-//										Path report = Activator.getReportingService().renderReport("medmon.medic.patient_test", Activator.class.getClassLoader(), reportData, "pdf");
-//										Program.findProgram(".pdf").execute(report.toString());
-									}
-								});
-								monitor.done();
-							} catch (IOException | BirtProcessingException e) {
-								e.printStackTrace();
-							}
-						}
-					};
-					new ProgressMonitorDialog(textTherapy.getShell()).run(true, false, runnable);
-				} catch (InvocationTargetException | InterruptedException e1) {
-					e1.printStackTrace();
-				}
-
+				showReport();
 			}
 		});
 
@@ -268,14 +235,54 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		});
 	}
 
-	public void dispose() {
-		// Dispose
-		workerEM.close();
-		selectionProvider.unregister();
-	}
+	private void showReport() {
+		final TherapyResult selection = selectionProvider.getSelection(TherapyResult.class);
 
-	public void setFocus() {
-		// Set focus
+		if (selection == null)
+			return;
+		Path path = Paths.get(selection.getData().getFile());
+		if (!Files.exists(path))
+			return;
+		if (selection.getData().getType().equals(Data.TRAIN))
+			return;
+
+		try {
+			IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						final Map<String, Object> reportData = new HashMap<>();
+						reportData.put(IReports.PATIENT, selection.getTherapy().getPatient());
+						reportData.put(IReports.THERAPY_RESULT, selection);
+						reportData.put(IReports.TIMESERIES_RESULTS, getInstances(selection));
+						monitor.beginTask("Erstelle Bericht", IProgressMonitor.UNKNOWN);
+						final Report report = Activator.getReportingService().renderReport(IReports.PATIENT_THERAPY_RESULT,
+								Activator.class.getClassLoader(), reportData, "html");
+						textTherapy.getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								selectionProvider.setSelection(Report.class, report);
+//								 Program.findProgram(".pdf").execute(report.toPath().toString());
+							}
+						});
+						monitor.done();
+					} catch (IOException | EngineException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+			new ProgressMonitorDialog(textTherapy.getShell()).run(true, false, runnable);
+		} catch (InvocationTargetException | InterruptedException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	private Instances getInstances(TherapyResult result) throws IOException {
+		Path path = result.getData().toPath();
+		try(Reader r = Files.newBufferedReader(path, Charset.defaultCharset())) {
+			return new Instances(r);
+		}
 	}
 
 	private void update() {
@@ -284,9 +291,6 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		ignoreModification = false;
 	}
 
-	public boolean setFormInput(Object input) {
-		return false;
-	}
 
 	public void selectionChanged(IFormPart part, ISelection selection) {
 
@@ -344,6 +348,16 @@ public class TherapyResultDetailPage implements IDetailsPage {
 		 * Database Access End
 		 ************************************************************/
 	}
+	
+	public void dispose() {
+		// Dispose
+		workerEM.close();
+		selectionProvider.unregister();
+	}
+
+	public void setFocus() {
+		// Set focus
+	}
 
 	public boolean isDirty() {
 		return true;
@@ -355,6 +369,10 @@ public class TherapyResultDetailPage implements IDetailsPage {
 
 	public void refresh() {
 		update();
+	}
+	
+	public boolean setFormInput(Object input) {
+		return false;
 	}
 
 	private class DirtyListener extends SelectionAdapter implements ModifyListener {

@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.medmon.database.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -91,6 +92,8 @@ public class Sensor {
 	}
 
 	public boolean addData(Data d) {
+		if(data == null)
+			data = new ArrayList<>();
 		if (data.contains(d))
 			return false;
 		boolean success = data.add(d);
@@ -99,8 +102,10 @@ public class Sensor {
 		return success;
 	}
 
-	public void removeData(Data data) {
-		this.data.remove(data);
+	public boolean removeData(Data data) {
+		if(data == null) 
+			this.data = new ArrayList<>();
+		return this.data.remove(data);
 	}
 
 	public String getFilePrefix() {

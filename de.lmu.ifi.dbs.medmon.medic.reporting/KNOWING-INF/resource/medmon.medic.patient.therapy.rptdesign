@@ -1,20 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="author">Nepomuk Seiler</property>
     <property name="createdBy">Eclipse BIRT Designer Version 3.7.2.v20120213 Build &lt;3.7.2.v20120214-1408></property>
+    <text-property name="title">Patient Therapy Overview</text-property>
     <property name="units">in</property>
-    <method name="initialize"><![CDATA[var appContext = reportContext.getAppContext();
-//var daReport = appContext.get("daReport");
-var timeIntervalResults = new Packages.de.lmu.ifi.dbs.medmon.medic.reporting.data.BarChartMock();
-var instances = timeIntervalResults.getInstances();
+    <method name="initialize"><![CDATA[importPackage(Packages.de.lmu.ifi.dbs.medmon.database.entity)
+importPackage(Packages.de.lmu.ifi.dbs.medmon.medic.reporting.data)
+var appContext = reportContext.getAppContext();
+var patient = appContext.get("patient");
+var therapy = appContext.get("therapy");
+var instances = appContext.get("timeSeriesResults");
 
-var instanceCount = 0;]]></method>
+//var mocky = new Packages.de.lmu.ifi.dbs.medmon.medic.reporting.data.PatientOverviewMock();
+//var patient = mocky.getPatient();
+//var therapy = mocky.getTherapy();
+//var instances = mocky.getTimeSeriesResults();
+
+var instanceCount = 0;
+var therapyResultsCount = 0;]]></method>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">90</property>
     <data-sources>
-        <script-data-source name="Instances" id="7"/>
+        <script-data-source name="Patient" id="7"/>
+        <script-data-source name="Instances" id="92"/>
     </data-sources>
     <data-sets>
+        <script-data-set name="PatientSet" id="43">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">columnId</property>
+                    <property name="dataType">javaObject</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">columnFirstname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">columnLastname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">columnTherapysart</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">columnGender</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">columnInsuranceId</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">columnBirth</property>
+                    <property name="dataType">date</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">columnId</property>
+                    <text-property name="displayName">Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnFirstname</property>
+                    <text-property name="displayName">Vorname</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnLastname</property>
+                    <text-property name="displayName">Nachname</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnTherapysart</property>
+                    <text-property name="displayName">Therapiebeginn</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnGender</property>
+                    <text-property name="displayName">Geschlecht</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnInsuranceId</property>
+                    <text-property name="displayName">Versicherungsnummer</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnBirth</property>
+                    <text-property name="displayName">Geburtstag</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">columnId</property>
+                        <property name="dataType">javaObject</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">columnFirstname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">columnLastname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">columnTherapysart</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">columnGender</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">columnInsuranceId</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">columnBirth</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Patient</property>
+            <method name="fetch"><![CDATA[row["columnId"] = patient.getId();
+row["columnFirstname"] = patient.getFirstname();
+row["columnLastname"] = patient.getLastname();
+row["columnTherapystart"] = patient.getTherapystart();
+row["columnGender"] = patient.getGender();
+row["columnInsuranceId"] = patient.getInsuranceId();
+row["columnBirth"] = patient.getBirth();
+return false;]]></method>
+        </script-data-set>
         <script-data-set name="TimeIntervalResults" id="8">
             <list-property name="resultSetHints">
                 <structure>
@@ -32,6 +160,11 @@ var instanceCount = 0;]]></method>
                     <property name="name">columnClass</property>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">columnClassIndex</property>
+                    <property name="dataType">integer</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -45,6 +178,10 @@ var instanceCount = 0;]]></method>
                 <structure>
                     <property name="columnName">columnClass</property>
                     <text-property name="displayName">Aktivität</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnClassIndex</property>
+                    <text-property name="displayName">Class Index</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -64,6 +201,11 @@ var instanceCount = 0;]]></method>
                         <property name="name">columnClass</property>
                         <property name="dataType">string</property>
                     </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">columnClassIndex</property>
+                        <property name="dataType">integer</property>
+                    </structure>
                 </list-property>
             </structure>
             <property name="dataSource">Instances</property>
@@ -73,7 +215,86 @@ if(instanceCount < instances.size()){
 	row["columnStart"] = new Date(inst.value(0))
 	row["columnEnd"] = new Date(inst.value(1))
 	row["columnClass"] = inst.stringValue(2);
+	row["columnClassIndex"] = inst.value(2);
 	instanceCount++;
+	return true;
+}
+return false;]]></method>
+        </script-data-set>
+        <script-data-set name="TherapySet" id="93">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">0</property>
+                    <property name="name">columnId</property>
+                    <property name="dataType">javaObject</property>
+                </structure>
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">columnCaption</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">columnSuccess</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">columnTimestamp</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">columnId</property>
+                    <text-property name="displayName">id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnCaption</property>
+                    <text-property name="displayName">Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnSuccess</property>
+                    <text-property name="displayName">Erfolg</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnTimestamp</property>
+                    <text-property name="displayName">Termin</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">columnId</property>
+                        <property name="dataType">javaObject</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">columnCaption</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">columnSuccess</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">columnTimestamp</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Patient</property>
+            <method name="fetch"><![CDATA[var results = therapy.getTherapyResults();
+if(therapyResultsCount < results.size()) {
+	var result = results.get(therapyResultsCount);
+	row["columnId"] = result.getId();
+	row["columnCaption"] = result.getCaption();
+	row["columnSuccess"] = result.getSuccess();
+	row["columnTimestamp"] = result.getTimestamp();
+	therapyResultsCount++;
 	return true;
 }
 return false;]]></method>
@@ -115,8 +336,10 @@ return false;]]></method>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">a4</property>
             <page-footer>
                 <text id="3">
+                    <property name="textAlign">right</property>
                     <property name="contentType">html</property>
                     <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
                 </text>
@@ -124,86 +347,176 @@ return false;]]></method>
         </simple-master-page>
     </page-setup>
     <body>
-        <table id="10">
-            <property name="dataSet">TimeIntervalResults</property>
+        <grid id="68">
+            <property name="width">7.777777777777778in</property>
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">columnStart</property>
-                    <text-property name="displayName">Start</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["columnStart"]</expression>
-                    <property name="dataType">date-time</property>
-                </structure>
-                <structure>
-                    <property name="name">columnEnd</property>
-                    <text-property name="displayName">Ende</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["columnEnd"]</expression>
-                    <property name="dataType">date-time</property>
-                </structure>
-                <structure>
-                    <property name="name">columnClass</property>
-                    <text-property name="displayName">Aktivität</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["columnClass"]</expression>
+                    <property name="name">LastName</property>
+                    <text-property name="displayName">LastName</text-property>
+                    <expression name="expression" type="javascript">patient.getLastname();</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">insuranceId</property>
+                    <text-property name="displayName">InsuranceId</text-property>
+                    <expression name="expression" type="javascript">patient.getInsuranceId();</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
-            <column id="26"/>
-            <column id="27"/>
-            <column id="28"/>
-            <column id="29"/>
-            <header>
-                <row id="11">
-                    <cell id="12"/>
-                    <cell id="13">
-                        <label id="30">
-                            <text-property name="text">Start</text-property>
-                        </label>
-                    </cell>
-                    <cell id="14">
-                        <label id="32">
-                            <text-property name="text">Ende</text-property>
-                        </label>
-                    </cell>
-                    <cell id="15">
-                        <label id="34">
-                            <text-property name="text">Aktivität</text-property>
-                        </label>
-                    </cell>
-                </row>
-            </header>
-            <detail>
-                <row id="16">
-                    <cell id="17"/>
-                    <cell id="18">
-                        <data id="31">
-                            <property name="resultSetColumn">columnStart</property>
-                        </data>
-                    </cell>
-                    <cell id="19">
-                        <data id="33">
-                            <property name="resultSetColumn">columnEnd</property>
-                        </data>
-                    </cell>
-                    <cell id="20">
-                        <data id="35">
-                            <property name="resultSetColumn">columnClass</property>
-                        </data>
-                    </cell>
-                </row>
-            </detail>
-            <footer>
-                <row id="21">
-                    <cell id="22"/>
-                    <cell id="23"/>
-                    <cell id="24"/>
-                    <cell id="25"/>
-                </row>
-            </footer>
-        </table>
-        <extended-item extensionName="Chart" id="36">
-            <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:data="http://www.birt.eclipse.org/ChartModelData" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
+            <column id="69">
+                <property name="width">0.6777777777777778in</property>
+            </column>
+            <column id="70">
+                <property name="width">1.1777777777777778in</property>
+            </column>
+            <column id="71">
+                <property name="width">3.2888888888888888in</property>
+            </column>
+            <column id="72">
+                <property name="width">2.6333333333333333in</property>
+            </column>
+            <row id="73">
+                <cell id="74">
+                    <label id="65">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Patient</text-property>
+                    </label>
+                </cell>
+                <cell id="75">
+                    <data id="67">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Column Binding</property>
+                                <text-property name="displayName">FirstName</text-property>
+                                <expression name="expression" type="javascript">patient.getFirstname();</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">Column Binding</property>
+                    </data>
+                </cell>
+                <cell id="76">
+                    <data id="78">
+                        <property name="resultSetColumn">LastName</property>
+                    </data>
+                </cell>
+                <cell id="77">
+                    <data id="79">
+                        <property name="textAlign">right</property>
+                        <property name="resultSetColumn">insuranceId</property>
+                    </data>
+                </cell>
+            </row>
+        </grid>
+        <label id="91">
+            <text-property name="text">-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text-property>
+        </label>
+        <grid id="94">
+            <column id="95"/>
+            <column id="96"/>
+            <row id="97">
+                <cell id="98">
+                    <label id="106">
+                        <property name="fontWeight">bold</property>
+                        <property name="color">#4D4D4D</property>
+                        <text-property name="text">Ergebnisse</text-property>
+                    </label>
+                </cell>
+                <cell id="99">
+                    <label id="142">
+                        <property name="fontWeight">bold</property>
+                        <property name="color">#4D4D4D</property>
+                        <text-property name="text">Aktivitätsverhältnis</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="100">
+                <cell id="101">
+                    <table id="119">
+                        <property name="dataSet">TherapySet</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">columnId</property>
+                                <text-property name="displayName">id</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["columnId"]</expression>
+                                <property name="dataType">javaObject</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnCaption</property>
+                                <text-property name="displayName">Name</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["columnCaption"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnSuccess</property>
+                                <text-property name="displayName">Erfolg</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["columnSuccess"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnTimestamp</property>
+                                <text-property name="displayName">Termin</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["columnTimestamp"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="132"/>
+                        <column id="133"/>
+                        <column id="134"/>
+                        <header>
+                            <row id="120">
+                                <cell id="121"/>
+                                <cell id="122">
+                                    <label id="135">
+                                        <text-property name="text">Name</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="123">
+                                    <label id="139">
+                                        <text-property name="text">Termin</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="124">
+                                <cell id="125"/>
+                                <cell id="126">
+                                    <data id="136">
+                                        <property name="resultSetColumn">columnCaption</property>
+                                    </data>
+                                </cell>
+                                <cell id="127">
+                                    <data id="140">
+                                        <property name="resultSetColumn">columnTimestamp</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="128">
+                                <property name="height">2.5444444444444443in</property>
+                                <cell id="129"/>
+                                <cell id="130"/>
+                                <cell id="131">
+                                    <property name="paddingTop">10pt</property>
+                                    <property name="paddingLeft">5pt</property>
+                                    <property name="paddingBottom">10pt</property>
+                                    <property name="paddingRight">5pt</property>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+                <cell id="102">
+                    <extended-item extensionName="Chart" name="activity" id="141">
+                        <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:data="http://www.birt.eclipse.org/ChartModelData" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
   <Version>2.5.3</Version>
-  <Type>Gantt Chart</Type>
-  <SubType>Standard Gantt Chart</SubType>
+  <Type>Bar Chart</Type>
+  <SubType>Side-by-side</SubType>
   <Block>
     <Children xsi:type="layout:TitleBlock">
       <Bounds>
@@ -350,7 +663,7 @@ return false;]]></method>
         </Color>
         <Visible>false</Visible>
       </Outline>
-      <Visible>true</Visible>
+      <Visible>false</Visible>
       <ClientArea>
         <Outline>
           <Style>Solid</Style>
@@ -390,7 +703,7 @@ return false;]]></method>
         <Visible>true</Visible>
       </Separator>
       <Position>Right</Position>
-      <ItemType>Categories</ItemType>
+      <ItemType>Series</ItemType>
       <Title>
         <Caption>
           <Value></Value>
@@ -463,10 +776,10 @@ return false;]]></method>
   </ExtendedProperties>
   <SampleData>
     <BaseSampleData>
-      <DataSetRepresentation>'A','B','C','D','E'</DataSetRepresentation>
+      <DataSetRepresentation>A, B, C</DataSetRepresentation>
     </BaseSampleData>
     <OrthogonalSampleData>
-      <DataSetRepresentation>01/05/2000,02/01/2000,04/12/2000,03/12/2000,02/29/2000</DataSetRepresentation>
+      <DataSetRepresentation>5,4,12</DataSetRepresentation>
       <SeriesDefinitionIndex>0</SeriesDefinitionIndex>
     </OrthogonalSampleData>
   </SampleData>
@@ -544,10 +857,10 @@ return false;]]></method>
     </Title>
     <TitlePosition>Below</TitlePosition>
     <AssociatedAxes>
-      <Type>DateTime</Type>
+      <Type>Linear</Type>
       <Title>
         <Caption>
-          <Value>Y-Axis Title</Value>
+          <Value>Tage</Value>
           <Font>
             <Size>14.0</Size>
             <Bold>true</Bold>
@@ -579,15 +892,12 @@ return false;]]></method>
           <Bottom>0.0</Bottom>
           <Right>3.0</Right>
         </Insets>
-        <Visible>false</Visible>
+        <Visible>true</Visible>
       </Title>
       <TitlePosition>Left</TitlePosition>
       <SeriesDefinitions>
         <Query>
           <Definition></Definition>
-          <Grouping>
-            <GroupType>Text</GroupType>
-          </Grouping>
         </Query>
         <SeriesPalette>
           <Entries xsi:type="attribute:ColorDefinition">
@@ -783,7 +1093,7 @@ return false;]]></method>
             <Blue>0</Blue>
           </Entries>
         </SeriesPalette>
-        <Series xsi:type="type:GanttSeries">
+        <Series xsi:type="type:BarSeries">
           <Visible>true</Visible>
           <Label>
             <Caption>
@@ -818,23 +1128,12 @@ return false;]]></method>
             <Visible>false</Visible>
           </Label>
           <DataDefinition>
-            <Definition>row[&quot;columnEnd&quot;]</Definition>
+            <Definition>BirtDateTime.diffDay(row[&quot;columnStart&quot;], row[&quot;columnEnd&quot;])</Definition>
             <Grouping>
-              <Enabled>true</Enabled>
+              <Enabled>false</Enabled>
               <GroupType>Text</GroupType>
-              <AggregateExpression>Min</AggregateExpression>
+              <AggregateExpression xsi:nil="true"/>
             </Grouping>
-          </DataDefinition>
-          <DataDefinition>
-            <Definition>row[&quot;columnStart&quot;]</Definition>
-            <Grouping>
-              <Enabled>true</Enabled>
-              <GroupType>Text</GroupType>
-              <AggregateExpression>Max</AggregateExpression>
-            </Grouping>
-          </DataDefinition>
-          <DataDefinition>
-            <Definition>row[&quot;columnClass&quot;]</Definition>
           </DataDefinition>
           <SeriesIdentifier>Series 1</SeriesIdentifier>
           <DataPoint>
@@ -843,7 +1142,7 @@ return false;]]></method>
             </Components>
             <Separator>, </Separator>
           </DataPoint>
-          <LabelPosition>Above</LabelPosition>
+          <LabelPosition>Outside</LabelPosition>
           <Stacked>false</Stacked>
           <Triggers>
             <Condition>onmouseover</Condition>
@@ -855,84 +1154,8 @@ return false;]]></method>
               </Value>
             </Action>
           </Triggers>
-          <Translucent>false</Translucent>
-          <StartMarker>
-            <Type>Nabla</Type>
-            <Size>4</Size>
-            <Visible>false</Visible>
-            <Outline>
-              <Visible>true</Visible>
-            </Outline>
-          </StartMarker>
-          <StartMarkerPosition>Below</StartMarkerPosition>
-          <EndMarker>
-            <Type>Nabla</Type>
-            <Size>4</Size>
-            <Visible>false</Visible>
-            <Outline>
-              <Visible>true</Visible>
-            </Outline>
-          </EndMarker>
-          <EndMarkerPosition>Above</EndMarkerPosition>
-          <ConnectionLine>
-            <Style>Solid</Style>
-            <Thickness>8</Thickness>
-            <Color>
-              <Transparency>255</Transparency>
-              <Red>0</Red>
-              <Green>0</Green>
-              <Blue>0</Blue>
-            </Color>
-            <Visible>true</Visible>
-          </ConnectionLine>
-          <Outline>
-            <Style>Solid</Style>
-            <Thickness>1</Thickness>
-            <Color>
-              <Transparency>255</Transparency>
-              <Red>0</Red>
-              <Green>0</Green>
-              <Blue>0</Blue>
-            </Color>
-            <Visible>true</Visible>
-          </Outline>
-          <DecorationLabel>
-            <Caption>
-              <Value></Value>
-              <Font>
-                <Alignment/>
-              </Font>
-            </Caption>
-            <Background xsi:type="attribute:ColorDefinition">
-              <Transparency>0</Transparency>
-              <Red>255</Red>
-              <Green>255</Green>
-              <Blue>255</Blue>
-            </Background>
-            <Outline>
-              <Style>Solid</Style>
-              <Thickness>1</Thickness>
-              <Color>
-                <Transparency>255</Transparency>
-                <Red>0</Red>
-                <Green>0</Green>
-                <Blue>0</Blue>
-              </Color>
-            </Outline>
-            <Insets>
-              <Top>0.0</Top>
-              <Left>2.0</Left>
-              <Bottom>0.0</Bottom>
-              <Right>3.0</Right>
-            </Insets>
-            <Visible>true</Visible>
-          </DecorationLabel>
-          <PaletteLineColor>true</PaletteLineColor>
+          <Riser>Rectangle</Riser>
         </Series>
-        <Grouping>
-          <GroupType>Text</GroupType>
-          <AggregateExpression>Sum</AggregateExpression>
-        </Grouping>
       </SeriesDefinitions>
       <Orientation>Vertical</Orientation>
       <LineAttributes>
@@ -978,6 +1201,7 @@ return false;]]></method>
         <Visible>true</Visible>
       </Label>
       <LabelPosition>Left</LabelPosition>
+      <Staggered>false</Staggered>
       <MajorGrid>
         <LineAttributes>
           <Style>Solid</Style>
@@ -1287,12 +1511,9 @@ return false;]]></method>
       </Series>
       <Grouping>
         <Enabled>true</Enabled>
-        <GroupingUnit>String</GroupingUnit>
-        <GroupingInterval>1.0</GroupingInterval>
         <GroupType>Text</GroupType>
         <AggregateExpression>Sum</AggregateExpression>
       </Grouping>
-      <SortKey/>
     </SeriesDefinitions>
     <Orientation>Horizontal</Orientation>
     <LineAttributes>
@@ -1338,7 +1559,6 @@ return false;]]></method>
       <Visible>true</Visible>
     </Label>
     <LabelPosition>Below</LabelPosition>
-    <Staggered>false</Staggered>
     <MajorGrid>
       <LineAttributes>
         <Style>Solid</Style>
@@ -1394,12 +1614,15 @@ return false;]]></method>
     </Scale>
     <Origin>
       <Type>Min</Type>
+      <Value xsi:type="data:NumberDataElement">
+        <Value>0.0</Value>
+      </Value>
     </Origin>
     <PrimaryAxis>true</PrimaryAxis>
     <CategoryAxis>true</CategoryAxis>
     <Percent>false</Percent>
   </Axes>
-  <Orientation>Horizontal</Orientation>
+  <Orientation>Vertical</Orientation>
   <UnitSpacing>50.0</UnitSpacing>
   <Rotation>
     <Angles>
@@ -1409,31 +1632,59 @@ return false;]]></method>
       <Type>None</Type>
     </Angles>
   </Rotation>
-  <ReverseCategory>false</ReverseCategory>
 </model:ChartWithAxes>
 ]]></xml-property>
-            <property name="outputFormat">PNG</property>
-            <property name="inheritColumns">false</property>
-            <property name="dataSet">TimeIntervalResults</property>
-            <property name="height">130pt</property>
-            <property name="width">7.955555555555556in</property>
+                        <property name="outputFormat">PNG</property>
+                        <property name="inheritColumns">false</property>
+                        <property name="dataSet">TimeIntervalResults</property>
+                        <property name="height">12cm</property>
+                        <property name="width">9.6cm</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">columnStart</property>
+                                <expression name="expression" type="javascript">dataSetRow["columnStart"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnEnd</property>
+                                <expression name="expression" type="javascript">dataSetRow["columnEnd"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnClass</property>
+                                <expression name="expression" type="javascript">dataSetRow["columnClass"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">columnClassIndex</property>
+                                <expression name="expression" type="javascript">dataSetRow["columnClassIndex"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                    </extended-item>
+                </cell>
+            </row>
+            <row id="103">
+                <cell id="104"/>
+                <cell id="105"/>
+            </row>
+        </grid>
+        <label id="144">
+            <property name="fontSize">14pt</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#4D4D4D</property>
+            <text-property name="text">Kommentar</text-property>
+        </label>
+        <data id="143">
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">columnStart</property>
-                    <expression name="expression" type="javascript">dataSetRow["columnStart"]</expression>
-                    <property name="dataType">date-time</property>
-                </structure>
-                <structure>
-                    <property name="name">columnEnd</property>
-                    <expression name="expression" type="javascript">dataSetRow["columnEnd"]</expression>
-                    <property name="dataType">date-time</property>
-                </structure>
-                <structure>
-                    <property name="name">columnClass</property>
-                    <expression name="expression" type="javascript">dataSetRow["columnClass"]</expression>
+                    <property name="name">TherapyComment</property>
+                    <expression name="expression" type="javascript">therapy.getComment();</expression>
                     <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
             </list-property>
-        </extended-item>
+            <property name="resultSetColumn">TherapyComment</property>
+        </data>
     </body>
 </report>

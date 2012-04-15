@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="units">in</property>
+    <property name="theme">defaultTheme</property>
+    <data-sets>
+        <script-data-set name="PatientSet" id="5">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">columnId</property>
+                    <property name="dataType">javaObject</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">columnFirstname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">columnLastname</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">columnTherapysart</property>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">columnGender</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">columnInsuranceId</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">columnBirth</property>
+                    <property name="dataType">date</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">columnId</property>
+                    <text-property name="displayName">Id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnFirstname</property>
+                    <text-property name="displayName">Vorname</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnLastname</property>
+                    <text-property name="displayName">Nachname</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnTherapysart</property>
+                    <text-property name="displayName">Therapiebeginn</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnGender</property>
+                    <text-property name="displayName">Geschlecht</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnInsuranceId</property>
+                    <text-property name="displayName">Versicherungsnummer</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">columnBirth</property>
+                    <text-property name="displayName">Geburtstag</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">columnId</property>
+                        <property name="dataType">javaObject</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">columnFirstname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">columnLastname</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">columnTherapysart</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">columnGender</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">columnInsuranceId</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">columnBirth</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Patient</property>
+            <method name="fetch"><![CDATA[row["columnId"] = patient.getId();
+row["columnFirstname"] = patient.getFirstname();
+row["columnLastname"] = patient.getLastname();
+row["columnTherapystart"] = patient.getTherapystart();
+row["columnGender"] = patient.getGender();
+row["columnInsuranceId"] = patient.getInsuranceId();
+row["columnBirth"] = patient.getBirth();
+return false;]]></method>
+        </script-data-set>
+    </data-sets>
+    <themes>
+        <theme name="defaultTheme" id="4"/>
+    </themes>
+    <page-setup>
+        <simple-master-page name="NewSimpleMasterPage" id="3"/>
+    </page-setup>
+</library>

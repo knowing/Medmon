@@ -7,17 +7,30 @@ Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.reporting.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.7.0",
  de.lmu.ifi.dbs.medmon.medic.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.derby;bundle-version="1.0.0"
+ org.eclipse.birt;bundle-version="3.7.2",
+ org.eclipse.birt.chart.engine;bundle-version="3.7.2",
+ org.eclipse.birt.report.engine;bundle-version="3.7.2",
+ org.eclipse.birt.data;bundle-version="3.7.2",
+ org.eclipse.birt.data.aggregation;bundle-version="3.7.2",
+ org.eclipse.birt.core.script.function;bundle-version="3.7.2"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/reportingService.xml
-Export-Package: de.lmu.ifi.dbs.medmon.medic.reporting.core,
+Export-Package: de.lmu.ifi.dbs.medmon.medic,
  de.lmu.ifi.dbs.medmon.medic.reporting.data,
  de.lmu.ifi.dbs.medmon.medic.reporting.service
-Import-Package: org.eclipse.birt.core.exception,
+Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
+ org.eclipse.birt.core.exception,
  org.eclipse.birt.core.framework,
  org.eclipse.birt.report.engine.api,
  org.eclipse.birt.report.model.api,
+ org.joda.time,
+ org.joda.time.base,
+ org.joda.time.chrono,
+ org.joda.time.convert,
+ org.joda.time.field,
+ org.joda.time.format,
+ org.joda.time.tz,
  org.slf4j;version="1.6.1",
  scala;version="[2.9.0.1,2.9.3.0]",
  scala.collection;version="[2.9.0.1,2.9.3.0]"

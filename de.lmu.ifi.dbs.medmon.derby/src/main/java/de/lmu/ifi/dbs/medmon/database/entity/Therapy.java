@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -150,8 +149,8 @@ public class Therapy {
 	public boolean addTherapyResult(TherapyResult therapyResult) {
 		if (therapyResults == null)
 			therapyResults = new ArrayList<>();
-		if (getTherapyResults().contains(therapyResult))
-			return false;
+//		if (getTherapyResults().contains(therapyResult))
+//			return false;
 		boolean success = getTherapyResults().add(therapyResult);
 		if (!this.equals(therapyResult.getTherapy()))
 			therapyResult.setTherapy(this);

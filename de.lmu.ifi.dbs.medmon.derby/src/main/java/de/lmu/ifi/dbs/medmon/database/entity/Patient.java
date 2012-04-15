@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -149,7 +150,7 @@ public class Patient {
 		return id;
 	}
 
-	protected void setId(long id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -226,6 +227,8 @@ public class Patient {
 	}
 
 	public void addTherapy(Therapy therapy) {
+		if(therapies == null)
+			therapies = new ArrayList<>();
 		therapies.add(therapy);
 		if (!this.equals(therapy.getPatient()))
 			therapy.setPatient(this);
@@ -257,28 +260,6 @@ public class Patient {
 	@Override
 	public String toString() {
 		return getFirstname() + " " + getLastname();
-	}
-
-	private String printTherapies() {
-		if (getTherapies() == null)
-			return "null";
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		for (Therapy t : getTherapies()) {
-			sb.append(t.getId()).append(";");
-		}
-		return sb.append("]").toString();
-	}
-
-	private String printData() {
-		if (getData() == null)
-			return "null";
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		for (Data d : getData()) {
-			sb.append(d.getId()).append(",");
-		}
-		return sb.append("]").toString();
 	}
 
 	@Override

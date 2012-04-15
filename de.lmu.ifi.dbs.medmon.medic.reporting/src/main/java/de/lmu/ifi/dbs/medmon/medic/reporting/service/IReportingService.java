@@ -6,7 +6,6 @@ import java.util.Map;
 import org.eclipse.birt.report.engine.api.EngineException;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Report;
-import de.lmu.ifi.dbs.medmon.medic.reporting.core.BirtProcessingException;
 
 public interface IReportingService {
 
@@ -25,6 +24,6 @@ public interface IReportingService {
 	 * @throws EngineException
 	 */
 	public Report renderReport(String reportId, ClassLoader classLoader, Map<String, Object> data,
-			String outputFormat) throws IOException, BirtProcessingException;
+			String outputFormat) throws IOException, EngineException;
 
 }
