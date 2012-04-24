@@ -1642,7 +1642,7 @@ return false;]]></method>
         <Query>
           <Definition>row[&quot;columnEnd&quot;]</Definition>
           <Grouping>
-            <GroupingUnit>Hours</GroupingUnit>
+            <GroupingUnit>Days</GroupingUnit>
             <GroupType>DateTime</GroupType>
           </Grouping>
         </Query>
@@ -2344,15 +2344,13 @@ return false;]]></method>
         <Stacked>false</Stacked>
       </Series>
       <Grouping>
-        <Enabled>false</Enabled>
+        <Enabled>true</Enabled>
         <GroupingUnit>Days</GroupingUnit>
         <GroupingInterval>1.0</GroupingInterval>
         <GroupType>Text</GroupType>
         <AggregateExpression>Sum</AggregateExpression>
       </Grouping>
-      <SortKey>
-        <Definition>row[&quot;columnClass&quot;]</Definition>
-      </SortKey>
+      <SortKey/>
     </SeriesDefinitions>
     <Orientation>Horizontal</Orientation>
     <LineAttributes>
