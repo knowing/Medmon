@@ -1253,7 +1253,7 @@ return false;]]></method>
         <label id="94">
             <property name="fontWeight">bold</property>
             <property name="color">#FF0000</property>
-            <text-property name="text">Diese Ausgabe ist nicht richtig. Keine Intervalle möglich!</text-property>
+            <text-property name="text">Diese Ausgabe ist nicht richtig. Intervalle nicht korrekt</text-property>
         </label>
         <extended-item extensionName="Chart" name="ActivityChart" id="36">
             <xml-property name="xmlRepresentation"><![CDATA[<model:ChartWithAxes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:attribute="http://www.birt.eclipse.org/ChartModelAttribute" xmlns:data="http://www.birt.eclipse.org/ChartModelData" xmlns:layout="http://www.birt.eclipse.org/ChartModelLayout" xmlns:model="http://www.birt.eclipse.org/ChartModel" xmlns:type="http://www.birt.eclipse.org/ChartModelType">
@@ -1519,7 +1519,7 @@ return false;]]></method>
   </ExtendedProperties>
   <SampleData>
     <BaseSampleData>
-      <DataSetRepresentation>6,4,12,8,10</DataSetRepresentation>
+      <DataSetRepresentation>'A','B','C','D','E'</DataSetRepresentation>
     </BaseSampleData>
     <OrthogonalSampleData>
       <DataSetRepresentation>01/05/2000,02/01/2000,04/12/2000,03/12/2000,02/29/2000</DataSetRepresentation>
@@ -1561,7 +1561,7 @@ return false;]]></method>
     <Visible>false</Visible>
   </EmptyMessage>
   <Axes>
-    <Type>Linear</Type>
+    <Type>Text</Type>
     <Title>
       <Caption>
         <Value>X-Axis Title</Value>
@@ -1640,9 +1640,10 @@ return false;]]></method>
       <TitlePosition>Left</TitlePosition>
       <SeriesDefinitions>
         <Query>
-          <Definition></Definition>
+          <Definition>row[&quot;columnEnd&quot;]</Definition>
           <Grouping>
-            <GroupType>Text</GroupType>
+            <GroupingUnit>Hours</GroupingUnit>
+            <GroupType>DateTime</GroupType>
           </Grouping>
         </Query>
         <SeriesPalette>
@@ -1890,7 +1891,7 @@ return false;]]></method>
             </Grouping>
           </DataDefinition>
           <DataDefinition>
-            <Definition>row[&quot;columnClass&quot;]</Definition>
+            <Definition>&quot;&quot;</Definition>
           </DataDefinition>
           <SeriesIdentifier>Series 1</SeriesIdentifier>
           <DataPoint>
@@ -1989,6 +1990,7 @@ return false;]]></method>
           <GroupType>Text</GroupType>
           <AggregateExpression>Sum</AggregateExpression>
         </Grouping>
+        <SortKey/>
       </SeriesDefinitions>
       <Orientation>Vertical</Orientation>
       <LineAttributes>
@@ -2329,7 +2331,7 @@ return false;]]></method>
           <Visible>false</Visible>
         </Label>
         <DataDefinition>
-          <Definition>row[&quot;columnClassIndex&quot;]</Definition>
+          <Definition>row[&quot;columnClass&quot;]</Definition>
         </DataDefinition>
         <SeriesIdentifier></SeriesIdentifier>
         <DataPoint>
@@ -2342,13 +2344,15 @@ return false;]]></method>
         <Stacked>false</Stacked>
       </Series>
       <Grouping>
-        <Enabled>true</Enabled>
-        <GroupingUnit>String</GroupingUnit>
+        <Enabled>false</Enabled>
+        <GroupingUnit>Days</GroupingUnit>
         <GroupingInterval>1.0</GroupingInterval>
-        <GroupType>Numeric</GroupType>
+        <GroupType>Text</GroupType>
         <AggregateExpression>Sum</AggregateExpression>
       </Grouping>
-      <SortKey/>
+      <SortKey>
+        <Definition>row[&quot;columnClass&quot;]</Definition>
+      </SortKey>
     </SeriesDefinitions>
     <Orientation>Horizontal</Orientation>
     <LineAttributes>
