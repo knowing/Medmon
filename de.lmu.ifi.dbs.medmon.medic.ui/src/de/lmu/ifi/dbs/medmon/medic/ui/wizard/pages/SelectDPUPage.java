@@ -18,9 +18,9 @@ public class SelectDPUPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public SelectDPUPage() {
-		super("selectMPUPage");
-		setTitle("Analyseverfahren auswaehlen");
-		setDescription("Wahlen sie ein Verfahren aus um die Daten zu analysieren");
+		super("SelectDPUPage");
+		setTitle("Analyseverfahren ausw\u00e4hlen.");
+		setDescription("W\u00e4hlen Sie ein Verfahren aus um die Daten zu analysieren");
 	}
 
 	/**

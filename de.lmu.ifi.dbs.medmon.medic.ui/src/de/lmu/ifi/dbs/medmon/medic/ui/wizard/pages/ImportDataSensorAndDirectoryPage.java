@@ -38,9 +38,9 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 	 * Create the wizard.
 	 */
 	public ImportDataSensorAndDirectoryPage() {
-		super("wizardPage");
-		setTitle("Sensor ausw\u00E4hlen");
-		setDescription("<missing>");
+		super("ImportDataSensorAndDirectoryPage");
+		setTitle("Sensor ausw\u00e4hlen");
+		setDescription("W\u00e4hlen Sie einen Sensor aus von dem Sie die Daten verwenden m\u00f6chten.");
 	}
 
 	/**

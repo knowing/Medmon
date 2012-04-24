@@ -47,7 +47,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	public TherapyResultTherapyPage() {
 		super("wizardPage");
 		setTitle("Therapie ausw\u00e4hlen");
-		setDescription("<missing>");
+		setDescription("W\u00e4hlen Sie eine Therapie aus dem die Daten zugeordnet werden.");
 	}
 
 	/**

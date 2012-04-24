@@ -48,9 +48,9 @@ public class TherapyResultPatientAndTypePage extends WizardPage implements IVali
 	 * Create the wizard.
 	 */
 	public TherapyResultPatientAndTypePage() {
-		super("wizardPage");
-		setTitle("Daten importieren");
-		setDescription("<missing>");
+		super("TherapyResultPatientAndTypePage");
+		setTitle("Datenimport und Analyseassistent");
+		setDescription("W\u00e4hlen Sie einen Patienten und die Datenquelle aus");
 	}
 
 	/**

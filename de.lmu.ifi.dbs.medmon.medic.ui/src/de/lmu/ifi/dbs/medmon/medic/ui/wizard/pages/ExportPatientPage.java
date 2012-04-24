@@ -17,9 +17,9 @@ public class ExportPatientPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public ExportPatientPage() {
-		super("patientExportPage");
+		super("ExportPatientPage");
 		setTitle("Patient Export");
-		setDescription("Waehlen Sie einen Patienten und die Informationen zum Export aus");
+		setDescription("W\u00e4hlen Sie einen Patienten und die Informationen zum Export aus.");
 	}
 
 	/**

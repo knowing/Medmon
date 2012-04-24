@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.wizard.WizardPage;
@@ -34,7 +33,7 @@ public class TherapyResultDataPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public TherapyResultDataPage() {
-		super("wizardPage");
+		super("TherapyResultDataPage");
 		setPageComplete(false);
 		setTitle("Therapie ausw\u00E4hlen");
 		setDescription("w\u00E4hlen sie die Therapie aus, zu der das neue Ergebnis geh\u00F6ren soll");

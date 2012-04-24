@@ -17,9 +17,9 @@ public class ImportPatientPage extends WizardPage {
 	 * Create the wizard.
 	 */
 	public ImportPatientPage() {
-		super("patientImportPage");
+		super("ImportPatientPage");
 		setTitle("Patient Import");
-		setDescription("Waehlen Sie eine Datei aus um einen Patient zu importieren");
+		setDescription("W\u00e4hlen Sie eine Datei aus um einen Patient zu importieren.");
 	}
 
 	/**

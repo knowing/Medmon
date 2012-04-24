@@ -48,9 +48,9 @@ public class ImportDataPatientAndTypePage extends WizardPage implements IValidat
 	 * Create the wizard.
 	 */
 	public ImportDataPatientAndTypePage() {
-		super("wizardPage");
+		super("ImportDataPatientAndTypePage");
 		setTitle("Daten importieren");
-		setDescription("<missing>");
+		setDescription("D..");
 	}
 
 	/**

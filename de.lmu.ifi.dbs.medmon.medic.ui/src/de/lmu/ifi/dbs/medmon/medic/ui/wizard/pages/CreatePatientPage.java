@@ -51,9 +51,9 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 	private static final String	ERROR_NO_INSURANCE_ID			= "Keine Versicherungsnummer";
 
 	public CreatePatientPage() {
-		super("Patient auswaehlen");
-		setDescription("Bitte waehlen sie einen Patienten aus");
-		setTitle("Patient auswaehlen");
+		super("CreatePatientPage");
+		setDescription("Bitte w\u00e4hlen sie einen Patienten aus.");
+		setTitle("Patient ausw\u00e4hlen");
 		setImageDescriptor(Activator.getImageDescriptor(ISharedImages.IMG_ADD_PATIENT_48));
 		errors = new TreeSet<String>();
 	}

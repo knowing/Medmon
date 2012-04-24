@@ -43,9 +43,9 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	 * Create the wizard.
 	 */
 	public ImportDataDataPage() {
-		super("wizardPage");
-		setTitle("Daten importieren");
-		setDescription("<missing>");
+		super("ImportDataDataPage");
+		setTitle("Datenauswahl");
+		setDescription("W\u00e4hlen Sie eine Quelldatei aus.");
 	}
 
 	/**

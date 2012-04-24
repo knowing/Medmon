@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataDataPage;
-import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataSensorAndDirectoryPage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultTherapyPage;
@@ -81,15 +80,6 @@ public class TherapyResultWizard extends Wizard {
 		addPage(sensorAndDirectoryPage);
 		addPage(dataPage);
 		addPage(selectDPUPage);
-	}
-
-	@Override
-	public boolean canFinish() {
-		for (IWizardPage page : getPages()) {
-			System.out.println(page.getTitle() + "   " + page.isPageComplete());
-		}
-
-		return super.canFinish();
 	}
 
 	@Override

@@ -24,8 +24,8 @@ import org.eclipse.ui.part.ViewPart;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
-import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportWizardHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.NewPatientHandler;
+import de.lmu.ifi.dbs.medmon.medic.ui.handler.QuickAnalyseHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionListener;
@@ -64,9 +64,9 @@ public class HomeView extends ViewPart {
 			public void linkActivated(HyperlinkEvent e) {
 				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
 				try {
-					handlerService.executeCommand(ImportWizardHandler.ID, null);
+					handlerService.executeCommand(QuickAnalyseHandler.ID, null);
 				} catch (Exception ex) {
-					throw new RuntimeException(ImportWizardHandler.ID, ex);
+					throw new RuntimeException(QuickAnalyseHandler.ID, ex);
 				}
 			}
 		});

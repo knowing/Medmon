@@ -334,11 +334,6 @@
                label="Datenimport"
                style="push">
          </command>
-         <command
-               commandId="de.lmu.ifi.dbs.medmon.medic.ui.loadDataFromDB"
-               label="Daten aus Datenbank"
-               style="push">
-         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -356,12 +351,6 @@
                commandId="de.lmu.ifi.dbs.medmon.medic.ui.dataImportWizard"
                label="Daten importieren"
                style="push">
-         </command>
-         <command
-               commandId="de.lmu.ifi.dbs.medmon.medic.ui.loadDataFromDB"
-               label="Daten aus Datebank laden"
-               style="push"
-               tooltip="Startet einen Assistenten zum Laden von Daten aus der Datenbankaten aus Datebank laden">
          </command>
          <command
                commandId="de.lmu.ifi.dbs.medmon.medic.ui.quickanalyse"

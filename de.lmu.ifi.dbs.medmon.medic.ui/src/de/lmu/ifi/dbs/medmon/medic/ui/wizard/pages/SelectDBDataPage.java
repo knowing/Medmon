@@ -49,7 +49,7 @@ public class SelectDBDataPage extends WizardPage {
 	 */
 	public SelectDBDataPage() {
 		super("SelectDBDataPage");
-		setMessage("Waehlt momentan alle Daten fuer jeweiligen Patienten");
+		setMessage("W\u00e4ehlt momentan alle Daten fuer jeweiligen Patienten");
 		setTitle("Datenbankverwaltung");
 		setDescription("---");
 	}
