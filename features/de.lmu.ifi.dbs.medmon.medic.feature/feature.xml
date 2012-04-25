@@ -38,8 +38,8 @@ limitations under the License.
    <requires>
       <import feature="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.1.qualifier" match="greaterOrEqual"/>
       <import feature="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.1.qualifier" match="greaterOrEqual"/>
-      <import feature="de.lmu.ifi.dbs.medmon.common.core.feature" version="1.0.1.qualifier" match="greaterOrEqual"/>
-      <import feature="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.1.qualifier" match="greaterOrEqual"/>
+      <import feature="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.1.qualifier"/>
+      <import feature="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.1.qualifier"/>
    </requires>
 
    <plugin

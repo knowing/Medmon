@@ -4,7 +4,7 @@
       label="Medmon Reporting"
       version="1.0.1.qualifier"
       provider-name="LMU Munich - Database Systems Group"
-      license-feature="de.lmu.ifi.dbs.medmon.common.core.feature"
+      license-feature="de.lmu.ifi.dbs.medmon.medic.feature"
       license-feature-version="1.0.1.qualifier">
 
    <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
@@ -24,7 +24,7 @@
    </url>
 
    <requires>
-      <import feature="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier" match="greaterOrEqual"/>
+      <import feature="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
    </requires>
 
    <plugin
