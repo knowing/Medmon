@@ -4,14 +4,9 @@ import java.text.DateFormat;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-
-import base.ui.icons.Icons;
 
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
-import de.lmu.ifi.dbs.medmon.base.ui.util.SWTResourceManager;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
-import de.lmu.ifi.dbs.medmon.services.IPatientService;
 
 public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 
