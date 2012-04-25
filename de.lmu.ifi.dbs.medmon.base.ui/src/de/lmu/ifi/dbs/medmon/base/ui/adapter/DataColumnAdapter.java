@@ -8,6 +8,7 @@ import org.eclipse.ui.ISharedImages;
 
 import base.ui.icons.Icons;
 
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.util.SWTResourceManager;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
@@ -60,7 +61,7 @@ public class DataColumnAdapter implements IWorkbenchColumnAdapter {
 		Data data = (Data) element;
 		switch (columnIndex) {
 		case 0:
-			return SWTResourceManager.getImage(Icons.class, data.getType() + ".gif");
+			return Activator.getImageDescriptor("/icons/" + data.getType() + ".gif").createImage();
 		}
 		return null;
 	}
