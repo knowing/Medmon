@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class TherapyResultTherapyPage extends WizardPage implements IValidationPage {
 
@@ -64,7 +64,7 @@ public class TherapyResultTherapyPage extends WizardPage implements IValidationP
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 
-		EntityManager entityManager = JPAUtil.createEntityManager();
+		EntityManager entityManager = Activator.getEntityManagerService().createEntityManager();
 		Query allTherapiesQuery = entityManager.createNamedQuery("Therapy.findByPatientId");
 		List<Therapy> allTherapies = allTherapiesQuery.setParameter("patientId", patient).getResultList();
 		entityManager.close();

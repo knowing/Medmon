@@ -6,8 +6,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
+import de.lmu.ifi.dbs.medmon.base.ui.util.IMedmonSharedImages;
 import de.lmu.ifi.dbs.medmon.base.ui.util.ResourceManager;
-import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
 /**
  * @author Nepomuk Seiler
@@ -57,7 +58,7 @@ public class DPUColumnAdapter implements IAdapterFactory {
 		public Image getColumnImage(Object element, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return ResourceManager.getPluginImage(IMedmonConstants.BASE_UI_PLUGIN, IMedmonConstants.IMG_CHECKED_16);
+				return ResourceManager.getPluginImage(Activator.PLUGIN_ID, IMedmonSharedImages.IMG_CHECKED_16);
 			default:
 				return null;
 			}

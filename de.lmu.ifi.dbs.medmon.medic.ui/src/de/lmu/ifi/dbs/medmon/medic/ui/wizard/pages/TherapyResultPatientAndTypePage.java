@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.medmon.base.ui.dialog.DialogFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
@@ -92,7 +91,7 @@ public class TherapyResultPatientAndTypePage extends WizardPage implements IVali
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
 
-		EntityManager tempEM = JPAUtil.createEntityManager();
+		EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
 		Patient mPatient = tempEM.find(Patient.class, selectedPatient.getId());
 		tempEM.close();
 

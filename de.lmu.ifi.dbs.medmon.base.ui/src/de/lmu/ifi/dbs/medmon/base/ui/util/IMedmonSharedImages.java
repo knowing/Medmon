@@ -1,16 +1,18 @@
 /**
  * 
  */
-package de.lmu.ifi.dbs.medmon.medic.core.util;
+package de.lmu.ifi.dbs.medmon.base.ui.util;
+
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 
 /**
  * @author Nepomuk Seiler
  * @version 0.1
  * @since 28.03.2011
  */
-public interface IMedmonConstants {
+public interface IMedmonSharedImages {
 
-	public static final String BASE_UI_PLUGIN = "de.lmu.ifi.dbs.medmon.base.ui";
+	public static final String BASE_UI_PLUGIN = Activator.PLUGIN_ID;
 	
 	/* ==================== */
 	/* ====== Folders ===== */

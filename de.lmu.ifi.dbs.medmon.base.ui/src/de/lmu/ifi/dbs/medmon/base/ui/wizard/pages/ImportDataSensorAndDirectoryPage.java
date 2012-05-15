@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
+package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -22,18 +22,18 @@ import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class ImportDataSensorAndDirectoryPage extends WizardPage implements IValidationPage {
-	private Table				table;
-	private Text				textFile;
-	private String				selectedDirectory			= null;
+
+	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgew\u00e4hlt";
+	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgew\u00e4hlt";
+
 	private ISensor				selectedSensor				= null;
 	private boolean				isDirectorySectionEnabled	= false;
 	private SortedSet<String>	errors						= new TreeSet<String>();
 
-	private static String		ERROR_NO_DIRECTORY_CHOOSEN	= "Keine Verzeichnis ausgew\u00e4hlt";
-	private static String		ERROR_NO_SENSOR_SELECTED	= "Kein Sensor ausgew\u00e4hlt";
 	private Button				btnChooseDirectory;
 	private SensorTableViewer	sensorTableViewer;
-	
+	private Text				txtSelectedDirectory;
+
 	/**
 	 * Create the wizard.
 	 */
@@ -41,28 +41,6 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 		super("ImportDataSensorAndDirectoryPage");
 		setTitle("Sensor ausw\u00e4hlen");
 		setDescription("W\u00e4hlen Sie einen Sensor aus von dem Sie die Daten verwenden m\u00f6chten.");
-	}
-
-	/**
-	 * WIZZARD-GET: get selected Sensor
-	 */
-	public ISensor getSelectedSensor() {
-		return selectedSensor;
-	}
-
-	/**
-	 * WIZZARD-GET: get selected Directory
-	 */
-	public String getSelectedDirectory() {
-		return selectedDirectory;
-	}
-
-	/**
-	 * WIZZARD-SET: set true if you need to select a directory
-	 */
-	public void setDirectorySectionEnabled(boolean flag) {
-		isDirectorySectionEnabled = flag;
-		btnChooseDirectory.setEnabled(flag);
 	}
 
 	/**
@@ -75,8 +53,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 		container.setLayout(new GridLayout(2, false));
 
 		sensorTableViewer = new SensorTableViewer(container, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
-		// final TableViewer sensorTableViewer = new TableViewer(container);
-		table = sensorTableViewer.getTable();
+		Table table = sensorTableViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		table.addSelectionListener(new ValidationListener(this) {
 			@Override
@@ -90,9 +67,9 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 			}
 		});
 
-		textFile = new Text(container, SWT.BORDER);
-		textFile.setEditable(false);
-		textFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtSelectedDirectory = new Text(container, SWT.BORDER);
+		txtSelectedDirectory.setEditable(false);
+		txtSelectedDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		btnChooseDirectory = new Button(container, SWT.NONE);
 		btnChooseDirectory.setText("Durchsuchen");
@@ -101,12 +78,13 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 			public void widgetSelected(SelectionEvent e) {
 				DirectoryDialog dlg = new DirectoryDialog(getShell());
 				dlg.setText("Standard-Pfad");
-				selectedDirectory = dlg.open();
+				String selectedDirectory = dlg.open();
 				if (selectedDirectory != null)
-					textFile.setText(selectedDirectory);
+					txtSelectedDirectory.setText(selectedDirectory);
 				else
-					textFile.setText("");
-				super.widgetSelected(e);
+					txtSelectedDirectory.setText("");
+
+				checkContents();
 			}
 		});
 
@@ -119,7 +97,7 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 		selectedSensor = JFaceUtil.initializeViewerSelection(ISensor.class, sensorTableViewer);
 
 		if (isDirectorySectionEnabled) {
-			if (selectedDirectory == null)
+			if (txtSelectedDirectory.getText() == null || txtSelectedDirectory.getText().isEmpty())
 				errors.add(ERROR_NO_DIRECTORY_CHOOSEN);
 			else
 				errors.remove(ERROR_NO_DIRECTORY_CHOOSEN);
@@ -138,6 +116,27 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 			setErrorMessage(errors.first());
 			setPageComplete(false);
 		}
+	}
 
+	/**
+	 * WIZZARD-GET: get selected Sensor
+	 */
+	public ISensor getSelectedSensor() {
+		return selectedSensor;
+	}
+
+	/**
+	 * WIZZARD-GET: get selected Directory
+	 */
+	public String getSelectedDirectory() {
+		return txtSelectedDirectory.getText();
+	}
+
+	/**
+	 * WIZZARD-SET: set true if you need to select a directory
+	 */
+	public void setDirectorySectionEnabled(boolean flag) {
+		isDirectorySectionEnabled = flag;
+		btnChooseDirectory.setEnabled(flag);
 	}
 }

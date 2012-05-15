@@ -22,7 +22,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.knowing.core.processing.GraphValidator;
-import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
+import de.lmu.ifi.dbs.medmon.base.ui.util.IMedmonSharedImages;
 
 public class ImportDPUHandler extends AbstractHandler implements IHandler {
 
@@ -44,7 +44,7 @@ public class ImportDPUHandler extends AbstractHandler implements IHandler {
 			GraphValidator validator = new GraphValidator(dpu);
 			//Validation
 			if(validator.validate()) {
-				File file = new File(IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR + dpu.getName().getText());
+				File file = new File(IMedmonSharedImages.DIR_DPU + IMedmonSharedImages.DIR_SEPERATOR + dpu.getName().getText());
 				if(file.exists()) {
 					if(!MessageDialog.openConfirm(shell, "Ueberschreiben?", "Verfahren existiert bereits! Wollen Sie es ueberschreiben?"))
 						return null;

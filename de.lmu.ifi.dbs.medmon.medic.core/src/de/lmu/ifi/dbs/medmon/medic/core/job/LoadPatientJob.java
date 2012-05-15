@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.core.Activator;
 
 public class LoadPatientJob extends Job {
 
@@ -29,7 +29,7 @@ public class LoadPatientJob extends Job {
 	}
 	
 	public static Patient[] getPatients() {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		em.getTransaction().begin();
 		Query allPatients = em.createNamedQuery("Patient.findAll");
 		List<Patient> patients = allPatients.getResultList();

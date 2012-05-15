@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Text;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.IValidationPage;
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.ValidationListener;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.ISharedImages;
 
@@ -124,7 +123,7 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 	@Override
 	public void checkContents() {
 		// Check identical patient
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		List resultList = em.createNamedQuery("Patient.findIdentical").setParameter("firstname", tFirstname.getText())
 				.setParameter("lastname", tLastname.getText()).setParameter("birth", dBirth.getSelection()).getResultList();
 

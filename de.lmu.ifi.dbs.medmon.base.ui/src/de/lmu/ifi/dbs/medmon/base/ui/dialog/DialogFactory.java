@@ -3,14 +3,13 @@ package de.lmu.ifi.dbs.medmon.base.ui.dialog;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 
 public class DialogFactory {
 
@@ -22,7 +21,7 @@ public class DialogFactory {
 	}
 
 	private static Patient[] loadPatients() {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 
 		
 		List<Patient> patients = em.createNamedQuery("Patient.findAll").getResultList();

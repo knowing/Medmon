@@ -10,7 +10,7 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 public class PatientProposalProvider implements IContentProposalProvider {
 
@@ -20,7 +20,7 @@ public class PatientProposalProvider implements IContentProposalProvider {
 
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		Query query = em.createNamedQuery("Patient.likeName");
 		query.setParameter("firstname", contents.toLowerCase() + "%");
 		query.setParameter("lastname", contents.toLowerCase() + "%");
@@ -43,7 +43,7 @@ public class PatientProposalProvider implements IContentProposalProvider {
 			return null;
 		String idString = patient.substring(left_index+1, right_index);
 		int id = Integer.valueOf(idString);
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		Patient returns = em.find(Patient.class, id);
 		em.close();
 		return returns;

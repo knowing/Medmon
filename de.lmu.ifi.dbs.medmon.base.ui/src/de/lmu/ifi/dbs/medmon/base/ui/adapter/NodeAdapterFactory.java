@@ -5,8 +5,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.lmu.ifi.dbs.knowing.core.model.INode;
+import de.lmu.ifi.dbs.medmon.base.ui.Activator;
+import de.lmu.ifi.dbs.medmon.base.ui.util.IMedmonSharedImages;
 import de.lmu.ifi.dbs.medmon.base.ui.util.ResourceManager;
-import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
 
 /**
  * @author Nepomuk Seiler
@@ -37,7 +38,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
 			
 			@Override
 			public ImageDescriptor getImageDescriptor(Object object) {
-				return ResourceManager.getPluginImageDescriptor(IMedmonConstants.BASE_UI_PLUGIN, IMedmonConstants.IMG_IMPORT_16);
+				return ResourceManager.getPluginImageDescriptor(Activator.PLUGIN_ID, IMedmonSharedImages.IMG_IMPORT_16);
 			}
 			
 			@Override

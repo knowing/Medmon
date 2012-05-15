@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages;
+package de.lmu.ifi.dbs.medmon.base.ui.wizard.pages;
 
 import java.net.URI;
 import java.nio.file.Path;
@@ -34,10 +34,6 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	private static String		ERROR_NO_URI_SELECTED	= "Keine Daten ausgew\u00e4hlt";
 
 	private TableViewer			tableViewer;
-	private TableViewerColumn	clmViewerFile;
-	private TableViewerColumn	clmViewerFrom;
-	private TableViewerColumn	clmViewerTo;
-	private Table				table;
 
 	/**
 	 * Create the wizard.
@@ -46,30 +42,6 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		super("ImportDataDataPage");
 		setTitle("Datenauswahl");
 		setDescription("W\u00e4hlen Sie eine Quelldatei aus.");
-	}
-
-	/**
-	 * WIZZARD-GET: get selected URI
-	 */
-	public URI getSelectedURI() {
-		return selectedURI;
-	}
-
-	/**
-	 * WIZZARD-SET: set the input of the DataViewer
-	 */
-	public void setInput(ISensor sensor, Object input) {
-		selectedURI = null;
-		tableViewer.setInput(input);
-
-		checkContents();
-	}
-
-	/**
-	 * WIZZARD-INIT:
-	 */
-	private void initialize() {
-		checkContents();
 	}
 
 	/**
@@ -83,25 +55,26 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		setControl(container);
 		container.setLayout(new GridLayout(1, false));
 
+		//TODO refactor this out to the SensorSourceWidget
 		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-		table = tableViewer.getTable();
+		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		clmViewerFile = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableViewerColumn clmViewerFile = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn clmFile = clmViewerFile.getColumn();
 		clmFile.setResizable(false);
 		clmFile.setWidth(300);
 		clmFile.setText("Datei");
 
-		clmViewerFrom = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableViewerColumn clmViewerFrom = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn clmFrom = clmViewerFrom.getColumn();
 		clmFrom.setResizable(false);
 		clmFrom.setWidth(120);
 		clmFrom.setText("Von");
 
-		clmViewerTo = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableViewerColumn clmViewerTo = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn clmTo = clmViewerTo.getColumn();
 		clmTo.setResizable(false);
 		clmTo.setWidth(120);
@@ -141,6 +114,13 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 		initialize();
 	}
 
+	/**
+	 * WIZZARD-INIT:
+	 */
+	private void initialize() {
+		checkContents();
+	}
+
 	@Override
 	public void checkContents() {
 
@@ -159,5 +139,22 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 			setPageComplete(false);
 		}
 
+	}
+
+	/**
+	 * WIZZARD-SET: set the input of the DataViewer
+	 */
+	public void setInput(ISensor sensor, Object input) {
+		selectedURI = null;
+		tableViewer.setInput(input);
+
+		checkContents();
+	}
+
+	/**
+	 * WIZZARD-GET: get selected URI
+	 */
+	public URI getSelectedURI() {
+		return selectedURI;
 	}
 }

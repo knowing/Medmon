@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
+import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 
 
 public class PatientContentProvider implements IStructuredContentProvider {
@@ -30,7 +30,7 @@ public class PatientContentProvider implements IStructuredContentProvider {
 	}
 	
 	private Patient[] getPatients() {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		Query allPatients = em.createNamedQuery("Patient.findAll");
 		List<Patient> patients = allPatients.getResultList();
 		em.close();

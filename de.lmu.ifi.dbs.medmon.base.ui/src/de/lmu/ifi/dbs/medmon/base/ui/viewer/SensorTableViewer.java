@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.base.ui.Activator;
 import de.lmu.ifi.dbs.medmon.base.ui.provider.WorkbenchTableLabelProvider;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
@@ -75,7 +74,7 @@ public class SensorTableViewer extends TableViewer {
 					if (mSensor == null)
 						return;
 
-					EntityManager entityManager = JPAUtil.createEntityManager();
+					EntityManager entityManager = Activator.getEntityManagerService().createEntityManager();
 
 					entityManager.getTransaction().begin();
 					mSensor = entityManager.merge(mSensor);

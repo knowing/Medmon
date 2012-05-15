@@ -12,7 +12,6 @@ import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.medic.core.util.JPAUtil;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
@@ -35,7 +34,7 @@ public class DataSelectionWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		EntityManager em = JPAUtil.createEntityManager();
+		EntityManager em = Activator.getEntityManagerService().createEntityManager();
 		Patient patient = page.getPatient();
 		// Select all days imported
 		List<Data> results = em.createNamedQuery("Data.findByPatient", Data.class)

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.knowing.core.model.IDataProcessingUnit;
 import de.lmu.ifi.dbs.medmon.base.ui.filter.DPUSearchFilter;
-import de.lmu.ifi.dbs.medmon.medic.core.util.IMedmonConstants;
+import de.lmu.ifi.dbs.medmon.base.ui.util.IMedmonSharedImages;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.handler.ImportDPUHandler;
 import de.lmu.ifi.dbs.medmon.medic.ui.provider.DPUContentProvider;
@@ -168,9 +168,9 @@ public class DPUMasterBlock extends MasterDetailsBlock {
 	}
 
 	private IDataProcessingUnit[] getUnits() {
-		File dpu_dir = new File(IMedmonConstants.DIR_DPU);
+		File dpu_dir = new File(IMedmonSharedImages.DIR_DPU);
 		String[] files = dpu_dir.list();
-		String path = IMedmonConstants.DIR_DPU + IMedmonConstants.DIR_SEPERATOR;
+		String path = IMedmonSharedImages.DIR_DPU + IMedmonSharedImages.DIR_SEPERATOR;
 		IDataProcessingUnit[] returns = new IDataProcessingUnit[files.length];
 
 		for (int i = 0; i < returns.length; i++) {
