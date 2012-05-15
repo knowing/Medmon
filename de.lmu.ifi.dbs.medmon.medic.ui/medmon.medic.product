@@ -77,10 +77,10 @@
       <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.v20110906-1605-782EqBqNKGVkiV-PUsgz-uny4gqO"/>
       <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.3.qualifier"/>
       <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.3.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.1.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.1.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.1.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.2.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.2.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.2.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.2.qualifier"/>
    </features>
 
    <configurations>

@@ -2,7 +2,7 @@
 <feature
       id="de.lmu.ifi.dbs.medmon.medic.core"
       label="Medmon Core"
-      version="1.0.1.qualifier"
+      version="1.0.2.qualifier"
       provider-name="LMU Munich - Database Systems Group">
 
    <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
