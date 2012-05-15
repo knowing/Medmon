@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  javax.persistence;bundle-version="2.0.3",
  de.lmu.ifi.dbs.medmon.jfreechart.libs;bundle-version="1.0.0",
  de.lmu.ifi.dbs.medmon.services;bundle-version="1.0.0",
- de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0"
+ de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0",
+ de.lmu.ifi.dbs.knowing.core;bundle-version="0.1.3"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
@@ -29,7 +30,8 @@ Export-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
  de.lmu.ifi.dbs.medmon.base.ui.widgets,
  de.lmu.ifi.dbs.medmon.base.ui.wizard,
  de.lmu.ifi.dbs.medmon.base.ui.wizard.pages
-Import-Package: org.eclipse.sapphire.java,
+Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
+ org.eclipse.sapphire.java,
  org.eclipse.sapphire.modeling,
  org.eclipse.sapphire.modeling.annotations,
  org.eclipse.sapphire.modeling.xml,
