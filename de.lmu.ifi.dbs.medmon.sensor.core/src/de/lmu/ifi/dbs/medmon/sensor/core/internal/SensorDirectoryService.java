@@ -37,18 +37,18 @@ public class SensorDirectoryService implements ISensorDirectoryService {
 	protected void bindSensor(ISensor sensor) {
 		sensors.put(sensor.getId(), sensor);
 		HashMap<String, Object> properties = new HashMap<>();
-		properties.put(SENSOR_PROPERTY_ADD, sensor);
+		properties.put(SENSOR_DATA, sensor);
 		properties.put("org.eclipse.e4.data", sensor); //This is for e4
-		eventAdmin.postEvent(new Event(SENSOR_TOPIC_CHANGED, properties));
+		eventAdmin.postEvent(new Event(SENSOR_TOPIC_ADD, properties));
 		log.debug("Added sensor "  + sensor.getId());
 	}
 
 	protected void unbindSensor(ISensor sensor) {
 		sensors.remove(sensor.getId());
 		HashMap<String, Object> properties = new HashMap<>();
-		properties.put(SENSOR_PROPERTY_REMOVED, sensor);
+		properties.put(SENSOR_DATA, sensor);
 		properties.put("org.eclipse.e4.data", sensor); //This is for e4
-		eventAdmin.postEvent(new Event(SENSOR_TOPIC_CHANGED, properties));
+		eventAdmin.postEvent(new Event(SENSOR_TOPIC_REMOVE, properties));
 		log.debug("Removed sensor "  + sensor.getId());
 	}
 	

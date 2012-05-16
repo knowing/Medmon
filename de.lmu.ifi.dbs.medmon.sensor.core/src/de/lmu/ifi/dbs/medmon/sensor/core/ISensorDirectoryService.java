@@ -11,10 +11,11 @@ import java.util.List;
  */
 public interface ISensorDirectoryService {
 	
-	public static final String SENSOR_TOPIC_CHANGED = "medmon/sensor/core/sensor/changed";
+	public static final String SENSOR_TOPIC = "medmon/sensor/core/sensor/*";
+	public static final String SENSOR_TOPIC_ADD = "medmon/sensor/core/sensor/add";
+	public static final String SENSOR_TOPIC_REMOVE = "medmon/sensor/core/sensor/remove";
 	
-	public static final String SENSOR_PROPERTY_ADD = "medmon.sensor.core.sensor.added";
-	public static final String SENSOR_PROPERTY_REMOVED = "medmon.sensor.core.sensor.removed";
+	public static final String SENSOR_DATA = "medmon.sensor.core.sensor";
 	
 
 	public List<ISensor> getSensors();
