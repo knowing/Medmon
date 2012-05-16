@@ -14,3 +14,4 @@ Import-Package: org.joda.time,
  org.osgi.framework;version="1.6.0",
  org.slf4j;version="1.6.1",
  weka.core
+Service-Component: OSGI-INF/sensorDirectoryService.xml

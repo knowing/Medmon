@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="de.lmu.ifi.dbs.medmon.sensor.core.directoryService">
+   <implementation class="de.lmu.ifi.dbs.medmon.sensor.core.internal.SensorDirectoryService"/>
+   <service>
+      <provide interface="de.lmu.ifi.dbs.medmon.sensor.core.ISensorDirectoryService"/>
+   </service>
+   <reference bind="bindSensor" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.sensor.core.ISensor" name="ISensor" policy="dynamic" unbind="unbindSensor"/>
+</scr:component>
