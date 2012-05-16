@@ -12,6 +12,7 @@ Export-Package: de.lmu.ifi.dbs.medmon.sensor.core,
 Bundle-Vendor: LMU Munich - Database Systems Group
 Import-Package: org.joda.time,
  org.osgi.framework;version="1.6.0",
+ org.osgi.service.event;version="1.2.0",
  org.slf4j;version="1.6.1",
  weka.core
 Service-Component: OSGI-INF/sensorDirectoryService.xml
