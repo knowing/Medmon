@@ -17,11 +17,6 @@ import weka.core.Instances;
 public interface IConverter {
 
 	/**
-	 * returns the attributes of the sensor data
-	 */
-	public Instances getHeader();
-	
-	/**
 	 * returns the data of the sensor.
 	 * 
 	 * After invoking this method the converter will close the

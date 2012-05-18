@@ -2,7 +2,7 @@ package de.sendsor.accelerationSensor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +65,7 @@ public class SDRConverter extends FileConverter {
 	private double				units					= 1.0;
 	private boolean				relativeTimestamp		= false;
 
-	public SDRConverter(URL url) throws IOException {
+	public SDRConverter(URI url) throws IOException {
 		super(url);
 		init();
 	}
@@ -96,11 +96,6 @@ public class SDRConverter extends FileConverter {
 			else if (name.equals("z"))
 				zAttribute = attribute;
 		}
-	}
-
-	@Override
-	public Instances getHeader() {
-		return header;
 	}
 
 	@Override

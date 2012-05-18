@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.medmon.medic.core.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -44,26 +42,24 @@ public class SensorManagerService implements ISensorManagerService {
 	public ISensor getSensor(String id) {
 		return sensorMap.get(id);
 	}
-	
+
 	@Override
 	public void notifySensorObservers(ISensor sensor) {
 		for (ISensorObserver observer : observers) {
 			observer.sensorUpdated(sensor);
-		}		
+		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Sensor loadSensorEntity(ISensor sensor) {
 		EntityManager tempEM = entityManagerService.createEntityManager();
-		List<Sensor> results = tempEM.createNamedQuery("Sensor.findBySensorId")
-				.setParameter("sensorId", sensor.getId())
-				.getResultList();
+		List<Sensor> results = tempEM.createNamedQuery("Sensor.findBySensorId").setParameter("sensorId", sensor.getId()).getResultList();
 
 		tempEM.close();
 		if (results.isEmpty())
 			return null;
-		
+
 		return results.get(0);
 	}
 
@@ -71,24 +67,26 @@ public class SensorManagerService implements ISensorManagerService {
 	public ISensor loadSensorService(Sensor sensor) {
 		return sensorMap.get(sensor.getSensorId());
 	}
+	
+	public IConverter createConverter(ISensor sensorService, URI input) throws IOException {
+		if (sensorService == null)
+			return null;
+		
+		if(!sensorService.isConvertable(input))
+			return null;
+		
+		try {
+			return sensorService.newConverter(input);
+		} catch (IOException e) {
+			log.error("Error generating converter", e);
+			return null;
+		}
+		
+	}
 
 	@Override
 	public IConverter createConverter(ISensor sensorService) throws IOException {
-
-		if (sensorService == null)
-			return null;
-
-		InputStream inputStream = createDefaultInput(sensorService);
-
-		if (inputStream == null)
-			return null;
-
-		try {
-			return sensorService.newConverter(inputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return createConverter(sensorService, createDefaultURI(sensorService));
 	}
 
 	@Override
@@ -109,30 +107,8 @@ public class SensorManagerService implements ISensorManagerService {
 	}
 
 	@Override
-	public InputStream createDefaultInput(ISensor sensor) throws IOException {
-		return createInput(sensor, availableInputs(sensor)[0]);
-	}
-
-	@Override
-	public InputStream createInput(ISensor sensor, URI uri) throws IOException {
-		try (InputStream newInputStream = new FileInputStream(new File(uri))) {
-			if (!sensor.isConvertable(newInputStream))
-				return null;
-		} catch (Exception e) {
-			log.error("createInput() -> InputStream not convertable");
-			e.printStackTrace();
-		}
-		return Files.newInputStream(Paths.get(uri));
-	}
-
-	@Override
-	public InputStream[] createInputs(ISensor sensor) throws IOException {
-		URI[] availableURIs = availableInputs(sensor);
-		InputStream[] inputStreams = new InputStream[availableURIs.length];
-		for (int index = 0; index < availableURIs.length; index++) {
-			inputStreams[index] = createInput(sensor, availableURIs[index]);
-		}
-		return inputStreams;
+	public URI createDefaultURI(ISensor sensor) throws IOException {
+		return availableInputs(sensor)[0];
 	}
 
 	/**
@@ -152,7 +128,7 @@ public class SensorManagerService implements ISensorManagerService {
 			tempEM.getTransaction().begin();
 			tempEM.persist(mSensor);
 			tempEM.getTransaction().commit();
-			
+
 			tempEM.close();
 
 			log.info("Sensor " + service.getName() + " " + service.getVersion() + " registered and DB entry created");

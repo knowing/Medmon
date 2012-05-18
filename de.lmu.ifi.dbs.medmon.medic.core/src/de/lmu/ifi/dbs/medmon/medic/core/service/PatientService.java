@@ -81,8 +81,8 @@ public class PatientService implements IPatientService {
 		Interval interval = converter.getInterval();
 
 		Data data = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
-
-		try (InputStream in = sensorManagerService.createDefaultInput(s)) {
+		
+		try (InputStream in = Files.newInputStream(Paths.get(sensorManagerService.createDefaultURI(s)))) {
 			Files.copy(in, data.toPath());
 			return data;
 		} catch (IOException e) {
@@ -101,8 +101,7 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public Data store(Patient patient, ISensor sensor, String type, URI inputURI) throws IOException {
-		InputStream inputStream = sensorManagerService.createInput(sensor, inputURI);
-		IConverter converter = sensor.newConverter(inputStream);
+		IConverter converter = sensor.newConverter(inputURI);
 
 		if (converter == null)
 			throw new IOException("No converter found for sensor " + sensor.getName());

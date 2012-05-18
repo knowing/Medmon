@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.medmon.sensor.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +15,7 @@ import java.nio.file.Paths;
  * @version 0.1
  * @since 2011-11-20
  */
-public abstract class FileConverter extends URLConverter {
+public abstract class FileConverter extends URIConverter {
 
 	private final Path source;
 
@@ -37,8 +37,8 @@ public abstract class FileConverter extends URLConverter {
 		source = null;
 	}
 	
-	public FileConverter(URL source) throws IOException {
-		super(source.openStream());
+	public FileConverter(URI source) throws IOException {
+		super(source);
 		this.source = null;
 	}
 

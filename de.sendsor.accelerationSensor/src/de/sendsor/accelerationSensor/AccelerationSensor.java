@@ -1,10 +1,13 @@
 package de.sendsor.accelerationSensor;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
+import java.util.Arrays;
 
+import weka.core.Instances;
 import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults;
 
 /**
  * 
@@ -15,7 +18,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
  */
 public class AccelerationSensor implements ISensor {
 
-	private final String	id	= getClass().getName() + ":" + getVersion();
+	private final String id = getClass().getName() + ":" + getVersion();
+	private final Instances header = TimeSeriesResults.newInstances(Arrays.asList(new String[] { "x", "y", "z" }));
 
 	@Override
 	public String getId() {
@@ -43,13 +47,19 @@ public class AccelerationSensor implements ISensor {
 	}
 
 	@Override
-	public boolean isConvertable(InputStream inputStream) throws IOException {
+	public Instances getHeader() {
+		return header;
+	}
+
+	@Override
+	public boolean isConvertable(URI input) throws IOException {
+		//TODO check if sdr is convertible
 		return true;
 	}
 
 	@Override
-	public IConverter newConverter(InputStream inputStream) throws IOException {
-		return new SDRConverter(inputStream);
+	public IConverter newConverter(URI input) throws IOException {
+		return new SDRConverter(input);
 	}
 
 	@Override
@@ -77,5 +87,4 @@ public class AccelerationSensor implements ISensor {
 		return true;
 	}
 
-	
 }

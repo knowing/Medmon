@@ -2,6 +2,9 @@ package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+
+import weka.core.Instances;
 
 
 /**
@@ -45,13 +48,18 @@ public interface ISensor {
 	public String getFilePrefix();
 	
 	/**
+	 * returns the attributes of the sensor data
+	 */
+	public Instances getHeader();
+	
+	/**
 	 * states whether the inputStream is convertible.
 	 * if true, a Converter can be created with newConverter().
 	 * @param inputStream
 	 * @return
 	 * @throws IOException 
 	 */
-	public boolean isConvertable(InputStream inputStream) throws IOException;
+	public boolean isConvertable(URI input) throws IOException;
 	
 	/**
 	 * returns an instance of IConverter which provides access to the data of the sensor
@@ -59,6 +67,6 @@ public interface ISensor {
 	 * @return
 	 * @throws IOException 
 	 */
-	public IConverter newConverter(InputStream inputStream) throws IOException;
+	public IConverter newConverter(URI input) throws IOException;
 	
 }
