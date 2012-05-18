@@ -87,15 +87,14 @@ public class TherapyResultPatientAndTypePage extends WizardPage implements IVali
 	 * @return
 	 */
 	private void initialize() {
-
 		IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 		Patient selectedPatient = selectionProvider.getSelection(Patient.class);
-
-		EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
-		Patient mPatient = tempEM.find(Patient.class, selectedPatient.getId());
-		tempEM.close();
-
-		selectPatient(mPatient);
+		if(selectedPatient != null) {
+			EntityManager tempEM = Activator.getEntityManagerService().createEntityManager();
+			Patient mPatient = tempEM.find(Patient.class, selectedPatient.getId());
+			tempEM.close();
+			selectPatient(mPatient);
+		}
 
 		checkContents();
 	}
