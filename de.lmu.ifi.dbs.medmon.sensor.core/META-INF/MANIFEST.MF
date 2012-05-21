@@ -8,11 +8,13 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.lmu.ifi.dbs.medmon.sensor.core,
  de.lmu.ifi.dbs.medmon.sensor.core.annotations,
+ de.lmu.ifi.dbs.medmon.sensor.core.device,
  de.lmu.ifi.dbs.medmon.sensor.core.util
 Bundle-Vendor: LMU Munich - Database Systems Group
 Import-Package: org.joda.time,
  org.osgi.framework;version="1.6.0",
+ org.osgi.service.cm;version="1.3.0",
  org.osgi.service.event;version="1.2.0",
  org.slf4j;version="1.6.1",
  weka.core
-Service-Component: OSGI-INF/sensorDirectoryService.xml
+Service-Component: OSGI-INF/sensorDirectoryService.xml, OSGI-INF/deviceService.xml
