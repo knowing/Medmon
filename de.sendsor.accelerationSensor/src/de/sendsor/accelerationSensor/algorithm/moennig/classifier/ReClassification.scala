@@ -1,18 +1,16 @@
 package de.sendsor.accelerationSensor.algorithm.moennig.classifier
 
 import java.util.{ ArrayList, Arrays, Collections, List => JList, Properties, Map => JMap }
+import java.util.{HashMap,Properties}
+import java.util.Map.Entry
 import scala.collection.JavaConversions._
 import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
 import de.lmu.ifi.dbs.knowing.core.events._
 import de.lmu.ifi.dbs.knowing.core.factory._
 import weka.core.{ Attribute, Instance, Instances }
-import java.util.Properties
-import java.util.HashMap
-import java.util.Map.Entry
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
 import akka.actor.ActorRef
-import akka.event.EventHandler.{ debug, info, warning, error }
 
 import ReClassification._
 

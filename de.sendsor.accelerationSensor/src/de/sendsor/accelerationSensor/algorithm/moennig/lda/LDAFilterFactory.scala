@@ -6,7 +6,6 @@ import java.io.{ InputStreamReader, LineNumberReader, IOException, StringReader,
 import scala.collection.immutable.Map
 import scala.collection.mutable.ListBuffer
 import akka.actor.Actor
-import akka.event.EventHandler.{ debug, info, warning, error }
 import de.lmu.ifi.dbs.knowing.core.exceptions.KnowingException
 import de.lmu.ifi.dbs.knowing.core.factory._
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory._
@@ -69,7 +68,7 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
 	}
 
 	def build(instances: Instances) {
-		debug(this, "Train LDA")
+		log.debug("Train LDA")
 		guessAndSetClassLabel(instances)
 		val lda = filter.asInstanceOf[LDAFilter]
 		val header = new Instances(instances, 0)
@@ -83,9 +82,9 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
 	override def start(): Unit = try {
 		val in = inputStream()
 		in match {
-			case None => warning(this, "No LDA training data found!")
+			case None => log.warning("No LDA training data found!")
 			case Some(i) =>
-				debug(this, "Loading LDA model")
+				log.debug("Loading LDA model")
 				val reader = new LineNumberReader(new InputStreamReader(i))
 				val line = reader.readLine
 				if (line == null) {
@@ -125,13 +124,13 @@ class LDAFilterWrapper extends WekaFilter(new LDAFilter) with TSerializable {
 				reader.close
 		}
 	} catch {
-		case e: IOException => warning(this, e.getMessage)
+		case e: IOException => log.warning(e.getMessage)
 	}
 
 	override def postStop() = outputStream match {
-		case None => debug(this, "Trained LDA will not be saved")
+		case None => log.debug("Trained LDA will not be saved")
 		case Some(o) =>
-			debug(this, "Saving LDA model")
+			log.debug("Saving LDA model")
 			val writer = new PrintWriter(o)
 			val lda = filter.asInstanceOf[LDAFilter]
 			writer.print(lda.getInDimensions + ";")

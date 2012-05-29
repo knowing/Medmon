@@ -1,7 +1,6 @@
 package de.sendsor.accelerationSensor
 
 import akka.actor.ActorRef
-import akka.actor.Actors.actorOf
 
 import scala.collection.immutable.Map
 import java.util.Properties

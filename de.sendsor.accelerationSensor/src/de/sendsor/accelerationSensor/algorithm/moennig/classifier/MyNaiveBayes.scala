@@ -2,7 +2,6 @@ package de.sendsor.accelerationSensor.algorithm.moennig.classifier
 
 import java.io.{InputStream, OutputStream}
 import java.util.{ArrayList,Properties}
-import akka.event.EventHandler.{debug,info, warning, error}
 import weka.core.{Attribute,Instances, Instance, DenseInstance}
 import weka.classifiers.Classifier
 import de.lmu.ifi.dbs.knowing.core.factory.TFactory
@@ -26,7 +25,7 @@ class MyNaiveBayes extends WekaClassifier(new MyNaiveBayesImpl) {
     val c = classifier.asInstanceOf[MyNaiveBayesImpl]
     guessAndCreateClassLabels(c.inputFormat)
     configure(properties)
-    debug(this,"MyNaiveBayes model loaded")
+    log.debug("MyNaiveBayes model loaded")
     true
   }
   

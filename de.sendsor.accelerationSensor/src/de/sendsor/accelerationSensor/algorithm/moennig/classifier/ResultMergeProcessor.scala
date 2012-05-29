@@ -4,7 +4,6 @@ import java.util.{ ArrayList, Arrays, Collections, List => JList, Properties, Ma
 import scala.collection.JavaConversions._
 import java.util.{Date,Properties}
 import java.text.SimpleDateFormat
-import akka.event.EventHandler.{ debug, info, warning, error }
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
 import de.lmu.ifi.dbs.knowing.core.processing.TProcessor
 import de.lmu.ifi.dbs.knowing.core.processing.ImmutableInstances
@@ -35,11 +34,11 @@ class ResultMergeProcessor extends TProcessor {
 	var labels: List[Any] = _
 
 	override def process(inst: Instances) = {
-		case (None, _) => warning(this, "Unkown input in ResultMergeProcessor on default port")
+		case (None, _) => log.warning("Unkown input in ResultMergeProcessor on default port")
 		case (Some(INPUT_RAWDATA), _) => addRawdata(inst)
 		case (Some(INPUT_SEGMENTS), _) => addSegments(inst)
 		case (Some(INPUT_NONSEGMENTS), _) => addNonSegments(inst)
-		case (Some(p), _) => warning(this, "Unkown input in ResultMergeProcessor on port " + p)
+		case (Some(p), _) => log.warning("Unkown input in ResultMergeProcessor on port " + p)
 	}
 
 	def addSegments(segs: Instances) {

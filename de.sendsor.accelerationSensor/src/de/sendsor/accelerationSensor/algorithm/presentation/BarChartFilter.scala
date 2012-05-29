@@ -1,7 +1,6 @@
 package de.sendsor.accelerationSensor.algorithm.presentation
 
 import java.util.Properties
-import akka.event.EventHandler.{ debug, info, warning, error }
 import weka.core.{ Instance, Instances, DenseInstance }
 import de.lmu.ifi.dbs.knowing.core.processing.TFilter
 import de.lmu.ifi.dbs.knowing.core.factory.ProcessorFactory
@@ -37,7 +36,7 @@ class BarChartFilter extends TFilter {
       val toIndex = intervalInst.attribute(ATTRIBUTE_TO).index
       val classIndex = intervalInst.attribute(ATTRIBUTE_CLASS).index
 
-      debug(this, "Create TimeIntervalInstances")
+      log.debug("Create TimeIntervalInstances")
       var currentClass = ""
       for (i <- 0 until instances.numInstances) {
         val inst = instances(i)

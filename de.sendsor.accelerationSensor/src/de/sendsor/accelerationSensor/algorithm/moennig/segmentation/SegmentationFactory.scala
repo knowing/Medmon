@@ -10,14 +10,11 @@ import de.lmu.ifi.dbs.knowing.core.weka.WekaFilterFactory._
 import SegmentationFactory._
 import de.lmu.ifi.dbs.knowing.core.japi.JProcessor
 import akka.actor.ActorRef
-import akka.actor.Actor.actorOf
 
-class SegmentationFactory extends TFactory {
+class SegmentationFactory extends ProcessorFactory(classOf[SegmentationWrapper]) {
   
-  val id = SegmentationFactory.id // id from static field
-  val name = SegmentationFactory.name // name from static field
-  
-  def getInstance(): ActorRef = actorOf[SegmentationWrapper]
+  override val id = SegmentationFactory.id // id from static field
+  override val name = SegmentationFactory.name // name from static field
   
   //Creates default Properties which are used if properties aren't set
   override def createDefaultProperties: Properties = {
