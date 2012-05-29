@@ -30,7 +30,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.lmu.ifi.dbs.medmon.medic.ui.handler,
  de.lmu.ifi.dbs.medmon.medic.ui.perspective,
  de.lmu.ifi.dbs.medmon.medic.ui.views
-Import-Package: de.lmu.ifi.dbs.knowing.core.swt.factory;version="0.1.4",
+Import-Package: de.lmu.ifi.dbs.knowing.core.swt,
+ de.lmu.ifi.dbs.knowing.core.swt.factory,
  de.lmu.ifi.dbs.medmon.database.entity,
  javax.persistence;version="2.0.3",
  org.jfree,
