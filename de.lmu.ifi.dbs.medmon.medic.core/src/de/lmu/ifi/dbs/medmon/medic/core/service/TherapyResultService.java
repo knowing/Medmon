@@ -126,7 +126,7 @@ public class TherapyResultService implements ITherapyResultService {
 		if (uiFactories.isEmpty())
 			throw new Exception("No UIFactory. Unable to display results.");
 
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, mapAsScalaMap(new HashMap<String, InputStream>()),
+		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, null, mapAsScalaMap(new HashMap<String, InputStream>()),
 				mapAsScalaMap(outputMap));
 	}
 
