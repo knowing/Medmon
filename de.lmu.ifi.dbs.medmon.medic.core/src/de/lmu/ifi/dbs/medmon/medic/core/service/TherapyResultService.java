@@ -179,7 +179,7 @@ public class TherapyResultService implements ITherapyResultService {
 
 				// Test if file is set
 				if (!filePropertySet) {
-					IProperty fileProperty = node.getProperties().addNewElement();
+					IProperty fileProperty = node.getProperties().insert();
 					fileProperty.setKey(INodeProperties.FILE());
 					fileProperty.setValue(filePropertyValue);
 				}
@@ -187,7 +187,7 @@ public class TherapyResultService implements ITherapyResultService {
 				// Set Path absolute or relative. Depend if URI or Data was used
 				// to create inputFile
 				if (!absolutePathSet) {
-					IProperty absoluteProperty = node.getProperties().addNewElement();
+					IProperty absoluteProperty = node.getProperties().insert();
 					absoluteProperty.setKey(INodeProperties.ABSOLUTE_PATH());
 					absoluteProperty.setValue(String.valueOf(inputFile.isAbsolute()));
 				}
