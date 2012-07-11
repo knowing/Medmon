@@ -16,6 +16,7 @@
 #ignore generated .class files
 *.class
 bin/
+target/
 
 
 
