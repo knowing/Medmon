@@ -48,6 +48,8 @@
 
     <module>de.sendsor.accelerationSensor</module>
     <module>de.sendsor.accelerationSensor.feature</module>
+
+    <module>de.lmu.ifi.dbs.medmon.site</module>
   </modules>
 
   <build>
@@ -128,6 +130,11 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/technology/nebula/snapshot</url>
 		</repository>
+		<repository>
+			<id>eclipse-nebula-incubation</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/technology/nebula/incubation/snapshot</url>
+		</repository>
 
 
 		<!-- Custom repositories -->
@@ -139,12 +146,12 @@
 		<repository>
 			<id>knowing-repository</id>
 			<layout>p2</layout>
-			<url>http://repository.mukis.de/de/lmu/ifi/dbs/knowing/de.lmu.ifi.dbs.knowing.updatesite/0.1.5-SNAPSHOT</url>
+			<url>http://repository.mukis.de/p2/knowing/0.1.5</url>
 		</repository>
 		<repository>
 			<id>jama-repository</id>
 			<layout>p2</layout>
-			<url>http://repository.mukis.de/p2/gov.nist.math.jama</url>
+			<url>http://repository.mukis.de/p2/jama/1.0.2</url>
 		</repository>
 
 		<!-- Scala repositories -->
