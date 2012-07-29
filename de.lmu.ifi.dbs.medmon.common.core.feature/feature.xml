@@ -121,13 +121,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="slf4j.api"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.core.resources"
          download-size="0"
          install-size="0"
@@ -177,13 +170,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="org.joda.time"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.scala-ide.scala.library"
          download-size="0"
          install-size="0"
@@ -191,57 +177,7 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.sapphire.modeling"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.modeling.xml"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.osgi"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.osgi.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.platform"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.workspace"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.wst.common.uriresolver"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.java"
          download-size="0"
          install-size="0"
          version="0.0.0"

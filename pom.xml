@@ -146,7 +146,7 @@
 		<repository>
 			<id>knowing-repository</id>
 			<layout>p2</layout>
-			<url>http://repository.mukis.de/p2/knowing/0.1.5</url>
+			<url>http://repository.mukis.de/p2/knowing/0.1.6</url>
 		</repository>
 		<repository>
 			<id>jama-repository</id>

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.lmu.ifi.dbs.knowing.core.feature_0.1.5.qualifier.jar" id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.5.qualifier">
-      <category name="de.lmu.ifi.dbs.medmon"/>
-   </feature>
    <feature url="features/de.lmu.ifi.dbs.medmon.sensor.feature_1.0.0.qualifier.jar" id="de.lmu.ifi.dbs.medmon.sensor.feature" version="1.0.0.qualifier">
       <category name="de.lmu.ifi.dbs.medmon"/>
    </feature>
