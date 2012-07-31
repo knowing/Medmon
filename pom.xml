@@ -153,6 +153,11 @@
 			<layout>p2</layout>
 			<url>http://repository.mukis.de/p2/jama/1.0.2</url>
 		</repository>
+		<repository>
+			<id>joda-repository</id>
+			<layout>p2</layout>
+			<url>http://repository.mukis.de/p2/joda</url>
+		</repository>
 
 		<!-- Scala repositories -->
 		<repository>
