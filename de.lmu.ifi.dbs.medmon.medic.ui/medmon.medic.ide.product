@@ -74,8 +74,6 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp" version="3.7.2.v20120120-1424-9DB5FmnFq5JCf1UA38R-kz0S0272"/>
-      <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.v20110906-1605-782EqBqNKGVkiV-PUsgz-uny4gqO"/>
       <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.0.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.0.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.2.qualifier"/>
@@ -86,6 +84,10 @@
       <feature id="de.lmu.ifi.dbs.knowing.weka.feature" version="0.1.6.qualifier"/>
       <feature id="de.lmu.ifi.dbs.medmon.sensor.feature" version="1.0.0.qualifier"/>
       <feature id="de.sendsor.accelerationSensor.feature" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.rcp" version="4.2.0.v20120528-1648-7IAPA7BrHQicRpNdOz-Obz-rlRCA"/>
+      <feature id="org.eclipse.emf.common" version="2.8.0.v20120606-0717"/>
+      <feature id="org.eclipse.emf.ecore" version="2.8.0.v20120606-0717"/>
+      <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.1.0.v20120524-0542-785EoBqNKNYz-GX2sUgCaBtr2dhs"/>
    </features>
 
    <configurations>
