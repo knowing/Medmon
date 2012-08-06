@@ -3,9 +3,7 @@
       id="de.lmu.ifi.dbs.medmon.medic.reporting.feature"
       label="Medmon Reporting"
       version="1.0.0.qualifier"
-      provider-name="LMU Munich - Database Systems Group"
-      license-feature="de.lmu.ifi.dbs.medmon.medic.feature"
-      license-feature-version="1.0.2.qualifier">
+      provider-name="LMU Munich - Database Systems Group">
 
    <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
       Adds Reporting functions to Medmon with BIRT
@@ -22,10 +20,6 @@
    <url>
       <update label="Medmon Repository" url="http://medmon.mukis.de/repository/medmon/"/>
    </url>
-
-   <requires>
-      <import feature="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.1.qualifier"/>
-   </requires>
 
    <plugin
          id="org.apache.batik.bridge"

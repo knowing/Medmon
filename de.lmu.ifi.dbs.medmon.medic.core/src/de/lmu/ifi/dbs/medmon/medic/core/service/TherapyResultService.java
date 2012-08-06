@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
@@ -76,14 +77,19 @@ public class TherapyResultService implements ITherapyResultService {
 		Path inputFile = data.toPath();
 
 		// Configure properties to run with inputFile
-		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
+		//IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
+		
+		Properties parameters = new Properties();
+		parameters.setProperty("sdr-file", inputFile.toString());
 
 		// Generate Data entity which stores the result
 		Data resultData = createData(patient, data);
 		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(resultData.toPath()));
 
 		// Finally run the DPU
-		executeDPU(execPath, configuredDPU, outputMap);
+		//executeDPU(execPath, configuredDPU, outputMap);
+		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters, mapAsScalaMap(new HashMap<String, InputStream>()),
+				mapAsScalaMap(outputMap));
 
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
@@ -103,12 +109,22 @@ public class TherapyResultService implements ITherapyResultService {
 		Path execPath = patient.toPath();
 		Path inputFile = Paths.get(input);
 
-		IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
+		//IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
+		
+		Properties parameters = new Properties();
+		parameters.setProperty("sdr-file", inputFile.toString());
+		//parameters.setProperty("arff-output", trgFile);
+
+		// SDR Classification No UI No Reclassification | SDR Classification No UI
+		// SDR Classification To ACData No Reclassification
+		//eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(), dlg.getSystem(), parameters, null, null);
 
 		Data data = createData(patient, sensor, input);
 		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
 
-		executeDPU(execPath, configuredDPU, outputMap);
+		// executeDPU(execPath, dpu, outputMap);
+		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters, mapAsScalaMap(new HashMap<String, InputStream>()),
+				mapAsScalaMap(outputMap));
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
 		tempEm.getTransaction().begin();

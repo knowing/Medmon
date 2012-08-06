@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Medmon for Medics" id="de.lmu.ifi.dbs.medmon.medic.ui.product" application="de.lmu.ifi.dbs.medmon.medic.ui.application" version="1.0.1.ALPHA3" useFeatures="true" includeLaunchers="true">
+<product name="Medmon for Medics" uid="medmon.medic" id="de.lmu.ifi.dbs.medmon.medic.ui.product" application="de.lmu.ifi.dbs.medmon.medic.ui.application" version="1.0.0" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/de.lmu.ifi.dbs.medmon.medic.ui/medmon.trans.png"/>
@@ -75,12 +75,11 @@
    <features>
       <feature id="org.eclipse.rcp" version="3.7.2.v20120120-1424-9DB5FmnFq5JCf1UA38R-kz0S0272"/>
       <feature id="org.eclipse.equinox.p2.rcp.feature" version="1.0.1.v20110906-1605-782EqBqNKGVkiV-PUsgz-uny4gqO"/>
-      <feature id="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.4.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.4.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.2.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.2.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.2.qualifier"/>
-      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.2.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.0.qualifier"/>
+      <feature id="de.lmu.ifi.dbs.medmon.medic.core.feature" version="1.0.0.qualifier"/>
+      <feature id="de.sendsor.accelerationSensor.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>

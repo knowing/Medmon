@@ -3,9 +3,7 @@
       id="de.lmu.ifi.dbs.medmon.common.ui.feature"
       label="Medmon UI Common"
       version="1.0.0.qualifier"
-      provider-name="LMU Munich - Database Systems Group"
-      license-feature="de.lmu.ifi.dbs.medmon.medic.feature"
-      license-feature-version="1.0.2.qualifier">
+      provider-name="LMU Munich - Database Systems Group">
 
    <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
       Medmon UI Common provides basic UI components for all Medmon products:
@@ -37,6 +35,14 @@ limitations under the License.
    <url>
       <update label="Medmon Repository" url="http://medmon.mukis.de/repository/medmon/"/>
    </url>
+
+   <includes
+         id="de.lmu.ifi.dbs.knowing.core.swt.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="de.lmu.ifi.dbs.knowing.swt.feature"
+         version="0.0.0"/>
 
    <plugin
          id="de.lmu.ifi.dbs.medmon.base.ui"

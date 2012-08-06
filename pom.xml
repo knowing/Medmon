@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.lmu.ifi.dbs.medmon</groupId>
-  <artifactId>Medmon</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  
-  <properties>
-     <tycho.version>0.15.0</tycho.version>
-     <scala.version>2.9.2</scala.version>
-     <wagon.version>1.0-beta-6</wagon.version>
-     <maven.compiler.source>1.7</maven.compiler.source>
-     <maven.compiler.target>1.7</maven.compiler.target>
-     <encoding>UTF-8</encoding>
-  </properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.lmu.ifi.dbs.medmon</groupId>
+	<artifactId>Medmon</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<tycho.version>0.15.0</tycho.version>
+		<scala.version>2.9.2</scala.version>
+		<wagon.version>1.0-beta-6</wagon.version>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<encoding>UTF-8</encoding>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -29,31 +28,34 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-  <modules>
-    <module>de.lmu.ifi.dbs.medmon.base.ui</module>
-    <module>de.lmu.ifi.dbs.medmon.derby</module>
-    <module>de.lmu.ifi.dbs.medmon.jfreechart.libs</module>
-    <module>de.lmu.ifi.dbs.medmon.medic.core</module>
-    <module>de.lmu.ifi.dbs.medmon.medic.logging</module>
-    <module>de.lmu.ifi.dbs.medmon.medic.reporting</module>
-    <module>de.lmu.ifi.dbs.medmon.medic.target</module>
-    <module>de.lmu.ifi.dbs.medmon.medic.ui</module>
-    <module>de.lmu.ifi.dbs.medmon.patient.ui</module>
+	<modules>
+		<module>de.lmu.ifi.dbs.medmon.base.ui</module>
+		<module>de.lmu.ifi.dbs.medmon.derby</module>
+		<module>de.lmu.ifi.dbs.medmon.jfreechart.libs</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.core</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.logging</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.reporting</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.ui</module>
+		<module>de.lmu.ifi.dbs.medmon.patient.ui</module>
+		<module>de.lmu.ifi.dbs.medmon.services</module>
 
-    <module>de.lmu.ifi.dbs.medmon.services</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.core.feature</module>
+		<module>de.lmu.ifi.dbs.medmon.common.ui.feature</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.feature</module>
 
-    <module>de.lmu.ifi.dbs.medmon.sensor.core</module>
-    <module>de.lmu.ifi.dbs.medmon.sensor.test</module>
-    <module>de.lmu.ifi.dbs.medmon.sensor.feature</module>
+		<module>de.lmu.ifi.dbs.medmon.sensor.core</module>
+		<module>de.lmu.ifi.dbs.medmon.sensor.test</module>
+		<module>de.lmu.ifi.dbs.medmon.sensor.feature</module>
+		<module>de.lmu.ifi.dbs.medmon.medic.reporting.feature</module>
 
-    <module>de.sendsor.accelerationSensor</module>
-    <module>de.sendsor.accelerationSensor.feature</module>
+		<module>de.sendsor.accelerationSensor</module>
+		<module>de.sendsor.accelerationSensor.feature</module>
 
-    <module>de.lmu.ifi.dbs.medmon.site</module>
-  </modules>
+		<module>de.lmu.ifi.dbs.medmon.site</module>
+	</modules>
 
-  <build>
-    <plugins>
+	<build>
+		<plugins>
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
@@ -100,8 +102,65 @@
 					</excludeResources>
 				</configuration>
 			</plugin>
-    </plugins>
-  </build>
+
+			<!-- Materialize Products -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-director-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>materialize-products</id>
+						<goals>
+							<goal>materialize-products</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>archive-products</id>
+						<goals>
+							<goal>archive-products</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<repositories>
 		<!-- Eclipse repositories -->
@@ -158,6 +217,12 @@
 			<layout>p2</layout>
 			<url>http://repository.mukis.de/p2/joda</url>
 		</repository>
+		<repository>
+			<id>jfreechart</id>
+			<layout>p2</layout>
+			<url>http://repository.mukis.de/p2/jfreechart</url>
+		</repository>
+
 
 		<!-- Scala repositories -->
 		<repository>
@@ -183,3 +248,5 @@
 		</pluginRepository>
 	</pluginRepositories>
 </project>
+
+

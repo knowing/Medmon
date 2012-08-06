@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="de.lmu.ifi.dbs.medmon.medic.core"
+      id="de.lmu.ifi.dbs.medmon.medic.core.feature"
       label="Medmon Core"
-      version="1.0.2.qualifier"
+      version="1.0.0.qualifier"
       provider-name="LMU Munich - Database Systems Group">
 
    <description url="http://www.dbs.ifi.lmu.de/cms/Sendsor">
@@ -35,6 +35,46 @@ limitations under the License.
    <url>
       <update label="Medmon Repository" url="http://medmon.mukis.de/repository/medmon/"/>
    </url>
+
+   <includes
+         id="de.lmu.ifi.dbs.knowing.core.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="de.lmu.ifi.dbs.knowing.weka.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="de.lmu.ifi.dbs.medmon.sensor.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.sapphire"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.sapphire.java"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.sapphire.modeling.xml"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.sapphire.osgi"
+         version="0.0.0"/>
+
+   <includes
+         id="org.joda.time.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.gemini.dbaccess.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.joda.convert.feature"
+         version="0.0.0"/>
 
    <plugin
          id="de.lmu.ifi.dbs.medmon.derby"
@@ -192,6 +232,27 @@ limitations under the License.
 
    <plugin
          id="de.lmu.ifi.dbs.knowing.weka"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.slf4j.api"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.platform"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.sapphire.workspace"
          download-size="0"
          install-size="0"
          version="0.0.0"

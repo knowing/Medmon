@@ -35,13 +35,6 @@ limitations under the License.
       <update label="Medmon Repository" url="http://medmon.mukis.de/repository/medmon/"/>
    </url>
 
-   <requires>
-      <import feature="de.lmu.ifi.dbs.knowing.core.feature" version="0.1.5.qualifier"/>
-      <import feature="de.lmu.ifi.dbs.knowing.swt.feature" version="0.1.5.qualifier"/>
-      <import feature="de.lmu.ifi.dbs.medmon.medic.core" version="1.0.1.qualifier"/>
-      <import feature="de.lmu.ifi.dbs.medmon.common.ui.feature" version="1.0.0.qualifier"/>
-   </requires>
-
    <plugin
          id="de.lmu.ifi.dbs.medmon.medic.ui"
          download-size="0"
