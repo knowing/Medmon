@@ -10,7 +10,7 @@ import de.lmu.ifi.dbs.knowing.core.processing.ImmutableInstances
 import de.lmu.ifi.dbs.knowing.core.events.Results
 import de.lmu.ifi.dbs.knowing.core.util.ResultsUtil
 import de.lmu.ifi.dbs.knowing.core.results.ClassDistributionResults.ATTRIBUTE_CLASS
-import weka.core.{Instance,Instances, Attribute,DenseInstance, FastVector}
+import weka.core.{Instance,Instances, Attribute,DenseInstance}
 import ResultMergeProcessorFactory._
 
 /**
@@ -62,6 +62,15 @@ class ResultMergeProcessor extends TProcessor {
 		}
 	}
 
+	/**
+	 * Generates an empty Instances object with the following
+	 * Attribute pattern:
+	 * 
+	 * class<lable1> | class<lable2> | ... 
+	 * -----------------------------------
+	 * 
+	 * @return Instances
+	 */
 	def determineFormat(): Instances = {
 		for (i <- 0 until segments.numAttributes) {
 			if (segments.attribute(i).`type` == Attribute.RELATIONAL && inputRelIndex < 0) {
@@ -72,11 +81,11 @@ class ResultMergeProcessor extends TProcessor {
 				sdf = new SimpleDateFormat(segments.attribute(i).getDateFormat());
 			}
 		}
-
-		val attributes = new FastVector[Attribute]
+		
+		val attributes = new ArrayList[Attribute]
 		val relaltionalAttribute: Instances = segments.attribute(inputRelIndex).relation()
 		for (i <- 0 until relaltionalAttribute.numAttributes()) {
-			attributes.addElement(relaltionalAttribute.attribute(i))
+			attributes.add(relaltionalAttribute.attribute(i))
 		}
 
 		labels = segments.classAttribute.enumerateValues.toList
@@ -109,6 +118,7 @@ class ResultMergeProcessor extends TProcessor {
 
 			while (si < segs.numInstances || ni < nonsegs.numInstances) {
 				if (si < segs.numInstances && ni < nonsegs.numInstances) {
+				    //TODO is this ever called?
 					val sDate = sdf.parse(segs.get(si).stringValue(inputStartTime))
 					val nDate = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
 					var rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))

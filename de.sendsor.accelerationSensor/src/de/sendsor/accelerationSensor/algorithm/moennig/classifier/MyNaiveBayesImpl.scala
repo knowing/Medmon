@@ -30,7 +30,7 @@ class MyNaiveBayesImpl extends weka.classifiers.bayes.NaiveBayes {
   override def buildClassifier(data: Instances) {
     deterimeInputFormat(data)
 
-    val train: Instances = new Instances(inputFormat, 0)
+    val train: Instances = new Instances(inputFormat, data.numAttributes)
 
     for (i <- 0 until data.numInstances) {
       var inst: DenseInstance = new DenseInstance(inputFormat.numAttributes());
