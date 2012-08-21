@@ -11,12 +11,14 @@ import de.sendsor.accelerationSensor.SDRLoaderFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ReClassificationFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ResultMergeProcessorFactory;
+import de.sendsor.accelerationSensor.algorithm.moennig.classifier.UncertainClassDumperFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.TruncatedPeakPredictionFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.segmentation.SegmentationFactory;
 import de.sendsor.accelerationSensor.algorithm.presentation.ACDataSaverFactory;
+import de.sendsor.accelerationSensor.algorithm.presentation.AreaChartFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.presentation.BarChartFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.walonka.NormalizeAndroidSensorDataFactory;
 
@@ -55,7 +57,9 @@ public class Activator implements BundleActivator {
 		util.registerProcessor(new SourceToClassConverterFactory());
 		util.registerProcessor(new ResultMergeProcessorFactory());
 		util.registerProcessor(new ReClassificationFactory());
+		util.registerProcessor(new UncertainClassDumperFactory());
 		util.registerProcessor(new BarChartFilterFactory());
+		util.registerProcessor(new AreaChartFilterFactory());
 		util.registerProcessor(new NormalizeAndroidSensorDataFactory());
 		util.registerSaver(new ACDataSaverFactory());
 	}

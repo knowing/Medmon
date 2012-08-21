@@ -66,8 +66,9 @@ class ResultMergeProcessor extends TProcessor {
 	 * Generates an empty Instances object with the following
 	 * Attribute pattern:
 	 * 
-	 * class<lable1> | class<lable2> | ... 
-	 * -----------------------------------
+	 * timestamp | y0 | y1 | y2 | class | classA | classB | classC | ...
+	 * -----------------------------------------------------------------
+	 * Date      | num| num| num| nom   | percent| percent| percent| ...
 	 * 
 	 * @return Instances
 	 */
@@ -118,7 +119,6 @@ class ResultMergeProcessor extends TProcessor {
 
 			while (si < segs.numInstances || ni < nonsegs.numInstances) {
 				if (si < segs.numInstances && ni < nonsegs.numInstances) {
-				    //TODO is this ever called?
 					val sDate = sdf.parse(segs.get(si).stringValue(inputStartTime))
 					val nDate = sdf.parse(nonsegs.get(ni).stringValue(inputStartTime))
 					var rDate = sdfRaw.parse(raw.get(ri).stringValue(inputStartTime))
