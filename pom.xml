@@ -194,7 +194,10 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/technology/nebula/incubation/snapshot</url>
 		</repository>
-
+		<repository>
+			<id>logback</id>
+			<url>http://logback.qos.ch/p2/r</url>
+		</repository>
 
 		<!-- Custom repositories -->
 		<repository>
@@ -205,7 +208,7 @@
 		<repository>
 			<id>knowing-repository</id>
 			<layout>p2</layout>
-			<url>http://repository.mukis.de/p2/knowing/0.1.6</url>
+			<url>http://repository.mukis.de/p2/knowing/snapshot</url>
 		</repository>
 		<repository>
 			<id>jama-repository</id>

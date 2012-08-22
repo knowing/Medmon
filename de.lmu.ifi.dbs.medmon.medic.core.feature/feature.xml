@@ -189,6 +189,13 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
+         id="ch.qos.logback.slf4j"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="gov.nist.math.jama"
          download-size="0"
          install-size="0"
