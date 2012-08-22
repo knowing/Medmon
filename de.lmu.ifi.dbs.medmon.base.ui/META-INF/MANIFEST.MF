@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.ui,
  javax.persistence;bundle-version="2.0.3",
  de.lmu.ifi.dbs.medmon.services;bundle-version="1.0.0",
  de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0",
- de.lmu.ifi.dbs.knowing.core;bundle-version="0.1.3"
+ de.lmu.ifi.dbs.knowing.core;bundle-version="[0.1.6, 1.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.lmu.ifi.dbs.medmon.base.ui.adapter,
@@ -44,7 +44,7 @@ Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
  org.joda.time.field;version="[2.0.0,3.0.0)",
  org.joda.time.format;version="[2.0.0,3.0.0)",
  org.joda.time.tz;version="[2.0.0,3.0.0)",
- org.slf4j;version="[1.6.0,1.7.0)",
+ org.slf4j;version="[1.6.4,1.7.0)",
  scala;version="[2.9.0.1,2.9.4.0)",
  scala.collection;version="[2.9.0.1,2.9.4.0)",
  scala.collection.generic;version="[2.9.0.1,2.9.4.0)",

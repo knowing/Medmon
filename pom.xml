@@ -138,6 +138,37 @@
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
+					<!--
+					<filters>
+					         <filter>
+					         	<type>eclipse-plugin</type>
+					         	<id>org.slf4j.api</id>
+					         	<restrictTo>
+					         	<versionRange>[1.6.4,2.0.0)</versionRange> ,
+					         	</restrictTo>
+					         </filter>
+					         <filter>
+					         	<type>eclipse-plugin</type>
+					         	<id>ch.qos.logback.core</id>
+					         	<restrictTo>
+					         	<versionRange>[1.0.0,2.0.0)</versionRange> 
+					         	</restrictTo>
+					         </filter>
+				         	<filter>
+					         	<type>eclipse-plugin</type>
+					         	<id>ch.qos.logback.classic</id>
+					         	<restrictTo>
+					         	<versionRange>[1.0.0,2.0.0)</versionRange>
+					         	</restrictTo>
+					         </filter>
+				         	<filter>
+					         	<type>eclipse-plugin</type>
+					         	<id>ch.qos.logback.slf4j</id>
+					         	<restrictTo>
+					         	<versionRange>[1.0.0,2.0.0)</versionRange>
+					         	</restrictTo>
+					         </filter>
+					</filters>-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -196,7 +227,8 @@
 		</repository>
 		<repository>
 			<id>logback</id>
-			<url>http://logback.qos.ch/p2/r</url>
+			<layout>p2</layout>
+			<url>http://logback.qos.ch/p2</url>
 		</repository>
 
 		<!-- Custom repositories -->

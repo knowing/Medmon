@@ -31,6 +31,6 @@ Import-Package: de.lmu.ifi.dbs.medmon.database.entity,
  org.joda.time.field,
  org.joda.time.format,
  org.joda.time.tz,
- org.slf4j;version="[1.6.0,1.7.0)",
+ org.slf4j;version="[1.6.4,2.0.0)",
  scala;version="[2.9.0.1,2.9.4.0)",
  scala.collection;version="[2.9.0.1,2.9.4.0)"

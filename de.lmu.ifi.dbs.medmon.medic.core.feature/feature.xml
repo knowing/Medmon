@@ -76,6 +76,14 @@ limitations under the License.
          id="org.joda.convert.feature"
          version="0.0.0"/>
 
+   <includes
+         id="ch.qos.logback.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.slf4j.feature"
+         version="0.0.0"/>
+
    <plugin
          id="de.lmu.ifi.dbs.medmon.derby"
          download-size="0"
@@ -175,27 +183,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="ch.qos.logback.classic"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="ch.qos.logback.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="ch.qos.logback.slf4j"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="gov.nist.math.jama"
          download-size="0"
          install-size="0"
@@ -245,13 +232,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="org.slf4j.api"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.sapphire.platform"
          download-size="0"
          install-size="0"
@@ -264,5 +244,6 @@ limitations under the License.
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
 
 </feature>
