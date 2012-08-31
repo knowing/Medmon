@@ -4,7 +4,8 @@ Bundle-Name: Sensor Test
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.sensor.test;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.sensor.test.Activator
-Require-Bundle: de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0"
+Require-Bundle: de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0",
+ org.junit4;bundle-version="4.8.1";resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.osgi.framework;version="1.6.0",

@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import weka.core.Instances;

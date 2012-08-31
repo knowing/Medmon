@@ -18,3 +18,4 @@ Import-Package: org.joda.time;version="[2.0.0,3.0.0)",
  org.slf4j;version="[1.6.4,2.0.0)",
  weka.core
 Service-Component: OSGI-INF/sensorDirectoryService.xml, OSGI-INF/deviceService.xml
+Require-Bundle: org.junit;bundle-version="4.8.1";resolution:=optional

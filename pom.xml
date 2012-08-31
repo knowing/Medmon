@@ -102,6 +102,34 @@
 					</excludeResources>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<argLine>-Xms256m -Xmx512m -XX:MaxPermSize=256M</argLine>
+					<includes>
+						<include>**/*Test.*</include>
+					</includes>
+					<dependencies>
+						<dependency>
+							<type>p2-installable-unit</type>
+							<artifactId>org.eclipse.equinox.ds</artifactId>
+						</dependency>
+					</dependencies>
+				</configuration>
+				<!--
+				<executions>
+					<execution>
+						<id>medmon-tests</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				-->
+			</plugin>
 
 			<!-- Materialize Products -->
 			<plugin>
@@ -138,37 +166,6 @@
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
-					<!--
-					<filters>
-					         <filter>
-					         	<type>eclipse-plugin</type>
-					         	<id>org.slf4j.api</id>
-					         	<restrictTo>
-					         	<versionRange>[1.6.4,2.0.0)</versionRange> ,
-					         	</restrictTo>
-					         </filter>
-					         <filter>
-					         	<type>eclipse-plugin</type>
-					         	<id>ch.qos.logback.core</id>
-					         	<restrictTo>
-					         	<versionRange>[1.0.0,2.0.0)</versionRange> 
-					         	</restrictTo>
-					         </filter>
-				         	<filter>
-					         	<type>eclipse-plugin</type>
-					         	<id>ch.qos.logback.classic</id>
-					         	<restrictTo>
-					         	<versionRange>[1.0.0,2.0.0)</versionRange>
-					         	</restrictTo>
-					         </filter>
-				         	<filter>
-					         	<type>eclipse-plugin</type>
-					         	<id>ch.qos.logback.slf4j</id>
-					         	<restrictTo>
-					         	<versionRange>[1.0.0,2.0.0)</versionRange>
-					         	</restrictTo>
-					         </filter>
-					</filters>-->
 				</configuration>
 			</plugin>
 			<plugin>
