@@ -1,9 +1,6 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
-import java.io.IOException;
-import java.net.URI;
-
-import weka.core.Instances;
+import org.osgi.service.device.Device;
 
 
 /**
@@ -14,7 +11,7 @@ import weka.core.Instances;
  * @since 2011-11-15
  *
  */
-public interface ISensor {
+public interface ISensor extends Device {
 
 	/**
 	 * returns the Id of the sendor
@@ -38,34 +35,25 @@ public interface ISensor {
 	 * returns the version
 	 * @return
 	 */
-	public String getVersion();
+	public String getSerial();
 	
 	/**
-	 * returns the file prefix this sensor uses
+	 * 
 	 * @return
 	 */
-	public String getFilePrefix();
+	public Category getCategory();
 	
 	/**
-	 * returns the attributes of the sensor data
+	 * 
+	 * @param driver
 	 */
-	public Instances getHeader();
+	public void setDriver(ISensorDriver driver);
 	
 	/**
-	 * states whether the inputStream is convertible.
-	 * if true, a Converter can be created with newConverter().
-	 * @param inputStream
+	 * 
 	 * @return
-	 * @throws IOException 
 	 */
-	public boolean isConvertable(URI input) throws IOException;
+	public ISensorDriver getDriver();
 	
-	/**
-	 * returns an instance of IConverter which provides access to the data of the sensor
-	 * @param inputStream
-	 * @return
-	 * @throws IOException 
-	 */
-	public IConverter newConverter(URI input) throws IOException;
 	
 }

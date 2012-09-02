@@ -3,19 +3,35 @@ package de.lmu.ifi.dbs.medmon.sensor.core;
 public abstract class AbstractSensor implements ISensor {
 
 	private final String id;
+	private ISensorDriver driver;
 
 	public AbstractSensor() {
-		id = getClass().getName() + getVersion();
+		id = getClass().getName() + "_" +  getSerial();
 	}
 
 	@Override
 	public String getId() {
 		return id;
 	}
+	
+	@Override
+	public ISensorDriver getDriver() {
+		return driver;
+	}
+	
+	@Override
+	public void setDriver(ISensorDriver driver) {
+		this.driver = driver;
+	}
+	
+	@Override
+	public void noDriverFound() {
+		this.driver = null;
+	}
 
 	@Override
 	public String toString() {
-		return getName() + " - " + getVersion() + " [" + getId() + "]";
+		return getName() + " - " + getSerial() + " [" + getId() + "]";
 	}
 
 	@Override
