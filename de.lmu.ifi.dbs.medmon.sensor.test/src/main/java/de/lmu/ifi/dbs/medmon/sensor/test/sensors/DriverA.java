@@ -23,11 +23,6 @@ public class DriverA extends AbstractSensorDriver {
 	}
 
 	@Override
-	public String getFilePrefix() {
-		return null;
-	}
-
-	@Override
 	public Interval getInterval(InputStream in) throws IOException {
 		return null;
 	}

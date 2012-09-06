@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
 import java.util.List;
 
 /**
@@ -15,13 +17,7 @@ public interface ISensorManager {
     public static final String SENSOR_TOPIC_REMOVE = "medmon/sensor/core/sensor/remove";
     
     public static final String SENSOR_DATA = "medmon.sensor.core.sensor";
-
-    /**
-     * 
-     * @param id
-     * @return sensor or null
-     */
-    public ISensor getSensor(String id);
+    public static final String SENSOR_SOURCE = "medmon.sensor.core.source";
     
     /**
      * 
@@ -32,8 +28,7 @@ public interface ISensorManager {
     /**
      * 
      */
-    //TODO create correct onSensorEvent method signature
-    public void onSensorEvent();
+    public void onSensorEvent(Path path, WatchEvent<Path> event);
     
     public void addListener(ISensorListener listener);
     

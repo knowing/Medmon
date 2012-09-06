@@ -1,6 +1,10 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
+import java.io.IOException;
+
 import org.osgi.service.device.Device;
+
+import weka.core.Instances;
 
 
 /**
@@ -55,5 +59,23 @@ public interface ISensor extends Device {
 	 */
 	public ISensorDriver getDriver();
 	
+	/**
+	 * Driver and source must be set. 
+	 * 
+	 * @return dataset 
+	 * @throws IOException
+	 */
+	public Instances getData() throws IOException;
+	
+	/**
+	 * <p>Creates a instance of this sensor with the specified
+	 * source. The source can be everything, e.g. Path, File,
+	 * String, URL, InputStream, etc.</p>
+	 * 
+	 * @param source
+	 * @return object on success - null on wrong source
+	 * @throws IOException - on failure
+	 */
+	public ISensor create(Object source) throws IOException;	
 	
 }

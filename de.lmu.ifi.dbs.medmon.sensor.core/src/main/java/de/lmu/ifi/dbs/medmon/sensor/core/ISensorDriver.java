@@ -43,9 +43,4 @@ public interface ISensorDriver extends Driver {
 	 */
 	public Instances getHeader();
 	
-	/**
-	 * returns the file prefix this sensor uses
-	 * @return
-	 */
-	public String getFilePrefix();
 }
