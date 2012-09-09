@@ -7,9 +7,11 @@ import java.nio.file.WatchEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,6 +26,7 @@ import com.google.common.collect.HashBiMap;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensorListener;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager;
+import de.lmu.ifi.dbs.medmon.sensor.core.SensorEvent;
 import de.lmu.ifi.dbs.medmon.sensor.core.watcher.IMassMediaWatcher;
 import de.lmu.ifi.dbs.medmon.sensor.core.watcher.LinuxWatcher;
 import de.lmu.ifi.dbs.medmon.sensor.core.watcher.WindowsWatcher;
@@ -40,6 +43,11 @@ public class SensorManagerService implements ISensorManager {
 
     /** Available sources */
     private List<Object> sources = new LinkedList<>();
+    
+    /** Sensor Listeners */
+    private Set<ISensorListener> listeners = new HashSet<>();
+    
+    /** */
     private EventAdmin eventAdmin;
 
     private ExecutorService watchServiceExecutor;
@@ -109,6 +117,12 @@ public class SensorManagerService implements ISensorManager {
                 if (oldSensor != null) {
                     removeSensorInstance(oldSensor);
                 }
+                
+                HashMap<String, Object> properties = new HashMap<>();
+                properties.put(SENSOR_DATA, sensorInstance);
+                properties.put(SENSOR_SOURCE, path);
+                properties.put(SENSOR_AVAILABLE, true);
+                postSensorEvent(properties);
                 log.debug("Added sensorInstance " + sensorInstance + " on path " + path);
             }
         } catch (IOException e) {
@@ -125,6 +139,7 @@ public class SensorManagerService implements ISensorManager {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put(SENSOR_DATA, sensorInstance);
         properties.put(SENSOR_SOURCE, source);
+        properties.put(SENSOR_AVAILABLE, false);
         postSensorEvent(properties);
         log.debug("Removed sensorInstance " + sensorInstance + " with source " + source);
     }
@@ -136,28 +151,33 @@ public class SensorManagerService implements ISensorManager {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put(SENSOR_DATA, removedSensor);
         properties.put(SENSOR_SOURCE, path);
+        properties.put(SENSOR_AVAILABLE, false);
         postSensorEvent(properties);
         log.debug("Removed path " + path + " with instance " + removedSensor);
     }
 
     private void postSensorEvent(Map<String, Object> properties) {
-    	//TODO post to all listeners
+    	for (ISensorListener listener : listeners) {
+    		ISensor sensor = (ISensor) properties.get(SENSOR_DATA);
+    		boolean available = (boolean) properties.get(SENSOR_AVAILABLE);
+			listener.sensorChanged(new SensorEvent(sensor, available));
+		}
     	
+        // This is for e4
     	if(eventAdmin == null)
     		return;
-        // This is for e4
         properties.put("org.eclipse.e4.data", properties.get(SENSOR_DATA));
         eventAdmin.postEvent(new Event(SENSOR_TOPIC_REMOVE, properties));
     }
 
     @Override
     public void addListener(ISensorListener listener) {
-        // TODO implement addListener
+    	listeners.add(listener);
     }
 
     @Override
     public void removeListener(ISensorListener listener) {
-        // TODO implement removeListener
+    	listeners.remove(listener);
     }
 
     /* ============================================== */

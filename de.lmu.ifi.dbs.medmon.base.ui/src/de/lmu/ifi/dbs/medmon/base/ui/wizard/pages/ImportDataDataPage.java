@@ -124,6 +124,7 @@ public class ImportDataDataPage extends WizardPage implements IValidationPage {
 	@Override
 	public void checkContents() {
 
+		//FIXME ISensor instead of URI class
 		selectedURI = JFaceUtil.initializeViewerSelection(URI.class, tableViewer);
 
 		if (selectedURI == null)

@@ -45,9 +45,14 @@ public abstract class MassMediaWatcher implements IMassMediaWatcher {
                 }
 
                 for (WatchEvent<?> event : key.pollEvents()) {
-                    @SuppressWarnings("unchecked")
-                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                    manager.onSensorEvent(resolveFullpath(ev), ev);
+                	try {
+                        @SuppressWarnings("unchecked")
+                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                        manager.onSensorEvent(resolveFullpath(ev), ev);
+                	} catch (Exception e) {
+                		log.error("Unable to process WatchEvent", e);
+                	}
+
                 }
                 if (!key.reset()) {
                     return;
