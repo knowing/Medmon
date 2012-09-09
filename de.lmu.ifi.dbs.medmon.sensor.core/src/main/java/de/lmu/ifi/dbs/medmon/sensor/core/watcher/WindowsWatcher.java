@@ -21,4 +21,9 @@ public class WindowsWatcher extends MassMediaWatcher {
         return null;
     }
 
+    @Override
+    protected Path massMediaDeviceDirectory() {
+        return null;
+    }
+
 }

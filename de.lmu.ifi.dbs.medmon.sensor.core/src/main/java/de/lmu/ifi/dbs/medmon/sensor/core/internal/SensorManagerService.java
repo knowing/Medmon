@@ -100,12 +100,11 @@ public class SensorManagerService implements ISensorManager {
         try {
             ISensor sensorInstance = sensor.create(path);
             if (sensor != null) {
-                //TODO double adding of sensors
                 ISensor oldSensor = sensorInstances.forcePut(path, sensorInstance);
                 if (oldSensor != null) {
                     removeSensorInstance(oldSensor);
                 }
-                log.debug("Added sensorInstance " + sensorInstance);
+                log.debug("Added sensorInstance " + sensorInstance + " on path " + path);
             }
         } catch (IOException e) {
             // TODO handle exception
