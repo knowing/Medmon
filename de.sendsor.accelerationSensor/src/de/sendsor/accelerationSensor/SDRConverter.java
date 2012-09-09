@@ -3,6 +3,8 @@ package de.sendsor.accelerationSensor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,6 @@ import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
 import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults;
-import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
 
 /**
  * <p>
@@ -31,7 +32,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.FileConverter;
  * @since 01.04.2011
  * 
  */
-public class SDRConverter extends FileConverter {
+public class SDRConverter {
 
 	private static final long	serialVersionUID		= 7663052852394853876L;
 	private final Logger		log						= LoggerFactory.getLogger(SDRConverter.class);
@@ -64,19 +65,23 @@ public class SDRConverter extends FileConverter {
 	private String				aggregate				= SDRLoaderFactory.AGGREGATE_AVERAGE();
 	private double				units					= 1.0;
 	private boolean				relativeTimestamp		= false;
+	
+	/* == Input == */
+	private InputStream input;
 
-	public SDRConverter(URI url) throws IOException {
-		super(url);
+	public SDRConverter(URI uri) throws IOException {
+	    //TODO SDRConverter exception handling
+	    input = uri.toURL().openStream();
 		init();
 	}
 
 	public SDRConverter(String file) throws IOException {
-		super(file);
+	    input = Files.newInputStream(Paths.get(file));
 		init();
 	}
 
 	public SDRConverter(InputStream input) {
-		super(input);
+	    this.input = input;
 		init();
 	}
 
@@ -98,7 +103,6 @@ public class SDRConverter extends FileConverter {
 		}
 	}
 
-	@Override
 	public Instances getData() throws IOException {
 		Instances dataset = new Instances(header);
 		if (input == null)
@@ -191,7 +195,6 @@ public class SDRConverter extends FileConverter {
 		return dataset;
 	}
 
-	@Override
 	public Interval getInterval() throws IOException {
 		// Initialize position handling
 		byte[] data = new byte[BLOCKSIZE];

@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.IOException;
 
+import org.joda.time.Interval;
 import org.osgi.service.device.Device;
 
 import weka.core.Instances;
@@ -48,24 +49,15 @@ public interface ISensor extends Device {
 	public Category getCategory();
 	
 	/**
-	 * 
 	 * @param driver
 	 */
 	public void setDriver(ISensorDriver driver);
 	
 	/**
-	 * 
-	 * @return
+	 * @return driver
 	 */
 	public ISensorDriver getDriver();
 	
-	/**
-	 * Driver and source must be set. 
-	 * 
-	 * @return dataset 
-	 * @throws IOException
-	 */
-	public Instances getData() throws IOException;
 	
 	/**
 	 * <p>Creates a instance of this sensor with the specified
@@ -77,5 +69,20 @@ public interface ISensor extends Device {
 	 * @throws IOException - on failure
 	 */
 	public ISensor create(Object source) throws IOException;	
+	
+	   /**
+     * Driver and source must be set. 
+     * 
+     * @return dataset 
+     * @throws IOException
+     */
+    public Instances getData() throws IOException;
+    
+    /**
+     * 
+     * @return
+     * @throws IOException
+     */
+    public Interval getInterval() throws IOException;
 	
 }

@@ -78,6 +78,11 @@ public class SensorManagerService implements ISensorManager {
     public List<ISensor> getSensors() {
         return Collections.unmodifiableList(new ArrayList<>(sensors.values()));
     }
+    
+    @Override
+    public List<ISensor> getConnectedSensors() {
+        return Collections.unmodifiableList(new ArrayList<>(sensorInstances.values()));
+    }
 
     /* ============================================== */
     /* =========== Filesystem Event Handling ======== */
@@ -143,11 +148,12 @@ public class SensorManagerService implements ISensorManager {
 
     @Override
     public void addListener(ISensorListener listener) {
+        // TODO implement addListener
     }
 
     @Override
     public void removeListener(ISensorListener listener) {
-
+        // TODO implement removeListener
     }
 
     /* ============================================== */

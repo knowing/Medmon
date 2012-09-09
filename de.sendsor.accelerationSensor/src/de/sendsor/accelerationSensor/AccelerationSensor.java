@@ -1,13 +1,13 @@
 package de.sendsor.accelerationSensor;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import weka.core.Instances;
-import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
+import de.lmu.ifi.dbs.medmon.sensor.core.AbstractSensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.Category;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults;
 
 /**
  * 
@@ -16,75 +16,47 @@ import de.lmu.ifi.dbs.knowing.core.results.TimeSeriesResults;
  * @since 2011-11-21
  * 
  */
-public class AccelerationSensor implements ISensor {
+public class AccelerationSensor extends AbstractSensor {
 
-	private final String id = getClass().getName() + ":" + getVersion();
-	private final Instances header = TimeSeriesResults.newInstances(Arrays.asList(new String[] { "x", "y", "z" }));
+    private Path sourceDirectory;
 
-	@Override
-	public String getId() {
-		return id;
-	}
+    @Override
+    public ISensor create(Object source) throws IOException {
+        AccelerationSensor sensor = null;
+        if(source instanceof Path) {
+            sensor = new AccelerationSensor();
+            sensor.sourceDirectory = (Path) source;
+        }
+        return sensor;
+    }
+    
+    @Override
+    protected InputStream input() throws IOException {
+        try(InputStream in = Files.newInputStream(sourceDirectory)) {
+            return in;
+        }
+    }
+    
+    @Override
+    public String getSerial() {
+        return "aa:bb:cc:dd";
+    }
 
-	@Override
-	public String getName() {
-		return "Sendsor Acceleration Sensor";
-	}
+    @Override
+    public Category getCategory() {
+        return Category.AC;
+    }
+    
 
-	@Override
-	public String getDescription() {
-		return "3D Acceleration Senesor";
-	}
+    @Override
+    public String getName() {
+        return "Sendsor Acceleration Sensor";
+    }
 
-	@Override
-	public String getVersion() {
-		return "1.0";
-	}
+    @Override
+    public String getDescription() {
+        return "3D Acceleration Senesor";
+    }
 
-	@Override
-	public String getFilePrefix() {
-		return "sdr";
-	}
-
-	@Override
-	public Instances getHeader() {
-		return header;
-	}
-
-	@Override
-	public boolean isConvertable(URI input) throws IOException {
-		//TODO check if sdr is convertible
-		return true;
-	}
-
-	@Override
-	public IConverter newConverter(URI input) throws IOException {
-		return new SDRConverter(input);
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		AccelerationSensor other = (AccelerationSensor) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
 
 }

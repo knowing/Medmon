@@ -27,6 +27,12 @@ public interface ISensorManager {
     
     /**
      * 
+     * @return all sensor instances which are connected to a data source
+     */
+    public List<ISensor> getConnectedSensors();
+    
+    /**
+     * 
      */
     public void onSensorEvent(Path path, WatchEvent<Path> event);
     

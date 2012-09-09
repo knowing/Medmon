@@ -21,11 +21,10 @@ import org.slf4j.LoggerFactory;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
-import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
-import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 
 public class PatientService implements IPatientService {
 
@@ -38,7 +37,7 @@ public class PatientService implements IPatientService {
 	private final DateFormat		dateF					= new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss-SSS");
 
 	private IEntityManagerService	entityManagerService	= null;
-	private ISensorManagerService	sensorManagerService	= null;
+	private ISensorManager	sensorManagerService	= null;
 
 	/**
 	 * <p>
@@ -72,13 +71,12 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public Data store(Patient p, ISensor s, String type) throws IOException {
-		IConverter converter = sensorManagerService.createConverter(s);
 
-		if (converter == null)
-			throw new IOException("No converter found for sensor " + s.getName());
+		if (s.getDriver() == null)
+			throw new IOException("No driver found for sensor " + s.getName());
 
 		Sensor entity = sensorManagerService.loadSensorEntity(s);
-		Interval interval = converter.getInterval();
+		Interval interval = s.getInterval();
 
 		Data data = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
 		
@@ -92,33 +90,6 @@ public class PatientService implements IPatientService {
 		}
 	}
 
-	/**
-	 * 
-	 * @param patient
-	 * @param sensor
-	 * @param type
-	 * @param inputURI
-	 */
-	@Override
-	public Data store(Patient patient, ISensor sensor, String type, URI inputURI) throws IOException {
-		IConverter converter = sensor.newConverter(inputURI);
-
-		if (converter == null)
-			throw new IOException("No converter found for sensor " + sensor.getName());
-
-		Sensor entity = sensorManagerService.loadSensorEntity(sensor);
-		Interval interval = converter.getInterval();
-
-		Data data = store(patient, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
-		// Copy raw data
-		try (OutputStream os = Files.newOutputStream(data.toPath())) {
-			Files.copy(Paths.get(inputURI), os);
-			return data;
-		} catch (IOException e) {
-			log.error("Error read from InputStream or writing to OutputStream.", e);
-			throw e;
-		}
-	}
 
 	protected void activate(ComponentContext context) {
 		log.debug("PatientService activated. Properties: " + context.getProperties());
