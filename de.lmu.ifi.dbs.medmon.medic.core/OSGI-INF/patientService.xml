@@ -5,5 +5,4 @@
       <provide interface="de.lmu.ifi.dbs.medmon.services.IPatientService"/>
    </service>
    <reference bind="bindEntityManager" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.services.IEntityManagerService" name="IEntityManagerService" policy="dynamic" unbind="unbindEntityManager"/>
-   <reference bind="bindSensorManagerService" cardinality="1..1" interface="de.lmu.ifi.dbs.medmon.services.ISensorManagerService" name="ISensorManagerService" policy="dynamic" unbind="unbindSensorManagerService"/>
 </scr:component>

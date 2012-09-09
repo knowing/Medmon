@@ -8,11 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.reporting.service.IReportingService;
-import de.lmu.ifi.dbs.medmon.services.IDBModelService;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
-import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.services.ITherapyResultService;
 
 /**
@@ -29,7 +28,7 @@ public class Activator extends AbstractUIPlugin {
 	// private static ServiceTracker<IPatientService, IPatientService>
 	// patientTracker;
 	private static ServiceTracker<IEntityManagerService, IEntityManagerService> entityServiceTracker;
-	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorManagerServiceTracker;
+	private static ServiceTracker<ISensorManager, ISensorManager> sensorManagerServiceTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> globalSelectionServiceTracker;
 	private static ServiceTracker<ITherapyResultService, ITherapyResultService> therapyResultServiceTracker;
@@ -49,7 +48,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		
-		sensorManagerServiceTracker = new ServiceTracker<ISensorManagerService, ISensorManagerService>(context, ISensorManagerService.class, null);
+		sensorManagerServiceTracker = new ServiceTracker<ISensorManager, ISensorManager>(context, ISensorManager.class, null);
 		sensorManagerServiceTracker.open();
 		
 		patientServiceTracker = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
@@ -122,7 +121,7 @@ public class Activator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	public static ISensorManagerService getSensorManagerService() {
+	public static ISensorManager getSensorManagerService() {
 		return sensorManagerServiceTracker.getService();
 	}
 

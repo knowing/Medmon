@@ -2,13 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
@@ -22,7 +16,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
-import de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
 
@@ -30,14 +23,7 @@ public class PatientService implements IPatientService {
 
 	private final Logger			log						= LoggerFactory.getLogger(IPatientService.class);
 
-	/** Format patient-id to 12 digits */
-	private final DecimalFormat		decimalF				= new DecimalFormat("000000000000");
-
-	/** Format dates with DateFormat.SHORT */
-	private final DateFormat		dateF					= new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss-SSS");
-
 	private IEntityManagerService	entityManagerService	= null;
-	private ISensorManager	sensorManagerService	= null;
 
 	/**
 	 * <p>
@@ -54,14 +40,14 @@ public class PatientService implements IPatientService {
 	 */
 	@Override
 	public Data store(Patient p, Sensor s, String type, Date from, Date to) {
-		EntityManager tempEM = entityManagerService.createEntityManager();
-		tempEM.getTransaction().begin();
+		EntityManager em = entityManagerService.createEntityManager();
+		em.getTransaction().begin();
 		Data data = new Data(from, to, s);
 		data.setPatient(p);
 		data.setType(type);
-		tempEM.persist(data);
-		tempEM.getTransaction().commit();
-		tempEM.close();
+		em.persist(data);
+		em.getTransaction().commit();
+		em.close();
 
 		return data;
 	}
@@ -70,17 +56,28 @@ public class PatientService implements IPatientService {
 	 * 
 	 */
 	@Override
-	public Data store(Patient p, ISensor s, String type) throws IOException {
+	public Data store(Patient p, ISensor sensor, String type) throws IOException {
 
-		if (s.getDriver() == null)
-			throw new IOException("No driver found for sensor " + s.getName());
+		if (sensor.getDriver() == null)
+			throw new IOException("No driver found for sensor " + sensor.getName());
 
-		Sensor entity = sensorManagerService.loadSensorEntity(s);
-		Interval interval = s.getInterval();
+		Interval interval = sensor.getInterval();
 
-		Data data = store(p, entity, type, interval.getStart().toDate(), interval.getEnd().toDate());
-		
-		try (InputStream in = Files.newInputStream(Paths.get(sensorManagerService.createDefaultURI(s)))) {
+		// Data data = store(p, entity, type, interval.getStart().toDate(),
+		// interval.getEnd().toDate());
+		EntityManager em = entityManagerService.createEntityManager();
+		em.getTransaction().begin();
+		// TODO load sensor entity - test
+		Sensor entity = em.find(Sensor.class, sensor.getId());
+		Data data = new Data(interval.getStart().toDate(), interval.getEnd().toDate(), entity);
+		data.setPatient(p);
+		data.setType(type);
+		em.persist(data);
+		em.getTransaction().commit();
+		em.close();
+
+		// Store file
+		try (InputStream in = sensor.getDataInputStream()) {
 			Files.copy(in, data.toPath());
 			return data;
 		} catch (IOException e) {
@@ -89,7 +86,6 @@ public class PatientService implements IPatientService {
 			throw e;
 		}
 	}
-
 
 	protected void activate(ComponentContext context) {
 		log.debug("PatientService activated. Properties: " + context.getProperties());
@@ -101,14 +97,6 @@ public class PatientService implements IPatientService {
 
 	protected void unbindEntityManager(IEntityManagerService service) {
 		entityManagerService = null;
-	}
-
-	protected void bindSensorManagerService(ISensorManagerService service) {
-		sensorManagerService = service;
-	}
-
-	protected void unbindSensorManagerService(ISensorManagerService service) {
-		sensorManagerService = null;
 	}
 
 }

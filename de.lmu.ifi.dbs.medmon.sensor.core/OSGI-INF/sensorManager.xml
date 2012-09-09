@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="de.lmu.ifi.dbs.medmon.sensor.core.sensorManager">
    <implementation class="de.lmu.ifi.dbs.medmon.sensor.core.internal.SensorManagerService"/>
-    <reference bind="bindEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic" unbind="unbindEventAdmin"/>
+    <reference bind="bindEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="dynamic" unbind="unbindEventAdmin"/>
    <reference bind="bindSensor" cardinality="0..n" interface="de.lmu.ifi.dbs.medmon.sensor.core.ISensor" name="ISensor" policy="dynamic" unbind="unbindSensor"/>
    <service>
       <provide interface="de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager"/>

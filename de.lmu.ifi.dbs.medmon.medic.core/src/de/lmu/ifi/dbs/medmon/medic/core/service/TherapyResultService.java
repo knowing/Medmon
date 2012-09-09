@@ -18,7 +18,6 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 
 import org.eclipse.swt.widgets.Composite;
-import org.joda.time.Interval;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +31,11 @@ import de.lmu.ifi.dbs.knowing.core.processing.INodeProperties;
 import de.lmu.ifi.dbs.knowing.core.service.IEvaluateService;
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
-import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
-import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
-import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 import de.lmu.ifi.dbs.medmon.services.ITherapyResultService;
 
 /**
@@ -56,8 +52,6 @@ public class TherapyResultService implements ITherapyResultService {
 
 	/** 1..1 relation */
 	private IPatientService				patientService;
-	/** 1..1 relation */
-	private ISensorManagerService		sensorManagerService;
 	/** 1..1 relation */
 	private IEvaluateService			evaluateService;
 
@@ -119,7 +113,7 @@ public class TherapyResultService implements ITherapyResultService {
 		// SDR Classification To ACData No Reclassification
 		//eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(), dlg.getSystem(), parameters, null, null);
 
-		Data data = createData(patient, sensor, input);
+		Data data = createData(patient, sensor);
 		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
 
 		// executeDPU(execPath, dpu, outputMap);
@@ -255,11 +249,8 @@ public class TherapyResultService implements ITherapyResultService {
 		return patientService.store(patient, data.getSensor(), Data.RESULT, data.getFrom(), data.getTo());
 	}
 
-	private Data createData(Patient patient, ISensor sensor, URI input) throws IOException {
-		IConverter converter = sensorManagerService.createConverter(sensor);
-		Sensor sensorEntity = sensorManagerService.loadSensorEntity(sensor);
-		Interval interval = converter.getInterval();
-		return patientService.store(patient, sensorEntity, Data.RESULT, interval.getStart().toDate(), interval.getEnd().toDate());
+	private Data createData(Patient patient, ISensor sensor) throws IOException {
+		return patientService.store(patient, sensor, Data.RESULT);
 	}
 
 	protected void activate(ComponentContext context) {
@@ -272,14 +263,6 @@ public class TherapyResultService implements ITherapyResultService {
 
 	protected void unbindPatientService(IPatientService patientService) {
 		this.patientService = null;
-	}
-
-	protected void bindSensorManagerService(ISensorManagerService sensorManagerService) {
-		this.sensorManagerService = sensorManagerService;
-	}
-
-	protected void unbindSensorManagerService(ISensorManagerService sensorManagerService) {
-		this.sensorManagerService = null;
 	}
 
 	protected void bindEvaluateService(IEvaluateService evaluateService) {

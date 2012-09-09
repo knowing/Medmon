@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.sensor.core;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.joda.time.Interval;
 
@@ -38,15 +37,13 @@ public abstract class AbstractSensor implements ISensor {
 
     @Override
     public Instances getData() throws IOException {
-        return getDriver().getData(input());
+        return getDriver().getData(getDataInputStream());
     }
 
     @Override
     public Interval getInterval() throws IOException {
-        return getDriver().getInterval(input());
+        return getDriver().getInterval(getDataInputStream());
     }
-
-    protected abstract InputStream input() throws IOException;
 
     @Override
     public String toString() {

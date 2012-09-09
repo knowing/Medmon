@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  de.lmu.ifi.dbs.medmon.services;bundle-version="1.0.0";visibility:=reexport,
  org.eclipse.sapphire.modeling;bundle-version="[0.5.0,0.6.0)",
  org.eclipse.sapphire.modeling.xml;bundle-version="[0.5.0,0.6.0)"
-Service-Component: OSGI-INF/sensorManagerService.xml, OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/therapyResultService.xml
+Service-Component: OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/therapyResultService.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: akka.actor;version="[2.0.0,3.0.0)",

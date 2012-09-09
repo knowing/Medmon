@@ -141,6 +141,10 @@ public class SensorManagerService implements ISensorManager {
     }
 
     private void postSensorEvent(Map<String, Object> properties) {
+    	//TODO post to all listeners
+    	
+    	if(eventAdmin == null)
+    		return;
         // This is for e4
         properties.put("org.eclipse.e4.data", properties.get(SENSOR_DATA));
         eventAdmin.postEvent(new Event(SENSOR_TOPIC_REMOVE, properties));

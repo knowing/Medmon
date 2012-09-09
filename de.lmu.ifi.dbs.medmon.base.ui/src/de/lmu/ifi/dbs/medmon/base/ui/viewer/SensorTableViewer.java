@@ -69,6 +69,8 @@ public class SensorTableViewer extends TableViewer {
 				dlg.setText("Standard-Pfad");
 				dlg.setMessage("w\u00e4hlen sie den neuen Standard-Pfad f\u00fcr diesen Sensor aus!");
 				String dir = dlg.open();
+				// FIXME implement SensorTableViewer
+				/*
 				if (dir != null) {
 					Sensor mSensor = Activator.getSensorManagerService().loadSensorEntity(selection);
 					if (mSensor == null)
@@ -85,6 +87,7 @@ public class SensorTableViewer extends TableViewer {
 
 					Activator.getSensorManagerService().notifySensorObservers(selection);
 				}
+				*/
 			}
 
 			public void widgetDefaultSelected(SelectionEvent event) {
@@ -117,8 +120,15 @@ public class SensorTableViewer extends TableViewer {
 		setContentProvider(new ArrayContentProvider());
 		setLabelProvider(new WorkbenchTableLabelProvider());
 	}
-
+	
 	private void initInput() {
+		List<ISensor> sensors = Activator.getSensorManagerService().getConnectedSensors();
+		log.debug("SENORS " + sensors);
+		log.debug("ALL SENSORS " + Activator.getSensorManagerService().getSensors());
+		setInput(sensors);
+	}
+
+	private void initInputOld() {
 		addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {

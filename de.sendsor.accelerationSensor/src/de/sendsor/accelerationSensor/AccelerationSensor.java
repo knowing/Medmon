@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 public class AccelerationSensor extends AbstractSensor {
 
     private Path sourceDirectory;
+    private static final String DATA_FILE = "input.sdr";
 
     @Override
     public ISensor create(Object source) throws IOException {
@@ -31,10 +32,8 @@ public class AccelerationSensor extends AbstractSensor {
     }
     
     @Override
-    protected InputStream input() throws IOException {
-        try(InputStream in = Files.newInputStream(sourceDirectory)) {
-            return in;
-        }
+    public InputStream getDataInputStream() throws IOException {
+        return Files.newInputStream(sourceDirectory.resolve(DATA_FILE));
     }
     
     @Override

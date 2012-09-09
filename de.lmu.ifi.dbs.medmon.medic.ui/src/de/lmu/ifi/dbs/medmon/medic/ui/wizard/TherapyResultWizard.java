@@ -5,12 +5,6 @@ import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_S
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -29,6 +23,7 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Therapy;
 import de.lmu.ifi.dbs.medmon.database.entity.TherapyResult;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
+import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultPatientAndTypePage;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.TherapyResultTherapyPage;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -91,34 +86,37 @@ public class TherapyResultWizard extends Wizard {
 		} else if (page == therapyPage || (page == patientAndTypePage && preselectedTherapy != null)) {
 			sensorAndDirectoryPage.setDirectorySectionEnabled(((options & SOURCE_FILE) != 0));
 			sensorAndDirectoryPage.checkContents();
-			prepateDataPage(options);
+			prepareDataPage(options);
 			return sensorAndDirectoryPage;
 		} else if (page == sensorAndDirectoryPage) {
-			prepateDataPage(options);
+			prepareDataPage(options);
 			return dataPage;
 		}
 		return super.getNextPage(page);
 	}
 
-	private void prepateDataPage(int options) {
+	private void prepareDataPage(int options) {
 		ISensor selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
 		String selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
-		if ((options & SOURCE_SENSOR) != 0)
-			dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
-		if ((options & SOURCE_FILE) != 0) {
-			List<URI> uriList = new ArrayList<URI>();
-			try {
-				DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory));
-				String filePrefix = selectedSensor.getFilePrefix();
-				for (Path file : directoyStream)
-					if (file.toString().endsWith(filePrefix))
-						uriList.add(file.toUri());
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			dataPage.setInput(null, uriList);
-		}
+		//if ((options & SOURCE_SENSOR) != 0)
+		dataPage.setInput(selectedSensor, Activator.getSensorManagerService().getConnectedSensors());
+		
+//		
+//		if ((options & SOURCE_FILE) != 0) {
+//			List<URI> uriList = new ArrayList<URI>();
+//			try {
+//				DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory));
+//				String filePrefix = selectedSensor.getFilePrefix();
+//				for (Path file : directoyStream)
+//					if (file.toString().endsWith(filePrefix))
+//						uriList.add(file.toUri());
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			dataPage.setInput(null, uriList);
+//		}
+		
 	}
 
 	@Override
@@ -133,7 +131,7 @@ public class TherapyResultWizard extends Wizard {
 		if (((options & SOURCE_SENSOR) | (options & SOURCE_FILE)) != 0) {
 
 			try {
-				data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW, selectedUri);
+				data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW);
 			} catch (IOException e) {
 				MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
 				e.printStackTrace();

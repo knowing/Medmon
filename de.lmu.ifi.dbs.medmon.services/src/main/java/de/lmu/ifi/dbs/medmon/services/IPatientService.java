@@ -1,7 +1,6 @@
 package de.lmu.ifi.dbs.medmon.services;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 
 import de.lmu.ifi.dbs.medmon.database.entity.Data;
@@ -48,17 +47,7 @@ public interface IPatientService {
 	 * @throws IOException 
 	 */
 	public Data store(Patient p, Sensor s, String type, Date from, Date to);
-	
-	/**
-	 * NOTE: this should return the created {@link Data} entity
-	 * 
-	 * @param patient
-	 * @param type
-	 * @param inputURL
-	 * @throws IOException
-	 */
-	public Data store(Patient patient, ISensor sensor, String type, URI inputURL) throws IOException;
-	
+		
 	
 	/**
 	 * <p>stores the data located on a sensor into the database</p>

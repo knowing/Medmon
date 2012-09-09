@@ -56,7 +56,7 @@ public class SensorWorkbenchAdapter implements IAdapterFactory {
 			case 0:
 				return sensor.getName();
 			case 1:
-				return sensor.getVersion();
+				return sensor.getSerial();
 			default:
 				return "-";
 			}

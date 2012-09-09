@@ -2,16 +2,9 @@ package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_RAW;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_FILE;
-import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.SOURCE_SENSOR;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -64,7 +57,7 @@ public class ImportDataWizard extends Wizard {
 		if ((options & IMPORT_RAW) != 0) {
 			try {
 				selectedURI = dataPage.getSelectedURI();
-				Data data = patientService.store(selectedPatient, selectedSensor, Data.RAW, selectedURI);
+				Data data = patientService.store(selectedPatient, selectedSensor, Data.RAW);
 				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
 				selectionProvider.setSelection(Patient.class, selectedPatient);
 				selectionProvider.setSelection(Data.class, data);
@@ -86,35 +79,36 @@ public class ImportDataWizard extends Wizard {
 		if (page == patientAndTypePage) {
 			sensorAndDirectoryPage.setDirectorySectionEnabled(((options & SOURCE_FILE) != 0));
 			sensorAndDirectoryPage.checkContents();
-			prepateDataPage(options);
+			prepareDataPage(options);
 			return sensorAndDirectoryPage;
 		} else if (page == sensorAndDirectoryPage) {
-			prepateDataPage(options);
+			prepareDataPage(options);
 			return dataPage;
 		}
 		return null;
 	}
 
-	private void prepateDataPage(int options) {
+	private void prepareDataPage(int options) {
 		selectedSensor = sensorAndDirectoryPage.getSelectedSensor();
 		selectedDirectory = sensorAndDirectoryPage.getSelectedDirectory();
-		if ((options & SOURCE_SENSOR) != 0)
-			dataPage.setInput(selectedSensor, Activator.getSensorManagerService().availableInputs(selectedSensor));
-		if ((options & SOURCE_FILE) != 0) {
-			List<URI> uriList = new ArrayList<URI>();
-			try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory))) {
-				String filePrefix = selectedSensor.getFilePrefix();
-				for (Path file : directoyStream) {
-					// Don't use file.endsWith() -> checks the last foldername
-					// of the path not the prefix of the file
-					if (file.toString().endsWith(filePrefix))
-						uriList.add(file.toUri());
-				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			dataPage.setInput(null, uriList);
-		}
+		//if ((options & SOURCE_SENSOR) != 0)
+			dataPage.setInput(selectedSensor, Activator.getSensorManagerService().getConnectedSensors());
+		
+//		if ((options & SOURCE_FILE) != 0) {
+//			List<URI> uriList = new ArrayList<URI>();
+//			try (DirectoryStream<Path> directoyStream = Files.newDirectoryStream(Paths.get(selectedDirectory))) {
+//				String filePrefix = selectedSensor.getFilePrefix();
+//				for (Path file : directoyStream) {
+//					// Don't use file.endsWith() -> checks the last foldername
+//					// of the path not the prefix of the file
+//					if (file.toString().endsWith(filePrefix))
+//						uriList.add(file.toUri());
+//				}
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			dataPage.setInput(null, uriList);
+//		}
 	}
 }

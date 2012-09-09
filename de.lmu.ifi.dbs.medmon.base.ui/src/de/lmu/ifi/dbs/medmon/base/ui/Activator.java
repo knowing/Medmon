@@ -10,9 +10,9 @@ import de.lmu.ifi.dbs.knowing.core.service.BundleDPUProvider;
 import de.lmu.ifi.dbs.knowing.core.service.IDPUDirectory;
 import de.lmu.ifi.dbs.knowing.core.service.IDPUProvider;
 import de.lmu.ifi.dbs.knowing.core.service.IEvaluateService;
+import de.lmu.ifi.dbs.medmon.sensor.core.ISensorManager;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
-import de.lmu.ifi.dbs.medmon.services.ISensorManagerService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -25,7 +25,7 @@ public class Activator extends AbstractUIPlugin  {
 	// The shared instance
 	private static Activator plugin;
 	
-	private static ServiceTracker<ISensorManagerService, ISensorManagerService> sensorTracker;
+	private static ServiceTracker<ISensorManager, ISensorManager> sensorTracker;
 	private static ServiceTracker<IPatientService, IPatientService> patientServiceTracker;
 	private static ServiceTracker<IEvaluateService, IEvaluateService> evaluationService;
 	private static ServiceTracker<IDPUDirectory, IDPUDirectory> dpuDirectoryTracker;
@@ -44,7 +44,7 @@ public class Activator extends AbstractUIPlugin  {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		sensorTracker = new ServiceTracker<>(context, ISensorManagerService.class, null);
+		sensorTracker = new ServiceTracker<>(context, ISensorManager.class, null);
 		sensorTracker.open();
 		
 		patientServiceTracker = new ServiceTracker<>(context, IPatientService.class, null);
@@ -98,7 +98,7 @@ public class Activator extends AbstractUIPlugin  {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 	
-	public static ISensorManagerService getSensorManagerService() {
+	public static ISensorManager getSensorManagerService() {
 		return sensorTracker.getService();
 	}
 	

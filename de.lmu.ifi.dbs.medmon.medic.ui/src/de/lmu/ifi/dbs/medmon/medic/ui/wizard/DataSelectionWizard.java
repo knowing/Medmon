@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.database.entity.Sensor;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.SelectDBDataPage;
-import de.lmu.ifi.dbs.medmon.sensor.core.IConverter;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 
 public class DataSelectionWizard extends Wizard {
@@ -64,7 +63,6 @@ public class DataSelectionWizard extends Wizard {
 		// The new input for the Viewer
 		
 		log.debug("IConverter converter = sensor.getConverter();");
-		IConverter converter = null;
 		for (Data data : results) {
 			//				ISensorDataContainer c = converter.convertToContainer(data.getFile(), ContainerType.WEEK, ContainerType.HOUR, null);
 			//				if(c instanceof RootSensorDataContainer) 
