@@ -31,7 +31,6 @@
 	<modules>
 		<module>de.lmu.ifi.dbs.medmon.base.ui</module>
 		<module>de.lmu.ifi.dbs.medmon.derby</module>
-		<module>de.lmu.ifi.dbs.medmon.jfreechart.libs</module>
 		<module>de.lmu.ifi.dbs.medmon.medic.core</module>
 		<module>de.lmu.ifi.dbs.medmon.medic.logging</module>
 		<module>de.lmu.ifi.dbs.medmon.medic.reporting</module>
