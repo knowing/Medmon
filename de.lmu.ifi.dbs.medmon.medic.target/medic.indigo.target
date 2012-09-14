@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="medic.indigo" sequenceNumber="30">
+<locations>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.joda.convert.feature.feature.group" version="1.2.0"/>
+<unit id="org.joda.time.feature.feature.group" version="2.1.0"/>
+<repository location="http://repository.mukis.de/p2/joda/"/>
+</location>
+<location path="${eclipse_home}" type="Directory"/>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="gov.nist.math.jama.feature.feature.group" version="1.0.2"/>
+<repository location="http://repository.mukis.de/p2/jama/1.0.2/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="de.lmu.ifi.dbs.knowing.core.feature.feature.group" version="0.1.6.201208221201"/>
+<unit id="de.lmu.ifi.dbs.knowing.core.swt.feature.feature.group" version="0.1.6.201208221201"/>
+<unit id="de.lmu.ifi.dbs.knowing.weka.feature.feature.group" version="0.1.6.201208221201"/>
+<repository location="http://repository.mukis.de/p2/knowing/snapshot/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="ch.qos.logback.feature.feature.group" version="1.0.7"/>
+<unit id="org.slf4j.feature.feature.group" version="1.6.6"/>
+<repository location="http://logback.qos.ch/p2"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.gemini.dbaccess.feature.feature.group" version="1.0.0.RELEASE"/>
+<repository location="http://download.eclipse.org/gemini/updates/dbaccess/1.0.0"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.sapphire.feature.group" version="0.5.2.201207231656"/>
+<unit id="org.eclipse.sapphire.java.feature.group" version="0.5.2.201207231656"/>
+<unit id="org.eclipse.sapphire.osgi.feature.group" version="0.5.2.201207231656"/>
+<unit id="org.eclipse.sapphire.modeling.xml.feature.group" version="0.5.2.201207231656"/>
+<repository location="http://download.eclipse.org/sapphire/0.5.2/repository"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="com.google.guava.runtime.feature.feature.group" version="11.0.1"/>
+<repository location="http://guava-osgi.googlecode.com/svn/trunk/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.nebula.cwt.feature.feature.group" version="0.9.0.201208281846"/>
+<unit id="org.eclipse.nebula.widgets.calendarcombo.feature.feature.group" version="1.0.0.201208281846"/>
+<unit id="org.eclipse.nebula.widgets.cdatetime.feature.feature.group" version="0.14.0.201208281846"/>
+<unit id="org.eclipse.nebula.widgets.grid.feature.feature.group" version="1.0.0.201208281846"/>
+<unit id="org.eclipse.nebula.widgets.oscilloscope.feature.feature.group" version="1.0.1.201208281846"/>
+<unit id="org.eclipse.nebula.widgets.paperclips.feature.feature.group" version="2.0.0.201208281846"/>
+<unit id="org.eclipse.nebula.effects.stw.feature.feature.group" version="1.0.0.201208281846"/>
+<repository location="http://download.eclipse.org/technology/nebula/snapshot"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="nz.ac.waikato.cs.weka.feature.feature.group" version="3.7.6.v20120711-1603"/>
+<repository location="http://repository.mukis.de/p2/weka/3.7.6/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.gemini.jpa.feature.feature.group" version="1.0.0.RELEASE"/>
+<repository location="http://download.eclipse.org/gemini/updates/jpa/1.0.0/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.jfreechart.feature.feature.group" version="1.0.13"/>
+<repository location="http://repository.mukis.de/p2/jfreechart/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.nebula.widgets.datechooser.feature.feature.group" version="1.0.0.201209120552"/>
+<unit id="org.eclipse.nebula.widgets.formattedtext.feature.feature.group" version="1.0.0.201209120552"/>
+<repository location="http://download.eclipse.org/technology/nebula/incubation/snapshot"/>
+</location>
+</locations>
+</target>

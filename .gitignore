@@ -18,6 +18,9 @@
 bin/
 target/
 
+# Tycho
+workspace/
+
 
 
 #except this file

@@ -1,3 +1,0 @@
-#Don't ignore generated .class files as this is a library
-!*.class
-
