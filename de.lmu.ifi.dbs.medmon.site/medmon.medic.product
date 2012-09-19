@@ -90,7 +90,7 @@
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt" autoStart="true" startLevel="0" />
       <plugin id="de.lmu.ifi.dbs.knowing.core.swt.charts" autoStart="true" startLevel="0" />
       <plugin id="de.lmu.ifi.dbs.medmon.medic.core" autoStart="true" startLevel="0" />
-      <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="false" startLevel="0" />
+      <plugin id="de.lmu.ifi.dbs.medmon.sensor.core" autoStart="true" startLevel="0" />
       <plugin id="de.sendsor.accelerationSensor" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />

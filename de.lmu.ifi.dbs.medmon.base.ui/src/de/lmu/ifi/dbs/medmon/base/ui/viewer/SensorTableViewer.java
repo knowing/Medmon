@@ -26,125 +26,120 @@ import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
 
 public class SensorTableViewer extends TableViewer {
 
-	private Menu popUpMenu;
+    private Menu popUpMenu;
 
-	public SensorTableViewer(Composite parent, int style) {
-		super(parent, style);
-		init();
-	}
+    public SensorTableViewer(Composite parent, int style) {
+        super(parent, style);
+        init();
+    }
 
-	private void init() {
-		initMenu();
-		initColumns();
-		initProvider();
-		initInput();
-	}
+    private void init() {
+        initMenu();
+        initColumns();
+        initProvider();
+        initInput();
+    }
 
-	public void initMenu() {
-		popUpMenu = new Menu(getTable().getShell(), SWT.POP_UP);
-		MenuItem itemSetDefaultPath = new MenuItem(popUpMenu, SWT.PUSH);
-		itemSetDefaultPath.setText("setze Standard-Pfad");
-		itemSetDefaultPath.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider
-						.newInstance(Activator.getBundleContext());
-				ISensor selection = selectionProvider
-						.getSelection(ISensor.class);
-				selectionProvider.unregister();
+    public void initMenu() {
+        popUpMenu = new Menu(getTable().getShell(), SWT.POP_UP);
+        MenuItem itemSetDefaultPath = new MenuItem(popUpMenu, SWT.PUSH);
+        itemSetDefaultPath.setText("setze Standard-Pfad");
+        itemSetDefaultPath.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+                ISensor selection = selectionProvider.getSelection(ISensor.class);
+                selectionProvider.unregister();
 
-				if (selection == null)
-					return;
+                if (selection == null)
+                    return;
 
-				DirectoryDialog dlg = new DirectoryDialog(getTable().getShell());
-				dlg.setText("Standard-Pfad");
-				dlg.setMessage("w\u00e4hlen sie den neuen Standard-Pfad f\u00fcr diesen Sensor aus!");
-				String dir = dlg.open();
-				// FIXME implement SensorTableViewer
+                DirectoryDialog dlg = new DirectoryDialog(getTable().getShell());
+                dlg.setText("Standard-Pfad");
+                dlg.setMessage("w\u00e4hlen sie den neuen Standard-Pfad f\u00fcr diesen Sensor aus!");
+                String dir = dlg.open();
+                // FIXME implement SensorTableViewer
 
-				if (dir != null) {
-					/*Sensor mSensor = Activator.getSensorManagerService()
-							.loadSensorEntity(selection);
-					if (mSensor == null)
-						return;
+                if (dir != null) {
+                    /*
+                     * Sensor mSensor = Activator.getSensorManagerService()
+                     * .loadSensorEntity(selection);
+                     * if (mSensor == null)
+                     * return;
+                     * 
+                     * EntityManager entityManager = Activator
+                     * .getEntityManagerService().createEntityManager();
+                     * 
+                     * entityManager.getTransaction().begin();
+                     * mSensor = entityManager.merge(mSensor);
+                     * mSensor.setDefaultpath(dir);
+                     * entityManager.getTransaction().commit();
+                     * 
+                     * entityManager.close();
+                     */
+                }
 
-					EntityManager entityManager = Activator
-							.getEntityManagerService().createEntityManager();
+            }
 
-					entityManager.getTransaction().begin();
-					mSensor = entityManager.merge(mSensor);
-					mSensor.setDefaultpath(dir);
-					entityManager.getTransaction().commit();
+        });
 
-					entityManager.close();*/
-				}
+        MenuItem itemImport = new MenuItem(popUpMenu, SWT.PUSH);
+        itemImport.setText("importieren");
 
-			}
+        getTable().setMenu(popUpMenu);
+    }
 
-		});
+    private void initColumns() {
+        getTable().setHeaderVisible(true);
+        getTable().setLinesVisible(true);
 
-		MenuItem itemImport = new MenuItem(popUpMenu, SWT.PUSH);
-		itemImport.setText("importieren");
+        TableViewerColumn viewerColumnName = new TableViewerColumn(this, SWT.LEAD);
+        viewerColumnName.getColumn().setText("Name");
+        viewerColumnName.getColumn().setWidth(150);
+        viewerColumnName.getColumn().setResizable(true);
+        viewerColumnName.getColumn().setMoveable(true);
+        TableViewerColumn viewerColumnVersion = new TableViewerColumn(this, SWT.LEAD);
+        viewerColumnVersion.getColumn().setText("Version");
+        viewerColumnVersion.getColumn().setWidth(150);
+        viewerColumnVersion.getColumn().setResizable(true);
+        viewerColumnVersion.getColumn().setMoveable(true);
+    }
 
-		getTable().setMenu(popUpMenu);
-	}
+    private void initProvider() {
+        setContentProvider(new ArrayContentProvider());
+        setLabelProvider(new WorkbenchTableLabelProvider());
+    }
 
-	private void initColumns() {
-		getTable().setHeaderVisible(true);
-		getTable().setLinesVisible(true);
+    private void initInput() {
+        List<ISensor> sensors = Activator.getSensorManagerService().getConnectedSensors();
+        setInput(sensors);
+        Activator.getSensorManagerService().addListener(new ISensorListener() {
 
-		TableViewerColumn viewerColumnName = new TableViewerColumn(this,
-				SWT.LEAD);
-		viewerColumnName.getColumn().setText("Name");
-		viewerColumnName.getColumn().setWidth(150);
-		viewerColumnName.getColumn().setResizable(true);
-		viewerColumnName.getColumn().setMoveable(true);
-		TableViewerColumn viewerColumnVersion = new TableViewerColumn(this,
-				SWT.LEAD);
-		viewerColumnVersion.getColumn().setText("Version");
-		viewerColumnVersion.getColumn().setWidth(150);
-		viewerColumnVersion.getColumn().setResizable(true);
-		viewerColumnVersion.getColumn().setMoveable(true);
-	}
+            @Override
+            public void sensorChanged(SensorEvent event) {
+                if (getControl().isDisposed())
+                    return;
+                getControl().getDisplay().asyncExec(new Runnable() {
 
-	private void initProvider() {
-		setContentProvider(new ArrayContentProvider());
-		setLabelProvider(new WorkbenchTableLabelProvider());
-	}
+                    @Override
+                    public void run() {
+                        setInput(Activator.getSensorManagerService().getConnectedSensors());
+                    }
+                });
+            }
+        });
 
-	private void initInput() {
-		List<ISensor> sensors = Activator.getSensorManagerService()
-				.getConnectedSensors();
-		setInput(sensors);
-		Activator.getSensorManagerService().addListener(new ISensorListener() {
+        addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+                if (selection.isEmpty())
+                    return;
 
-			@Override
-			public void sensorChanged(SensorEvent event) {
-				getControl().getDisplay().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						setInput(Activator.getSensorManagerService()
-								.getConnectedSensors());
-					}
-				});
-			}
-		});
-
-		addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) event
-						.getSelection();
-				if (selection.isEmpty())
-					return;
-
-				IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider
-						.newInstance(Activator.getBundleContext());
-				selectionProvider.setSelection(ISensor.class,
-						(ISensor) selection.getFirstElement());
-				selectionProvider.unregister();
-			}
-		});
-	}
+                IGlobalSelectionProvider selectionProvider = GlobalSelectionProvider.newInstance(Activator.getBundleContext());
+                selectionProvider.setSelection(ISensor.class, (ISensor) selection.getFirstElement());
+                selectionProvider.unregister();
+            }
+        });
+    }
 
 }
