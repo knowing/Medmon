@@ -20,4 +20,4 @@ Import-Package: org.joda.time;version="[2.0.0,3.0.0)",
  weka.core;version="[3.7.6,3.8.0)"
 Service-Component: OSGI-INF/sensorManager.xml
 Require-Bundle: org.junit;bundle-version="4.8.1";resolution:=optional,
- com.google.guava;bundle-version="10.0.1"
+ com.google.guava;bundle-version="[10.0.1,13.0.1)"

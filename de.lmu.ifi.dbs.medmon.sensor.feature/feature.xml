@@ -16,6 +16,10 @@
       [Enter License Description here.]
    </license>
 
+   <includes
+         id="com.google.guava.runtime.feature"
+         version="0.0.0"/>
+
    <plugin
          id="de.lmu.ifi.dbs.medmon.sensor.core"
          download-size="0"

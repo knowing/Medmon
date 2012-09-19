@@ -229,6 +229,12 @@
 
 		<!-- Custom repositories -->
 		<repository>
+			<id>google-guava</id>
+			<layout>p2</layout>
+			<url>http://guava-osgi.googlecode.com/svn/trunk/repository/</url>
+		</repository>
+
+		<repository>
 			<id>dependency-repository</id>
 			<layout>p2</layout>
 			<url>http://repository.mukis.de/p2/dependencies</url>
