@@ -66,13 +66,14 @@ public interface ISensor extends Device {
 
     /**
      * <p>
-     * Creates a instance of this sensor with the specified source. The source
-     * can be everything, e.g. Path, File, String, URL, InputStream, etc.
+     * Creates a instance of this sensor with the specified source. The source can be everything, e.g. Path, File,
+     * String, URL, InputStream, etc.
      * </p>
      * 
      * @param source
      * @return object on success - null on wrong source
-     * @throws IOException - on failure
+     * @throws IOException
+     *             - on failure
      */
     public ISensor create(Object source) throws IOException;
 
@@ -99,5 +100,12 @@ public interface ISensor extends Device {
      * @throws IOException
      */
     public InputStream getDataInputStream() throws IOException;
+
+    /**
+     * Defines if this is just the service or a valid instance
+     * 
+     * @return
+     */
+    public boolean isInstance();
 
 }

@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import weka.core.Instances;
-
 import de.lmu.ifi.dbs.medmon.sensor.core.AbstractSensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.Category;
 import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
@@ -68,7 +67,7 @@ public class SensorA extends AbstractSensor {
 
         SensorA sensor = new SensorA();
         sensor.sourceFolder = sourceFolder;
-
+        sensor.instance = true;
         return sensor;
     }
 

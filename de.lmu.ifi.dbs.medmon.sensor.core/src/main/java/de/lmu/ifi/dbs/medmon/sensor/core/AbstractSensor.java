@@ -10,6 +10,7 @@ public abstract class AbstractSensor implements ISensor {
 
     private final String id;
     private ISensorDriver driver;
+    protected boolean instance;
 
     public AbstractSensor() {
         id = getClass().getName() + "_" + getSerial();
@@ -43,6 +44,11 @@ public abstract class AbstractSensor implements ISensor {
     @Override
     public Interval getInterval() throws IOException {
         return getDriver().getInterval(getDataInputStream());
+    }
+
+    @Override
+    public boolean isInstance() {
+        return instance;
     }
 
     @Override

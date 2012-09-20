@@ -24,18 +24,19 @@ public class AccelerationSensor extends AbstractSensor {
     @Override
     public ISensor create(Object source) throws IOException {
         AccelerationSensor sensor = null;
-        if(source instanceof Path) {
+        if (source instanceof Path) {
             sensor = new AccelerationSensor();
             sensor.sourceDirectory = (Path) source;
+            sensor.instance = true;
         }
         return sensor;
     }
-    
+
     @Override
     public InputStream getDataInputStream() throws IOException {
         return Files.newInputStream(sourceDirectory.resolve(DATA_FILE));
     }
-    
+
     @Override
     public String getSerial() {
         return "aa:bb:cc:dd";
@@ -45,7 +46,6 @@ public class AccelerationSensor extends AbstractSensor {
     public Category getCategory() {
         return Category.AC;
     }
-    
 
     @Override
     public String getName() {
@@ -56,6 +56,5 @@ public class AccelerationSensor extends AbstractSensor {
     public String getDescription() {
         return "3D Acceleration Senesor";
     }
-
 
 }
