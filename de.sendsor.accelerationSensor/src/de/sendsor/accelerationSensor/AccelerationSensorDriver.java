@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.medmon.sensor.core.Category;
 public class AccelerationSensorDriver extends AbstractSensorDriver {
 
     private static final Instances header = TimeSeriesResults.newInstances(Arrays.asList(new String[] { "x", "y", "z" }));
-    
+
     @Override
     public Instances getData(InputStream in) throws IOException {
         SDRConverter converter = new SDRConverter(in);
@@ -33,15 +33,18 @@ public class AccelerationSensorDriver extends AbstractSensorDriver {
         return header;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public int match(Category category, ServiceReference reference) {
-        if(!category.equals(Category.AC))
+        System.err.println("input category: " + category);
+        System.err.println("check category: " + Category.AC);
+        System.err.println("equals: " + category.equals(Category.AC));
+        if (!category.equals(Category.AC))
             return 0;
         Object sensor = reference.getBundle().getBundleContext().getService(reference);
-        if(sensor instanceof AccelerationSensor)
+        System.err.println(sensor.getClass());
+        if (sensor instanceof AccelerationSensor)
             return 1;
         return 0;
     }
-
 }
