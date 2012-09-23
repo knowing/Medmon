@@ -88,7 +88,7 @@ public class CreatePatientPage extends WizardPage implements IValidationPage {
 		lBirth.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lBirth.setText("Geburtsdatum");
 
-		dBirth = new CDateTime(container, CDT.BORDER | CDT.SPINNER);
+		dBirth = new CDateTime(container, CDT.BORDER | CDT.DATE_MEDIUM | CDT.DROP_DOWN);
 		dBirth.addSelectionListener(new ValidationListener(this));
 
 		Label lGender = new Label(container, SWT.NONE);

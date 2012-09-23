@@ -166,7 +166,7 @@ public class PatientView extends ViewPart {
 		toolkit.adapt(lblBirth, true, true);
 		lblBirth.setText("Geburtsdatum:");
 
-		dateBirth = new CDateTime(cPatient, CDT.BORDER | CDT.SPINNER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
+		dateBirth = new CDateTime(cPatient, CDT.BORDER | CDT.DROP_DOWN | CDT.DATE_MEDIUM);
 		GridData gd_dateBirth = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
 		gd_dateBirth.heightHint = 20;
 		dateBirth.setLayoutData(gd_dateBirth);
