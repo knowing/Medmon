@@ -71,28 +71,31 @@ public class TherapyResultService implements ITherapyResultService {
 		Path inputFile = data.toPath();
 
 		// Configure properties to run with inputFile
-		//IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
-		
+		// IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
+		// inputFile);
+
 		Properties parameters = new Properties();
 		parameters.setProperty("sdr-file", inputFile.toString());
 
 		// Generate Data entity which stores the result
-		Data resultData = createData(patient, data);
+		// Data resultData = createData(patient, data);
+		// FIXME
+		Data resultData = null;
 		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(resultData.toPath()));
 
 		// Finally run the DPU
-		//executeDPU(execPath, configuredDPU, outputMap);
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters, mapAsScalaMap(new HashMap<String, InputStream>()),
-				mapAsScalaMap(outputMap));
+		// executeDPU(execPath, configuredDPU, outputMap);
+		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
+				mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
 
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
 		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",resultData, therapy);
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", resultData, therapy);
 		tempEm.persist(result);
 		tempEm.getTransaction().commit();
 		tempEm.close();
-		
+
 		return result;
 	}
 
@@ -103,30 +106,33 @@ public class TherapyResultService implements ITherapyResultService {
 		Path execPath = patient.toPath();
 		Path inputFile = Paths.get(input);
 
-		//IDataProcessingUnit configuredDPU = configureDPU(dpu, patient, inputFile);
-		
+		// IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
+		// inputFile);
+
 		Properties parameters = new Properties();
 		parameters.setProperty("sdr-file", inputFile.toString());
-		//parameters.setProperty("arff-output", trgFile);
+		// parameters.setProperty("arff-output", trgFile);
 
-		// SDR Classification No UI No Reclassification | SDR Classification No UI
+		// SDR Classification No UI No Reclassification | SDR Classification No
+		// UI
 		// SDR Classification To ACData No Reclassification
-		//eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(), dlg.getSystem(), parameters, null, null);
+		// eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(),
+		// dlg.getSystem(), parameters, null, null);
 
 		Data data = createData(patient, sensor);
 		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
 
 		// executeDPU(execPath, dpu, outputMap);
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters, mapAsScalaMap(new HashMap<String, InputStream>()),
-				mapAsScalaMap(outputMap));
+		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
+				mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
 		// Create the TherapyResultEntity with the data entity
 		EntityManager tempEm = entityManagerService.createEntityManager();
 		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>",data, therapy);
+		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", data, therapy);
 		tempEm.persist(result);
 		tempEm.getTransaction().commit();
 		tempEm.close();
-		
+
 		return result;
 	}
 
@@ -245,9 +251,11 @@ public class TherapyResultService implements ITherapyResultService {
 		return outputMap;
 	}
 
-	private Data createData(Patient patient, Data data) throws IOException {
-		return patientService.store(patient, data.getSensor(), Data.RESULT, data.getFrom(), data.getTo());
-	}
+	/*
+	 * private Data createData(Patient patient, Data data) throws IOException {
+	 * return patientService.store(patient, data.getSensor(), Data.RESULT,
+	 * data.getFrom(), data.getTo()); }
+	 */
 
 	private Data createData(Patient patient, ISensor sensor) throws IOException {
 		return patientService.store(patient, sensor, Data.RESULT);

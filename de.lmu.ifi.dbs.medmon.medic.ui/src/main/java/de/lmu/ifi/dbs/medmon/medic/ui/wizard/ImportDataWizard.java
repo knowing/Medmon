@@ -3,14 +3,12 @@ package de.lmu.ifi.dbs.medmon.medic.ui.wizard;
 import static de.lmu.ifi.dbs.medmon.medic.ui.wizard.ImportWizardOptions.IMPORT_RAW;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 
 import de.lmu.ifi.dbs.medmon.base.ui.wizard.pages.ImportDataSensorAndDirectoryPage;
+import de.lmu.ifi.dbs.medmon.database.entity.Data;
 import de.lmu.ifi.dbs.medmon.database.entity.Patient;
 import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
 import de.lmu.ifi.dbs.medmon.medic.ui.wizard.pages.ImportDataPatientAndTypePage;
@@ -45,8 +43,8 @@ public class ImportDataWizard extends Wizard {
             // Copy selected file
             if (sensorAndDirectoryPage.isFileSectionEnabled()) {
                 String selectedFile = sensorAndDirectoryPage.getSelectedFile();
-                try (InputStream in = Files.newInputStream(Paths.get(selectedFile))) {
-                    throw new RuntimeException("Raw data selectedFile import not implemented yet");
+                try {
+                    Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW, selectedFile);
                 } catch (IOException e) {
                     MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
                     e.printStackTrace();
@@ -54,8 +52,8 @@ public class ImportDataWizard extends Wizard {
 
                 // Convert to instances and store
             } else {
-                try (InputStream in = selectedSensor.getDataInputStream()) {
-                    throw new RuntimeException("Raw data sensor import not implemented yet");
+                try {
+                    Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW);
                 } catch (IOException e) {
                     MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
                     e.printStackTrace();
