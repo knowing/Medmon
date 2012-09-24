@@ -43,10 +43,10 @@ public class SensorManagerService implements ISensorManager {
 
     /** Available sources */
     private List<Object> sources = new LinkedList<>();
-    
+
     /** Sensor Listeners */
     private Set<ISensorListener> listeners = new HashSet<>();
-    
+
     /** */
     private EventAdmin eventAdmin;
 
@@ -86,7 +86,7 @@ public class SensorManagerService implements ISensorManager {
     public List<ISensor> getSensors() {
         return Collections.unmodifiableList(new ArrayList<>(sensors.values()));
     }
-    
+
     @Override
     public List<ISensor> getConnectedSensors() {
         return Collections.unmodifiableList(new ArrayList<>(sensorInstances.values()));
@@ -117,7 +117,7 @@ public class SensorManagerService implements ISensorManager {
                 if (oldSensor != null) {
                     removeSensorInstance(oldSensor);
                 }
-                
+
                 HashMap<String, Object> properties = new HashMap<>();
                 properties.put(SENSOR_DATA, sensorInstance);
                 properties.put(SENSOR_SOURCE, path);
@@ -157,27 +157,26 @@ public class SensorManagerService implements ISensorManager {
     }
 
     private void postSensorEvent(Map<String, Object> properties) {
-    	for (ISensorListener listener : listeners) {
-    		ISensor sensor = (ISensor) properties.get(SENSOR_DATA);
-    		boolean available = (boolean) properties.get(SENSOR_AVAILABLE);
-			listener.sensorChanged(new SensorEvent(sensor, available));
-		}
-    	
+        for (ISensorListener listener : listeners) {
+            ISensor sensor = (ISensor) properties.get(SENSOR_DATA);
+            listener.sensorChanged(new SensorEvent(sensor));
+        }
+
         // This is for e4
-    	if(eventAdmin == null)
-    		return;
+        if (eventAdmin == null)
+            return;
         properties.put("org.eclipse.e4.data", properties.get(SENSOR_DATA));
         eventAdmin.postEvent(new Event(SENSOR_TOPIC_REMOVE, properties));
     }
 
     @Override
     public void addListener(ISensorListener listener) {
-    	listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
     public void removeListener(ISensorListener listener) {
-    	listeners.remove(listener);
+        listeners.remove(listener);
     }
 
     /* ============================================== */
@@ -187,6 +186,15 @@ public class SensorManagerService implements ISensorManager {
     protected void bindSensor(ISensor sensor) {
         sensors.put(sensor.getId(), sensor);
         log.debug("Added sensor " + sensor.getId());
+
+        // Inform listeners about new sensor
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put(SENSOR_DATA, sensor);
+        properties.put(SENSOR_SOURCE, null);
+        properties.put(SENSOR_AVAILABLE, true);
+        postSensorEvent(properties);
+
+        // Try to create an instance from existing sources
         for (Object source : sources) {
             if (source instanceof Path) {
                 addSensorInstance(sensor, (Path) source);
@@ -196,10 +204,18 @@ public class SensorManagerService implements ISensorManager {
 
     protected void unbindSensor(ISensor sensor) {
         sensors.remove(sensor.getId());
+        log.debug("Removed sensor " + sensor.getId());
+        // Inform listeners about new sensor
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put(SENSOR_DATA, sensor);
+        properties.put(SENSOR_SOURCE, null);
+        properties.put(SENSOR_AVAILABLE, false);
+        postSensorEvent(properties);
+
         for (ISensor sensorInstance : sensorInstances.values()) {
             removeSensorInstance(sensorInstance);
         }
-        log.debug("Removed sensor " + sensor.getId());
+
     }
 
     protected void bindEventAdmin(EventAdmin eventAdmin) {

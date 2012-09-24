@@ -18,7 +18,7 @@ public interface ISensorManager {
 
     public static final String SENSOR_DATA = "medmon.sensor.core.sensor";
     public static final String SENSOR_SOURCE = "medmon.sensor.core.source";
-    public static final String SENSOR_AVAILABLE = "medmon.sensor.core.available";
+    public static final String SENSOR_AVAILABLE = "medmon.sensor.core.sensor.available";
 
     /**
      * 

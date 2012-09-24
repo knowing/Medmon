@@ -36,13 +36,9 @@ public class AccelerationSensorDriver extends AbstractSensorDriver {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public int match(Category category, ServiceReference reference) {
-        System.err.println("input category: " + category);
-        System.err.println("check category: " + Category.AC);
-        System.err.println("equals: " + category.equals(Category.AC));
         if (!category.equals(Category.AC))
             return 0;
         Object sensor = reference.getBundle().getBundleContext().getService(reference);
-        System.err.println(sensor.getClass());
         if (sensor instanceof AccelerationSensor)
             return 1;
         return 0;

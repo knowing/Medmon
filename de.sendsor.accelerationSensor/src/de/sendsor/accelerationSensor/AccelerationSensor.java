@@ -1,9 +1,15 @@
 package de.sendsor.accelerationSensor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import de.lmu.ifi.dbs.medmon.sensor.core.AbstractSensor;
 import de.lmu.ifi.dbs.medmon.sensor.core.Category;
@@ -24,12 +30,50 @@ public class AccelerationSensor extends AbstractSensor {
     @Override
     public ISensor create(Object source) throws IOException {
         AccelerationSensor sensor = null;
-        if (source instanceof Path) {
-            sensor = new AccelerationSensor();
-            sensor.sourceDirectory = (Path) source;
-            sensor.instance = true;
-        }
+        Path path = pathFromSource(source);
+        if (!checkPath(path))
+            return null;
+        sensor = new AccelerationSensor();
+        sensor.sourceDirectory = (Path) source;
+        sensor.instance = true;
         return sensor;
+    }
+
+    private Path pathFromSource(Object source) throws IOException {
+        if (source instanceof Path) {
+            return (Path) source;
+        } else if (source instanceof String) {
+            return Paths.get((String) source);
+        } else if (source instanceof URI) {
+            return Paths.get((URI) source);
+        } else if (source instanceof URL) {
+            URL url = (URL) source;
+            try {
+                return Paths.get(url.toURI());
+            } catch (URISyntaxException e) {
+                throw new IOException("URL could not be converted to URI", e);
+            }
+        } else if (source instanceof File) {
+            return ((File) source).toPath();
+        }
+        return null;
+    }
+
+    private boolean checkPath(Path path) throws IOException {
+        if (path == null)
+            return false;
+
+        if (Files.isDirectory(path)) {
+            // TODO check for sdr file
+            try (DirectoryStream<Path> in = Files.newDirectoryStream(path)) {
+                for (Path file : in) {
+                    if (file.getFileName().toString().endsWith(".sdr")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return path.getFileName().toString().endsWith(".sdr");
     }
 
     @Override

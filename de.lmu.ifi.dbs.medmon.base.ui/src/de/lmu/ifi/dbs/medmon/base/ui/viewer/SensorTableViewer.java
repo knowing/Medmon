@@ -27,9 +27,9 @@ import de.lmu.ifi.dbs.medmon.services.GlobalSelectionProvider;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionProvider;
 
 public class SensorTableViewer extends TableViewer {
-	
-	private static final String[] columns = new String[] {"", "Name", "Version"};
-	private static final int[] width = new int[] { 24, 200, 150 };
+
+    private static final String[] columns = new String[] { "", "Name", "Version" };
+    private static final int[] width = new int[] { 24, 200, 150 };
 
     private Menu popUpMenu;
     private ViewerFilter driverFilter;
@@ -55,7 +55,6 @@ public class SensorTableViewer extends TableViewer {
 
         final MenuItem itemDriver = new MenuItem(popUpMenu, SWT.CHECK);
         itemDriver.setText("Treiber anzeigen");
-        itemDriver.setEnabled(true);
         itemDriver.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -66,6 +65,7 @@ public class SensorTableViewer extends TableViewer {
                 }
             }
         });
+        itemDriver.setSelection(true);
 
         getControl().setMenu(popUpMenu);
     }
@@ -73,14 +73,14 @@ public class SensorTableViewer extends TableViewer {
     private void initColumns() {
         getTable().setHeaderVisible(true);
         getTable().setLinesVisible(true);
-        
+
         for (int i = 0; i < columns.length; i++) {
             TableViewerColumn viewerColumnName = new TableViewerColumn(this, SWT.LEAD);
             viewerColumnName.getColumn().setText(columns[i]);
             viewerColumnName.getColumn().setWidth(width[i]);
             viewerColumnName.getColumn().setResizable(true);
             viewerColumnName.getColumn().setMoveable(true);
-		}
+        }
 
     }
 
@@ -130,7 +130,6 @@ public class SensorTableViewer extends TableViewer {
                 return sensor.isInstance();
             }
         };
-        addFilter(driverFilter);
     }
 
     private List<ISensor> getSensors() {
