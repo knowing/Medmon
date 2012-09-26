@@ -48,252 +48,248 @@ import de.lmu.ifi.dbs.medmon.services.ITherapyResultService;
  */
 public class TherapyResultService implements ITherapyResultService {
 
-	private final Logger				log			= LoggerFactory.getLogger(ITherapyResultService.class);
+    private final Logger log = LoggerFactory.getLogger(ITherapyResultService.class);
 
-	/** 1..1 relation */
-	private IPatientService				patientService;
-	/** 1..1 relation */
-	private IEvaluateService			evaluateService;
+    /** 1..1 relation */
+    private IPatientService patientService;
+    /** 1..1 relation */
+    private IEvaluateService evaluateService;
 
-	private IEntityManagerService		entityManagerService;
+    private IEntityManagerService entityManagerService;
 
-	/** 0..n relation */
-	private List<UIFactory<Composite>>	uiFactories	= new ArrayList<UIFactory<Composite>>();
+    /** 0..n relation */
+    private List<UIFactory<Composite>> uiFactories = new ArrayList<UIFactory<Composite>>();
 
-	// private List<IModelStore> modelStorie = new ArrayList<IModelStore>();
+    // private List<IModelStore> modelStorie = new ArrayList<IModelStore>();
 
-	@Override
-	public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, Data data) throws Exception {
-		// TODO Try/Catch block to rollback actions on failure
+    @Override
+    public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, Data data) throws Exception {
+        // TODO Try/Catch block to rollback actions on failure
 
-		// Resolve data location -> inputfile
-		Path execPath = patient.toPath();
-		Path inputFile = data.toPath();
+        // Resolve data location -> inputfile
+        Path execPath = patient.toPath();
+        Path inputFile = data.toPath();
 
-		// Configure properties to run with inputFile
-		// IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
-		// inputFile);
+        // Configure properties to run with inputFile
+        // IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
+        // inputFile);
 
-		Properties parameters = new Properties();
-		parameters.setProperty("sdr-file", inputFile.toString());
+        Properties parameters = new Properties();
+        parameters.setProperty("sdr-file", inputFile.toString());
 
-		// Generate Data entity which stores the result
-		// Data resultData = createData(patient, data);
-		// FIXME
-		Data resultData = null;
-		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(resultData.toPath()));
+        // Generate Data entity which stores the result
+        Data resultData = createData(patient, data);
+        Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(resultData.toPath()));
 
-		// Finally run the DPU
-		// executeDPU(execPath, configuredDPU, outputMap);
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
-				mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
+        // Finally run the DPU
+        // executeDPU(execPath, configuredDPU, outputMap);
+        evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
+                mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
 
-		// Create the TherapyResultEntity with the data entity
-		EntityManager tempEm = entityManagerService.createEntityManager();
-		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", resultData, therapy);
-		tempEm.persist(result);
-		tempEm.getTransaction().commit();
-		tempEm.close();
+        // Create the TherapyResultEntity with the data entity
+        EntityManager tempEm = entityManagerService.createEntityManager();
+        tempEm.getTransaction().begin();
+        TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", resultData, therapy);
+        tempEm.persist(result);
+        tempEm.getTransaction().commit();
+        tempEm.close();
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, ISensor sensor, URI input)
-			throws Exception {
-		// TODO Try/Catch block to rollback actions on failure
-		Path execPath = patient.toPath();
-		Path inputFile = Paths.get(input);
+    @Override
+    public TherapyResult createTherapyResult(IDataProcessingUnit dpu, Patient patient, Therapy therapy, ISensor sensor, URI input)
+            throws Exception {
+        // TODO Try/Catch block to rollback actions on failure
+        Path execPath = patient.toPath();
+        Path inputFile = Paths.get(input);
 
-		// IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
-		// inputFile);
+        // IDataProcessingUnit configuredDPU = configureDPU(dpu, patient,
+        // inputFile);
 
-		Properties parameters = new Properties();
-		parameters.setProperty("sdr-file", inputFile.toString());
-		// parameters.setProperty("arff-output", trgFile);
+        Properties parameters = new Properties();
+        parameters.setProperty("sdr-file", inputFile.toString());
+        // parameters.setProperty("arff-output", trgFile);
 
-		// SDR Classification No UI No Reclassification | SDR Classification No
-		// UI
-		// SDR Classification To ACData No Reclassification
-		// eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(),
-		// dlg.getSystem(), parameters, null, null);
+        // SDR Classification No UI No Reclassification | SDR Classification No
+        // UI
+        // SDR Classification To ACData No Reclassification
+        // eval.evaluate(dpu, execPath.toUri(), dlg.getUiFactory(),
+        // dlg.getSystem(), parameters, null, null);
 
-		Data data = createData(patient, sensor);
-		Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
+        Data data = createData(patient, sensor);
+        Map<String, OutputStream> outputMap = createOutputMap(Files.newOutputStream(data.toPath()));
 
-		// executeDPU(execPath, dpu, outputMap);
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
-				mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
-		// Create the TherapyResultEntity with the data entity
-		EntityManager tempEm = entityManagerService.createEntityManager();
-		tempEm.getTransaction().begin();
-		TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", data, therapy);
-		tempEm.persist(result);
-		tempEm.getTransaction().commit();
-		tempEm.close();
+        // executeDPU(execPath, dpu, outputMap);
+        evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, parameters,
+                mapAsScalaMap(new HashMap<String, InputStream>()), mapAsScalaMap(outputMap));
+        // Create the TherapyResultEntity with the data entity
+        EntityManager tempEm = entityManagerService.createEntityManager();
+        tempEm.getTransaction().begin();
+        TherapyResult result = new TherapyResult("<Neues Therapieergebnis>", data, therapy);
+        tempEm.persist(result);
+        tempEm.getTransaction().commit();
+        tempEm.close();
 
-		return result;
-	}
+        return result;
+    }
 
-	private void executeDPU(Path execPath, IDataProcessingUnit dpu, Map<String, OutputStream> outputMap) throws Exception {
-		// PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
-		// TODO Create own UIFactory! Check if uiFactories aren't empty, etc
-		if (uiFactories.isEmpty())
-			throw new Exception("No UIFactory. Unable to display results.");
+    private void executeDPU(Path execPath, IDataProcessingUnit dpu, Map<String, OutputStream> outputMap) throws Exception {
+        // PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(PresenterView.ID());
+        // TODO Create own UIFactory! Check if uiFactories aren't empty, etc
+        if (uiFactories.isEmpty())
+            throw new Exception("No UIFactory. Unable to display results.");
 
-		evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, null, mapAsScalaMap(new HashMap<String, InputStream>()),
-				mapAsScalaMap(outputMap));
-	}
+        evaluateService.evaluate(dpu, execPath.toUri(), uiFactories.get(0), null, null, mapAsScalaMap(new HashMap<String, InputStream>()),
+                mapAsScalaMap(outputMap));
+    }
 
-	/**
-	 * <p>
-	 * Configures the selected DPU:
-	 * <li>Remove all FILE, DIR, URL properties on NodeType.LOADER</li>
-	 * <li>Remove all FILE, DIR, URL properties on NodeType.SAVER</li>
-	 * <li>Set (DE)SERIALIZE property</li>
-	 * </p>
-	 * 
-	 * @param originalDPU
-	 * @param patient
-	 * @param data
-	 * @throws IOException
-	 * @return configured DPU or null
-	 */
-	private IDataProcessingUnit configureDPU(IDataProcessingUnit originalDPU, Patient patient, Path inputFile) throws IOException {
-		IDataProcessingUnit dpu = IDataProcessingUnit.TYPE.instantiate();
-		dpu.copy(originalDPU);
+    /**
+     * <p>
+     * Configures the selected DPU:
+     * <li>Remove all FILE, DIR, URL properties on NodeType.LOADER</li>
+     * <li>Remove all FILE, DIR, URL properties on NodeType.SAVER</li>
+     * <li>Set (DE)SERIALIZE property</li>
+     * </p>
+     * 
+     * @param originalDPU
+     * @param patient
+     * @param data
+     * @throws IOException
+     * @return configured DPU or null
+     */
+    private IDataProcessingUnit configureDPU(IDataProcessingUnit originalDPU, Patient patient, Path inputFile) throws IOException {
+        IDataProcessingUnit dpu = IDataProcessingUnit.TYPE.instantiate();
+        dpu.copy(originalDPU);
 
-		// Set properties
-		for (INode node : dpu.getNodes()) {
+        // Set properties
+        for (INode node : dpu.getNodes()) {
 
-			// Loader -> replace file with locateFilename(data, RAW)
-			if (node.getType().getContent().equals(NodeType.LOADER)) {
-				// This is not very handsome. Store properties to remove and
-				// then remove them.
-				List<IProperty> toRemove = new ArrayList<IProperty>();
-				boolean filePropertySet = false;
-				boolean absolutePathSet = false;
-				String filePropertyValue = inputFile.toString();
-				for (IProperty p : node.getProperties()) {
-					String key = p.getKey().getContent();
-					if (key.equals(INodeProperties.FILE())) {
-						p.setValue(filePropertyValue);
-						filePropertySet = true;
-					} else if (key.equals(INodeProperties.ABSOLUTE_PATH())) {
-						p.setValue(String.valueOf(inputFile.isAbsolute()));
-						absolutePathSet = true;
-					} else if (key.equals(INodeProperties.DIR()) || key.equals(INodeProperties.URL())) {
-						toRemove.add(p);
-					}
-				}
+            // Loader -> replace file with locateFilename(data, RAW)
+            if (node.getType().getContent().equals(NodeType.LOADER)) {
+                // This is not very handsome. Store properties to remove and
+                // then remove them.
+                List<IProperty> toRemove = new ArrayList<IProperty>();
+                boolean filePropertySet = false;
+                boolean absolutePathSet = false;
+                String filePropertyValue = inputFile.toString();
+                for (IProperty p : node.getProperties()) {
+                    String key = p.getKey().getContent();
+                    if (key.equals(INodeProperties.FILE())) {
+                        p.setValue(filePropertyValue);
+                        filePropertySet = true;
+                    } else if (key.equals(INodeProperties.ABSOLUTE_PATH())) {
+                        p.setValue(String.valueOf(inputFile.isAbsolute()));
+                        absolutePathSet = true;
+                    } else if (key.equals(INodeProperties.DIR()) || key.equals(INodeProperties.URL())) {
+                        toRemove.add(p);
+                    }
+                }
 
-				// Actual removal.
-				for (IProperty p : toRemove) {
-					node.getProperties().remove(p);
-				}
+                // Actual removal.
+                for (IProperty p : toRemove) {
+                    node.getProperties().remove(p);
+                }
 
-				// Test if file is set
-				if (!filePropertySet) {
-					IProperty fileProperty = node.getProperties().insert();
-					fileProperty.setKey(INodeProperties.FILE());
-					fileProperty.setValue(filePropertyValue);
-				}
+                // Test if file is set
+                if (!filePropertySet) {
+                    IProperty fileProperty = node.getProperties().insert();
+                    fileProperty.setKey(INodeProperties.FILE());
+                    fileProperty.setValue(filePropertyValue);
+                }
 
-				// Set Path absolute or relative. Depend if URI or Data was used
-				// to create inputFile
-				if (!absolutePathSet) {
-					IProperty absoluteProperty = node.getProperties().insert();
-					absoluteProperty.setKey(INodeProperties.ABSOLUTE_PATH());
-					absoluteProperty.setValue(String.valueOf(inputFile.isAbsolute()));
-				}
+                // Set Path absolute or relative. Depend if URI or Data was used
+                // to create inputFile
+                if (!absolutePathSet) {
+                    IProperty absoluteProperty = node.getProperties().insert();
+                    absoluteProperty.setKey(INodeProperties.ABSOLUTE_PATH());
+                    absoluteProperty.setValue(String.valueOf(inputFile.isAbsolute()));
+                }
 
-				log.debug("Set Loader[" + node.getId().getContent() + "] FILE to " + filePropertyValue);
+                log.debug("Set Loader[" + node.getId().getContent() + "] FILE to " + filePropertyValue);
 
-			} else if (node.getType().getContent().equals(NodeType.SAVER)) {
-				// This is not very handsome. Store properties to remove and
-				// then remove them.
-				List<IProperty> toRemove = new ArrayList<IProperty>();
-				for (IProperty p : node.getProperties()) {
-					String key = p.getKey().getContent();
-					if (key.equals(INodeProperties.FILE()) || key.equals(INodeProperties.URL())) {
-						toRemove.add(p);
-					}
-				}
-				// Actual removal.
-				for (IProperty p : toRemove) {
-					node.getProperties().remove(p);
-					log.debug("Removed property " + p.getKey().getContent() + " from " + node.getId().getContent());
-				}
+            } else if (node.getType().getContent().equals(NodeType.SAVER)) {
+                // This is not very handsome. Store properties to remove and
+                // then remove them.
+                List<IProperty> toRemove = new ArrayList<IProperty>();
+                for (IProperty p : node.getProperties()) {
+                    String key = p.getKey().getContent();
+                    if (key.equals(INodeProperties.FILE()) || key.equals(INodeProperties.URL())) {
+                        toRemove.add(p);
+                    }
+                }
+                // Actual removal.
+                for (IProperty p : toRemove) {
+                    node.getProperties().remove(p);
+                    log.debug("Removed property " + p.getKey().getContent() + " from " + node.getId().getContent());
+                }
 
-			} else {
-				// Change serialize/deserialize property
-				for (IProperty p : node.getProperties()) {
-					String key = p.getKey().getContent();
-					if (key.equals(INodeProperties.SERIALIZE()) || key.equals(INodeProperties.DESERIALIZE())) {
-						String serializePath = p.getValue().getContent();
-						Path serializeFile = Paths.get(serializePath).getFileName();
-						Path resolvedFile = Paths.get(Data.TRAIN).resolve(serializeFile);
-						p.setValue(resolvedFile.toString());
-						log.debug("Set Processor[" + node.getId().getContent() + "] (DE)SERIALIZE to " + resolvedFile + " ["
-								+ p.getValue().getContent() + "]");
-					}
-				}
-			}
-		}
-		return dpu;
-	}
+            } else {
+                // Change serialize/deserialize property
+                for (IProperty p : node.getProperties()) {
+                    String key = p.getKey().getContent();
+                    if (key.equals(INodeProperties.SERIALIZE()) || key.equals(INodeProperties.DESERIALIZE())) {
+                        String serializePath = p.getValue().getContent();
+                        Path serializeFile = Paths.get(serializePath).getFileName();
+                        Path resolvedFile = Paths.get(Data.TRAIN).resolve(serializeFile);
+                        p.setValue(resolvedFile.toString());
+                        log.debug("Set Processor[" + node.getId().getContent() + "] (DE)SERIALIZE to " + resolvedFile + " ["
+                                + p.getValue().getContent() + "]");
+                    }
+                }
+            }
+        }
+        return dpu;
+    }
 
-	private Map<String, OutputStream> createOutputMap(OutputStream outputStream) throws IOException {
-		HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
-		// Data.RESULT -> document this somewhere, very important!
-		outputMap.put(Data.RESULT, outputStream);
-		return outputMap;
-	}
+    private Map<String, OutputStream> createOutputMap(OutputStream outputStream) throws IOException {
+        HashMap<String, OutputStream> outputMap = new HashMap<String, OutputStream>();
+        // Data.RESULT -> document this somewhere, very important!
+        outputMap.put(Data.RESULT, outputStream);
+        return outputMap;
+    }
 
-	/*
-	 * private Data createData(Patient patient, Data data) throws IOException {
-	 * return patientService.store(patient, data.getSensor(), Data.RESULT,
-	 * data.getFrom(), data.getTo()); }
-	 */
+    private Data createData(Patient patient, Data data) throws IOException {
+        return patientService.store(patient, data);
+    }
 
-	private Data createData(Patient patient, ISensor sensor) throws IOException {
-		return patientService.store(patient, sensor, Data.RESULT);
-	}
+    private Data createData(Patient patient, ISensor sensor) throws IOException {
+        return patientService.store(patient, sensor, Data.RESULT);
+    }
 
-	protected void activate(ComponentContext context) {
-		log.debug("TherapyResultSerivce activated");
-	}
+    protected void activate(ComponentContext context) {
+        log.debug("TherapyResultSerivce activated");
+    }
 
-	protected void bindPatientService(IPatientService patientService) {
-		this.patientService = patientService;
-	}
+    protected void bindPatientService(IPatientService patientService) {
+        this.patientService = patientService;
+    }
 
-	protected void unbindPatientService(IPatientService patientService) {
-		this.patientService = null;
-	}
+    protected void unbindPatientService(IPatientService patientService) {
+        this.patientService = null;
+    }
 
-	protected void bindEvaluateService(IEvaluateService evaluateService) {
-		this.evaluateService = evaluateService;
-	}
+    protected void bindEvaluateService(IEvaluateService evaluateService) {
+        this.evaluateService = evaluateService;
+    }
 
-	protected void unbindEvaluateService(IEvaluateService evaluateService) {
-		this.evaluateService = null;
-	}
+    protected void unbindEvaluateService(IEvaluateService evaluateService) {
+        this.evaluateService = null;
+    }
 
-	protected void bindEntityManagerService(IEntityManagerService entityManagerService) {
-		this.entityManagerService = entityManagerService;
-	}
+    protected void bindEntityManagerService(IEntityManagerService entityManagerService) {
+        this.entityManagerService = entityManagerService;
+    }
 
-	protected void unbindEntityManagerService(IEntityManagerService entityManagerService) {
-		this.entityManagerService = null;
-	}
+    protected void unbindEntityManagerService(IEntityManagerService entityManagerService) {
+        this.entityManagerService = null;
+    }
 
-	protected void bindUiFactories(UIFactory<Composite> uiFactory) {
-		uiFactories.add(uiFactory);
-	}
+    protected void bindUiFactories(UIFactory<Composite> uiFactory) {
+        uiFactories.add(uiFactory);
+    }
 
-	protected void unbindUiFactories(UIFactory<Composite> uiFactory) {
-		uiFactories.remove(uiFactory);
-	}
+    protected void unbindUiFactories(UIFactory<Composite> uiFactory) {
+        uiFactories.remove(uiFactory);
+    }
 }

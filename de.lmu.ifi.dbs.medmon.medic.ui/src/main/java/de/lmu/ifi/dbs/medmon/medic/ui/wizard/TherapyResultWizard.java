@@ -9,7 +9,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.WorkbenchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,37 +92,35 @@ public class TherapyResultWizard extends Wizard {
 
         int options = patientAndTypePage.getOption();
         Data data = null;
+        try {
+            if ((options & SOURCE_SENSOR) != 0) {
+                if ((options & SOURCE_FILE) != 0 || sensorAndDirectoryPage.isFileSectionEnabled()) {
+                    String file = sensorAndDirectoryPage.getSelectedFile();
+                    data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW, file);
+                } else {
+                    data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW);
+                }
 
-        if (((options & SOURCE_SENSOR) | (options & SOURCE_FILE)) != 0) {
-
-            try {
-                data = Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW);
-            } catch (IOException e) {
-                MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
-                e.printStackTrace();
-                return false;
             }
 
-            try {
-                IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
-                ITherapyResultService resultService = Activator.getTherapyResultService();
-                TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
-                Activator.getGlobalSelectionService().setSelection(TherapyResult.class, results);
-                Activator.getGlobalSelectionService().updateSelection(Therapy.class);
-                Activator.getGlobalSelectionService().updateSelection(Patient.class);
-                log.debug("Therapy Results created " + results);
-            } catch (Exception e) {
-                e.printStackTrace();
-                MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
-                return false;
-            }
+            IDataProcessingUnit dpu = selectDPUPage.getDataProcessingUnit();
+            ITherapyResultService resultService = Activator.getTherapyResultService();
+            TherapyResult results = resultService.createTherapyResult(dpu, selectedPatient, preselectedTherapy, data);
+            Activator.getGlobalSelectionService().setSelection(TherapyResult.class, results);
+            Activator.getGlobalSelectionService().updateSelection(Therapy.class);
+            Activator.getGlobalSelectionService().updateSelection(Patient.class);
+            log.debug("Therapy Results created " + results);
 
-            try {
-                PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-            } catch (WorkbenchException e) {
-                e.printStackTrace();
-            }
+            PlatformUI.getWorkbench().showPerspective("de.lmu.ifi.dbs.medmon.medic.ui.default",
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+        } catch (IOException e) {
+            MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            MessageDialog.openError(getShell(), "Fehler beim Ausfuehren des Klassifikationsprozesses", e.getMessage());
+            e.printStackTrace();
+            return false;
         }
 
         return true;

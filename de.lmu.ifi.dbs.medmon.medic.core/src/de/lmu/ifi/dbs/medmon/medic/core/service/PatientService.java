@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +56,8 @@ public class PatientService implements IPatientService {
 
         if (type.equals(Data.RESULT) || type.equals(Data.TRAIN)) {
             // Copy converted
-            try (InputStream in = Files.newInputStream(Paths.get(file)); OutputStream out = Files.newOutputStream(data.toPath())) {
+            try (InputStream in = Files.newInputStream(Paths.get(file), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                    OutputStream out = Files.newOutputStream(data.toPath())) {
                 interval = driver.getInterval(in);
                 Instances instances = driver.getData(in);
                 ArffSaver saver = new ArffSaver();
@@ -65,12 +68,12 @@ public class PatientService implements IPatientService {
 
         } else {
             // Copy raw
-            try (InputStream in = sensor.getDataInputStream()) {
-                Files.copy(in, data.toPath());
+            try (InputStream in = Files.newInputStream(Paths.get(file))) {
+                Files.copy(in, data.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         }
 
-        return null;
+        return data;
     }
 
     @Override
@@ -100,6 +103,25 @@ public class PatientService implements IPatientService {
 
         return data;
 
+    }
+
+    @Override
+    public Data store(Patient patient, Data data) throws IOException {
+        Sensor sensorEntity = data.getSensor();
+        if (sensorEntity == null)
+            throw new IllegalStateException("No sensor attached  to data object");
+        ISensor sensor = sensorManager.getSensor(sensorEntity.getId());
+        if (sensor == null)
+            throw new IllegalStateException("No Sensor service found with id " + sensorEntity.getId());
+
+        ISensorDriver driver = sensor.getDriver();
+        if (driver == null)
+            throw new IllegalStateException("No Driver attached to sensor " + sensor.getName());
+
+        try (InputStream in = Files.newInputStream(data.toPath())) {
+            Interval interval = driver.getInterval(in);
+            return createDataEntity(patient, sensor, Data.RESULT, interval);
+        }
     }
 
     private Data createDataEntity(Patient patient, ISensor sensor, String type, Interval interval) {
@@ -135,7 +157,7 @@ public class PatientService implements IPatientService {
         for (ISensor sensor : sensors) {
             Sensor entity = em.find(Sensor.class, sensor.getId());
             if (entity == null) {
-                Sensor newEntity = new Sensor(sensor.getId(), sensor.getName(), sensor.getSerial());
+                Sensor newEntity = new Sensor(sensor.getId(), sensor.getName(), sensor.getSerial(), sensor.getFilePrefix());
                 em.persist(newEntity);
             }
         }

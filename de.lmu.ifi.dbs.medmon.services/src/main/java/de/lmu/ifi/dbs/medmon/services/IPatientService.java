@@ -57,4 +57,14 @@ public interface IPatientService {
      */
     public Data store(Patient patient, ISensor sensor, String type) throws IOException;
 
+    /**
+     * Create a Data.RESULT Data entity
+     * 
+     * @param patient
+     * @param data
+     * @return
+     * @throws IOException
+     */
+    public Data store(Patient patient, Data data) throws IOException;
+
 }

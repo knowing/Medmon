@@ -33,10 +33,11 @@ public class Sensor {
     protected Sensor() {
     }
 
-    public Sensor(String id, String name, String serial) {
+    public Sensor(String id, String name, String serial, String filePrefix) {
         this.id = id;
         this.name = name;
         this.serial = serial;
+        this.filePrefix = filePrefix;
     }
 
     public String getId() {

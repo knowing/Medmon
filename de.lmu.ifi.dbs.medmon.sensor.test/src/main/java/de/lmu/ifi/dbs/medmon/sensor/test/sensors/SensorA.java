@@ -40,6 +40,11 @@ public class SensorA extends AbstractSensor {
     }
 
     @Override
+    public String getFilePrefix() {
+        return "aaa";
+    }
+
+    @Override
     public Instances getData() throws IOException {
         if (getDriver() == null)
             throw new IOException("No driver found!");

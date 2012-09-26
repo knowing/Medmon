@@ -83,6 +83,11 @@ public class SensorManagerService implements ISensorManager {
     }
 
     @Override
+    public ISensor getSensor(String id) {
+        return sensors.get(id);
+    }
+
+    @Override
     public List<ISensor> getSensors() {
         return Collections.unmodifiableList(new ArrayList<>(sensors.values()));
     }

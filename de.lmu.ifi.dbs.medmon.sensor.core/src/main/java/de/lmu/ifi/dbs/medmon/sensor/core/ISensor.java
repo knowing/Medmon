@@ -55,6 +55,12 @@ public interface ISensor extends Device {
     public Category getCategory();
 
     /**
+     * 
+     * @return
+     */
+    public String getFilePrefix();
+
+    /**
      * @param driver
      */
     public void setDriver(ISensorDriver driver);

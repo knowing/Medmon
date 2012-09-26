@@ -21,6 +21,14 @@ public interface ISensorManager {
     public static final String SENSOR_AVAILABLE = "medmon.sensor.core.sensor.available";
 
     /**
+     * Get the registered ISensor service attached to no source
+     * 
+     * @param id
+     * @return nonInstance Sensor
+     */
+    public ISensor getSensor(String id);
+
+    /**
      * 
      * @return all available sensor services (no instances) with and without driver
      */

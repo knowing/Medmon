@@ -101,4 +101,9 @@ public class AccelerationSensor extends AbstractSensor {
         return "3D Acceleration Senesor";
     }
 
+    @Override
+    public String getFilePrefix() {
+        return "sdr";
+    }
+
 }

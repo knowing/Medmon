@@ -115,7 +115,7 @@ public class Data {
     }
 
     private String generateFilename() {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss-SSS");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm");
         StringBuilder sb = new StringBuilder(32);
         sb.append(df.format(from)).append("_to_").append(df.format(to)).append(".");
         switch (type) {
