@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.6"?>
-
-<target name="medic.indigo" sequenceNumber="39">
+<?pde version="3.6"?><target name="medic.indigo" sequenceNumber="41">
 <locations>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.jfreechart.feature.feature.group" version="1.0.13"/>
@@ -25,11 +23,6 @@
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="gov.nist.math.jama.feature.feature.group" version="1.0.2"/>
 <repository location="http://repository.mukis.de/p2/jama/1.0.2/"/>
-</location>
-<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.nebula.widgets.datechooser.feature.feature.group" version="1.0.0.201209181746"/>
-<unit id="org.eclipse.nebula.widgets.formattedtext.feature.feature.group" version="1.0.0.201209181746"/>
-<repository location="http://download.eclipse.org/technology/nebula/incubation/snapshot"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.gemini.jpa.feature.feature.group" version="1.0.0.RELEASE"/>
@@ -62,13 +55,16 @@
 <repository location="http://download.eclipse.org/sapphire/0.5.2/repository"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.nebula.cwt.feature.feature.group" version="0.9.0.201209200934"/>
-<unit id="org.eclipse.nebula.widgets.calendarcombo.feature.feature.group" version="1.0.0.201209200934"/>
-<unit id="org.eclipse.nebula.widgets.cdatetime.feature.feature.group" version="0.14.0.201209200934"/>
-<unit id="org.eclipse.nebula.widgets.grid.feature.feature.group" version="1.0.0.201209200934"/>
-<unit id="org.eclipse.nebula.widgets.oscilloscope.feature.feature.group" version="1.0.1.201209200934"/>
-<unit id="org.eclipse.nebula.widgets.paperclips.feature.feature.group" version="2.0.0.201209200934"/>
-<unit id="org.eclipse.nebula.effects.stw.feature.feature.group" version="1.0.0.201209200934"/>
+<unit id="org.eclipse.nebula.widgets.datechooser.feature.feature.group" version="1.0.0.201209251017"/>
+<unit id="org.eclipse.nebula.widgets.formattedtext.feature.feature.group" version="1.0.0.201209251017"/>
+<unit id="org.eclipse.nebula.widgets.pagination.feature.feature.group" version="1.0.0.201209251017"/>
+<repository location="http://download.eclipse.org/technology/nebula/incubation/snapshot"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.nebula.cwt.feature.feature.group" version="0.9.0.201209251015"/>
+<unit id="org.eclipse.nebula.widgets.calendarcombo.feature.feature.group" version="1.0.0.201209251015"/>
+<unit id="org.eclipse.nebula.widgets.cdatetime.feature.feature.group" version="0.14.0.201209251015"/>
+<unit id="org.eclipse.nebula.widgets.oscilloscope.feature.feature.group" version="1.0.1.201209251015"/>
 <repository location="http://download.eclipse.org/technology/nebula/snapshot"/>
 </location>
 </locations>
