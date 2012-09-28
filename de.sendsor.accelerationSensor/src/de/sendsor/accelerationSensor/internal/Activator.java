@@ -19,7 +19,6 @@ import de.sendsor.accelerationSensor.SDRLoaderFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.MyNaiveBayesFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ReClassificationFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.classifier.ResultMergeProcessorFactory;
-import de.sendsor.accelerationSensor.algorithm.moennig.classifier.UncertainClassDumperFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.fv.AugmentedFVFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.lda.LDAFilterFactory;
 import de.sendsor.accelerationSensor.algorithm.moennig.preprocessing.SourceToClassConverterFactory;
@@ -76,7 +75,6 @@ public class Activator implements BundleActivator {
         util.registerProcessor(new SourceToClassConverterFactory());
         util.registerProcessor(new ResultMergeProcessorFactory());
         util.registerProcessor(new ReClassificationFactory());
-        util.registerProcessor(new UncertainClassDumperFactory());
         util.registerProcessor(new BarChartFilterFactory());
         util.registerProcessor(new AreaChartFilterFactory());
         util.registerProcessor(new NormalizeAndroidSensorDataFactory());
