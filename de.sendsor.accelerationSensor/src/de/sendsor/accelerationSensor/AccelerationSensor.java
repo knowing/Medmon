@@ -32,7 +32,7 @@ public class AccelerationSensor extends AbstractSensor {
         AccelerationSensor sensor = null;
         Path path = pathFromSource(source);
         if (!checkPath(path))
-            return null;
+            return sensor;
         sensor = new AccelerationSensor();
         sensor.sourceDirectory = (Path) source;
         sensor.instance = true;
@@ -73,7 +73,7 @@ public class AccelerationSensor extends AbstractSensor {
                 }
             }
         }
-        return path.getFileName().toString().endsWith(".sdr");
+        return path.getFileName() == null ? false : path.getFileName().toString().endsWith(".sdr");
     }
 
     @Override
