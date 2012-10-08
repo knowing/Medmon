@@ -71,11 +71,15 @@ public class SensorWorkbenchAdapter implements IAdapterFactory {
             ISensor sensor = (ISensor) element;
             switch (columnIndex) {
             case 0:
+                ImageDescriptor descriptor = null;
                 if (sensor.isInstance()) {
-                    ImageDescriptor descriptor = Activator.getImageDescriptor("/icons/sensor_24.png");
-                    return ResourceManager.getImage(descriptor);
+                    descriptor = Activator.getImageDescriptor("/icons/sensor_24.png");
+                } else if (sensor.getDriver() == null) {
+                    descriptor = Activator.getImageDescriptor("/icons/dialog_error_24.png");
+                } else {
+                    descriptor = Activator.getImageDescriptor("/icons/sensor_disabled_24.png");
                 }
-                ImageDescriptor descriptor = Activator.getImageDescriptor("/icons/sensor_disabled_24.png");
+
                 return ResourceManager.getImage(descriptor);
             default:
                 return null;

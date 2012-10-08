@@ -31,7 +31,8 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
 
     private static final String ERROR_NO_FILE_CHOOSEN = "Keine Sensordatei ausgew\u00e4hlt";
     private static final String ERROR_NO_SENSOR_SELECTED = "Kein Sensor ausgew\u00e4hlt";
-    private static final String ERROR_WRONG_FILE = "Der Sensor kann mit der ausgew\u00e4hlten Datei nicht umgehen.";
+    private static final String ERROR_WRONG_FILE = "Der Sensor kann mit der ausgew\u00e4hlten Datei nicht umgehen";
+    private static final String ERROR_NO_SENSOR_DRIVER = "Der Treiber konnte nicht geladen werden";
 
     private ISensor selectedSensor = null;
     private boolean isFileSectionEnabled = false;
@@ -125,10 +126,14 @@ public class ImportDataSensorAndDirectoryPage extends WizardPage implements IVal
         if (errors.isEmpty()) {
             try (InputStream in = Files.newInputStream(Paths.get(txtSelectedFile.getText()))) {
                 ISensorDriver driver = selectedSensor.getDriver();
-                Interval interval = driver.getInterval(in);
-                errors.remove(ERROR_WRONG_FILE);
-                DateFormat df = DateFormat.getDateTimeInstance();
-                setMessage(df.format(interval.getStart().toDate()) + " - " + df.format(interval.getEnd().toDate()));
+                if (driver != null) {
+                    Interval interval = driver.getInterval(in);
+                    errors.remove(ERROR_WRONG_FILE);
+                    DateFormat df = DateFormat.getDateTimeInstance();
+                    setMessage(df.format(interval.getStart().toDate()) + " - " + df.format(interval.getEnd().toDate()));
+                } else {
+                    errors.add(ERROR_NO_SENSOR_DRIVER);
+                }
             } catch (IOException e) {
                 errors.add(ERROR_WRONG_FILE);
             }
