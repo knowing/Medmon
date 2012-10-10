@@ -120,7 +120,7 @@ public class Data {
         sb.append(df.format(from)).append("_to_").append(df.format(to)).append(".");
         switch (type) {
         case RAW:
-            return sb.append(sensor.getId()).append(".").append(sensor.getFilePrefix()).toString();
+            return sb.append(removeSpecialChars(sensor.getId())).append(".").append(sensor.getFilePrefix()).toString();
         case TRAIN:
             return sb.append("arff").toString();
         case RESULT:
@@ -128,6 +128,10 @@ public class Data {
         default:
             return sb.append("unkown").toString();
         }
+    }
+    
+    private String removeSpecialChars(String str) {
+    	return str.replaceAll("[:,;^]", "_");
     }
 
     public Path toPath() {
