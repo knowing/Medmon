@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
-import de.lmu.ifi.dbs.medmon.services.IDBModelService;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
@@ -24,102 +23,101 @@ import de.lmu.ifi.dbs.medmon.services.IPatientService;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String														PLUGIN_ID	= "de.lmu.ifi.dbs.medmon.medic.core";	//$NON-NLS-1$
+    // The plug-in ID
+    public static final String PLUGIN_ID = "de.lmu.ifi.dbs.medmon.medic.core"; //$NON-NLS-1$
 
-	// The shared instance
-	private static Activator														plugin;
+    // The shared instance
+    private static Activator plugin;
 
-	private static final Logger														log			= LoggerFactory.getLogger(PLUGIN_ID);
+    private static final Logger log = LoggerFactory.getLogger(PLUGIN_ID);
 
-	private static ServiceTracker<IEntityManagerService, IEntityManagerService>		emServiceTracker;
-	private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>	emSelectionService;
-	private static ServiceTracker<IPatientService, IPatientService>					emPatientService;
-	private static ServiceTracker<IDBModelService, IDBModelService>					emDBModelService;
+    private static ServiceTracker<IEntityManagerService, IEntityManagerService> emServiceTracker;
+    private static ServiceTracker<IGlobalSelectionService, IGlobalSelectionService> emSelectionService;
+    private static ServiceTracker<IPatientService, IPatientService> emPatientService;
 
-	public static BundleContext getBundleContext() {
-		return Activator.plugin.getBundle().getBundleContext();
-	}
+    public static BundleContext getBundleContext() {
+        return Activator.plugin.getBundle().getBundleContext();
+    }
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
+    /**
+     * The constructor
+     */
+    public Activator() {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+     * )
+     */
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
 
-		emServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
-		emServiceTracker.open();
+        emServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
+        emServiceTracker.open();
 
-		emSelectionService = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class,
-				null);
-		emSelectionService.open();
+        emSelectionService = new ServiceTracker<IGlobalSelectionService, IGlobalSelectionService>(context, IGlobalSelectionService.class,
+                null);
+        emSelectionService.open();
 
-		emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
-		emPatientService.open();
+        emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
+        emPatientService.open();
 
-		createApplicationFolders();
-	}
+        createApplicationFolders();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
-	 */
-	public void stop(BundleContext context) throws Exception {
-		emServiceTracker.close();
-		emSelectionService.close();
-		emPatientService.close();
-		plugin = null;
-		super.stop(context);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+     * )
+     */
+    public void stop(BundleContext context) throws Exception {
+        emServiceTracker.close();
+        emSelectionService.close();
+        emPatientService.close();
+        plugin = null;
+        super.stop(context);
+    }
 
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+    /**
+     * Returns the shared instance
+     * 
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
 
-	public static IEntityManagerService getEntityManagerService() {
-		return emServiceTracker.getService();
-	}
+    public static IEntityManagerService getEntityManagerService() {
+        return emServiceTracker.getService();
+    }
 
-	public static IGlobalSelectionService getSelectionService() {
-		return emSelectionService.getService();
-	}
+    public static IGlobalSelectionService getSelectionService() {
+        return emSelectionService.getService();
+    }
 
-	public static IPatientService getPatientService() {
-		return emPatientService.getService();
-	}
+    public static IPatientService getPatientService() {
+        return emPatientService.getService();
+    }
 
-	private void createApplicationFolders() {
-		IPreferenceStore store = plugin.getPreferenceStore();
+    private void createApplicationFolders() {
+        IPreferenceStore store = plugin.getPreferenceStore();
 
-		Path root = Paths.get(store.getString(IMedicPreferences.MEDMON_NODE));
-		try {
-			Files.createDirectory(root);
-			Files.createDirectories(root.resolve(store.getString(IMedicPreferences.MEDMON_DPU)));
-		} catch (FileAlreadyExistsException e) {
-			log.debug("Medmon folder already exists");
-		} catch (IOException e) {
-			log.error("IOException in Activator", e);
-		}
+        Path root = Paths.get(store.getString(IMedicPreferences.MEDMON_NODE));
+        try {
+            Files.createDirectory(root);
+            Files.createDirectories(root.resolve(store.getString(IMedicPreferences.MEDMON_DPU)));
+        } catch (FileAlreadyExistsException e) {
+            log.debug("Medmon folder already exists");
+        } catch (IOException e) {
+            log.error("IOException in Activator", e);
+        }
 
-	}
+    }
 
 }

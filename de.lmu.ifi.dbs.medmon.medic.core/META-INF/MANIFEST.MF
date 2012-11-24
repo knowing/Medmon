@@ -6,9 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.core.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="1.0.0";visibility:=reexport,
- de.lmu.ifi.dbs.knowing.core;bundle-version="0.1.5";visibility:=reexport,
- de.lmu.ifi.dbs.medmon.services;bundle-version="1.0.0";visibility:=reexport,
+ de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
+ de.lmu.ifi.dbs.knowing.core;bundle-version="[0.1.5,1.0.0)";visibility:=reexport,
+ de.lmu.ifi.dbs.medmon.services;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
  org.eclipse.sapphire.modeling;bundle-version="[0.5.0,0.6.0)",
  org.eclipse.sapphire.modeling.xml;bundle-version="[0.5.0,0.6.0)"
 Service-Component: OSGI-INF/entityManagerService.xml, OSGI-INF/globalSelectionService.xml, OSGI-INF/patientService.xml, OSGI-INF/therapyResultService.xml
