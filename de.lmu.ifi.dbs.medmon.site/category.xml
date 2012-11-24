@@ -6,6 +6,15 @@
    <feature url="features/de.sendsor.accelerationSensor.feature_1.0.0.qualifier.jar" id="de.sendsor.accelerationSensor.feature" version="1.0.0.qualifier">
       <category name="de.lmu.ifi.dbs.medmon"/>
    </feature>
-   <category-def name="de.lmu.ifi.dbs.medmon.extensions" label="Erweiterungen"/>
+   <feature url="features/de.lmu.ifi.dbs.medmon.medic.core.feature_1.0.0.qualifier.jar" id="de.lmu.ifi.dbs.medmon.medic.core.feature" version="1.0.0.qualifier">
+      <category name="de.lmu.ifi.dbs.medmon"/>
+   </feature>
+   <feature url="features/de.lmu.ifi.dbs.medmon.medic.feature_1.0.0.qualifier.jar" id="de.lmu.ifi.dbs.medmon.medic.feature" version="1.0.0.qualifier">
+      <category name="de.lmu.ifi.dbs.medmon"/>
+   </feature>
+   <feature url="features/de.lmu.ifi.dbs.medmon.medic.reporting.feature_1.0.0.qualifier.jar" id="de.lmu.ifi.dbs.medmon.medic.reporting.feature" version="1.0.0.qualifier">
+      <category name="de.lmu.ifi.dbs.medmon"/>
+   </feature>
+   <category-def name="de.lmu.ifi.dbs.medmon.extensions" label="Extensions"/>
    <category-def name="de.lmu.ifi.dbs.medmon" label="Medmon"/>
 </site>
