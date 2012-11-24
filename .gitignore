@@ -21,7 +21,8 @@ target/
 # Tycho
 workspace/
 
-
+# logs
+*.log
 
 #except this file
 !.gitignore

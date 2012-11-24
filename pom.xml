@@ -51,6 +51,7 @@
 		<module>de.sendsor.accelerationSensor.feature</module>
 
 		<module>de.lmu.ifi.dbs.medmon.site</module>
+        <!-- <module>de.lmu.ifi.dbs.medmon.medic.target</module> -->
 	</modules>
 
 	<build>
@@ -209,7 +210,17 @@
 		<repository>
 			<id>eclipse-gemini-dbaccess</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/gemini/dbaccess/updates/1.0</url>
+			<url>http://download.eclipse.org/gemini/dbaccess/updates/1.1-M3</url>
+		</repository>
+		<repository>
+			<id>eclipse-gemini-jpa</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/gemini/updates/jpa/1.1.0</url>
+		</repository>
+		<repository>
+			<id>eclipse-eclipselink</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/rt/eclipselink/updates</url>
 		</repository>
 		<repository>
 			<id>eclipse-nebula</id>
