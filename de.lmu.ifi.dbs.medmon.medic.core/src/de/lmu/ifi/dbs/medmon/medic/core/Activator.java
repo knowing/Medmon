@@ -6,8 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -21,13 +22,13 @@ import de.lmu.ifi.dbs.medmon.services.IPatientService;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator implements BundleActivator {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "de.lmu.ifi.dbs.medmon.medic.core"; //$NON-NLS-1$
 
     // The shared instance
-    private static Activator plugin;
+    private static BundleContext context;
 
     private static final Logger log = LoggerFactory.getLogger(PLUGIN_ID);
 
@@ -36,7 +37,7 @@ public class Activator extends AbstractUIPlugin {
     private static ServiceTracker<IPatientService, IPatientService> emPatientService;
 
     public static BundleContext getBundleContext() {
-        return Activator.plugin.getBundle().getBundleContext();
+        return context;
     }
 
     /**
@@ -53,8 +54,7 @@ public class Activator extends AbstractUIPlugin {
      * )
      */
     public void start(BundleContext context) throws Exception {
-        super.start(context);
-        plugin = this;
+        Activator.context = context;
 
         emServiceTracker = new ServiceTracker<IEntityManagerService, IEntityManagerService>(context, IEntityManagerService.class, null);
         emServiceTracker.open();
@@ -66,7 +66,7 @@ public class Activator extends AbstractUIPlugin {
         emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
         emPatientService.open();
 
-        createApplicationFolders();
+        // createApplicationFolders();
     }
 
     /*
@@ -80,17 +80,6 @@ public class Activator extends AbstractUIPlugin {
         emServiceTracker.close();
         emSelectionService.close();
         emPatientService.close();
-        plugin = null;
-        super.stop(context);
-    }
-
-    /**
-     * Returns the shared instance
-     * 
-     * @return the shared instance
-     */
-    public static Activator getDefault() {
-        return plugin;
     }
 
     public static IEntityManagerService getEntityManagerService() {
@@ -106,12 +95,12 @@ public class Activator extends AbstractUIPlugin {
     }
 
     private void createApplicationFolders() {
-        IPreferenceStore store = plugin.getPreferenceStore();
+        IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode(IMedicPreferences.MEDMON_NODE);
+        Path root = Paths.get(node.get(IMedicPreferences.MEDMON_DIR, System.getProperty("user.home") + "/.medmon"));
 
-        Path root = Paths.get(store.getString(IMedicPreferences.MEDMON_NODE));
         try {
             Files.createDirectory(root);
-            Files.createDirectories(root.resolve(store.getString(IMedicPreferences.MEDMON_DPU)));
+            Files.createDirectories(root.resolve(node.get(IMedicPreferences.MEDMON_DPU, "dpu")));
         } catch (FileAlreadyExistsException e) {
             log.debug("Medmon folder already exists");
         } catch (IOException e) {
@@ -119,5 +108,4 @@ public class Activator extends AbstractUIPlugin {
         }
 
     }
-
 }

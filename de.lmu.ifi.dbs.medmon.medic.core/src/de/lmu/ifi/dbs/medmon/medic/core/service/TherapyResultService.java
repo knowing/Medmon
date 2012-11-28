@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.medmon.medic.core.service;
 
 import static scala.collection.JavaConversions.mapAsScalaMap;
 
+import java.awt.Composite;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +18,6 @@ import java.util.Properties;
 
 import javax.persistence.EntityManager;
 
-import org.eclipse.swt.widgets.Composite;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class TherapyResultService implements ITherapyResultService {
     private IEntityManagerService entityManagerService;
 
     /** 0..n relation */
-    private List<UIFactory<Composite>> uiFactories = new ArrayList<UIFactory<Composite>>();
+    private List<UIFactory<?>> uiFactories = new ArrayList<UIFactory<?>>();
 
     // private List<IModelStore> modelStorie = new ArrayList<IModelStore>();
 

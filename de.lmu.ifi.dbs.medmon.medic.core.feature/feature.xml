@@ -48,41 +48,22 @@ limitations under the License.
          id="de.lmu.ifi.dbs.medmon.sensor.feature"
          version="0.0.0"/>
 
-   <includes
-         id="org.eclipse.sapphire"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.sapphire.java"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.sapphire.modeling.xml"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.sapphire.osgi"
-         version="0.0.0"/>
-
-   <includes
-         id="org.joda.time.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.gemini.dbaccess.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.joda.convert.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="ch.qos.logback.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.slf4j.feature"
-         version="0.0.0"/>
+   <requires>
+      <import feature="org.eclipse.sapphire" version="0.5.2.201207231656" match="greaterOrEqual"/>
+      <import feature="org.eclipse.sapphire.java" version="0.5.2.201207231656" match="greaterOrEqual"/>
+      <import feature="org.eclipse.sapphire.modeling.xml" version="0.5.2.201207231656" match="greaterOrEqual"/>
+      <import feature="org.eclipse.sapphire.osgi" version="0.5.2.201207231656" match="greaterOrEqual"/>
+      <import feature="ch.qos.logback.feature" version="1.0.7"/>
+      <import feature="org.slf4j.feature" version="1.6.6" match="greaterOrEqual"/>
+      <import feature="org.eclipse.gemini.dbaccess.feature" version="1.0.0.RELEASE" match="greaterOrEqual"/>
+      <import feature="org.eclipse.persistence.jpa" version="2.4.0.v20120608-r11652" match="greaterOrEqual"/>
+      <import feature="org.eclipse.gemini.jpa.feature" version="1.0.0.RELEASE" match="greaterOrEqual"/>
+      <import feature="org.joda.convert.feature" version="1.2.0" match="greaterOrEqual"/>
+      <import feature="org.joda.time.feature" version="2.1.0" match="greaterOrEqual"/>
+      <import feature="gov.nist.math.jama.feature" version="1.0.2"/>
+      <import feature="org.eclipse.sapphire.platform" version="0.5.2.201207231656" match="greaterOrEqual"/>
+      <import feature="org.eclipse.equinox.core.feature" version="1.0.1.R37x_v20110907-7K7VFB_ETaXFZ3mP_8CeJQ02722"/>
+   </requires>
 
    <plugin
          id="de.lmu.ifi.dbs.medmon.derby"
@@ -99,56 +80,7 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="javax.persistence"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.apache.derby"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.gemini.dbaccess.derby"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.gemini.jpa"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.antlr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.asm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.jpa"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -170,27 +102,6 @@ limitations under the License.
 
    <plugin
          id="org.eclipse.core.filesystem"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="gov.nist.math.jama"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.ds"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.util"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -219,34 +130,6 @@ limitations under the License.
 
    <plugin
          id="de.lmu.ifi.dbs.knowing.weka"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.platform"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.sapphire.workspace"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.jpa.jpql"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.device"
          download-size="0"
          install-size="0"
          version="0.0.0"

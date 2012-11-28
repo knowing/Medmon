@@ -4,8 +4,7 @@ Bundle-Name: Medmon Medic Core
 Bundle-SymbolicName: de.lmu.ifi.dbs.medmon.medic.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.lmu.ifi.dbs.medmon.medic.core.Activator
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  de.lmu.ifi.dbs.medmon.sensor.core;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
  de.lmu.ifi.dbs.knowing.core;bundle-version="[0.1.5,1.0.0)";visibility:=reexport,
  de.lmu.ifi.dbs.medmon.services;bundle-version="[1.0.0,2.0.0)";visibility:=reexport,
