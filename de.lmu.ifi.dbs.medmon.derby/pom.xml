@@ -48,6 +48,29 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.1.0</version>
+                <executions>
+                    <execution>
+                        <id>process-jpa-metamodel</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources/metamodel</outputDirectory>
+                            <compilerArguments>-Aeclipselink.persistencexml=${project.basedir}/src/main/resources/META-INF/persistence.xml
+                            </compilerArguments>
+                            <processors>
+                                <processor>org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor</processor>
+                            </processors>
+                        </configuration>
+                    </execution>
+                </executions>
+        </plugin>
         </plugins>
     </build>
 </project>

@@ -10,6 +10,7 @@
 		<tycho.version>0.16.0</tycho.version>
 		<scala.version>2.9.2</scala.version>
 		<wagon.version>1.0-beta-6</wagon.version>
+        <eclipselink.version>2.4.0</eclipselink.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<encoding>UTF-8</encoding>
@@ -27,6 +28,12 @@
 			<version>1.8</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.modelgen</artifactId>
+            <version>${eclipselink.version}</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 	<modules>
 		<module>de.lmu.ifi.dbs.medmon.base.ui</module>
@@ -118,23 +125,16 @@
 						</dependency>
 					</dependencies>
 				</configuration>
-				<!--
-				<executions>
-					<execution>
-						<id>medmon-tests</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-				-->
 			</plugin>
 		</plugins>
 	</build>
 
 	<repositories>
 		<!-- Eclipse repositories -->
+        <repository>
+            <id>EclipseLink</id>
+            <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
+        </repository>
 		<repository>
 			<id>eclipse-indigo</id>
 			<layout>p2</layout>
