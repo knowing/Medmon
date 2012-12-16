@@ -40,19 +40,13 @@ public class Activator implements BundleActivator {
         return context;
     }
 
-    /**
-     * The constructor
-     */
-    public Activator() {
-    }
-
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
      * )
      */
+    @Override
     public void start(BundleContext context) throws Exception {
         Activator.context = context;
 
@@ -66,16 +60,16 @@ public class Activator implements BundleActivator {
         emPatientService = new ServiceTracker<IPatientService, IPatientService>(context, IPatientService.class, null);
         emPatientService.open();
 
-        // createApplicationFolders();
+        createApplicationFolders();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
      * )
      */
+    @Override
     public void stop(BundleContext context) throws Exception {
         emServiceTracker.close();
         emSelectionService.close();

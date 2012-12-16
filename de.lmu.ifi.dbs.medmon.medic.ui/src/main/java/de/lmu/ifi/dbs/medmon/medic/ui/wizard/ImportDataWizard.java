@@ -44,7 +44,7 @@ public class ImportDataWizard extends Wizard {
             if (sensorAndDirectoryPage.isFileSectionEnabled()) {
                 String selectedFile = sensorAndDirectoryPage.getSelectedFile();
                 try {
-                    Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW, selectedFile);
+                    patientService.store(selectedPatient, selectedSensor, Data.RAW, selectedFile);
                 } catch (IOException e) {
                     MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
                     e.printStackTrace();
@@ -53,7 +53,7 @@ public class ImportDataWizard extends Wizard {
                 // Convert to instances and store
             } else {
                 try {
-                    Activator.getPatientService().store(selectedPatient, selectedSensor, Data.RAW);
+                    patientService.store(selectedPatient, selectedSensor, Data.RAW);
                 } catch (IOException e) {
                     MessageDialog.openError(getShell(), "Daten konnten nicht importiert werden", e.getMessage());
                     e.printStackTrace();

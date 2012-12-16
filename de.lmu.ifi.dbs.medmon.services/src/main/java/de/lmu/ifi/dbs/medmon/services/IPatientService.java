@@ -9,8 +9,8 @@ import de.lmu.ifi.dbs.medmon.sensor.core.ISensor;
 /**
  * 
  * <p>
- * This service maps between database and filesystem. The database acts as a cache where addresses to the specific
- * {@link Data} object are stored.
+ * This service maps between database and filesystem. The database acts as a cache where addresses to the specific {@link Data} object are
+ * stored.
  * </p>
  * 
  * <p>
@@ -34,9 +34,9 @@ public interface IPatientService {
      * 
      * @param patient
      * @param sensor
-     * @param type
-     * @param file
-     * @return
+     * @param type - Data.RAW | Data.TRAIN | Data.RESULT
+     * @param file - filename on the sensor
+     * @return detached database entity
      * @throws IOException
      */
     public Data store(Patient patient, ISensor sensor, String type, String file) throws IOException;
@@ -47,12 +47,9 @@ public interface IPatientService {
      * </p>
      * NOTE: this should return the created {@link Data} entity
      * 
-     * @param patient
-     *            - the patient to which the data belongs
-     * @param sensorService
-     *            - a sensor-service
-     * @param type
-     *            - the type of the data to be stored
+     * @param patient - the patient to which the data belongs
+     * @param sensorService - a sensor-service
+     * @param type - the type of the data to be stored
      * @throws IOException
      */
     public Data store(Patient patient, ISensor sensor, String type) throws IOException;
