@@ -6,15 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.lmu.ifi.dbs.medmon.medic.core.preferences.IMedicPreferences;
 import de.lmu.ifi.dbs.medmon.services.IEntityManagerService;
 import de.lmu.ifi.dbs.medmon.services.IGlobalSelectionService;
 import de.lmu.ifi.dbs.medmon.services.IPatientService;
@@ -89,12 +86,10 @@ public class Activator implements BundleActivator {
     }
 
     private void createApplicationFolders() {
-        IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode(IMedicPreferences.MEDMON_NODE);
-        Path root = Paths.get(node.get(IMedicPreferences.MEDMON_DIR, System.getProperty("user.home") + "/.medmon"));
+        Path root = Paths.get(System.getProperty("user.home"), ".medmon");
 
         try {
             Files.createDirectory(root);
-            Files.createDirectories(root.resolve(node.get(IMedicPreferences.MEDMON_DPU, "dpu")));
         } catch (FileAlreadyExistsException e) {
             log.debug("Medmon folder already exists");
         } catch (IOException e) {

@@ -16,39 +16,41 @@ import de.lmu.ifi.dbs.medmon.medic.ui.Activator;
  */
 public class ApplicationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	/**
-	 * Create the preference page.
-	 */
-	public ApplicationPreferencePage() {
-		super(GRID);
-	}
+    /**
+     * Create the preference page.
+     */
+    public ApplicationPreferencePage() {
+        super(GRID);
+    }
 
-	/**
-	 * Create contents of the preference page.
-	 */
-	@Override
-	protected void createFieldEditors() {
-		addField(new DirectoryFieldEditor(IMedicPreferences.MEDMON_DIR, "Programmordner", getFieldEditorParent()));
-	}
-	
-	@Override
-	protected void checkState() {
-		super.checkState();
-		String defaultValue = getPreferenceStore().getDefaultString(IMedicPreferences.MEDMON_DIR);
-		String value = getPreferenceStore().getString(IMedicPreferences.MEDMON_DIR);
-		if(!defaultValue.equals(value)) {
-			setErrorMessage("Sie duerfen das Programmverzeichnis nicht aendern");
-			setValid(false);
-		}
-			
-	}
-	
-	/**
-	 * Initialize the preference page.
-	 */
-	public void init(IWorkbench workbench) {
-		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("Programmeinstellungen");
-	}
+    /**
+     * Create contents of the preference page.
+     */
+    @Override
+    protected void createFieldEditors() {
+        // FIXME this should not be called here
+        addField(new DirectoryFieldEditor(IMedicPreferences.MEDMON_DIR, "Programmordner", getFieldEditorParent()));
+    }
+
+    @Override
+    protected void checkState() {
+        super.checkState();
+        String defaultValue = getPreferenceStore().getDefaultString(IMedicPreferences.MEDMON_DIR);
+        String value = getPreferenceStore().getString(IMedicPreferences.MEDMON_DIR);
+        if (!defaultValue.equals(value)) {
+            setErrorMessage("Sie duerfen das Programmverzeichnis nicht aendern");
+            setValid(false);
+        }
+
+    }
+
+    /**
+     * Initialize the preference page.
+     */
+    @Override
+    public void init(IWorkbench workbench) {
+        setPreferenceStore(Activator.getDefault().getPreferenceStore());
+        setDescription("Programmeinstellungen");
+    }
 
 }
