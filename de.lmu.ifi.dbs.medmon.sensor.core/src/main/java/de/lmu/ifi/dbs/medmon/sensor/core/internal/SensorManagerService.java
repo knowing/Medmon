@@ -118,6 +118,7 @@ public class SensorManagerService implements ISensorManager {
         try {
             ISensor sensorInstance = sensor.create(path);
             if (sensorInstance != null) {
+                sensorInstance.setDriver(sensor.getDriver());
                 ISensor oldSensor = sensorInstances.forcePut(path, sensorInstance);
                 if (oldSensor != null) {
                     removeSensorInstance(oldSensor);
