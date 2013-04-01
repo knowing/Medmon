@@ -8,6 +8,7 @@
 
 	<properties>
 		<tycho.version>0.16.0</tycho.version>
+        <tychoExtras.version>0.16.0</tychoExtras.version>
 		<scala.version>2.9.2</scala.version>
 		<wagon.version>1.0-beta-6</wagon.version>
         <eclipselink.version>2.4.0</eclipselink.version>
@@ -126,6 +127,47 @@
 					</dependencies>
 				</configuration>
 			</plugin>
+           <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-source-plugin</artifactId>
+                <version>${tycho.version}</version>
+                <executions>
+                    <execution>
+                        <id>plugin-source</id>
+                        <goals>
+                            <goal>plugin-source</goal>
+                        </goals>
+                    </execution>
+              </executions>
+            </plugin>
+            <plugin>
+	            <groupId>org.eclipse.tycho.extras</groupId>
+	            <artifactId>tycho-source-feature-plugin</artifactId>
+	            <version>${tychoExtras.version}</version>
+	            <executions>
+		            <execution>
+			            <id>source-feature</id>
+			            <phase>package</phase>
+			            <goals>
+				            <goal>source-feature</goal>
+			            </goals>
+		            </execution>
+	            </executions>
+            </plugin>
+            <plugin>
+	            <groupId>org.eclipse.tycho</groupId>
+	            <artifactId>tycho-p2-plugin</artifactId>
+	            <version>${tycho.version}</version>
+	            <executions>
+		            <execution>
+			            <id>attach-p2-metadata</id>
+			            <phase>package</phase>
+			            <goals>
+				            <goal>p2-metadata</goal>
+			            </goals>
+		            </execution>
+	            </executions>
+            </plugin>
 		</plugins>
 	</build>
 
